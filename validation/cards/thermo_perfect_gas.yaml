@@ -1,0 +1,52 @@
+id: thermo.perfect_gas
+name: Perfect-gas thermodynamics primitives
+category: thermodynamics
+status: research_required
+source:
+  id: source.thermo.nasa_glenn_cea.research_required
+  status: research_required
+  locator_notes: "Exact NASA Glenn/CEA page, equation, version, and property-definition provenance review pending."
+assumptions:
+  - perfect gas for density and speed-of-sound helpers
+  - calorically perfect gas where constant-gamma heat-capacity relations are used
+  - SI units for pressure, temperature, density, gas constants, molar mass, and heat capacities
+  - universal gas constant seed remains linked to a separate NIST/CODATA source-registry review
+  - no CEA wrapper, native library, or foreign runtime dependency is introduced
+  - positive absolute temperature for density and speed of sound
+  - heat capacities are positive and cp is greater than cv for gamma_from_cp_cv
+  - molar mass is positive and finite for specific gas constant conversion
+domain: "pressure >= 0; gas_constant > 0; temperature > 0; gamma > 1; cp > cv > 0; molar_mass_kg_per_mol > 0"
+inputs:
+  - pressure_pa
+  - gas_constant_j_per_kg_k
+  - temperature_k
+  - gamma
+  - cp_j_per_kg_k
+  - cv_j_per_kg_k
+  - molar_mass_kg_per_mol
+outputs:
+  - density_kg_m3
+  - speed_of_sound_m_s
+  - cp_j_per_kg_k
+  - cv_j_per_kg_k
+  - gamma
+  - specific_gas_constant_j_per_kg_k
+tests:
+  - sea-level dry-air density from p/(R*T) is near 1.225 kg/m^3
+  - zero pressure returns zero density
+  - cp is greater than cv for gamma > 1 and positive R
+  - gamma round-trips as cp/cv
+  - cp minus cv equals the specific gas constant
+  - standard dry-air speed of sound is near 340.294 m/s
+  - dry-air specific gas constant from molar mass is plausible
+  - invalid temperatures, gas constants, gamma values, heat capacities, and molar masses are rejected
+  - nonfinite computed outputs return numerical_failure
+failure_modes:
+  - negative or nonfinite pressure rejected
+  - nonpositive or nonfinite gas constant rejected
+  - nonpositive or nonfinite temperature rejected
+  - gamma less than or equal to 1 rejected
+  - cp less than or equal to cv rejected
+  - nonpositive molar mass rejected
+  - overflow or nonfinite derived values rejected as numerical_failure
+notes: "Implementation scaffold only; card and source remain research_required until exact source equations, page/table identifiers, example values, and tolerances are reviewed."

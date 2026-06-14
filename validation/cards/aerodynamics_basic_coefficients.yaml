@@ -1,0 +1,49 @@
+id: aero.basic_coefficients.phase_0_001
+name: Phase 0.001 basic aerodynamic force and coefficient helpers
+category: aerodynamics
+status: research_required
+source:
+  id: source.aerodynamics.basic_coefficients.research_required
+  status: research_required
+  locator_notes: "Exact source edition, equation IDs, sign conventions, reference-area conventions, example values, and tolerance targets remain pending."
+assumptions:
+  - scalar algebraic coefficient bookkeeping only
+  - dynamic pressure uses q = 0.5*rho*V^2 with speed magnitude supplied by the caller
+  - lift and drag force helpers use a caller-selected reference area and coefficient convention
+  - induced drag uses CDi = CL^2/(pi*AR*e) with positive aspect ratio and positive Oswald efficiency
+  - compressibility corrections, Reynolds-number effects, stall, trim, airfoil polars, lifting-line analysis, and stability derivatives are out of scope
+  - source traceability and reference numerical validation remain pending
+domain: "rho >= 0; velocity >= 0; q >= 0 and area >= 0 for force calculations; q > 0 and area > 0 for inverse coefficient calculations; aspect_ratio > 0; oswald_efficiency > 0; coefficients and forces finite where signed values are allowed"
+inputs:
+  - rho
+  - velocity
+  - q
+  - area
+  - lift
+  - drag
+  - cl
+  - cd
+  - aspect_ratio
+  - oswald_efficiency
+outputs:
+  - dynamic_pressure
+  - lift
+  - drag
+  - lift_coefficient
+  - drag_coefficient
+  - induced_drag_coefficient
+tests:
+  - dynamic pressure equals 0.5*rho*V^2 for a representative case
+  - zero density or zero velocity returns zero dynamic pressure
+  - lift and lift coefficient inverse round trip for representative scalar values
+  - drag and drag coefficient inverse round trip for representative scalar values
+  - induced drag is positive for nonzero CL and valid positive aspect ratio and Oswald efficiency
+  - invalid negative or nonpositive domain cases return checked AeroResult errors instead of unchecked arithmetic
+  - nonfinite derived values return numerical_failure
+failure_modes:
+  - negative density, velocity, dynamic pressure, or reference area returns a domain error where nonnegative values are required
+  - nonpositive q or area in inverse coefficient helpers returns a domain error
+  - nonpositive aspect ratio or Oswald efficiency returns a domain error
+  - nonfinite coefficients or forces are rejected where finite signed values are allowed
+  - overflow or nonfinite derived values report numerical_failure
+notes: "This card is a validation-planning scaffold only. It does not validate aerodynamic prediction accuracy, flight-readiness, vehicle design applicability, or certification status."

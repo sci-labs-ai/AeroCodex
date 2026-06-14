@@ -1,0 +1,22 @@
+id: source.life_support.nasa_bvad_eclss.research_required
+title: NASA life-support, BVAD, and ECLSS sources
+category: life_support
+status: research_required
+intended_use:
+  - Research target for Phase 0.001 closure fraction, production area, buffer residence time, crew daily requirement, and net mass-balance helpers.
+  - Research target for later crop productivity, oxygen, carbon dioxide, water, biological-loop, and ECLSS boundary-condition assumptions.
+requested_details:
+  - Exact NASA BVAD/ECLSS documents, editions, page ranges, tables, equations, units, and assumptions.
+  - Whether each future example should be illustrative, equation-traceable, implementation-verified, reference-validatable, or experiment-validatable.
+  - Boundary definitions for closure fraction, production area, buffer residence time, storage, overproduction, leakage, reserves, and contingency margins.
+  - Reference examples and tolerance conventions for future validation cards.
+implementation_notes:
+  - Current life-support helpers are preliminary scalar mass-balance scaffolding only.
+  - Microtask 20 reviewed arithmetic guards, warning behavior for closure fractions above one, and research-required trace metadata.
+  - No biological growth model, medical or human-factors model, microbial-risk model, cabin controller, crop database, ECLSS simulator, or habitat-safety model is implemented.
+  - No native library, wrapper dependency, FFI, foreign runtime, generated binary, or external property database is added.
+limits:
+  - Not a certification claim.
+  - Not evidence of operational, flight, habitat, medical, or mission readiness.
+  - Not a substitute for NASA source review, environmental-control hazard analysis, crew safety review, or system-level ECLSS validation.
+notes: "Research target for Phase 0.001 life-support mass-balance scaffolding. Status intentionally remains research_required."

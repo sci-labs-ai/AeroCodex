@@ -1,0 +1,25 @@
+id: gasdyn.isentropic.temperature_ratio
+name: Isentropic total-to-static temperature ratio
+category: gas_dynamics
+status: research_required
+source:
+  id: source.gasdynamics.naca_report_1135.research_required
+  status: research_required
+assumptions:
+  - calorically perfect gas
+  - isentropic flow
+  - scalar Mach number
+  - gamma greater than 1
+domain: "Mach >= 0, gamma > 1"
+inputs:
+  - mach
+  - gamma
+outputs:
+  - T0_over_T
+tests:
+  - ratios equal 1 at Mach 0
+  - ratios increase for Mach greater than 0
+failure_modes:
+  - negative Mach rejected
+  - invalid gamma rejected
+notes: "Exact source equation and table provenance pending review."

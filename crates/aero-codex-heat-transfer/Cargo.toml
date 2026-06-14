@@ -1,0 +1,18 @@
+[package]
+name = "aero-codex-heat-transfer"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[lib]
+name = "aero_codex_heat_transfer"
+path = "src/lib.rs"
+
+[dependencies]
+aero-codex-core = { path = "../aero-codex-core" }
+aero-codex-constants = { path = "../aero-codex-constants" }
+
+[lints]
+workspace = true

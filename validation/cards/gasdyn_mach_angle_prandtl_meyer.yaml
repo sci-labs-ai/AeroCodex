@@ -1,0 +1,40 @@
+id: gasdyn.expansion.mach_angle_prandtl_meyer
+name: Mach-angle and Prandtl-Meyer perfect-gas expansion relations
+category: gas_dynamics
+status: research_required
+source:
+  id: source.gasdynamics.naca_report_1135.research_required
+  status: research_required
+  locator_notes: "Exact NACA Report 1135/equivalent edition, Mach-angle and Prandtl-Meyer equation numbers, table references, and tolerance targets pending review."
+assumptions:
+  - calorically perfect gas with constant gamma
+  - steady inviscid supersonic expansion context for Prandtl-Meyer relation
+  - scalar Mach number with sonic boundary allowed for direct Mach-angle and Prandtl-Meyer helpers
+  - inverse Prandtl-Meyer helper uses bracketing and bisection with an explicit tolerance
+  - no oblique-shock or expansion-fan flow-field solver is claimed by this card
+  - source traceability and reference numerical validation remain pending
+domain: "Mach >= 1 for direct Mach angle and Prandtl-Meyer nu; gamma > 1 for Prandtl-Meyer helpers; 0 <= nu < nu_max(gamma); tolerance > 0"
+inputs:
+  - mach
+  - gamma
+  - nu
+  - tolerance
+outputs:
+  - mach_angle_mu
+  - prandtl_meyer_nu
+  - inverse_mach
+tests:
+  - Mach angle is 90 degrees at Mach 1 and 30 degrees at Mach 2
+  - Prandtl-Meyer nu is zero at Mach 1
+  - Prandtl-Meyer nu increases for representative supersonic Mach numbers
+  - representative Mach 2 gamma 1.4 Prandtl-Meyer angle is checked as a source-review placeholder
+  - inverse Prandtl-Meyer round-trips representative direct calculations within the requested tolerance
+  - subsonic Mach, invalid gamma, negative nu, target nu at or above nu_max, and nonpositive tolerance are rejected
+failure_modes:
+  - subsonic Mach rejected
+  - invalid gamma rejected
+  - negative or nonfinite nu rejected
+  - target nu at or above maximum Prandtl-Meyer angle rejected
+  - nonpositive tolerance rejected
+  - failed inverse bracketing or bisection reported as numerical failure
+notes: "Phase 0.001 scalar perfect-gas scaffold only; source equation traceability, reference-table validation, and tolerances remain research_required. Oblique-shock review is intentionally deferred to Microtask 12."

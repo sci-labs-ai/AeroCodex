@@ -1,0 +1,25 @@
+id: source.astrodynamics.two_body_basics.research_required
+title: Basic two-body astrodynamics equation source to be selected
+category: astrodynamics
+status: research_required
+intended_use:
+  - Source target for circular-orbit speed v = sqrt(mu/r).
+  - Source target for circular-orbit period T = 2*pi*sqrt(r^3/mu).
+  - Source target for escape speed v_e = sqrt(2*mu/r).
+  - Source target for vis-viva speed v = sqrt(mu*(2/r - 1/a)).
+  - Source target for specific orbital energy epsilon = -mu/(2*a) for positive semi-major axis.
+requested_details:
+  - Exact astrodynamics textbook, NASA educational source, JPL/NASA reference, or other source edition selected for each equation.
+  - Equation numbers, page ranges, symbols, SI units, gravitational-parameter convention, radius convention, and semi-major-axis convention.
+  - Whether each equation is stated for circular, elliptical, parabolic, or hyperbolic cases and how Phase 0.001 restricts the domain.
+  - Representative Earth-orbit values and tolerances suitable for pure-Rust unit and validation tests.
+  - Relationship to the separate NASA/JPL parameter source seed used for gravitational parameters and radii.
+implementation_notes:
+  - Microtask 18 reviews scalar two-body helpers only.
+  - Hohmann transfer and sphere-of-influence helpers are reviewed separately by the Microtask 19 transfer/celestial source seed.
+  - No ephemeris engine, propagator, astrodynamics toolkit wrapper, native library, SPICE interface, FFI, or foreign runtime dependency is included.
+  - Current source status remains research_required until exact source locators and tolerances are reviewed.
+limits:
+  - Not a certification claim.
+  - Not evidence of operational, flight, or mission readiness.
+notes: "Research target for Phase 0.001 astrodynamics two-body helpers."

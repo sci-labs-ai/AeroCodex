@@ -1,0 +1,57 @@
+id: life_support.bioregenerative.mass_balance
+name: Bio-regenerative life-support scalar mass-balance helper group
+category: life_support
+status: research_required
+source:
+  id: source.life_support.bioregenerative_mass_balance.research_required
+  status: research_required
+assumptions:
+  - steady daily or rate-normalized accounting interval
+  - inputs use consistent units and species definitions
+  - accounting boundary, storage convention, reserve convention, and quality constraints are supplied by the caller
+domain:
+  summary: "nonnegative inventories, rates, daily totals, and per-crew demands; strictly positive required totals, productivity, and flow rates where division is performed"
+  bounds:
+    - recycled_mass_rate >= 0 and total_required_mass_rate > 0
+    - required_mass_per_day >= 0 and productivity_per_area_per_day > 0
+    - buffer_mass >= 0 and flow_rate > 0
+    - per_crew_per_day >= 0 with crew_count supplied as an unsigned integer
+    - production, consumption, generation, and removal daily totals >= 0
+  excluded_cases:
+    - biological growth dynamics
+    - medical or habitat-safety suitability
+    - mission-level closure, reliability, or contingency assessment
+inputs:
+  - recycled_mass_rate
+  - total_required_mass_rate
+  - required_mass_per_day
+  - productivity_per_area_per_day
+  - buffer_mass
+  - flow_rate
+  - crew_count
+  - per_crew_per_day
+  - production_or_removal_per_day
+  - consumption_or_generation_per_day
+outputs:
+  - closure_fraction
+  - required_production_area
+  - buffer_residence_time
+  - crew_daily_requirement
+  - net_daily_balance
+  - oxygen_balance
+  - carbon_dioxide_balance
+  - water_recovery_balance
+tests:
+  - closure fraction equals recycled divided by required
+  - closure and water recovery warn when fraction exceeds one
+  - required area decreases as productivity increases
+  - residence time equals buffer inventory divided by flow rate
+  - crew daily requirement scales linearly with crew count
+  - net and gas balance signs follow documented production/removal minus consumption/generation conventions
+  - nonfinite derived values return numerical failure
+failure_modes:
+  - negative inventory, rate, daily total, or per-crew demand rejected
+  - nonpositive required total, productivity, or flow rate rejected
+  - nonfinite input rejected
+  - nonfinite derived output reported as numerical failure
+notes: "Planning card only. Phase 0.001 helpers are scalar mass-balance primitives, not validated ECLSS design, habitat-safety, medical, or mission-readiness models."

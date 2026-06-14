@@ -1,0 +1,28 @@
+id: life_support.bioregenerative.buffer_residence_time
+name: Buffer residence time
+category: life_support
+status: research_required
+source:
+  id: source.life_support.nasa_bvad_eclss.research_required
+  status: research_required
+assumptions:
+  - well-mixed buffer or simple inventory-over-flow bookkeeping
+  - steady positive flow rate
+  - buffer inventory and flow rate use consistent mass or volume units
+domain: "buffer_mass >= 0, flow_rate > 0"
+inputs:
+  - buffer_mass
+  - flow_rate
+outputs:
+  - residence_time
+tests:
+  - residence time equals buffer divided by flow
+  - zero buffer returns zero residence time
+  - residence time is nonnegative for valid inputs
+  - nonfinite derived residence time returns numerical failure
+failure_modes:
+  - negative buffer rejected
+  - nonpositive flow rejected
+  - nonfinite input rejected
+  - nonfinite derived output rejected
+notes: "Phase 0.001 mass-balance primitive only; not a validated storage, transient, control, or habitat-safety model."

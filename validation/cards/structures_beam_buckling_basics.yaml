@@ -1,0 +1,45 @@
+id: structures.beam_buckling_basics.phase_0_001
+name: Phase 0.001 structures beam and buckling helpers
+category: structures
+status: research_required
+source:
+  id: source.structures.basic_mechanics.research_required
+  status: research_required
+  locator_notes: "Exact mechanics source edition, equation IDs, sign conventions, end-condition conventions, representative examples, and tolerance targets remain pending."
+assumptions:
+  - scalar elementary engineering-mechanics bookkeeping only
+  - axial stress uses sigma = F/A with caller-supplied signed axial force convention
+  - bending stress uses sigma = M*y/I with caller-supplied signed moment and section-coordinate convention
+  - cantilever tip deflection uses Euler-Bernoulli delta = F*L^3/(3*E*I) for an end load
+  - Euler column buckling uses P_cr = pi^2*E*I/(K*L)^2 for ideal slender-column behavior
+  - shear deformation, plasticity, crippling, local buckling, fatigue, fracture, joints, fasteners, composites, finite-element behavior, and code allowables are out of scope
+  - source traceability and reference numerical validation remain pending
+domain: "area > 0; second_moment_area > 0; length > 0; elastic_modulus > 0; effective_length_factor > 0; force, moment, and y finite"
+inputs:
+  - force
+  - area
+  - moment
+  - y
+  - second_moment_area
+  - length
+  - elastic_modulus
+  - effective_length_factor
+outputs:
+  - axial_stress
+  - bending_stress
+  - cantilever_tip_deflection_end_load
+  - euler_column_buckling_load
+tests:
+  - axial stress equals F/A and preserves signed force convention
+  - bending stress equals M*y/I and increases with moment for fixed y and I
+  - cantilever tip deflection equals F*L^3/(3*E*I) and increases with force
+  - Euler buckling load equals pi^2*E*I/(K*L)^2 and decreases as length increases
+  - invalid zero or negative area, length, elastic modulus, second moment of area, and effective length factor are rejected
+  - nonfinite derived values return numerical_failure
+failure_modes:
+  - nonpositive area returns a nonpositive-input error for axial stress
+  - nonpositive second moment of area returns a nonpositive-input error for bending, beam, and buckling helpers
+  - nonpositive length or elastic modulus returns a nonpositive-input error for beam and buckling helpers
+  - nonpositive effective length factor returns a nonpositive-input error for Euler buckling
+  - nonfinite force, moment, y, or derived arithmetic returns a checked AeroResult error
+notes: "This card is a validation-planning scaffold only. It does not validate aircraft structures, spacecraft structures, structural margins, finite-element models, code compliance, operational use, or certification status."

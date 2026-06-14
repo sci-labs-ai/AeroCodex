@@ -1,0 +1,51 @@
+id: flight_dynamics.basic_performance.phase_0_001
+name: Phase 0.001 flight-dynamics basic performance helpers
+category: flight_dynamics
+status: research_required
+source:
+  id: source.flight_dynamics.basic_performance.research_required
+  status: research_required
+  locator_notes: "Exact flight-performance source edition, equation IDs, sign conventions, level-turn assumptions, CLmax convention, representative examples, and tolerance targets remain pending."
+assumptions:
+  - scalar preliminary-design flight-dynamics bookkeeping only
+  - level-turn helpers assume a steady, level, coordinated point-mass turn with no sideslip
+  - load factor uses n = 1/cos(phi) with finite bank angle satisfying |phi| < 90 degrees
+  - turn rate uses omega = g*tan(phi)/V and preserves the signed bank-angle convention
+  - turn radius uses R = V^2/(g*|tan(phi)|) as a positive scalar radius and rejects zero bank
+  - stall speed uses Vs = sqrt(2W/(rho*S*CLmax)) with caller-supplied positive scalar weight, density, reference area, and CLmax
+  - specific excess power uses Ps = (T-D)*V/W with caller-supplied finite thrust and drag convention
+  - trim, stability derivatives, compressibility, buffet, control limits, structural margins, propulsion lapse, and envelope protection are out of scope
+  - source traceability and reference numerical validation remain pending
+domain: "|bank_angle| < 90 degrees and not too close to singular; g > 0; velocity > 0 for turn helpers; weight > 0; density > 0; wing_area > 0; cl_max > 0; specific-excess-power velocity >= 0"
+inputs:
+  - bank_angle
+  - g
+  - velocity
+  - weight
+  - density
+  - wing_area
+  - cl_max
+  - thrust
+  - drag
+outputs:
+  - load_factor_level_turn
+  - turn_rate
+  - turn_radius
+  - stall_speed
+  - specific_excess_power
+tests:
+  - load factor at zero bank equals one
+  - load factor increases with bank-angle magnitude below the singularity
+  - turn rate follows g*tan(phi)/V and preserves signed bank convention
+  - turn radius decreases as bank angle increases for fixed speed and gravity
+  - stall speed increases with weight for fixed density, area, and CLmax
+  - specific excess power is positive when thrust exceeds drag and negative when drag exceeds thrust
+  - invalid or singular inputs are rejected
+  - nonfinite derived values return numerical_failure
+failure_modes:
+  - bank angles at or beyond the level-turn singularity return an out-of-domain error
+  - zero bank angle returns an out-of-domain error for finite turn radius
+  - nonpositive gravity, turn speed, weight, density, wing area, or CLmax return checked AeroResult errors
+  - negative specific-excess-power speed returns a checked AeroResult error
+  - nonfinite thrust, drag, bank angle, or derived arithmetic returns a checked AeroResult error
+notes: "This card is a validation-planning scaffold only. It does not validate aircraft performance prediction, flight-envelope safety, handling qualities, operational use, or certification status."

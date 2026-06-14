@@ -1,0 +1,28 @@
+id: life_support.bioregenerative.required_production_area
+name: Required production area
+category: life_support
+status: research_required
+source:
+  id: source.life_support.nasa_bvad_eclss.research_required
+  status: research_required
+assumptions:
+  - productivity is constant over the accounting period
+  - crop yield, edible fraction, growth lighting, environmental control, losses, and reserves are external to this primitive
+  - required mass and productivity use consistent units
+domain: "required_mass_per_day >= 0, productivity_per_area_per_day > 0"
+inputs:
+  - required_mass_per_day
+  - productivity_per_area_per_day
+outputs:
+  - required_area
+tests:
+  - required area equals required mass divided by productivity
+  - required area decreases as productivity increases
+  - zero required mass returns zero area
+  - nonfinite derived area returns numerical failure
+failure_modes:
+  - negative required mass rejected
+  - nonpositive productivity rejected
+  - nonfinite input rejected
+  - nonfinite derived output rejected
+notes: "Research scaffold only; crop productivity, BVAD/ECLSS assumptions, and validation tolerances remain pending."

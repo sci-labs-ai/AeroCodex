@@ -1,0 +1,145 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://aerocodex.local/schema/codex_card.schema.json",
+    "title": "AeroCodex Codex Card",
+    "description": "Conservative schema for source-traceability and validation-planning cards. Phase 0.001 cards are not certification, flight-readiness, mission-readiness, or operational-approval artifacts.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "id",
+        "name",
+        "category",
+        "status",
+        "source",
+        "assumptions",
+        "domain",
+        "inputs",
+        "outputs",
+        "tests",
+        "failure_modes",
+        "notes"
+    ],
+    "properties": {
+        "id": {
+            "$ref": "#/$defs/dotted_id"
+        },
+        "name": {
+            "type": "string",
+            "minLength": 1
+        },
+        "category": {
+            "$ref": "#/$defs/card_category"
+        },
+        "status": {
+            "$ref": "#/$defs/verification_status"
+        },
+        "source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "id",
+                "status"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "pattern": "^source[.][a-z0-9_]+([.][a-z0-9_]+)+$"
+                },
+                "status": {
+                    "$ref": "#/$defs/verification_status"
+                },
+                "locator_notes": {
+                    "type": "string"
+                }
+            }
+        },
+        "assumptions": {
+            "$ref": "#/$defs/nonempty_string_list"
+        },
+        "domain": {
+            "oneOf": [
+                {
+                    "type": "string",
+                    "minLength": 1
+                },
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "summary": {
+                            "type": "string",
+                            "minLength": 1
+                        },
+                        "bounds": {
+                            "$ref": "#/$defs/nonempty_string_list"
+                        },
+                        "excluded_cases": {
+                            "$ref": "#/$defs/nonempty_string_list"
+                        }
+                    },
+                    "required": [
+                        "summary"
+                    ]
+                }
+            ]
+        },
+        "inputs": {
+            "$ref": "#/$defs/nonempty_string_list"
+        },
+        "outputs": {
+            "$ref": "#/$defs/nonempty_string_list"
+        },
+        "tests": {
+            "$ref": "#/$defs/nonempty_string_list"
+        },
+        "failure_modes": {
+            "$ref": "#/$defs/nonempty_string_list"
+        },
+        "notes": {
+            "type": "string",
+            "minLength": 1
+        }
+    },
+    "$defs": {
+        "dotted_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+([.][a-z0-9_]+)+$"
+        },
+        "verification_status": {
+            "type": "string",
+            "enum": [
+                "research_required",
+                "equation_traceable",
+                "implementation_verified",
+                "reference_validated",
+                "experiment_validated"
+            ]
+        },
+        "card_category": {
+            "type": "string",
+            "enum": [
+                "core",
+                "constants",
+                "atmosphere",
+                "thermodynamics",
+                "gas_dynamics",
+                "aerodynamics",
+                "propulsion",
+                "heat_transfer",
+                "structures",
+                "flight_dynamics",
+                "astrodynamics",
+                "life_support",
+                "validation"
+            ]
+        },
+        "nonempty_string_list": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "string",
+                "minLength": 1
+            }
+        }
+    }
+}

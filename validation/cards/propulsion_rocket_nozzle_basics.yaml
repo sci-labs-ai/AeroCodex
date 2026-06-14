@@ -1,0 +1,55 @@
+id: propulsion.rocket_nozzle_basics.phase_0_001
+name: Phase 0.001 rocket and nozzle basic helpers
+category: propulsion
+status: research_required
+source:
+  id: source.propulsion.rocket_nozzle_basics.research_required
+  status: research_required
+  locator_notes: "Exact source edition, equation IDs, pressure-thrust sign convention, standard-gravity convention, representative examples, and tolerance targets remain pending."
+assumptions:
+  - scalar ideal rocket-equation bookkeeping only
+  - delta-v helper uses DeltaV = Isp*g0*ln(m0/mf) with initial_mass > final_mass > 0
+  - mass-ratio inverse uses exp(DeltaV/(Isp*g0)) and accepts zero delta-v as a boundary case
+  - ideal thrust uses mdot*Ve + (pe - pa)*Ae with caller-documented axial-force convention
+  - choked mass flux assumes ideal calorically perfect gas with constant gamma and gas constant
+  - combustion chemistry, real-gas effects, finite-rate chemistry, discharge coefficients, losses, engine cycles, and trajectory coupling are out of scope
+  - source traceability and reference numerical validation remain pending
+domain: "isp > 0; g0 > 0; initial_mass > final_mass > 0 for positive delta-v; delta_v >= 0 for mass-ratio inverse; mass_flow >= 0; exit_velocity >= 0; exit_pressure >= 0; ambient_pressure >= 0; exit_area >= 0; gamma > 1; gas_constant > 0; stagnation_pressure >= 0; stagnation_temperature > 0"
+inputs:
+  - isp
+  - g0
+  - initial_mass
+  - final_mass
+  - delta_v
+  - mass_flow
+  - exit_velocity
+  - exit_pressure
+  - ambient_pressure
+  - exit_area
+  - effective_exhaust_velocity
+  - gamma
+  - gas_constant
+  - stagnation_pressure
+  - stagnation_temperature
+outputs:
+  - tsiolkovsky_delta_v
+  - mass_ratio_from_delta_v
+  - ideal_thrust
+  - specific_impulse_from_effective_exhaust_velocity
+  - choked_mass_flux_per_area
+tests:
+  - delta-v and mass-ratio inverse round trip for a representative mass ratio
+  - zero delta-v returns mass ratio of one
+  - ideal thrust combines momentum thrust and pressure thrust
+  - negative pressure-thrust contribution is preserved by sign convention
+  - specific impulse equals effective exhaust velocity divided by standard gravity
+  - choked mass flux is positive for representative valid stagnation inputs and zero for zero stagnation pressure
+  - invalid domain cases return checked AeroResult errors instead of unchecked arithmetic
+  - nonfinite derived values return numerical_failure
+failure_modes:
+  - nonpositive specific impulse, standard gravity, mass, gas constant, or stagnation temperature returns a domain error where positive values are required
+  - initial mass less than or equal to final mass returns an out-of-domain error for positive delta-v
+  - negative delta-v, mass flow, exit velocity, pressure, exit area, or stagnation pressure returns a domain error where nonnegative values are required
+  - gamma less than or equal to one returns an out-of-domain error
+  - overflow or nonfinite derived values report numerical_failure
+notes: "This card is a validation-planning scaffold only. It does not validate propulsion-system performance, engine design applicability, mission use, or certification status."

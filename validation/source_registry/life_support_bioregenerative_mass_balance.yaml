@@ -1,0 +1,20 @@
+id: source.life_support.bioregenerative_mass_balance.research_required
+title: Bio-regenerative life-support mass-balance source seed
+category: life_support
+status: research_required
+intended_use:
+  - Research target for closure fraction, production area, buffer residence time, crew daily requirement, oxygen balance, carbon-dioxide balance, water recovery, and generic mass-balance bookkeeping.
+  - Bridge source seed for later NASA BVAD/ECLSS and crop-productivity source review.
+requested_details:
+  - Exact BVAD/ECLSS source documents, editions, page ranges, tables, equations, units, and assumptions.
+  - Boundary definitions for closure fractions, daily requirements, buffer residence time, oxygen, carbon dioxide, water recovery, storage, overproduction, leakage, and reserves.
+  - Representative numerical examples and tolerances suitable for future reference-validation cards.
+implementation_notes:
+  - Current life-support helpers are scalar arithmetic primitives with caller-supplied rates or daily quantities.
+  - Closure-style ratios above one are reported with warnings and outside-documented-domain validity metadata for accounting-boundary review.
+  - No biological growth model, crew-health model, cabin controller, ECLSS simulator, crop database, native wrapper, or foreign runtime is implemented.
+limits:
+  - Not a certification claim.
+  - Not a validated ECLSS design model.
+  - Not evidence of operational, flight, habitat, medical, crew-safety, or mission readiness.
+notes: "Research target for Phase 0.001 life-support mass-balance scaffolding. Status intentionally remains research_required."

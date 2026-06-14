@@ -1,0 +1,43 @@
+id: life_support.bioregenerative.daily_mass_balance
+name: Crew and daily mass-balance helper group
+category: life_support
+status: research_required
+source:
+  id: source.life_support.bioregenerative_mass_balance.research_required
+  status: research_required
+assumptions:
+  - crew count is represented by an unsigned integer
+  - per-crew, production, consumption, generation, removal, recovery, and requirement quantities are finite nonnegative daily rates
+  - sign convention is caller visible and does not imply biological, medical, habitat-safety, or mission validation
+domain: "crew_count >= 0 by type; per_crew_per_day >= 0; production_per_day >= 0; consumption_per_day >= 0; required_water_per_day > 0 through closure_fraction"
+inputs:
+  - crew_count
+  - per_crew_per_day
+  - production_per_day
+  - consumption_per_day
+  - oxygen_production_per_day
+  - oxygen_consumption_per_day
+  - co2_generation_per_day
+  - co2_removal_per_day
+  - recovered_water_per_day
+  - required_water_per_day
+outputs:
+  - crew_daily_requirement
+  - net_daily_balance
+  - oxygen_balance
+  - carbon_dioxide_balance
+  - water_recovery_balance
+tests:
+  - crew requirement scales linearly with crew count
+  - net daily balance sign is correct
+  - oxygen balance is production minus consumption
+  - carbon dioxide balance is removal minus generation
+  - water recovery balance reuses closure-fraction warning semantics
+  - nonfinite derived output returns numerical failure
+failure_modes:
+  - negative rates rejected
+  - negative per-crew requirement rejected
+  - nonpositive required water rejected through closure fraction
+  - nonfinite input rejected
+  - nonfinite derived output rejected
+notes: "Phase 0.001 scalar daily/rate-normalized bookkeeping only; not a validated crop, crew-health, atmosphere-control, water-processing, habitat-safety, or ECLSS design model."

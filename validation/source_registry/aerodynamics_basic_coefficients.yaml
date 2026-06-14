@@ -1,0 +1,22 @@
+id: source.aerodynamics.basic_coefficients.research_required
+title: Aerodynamics basic force and coefficient source to be selected
+category: aerodynamics
+status: research_required
+intended_use:
+  - Source target for dynamic pressure, lift, drag, inverse force coefficients, and induced-drag coefficient equations.
+  - Source target for sign conventions, reference-area conventions, aspect-ratio conventions, and Oswald-efficiency interpretation.
+  - Research target for representative scalar examples and numerical tolerance choices for the Phase 0.001 aerodynamics helpers.
+requested_details:
+  - Exact textbook, NASA educational page, NACA/NASA report, or other source edition selected for each equation.
+  - Equation numbers, page ranges, symbols, units, reference-area definitions, and coefficient sign conventions.
+  - Whether drag coefficient examples assume positive drag only or allow signed bookkeeping conventions.
+  - Aspect-ratio and Oswald-efficiency domain conventions for induced-drag coefficient examples.
+  - Reference values and tolerances suitable for pure-Rust unit and validation tests.
+implementation_notes:
+  - Microtask 13 reviewed scalar algebraic helpers only.
+  - No airfoil polar, lifting-line solver, compressibility correction, Reynolds-number correction, trim model, or stability derivative model is included.
+  - Current source status remains research_required until exact source locators and tolerances are reviewed.
+limits:
+  - Not a certification claim.
+  - Not evidence of operational, flight, or mission readiness.
+notes: "Research target for Phase 0.001 basic aerodynamic coefficient bookkeeping."

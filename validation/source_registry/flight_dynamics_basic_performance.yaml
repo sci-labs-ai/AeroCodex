@@ -1,0 +1,24 @@
+id: source.flight_dynamics.basic_performance.research_required
+title: Basic flight-dynamics and aircraft-performance equation source to be selected
+category: flight_dynamics
+status: research_required
+intended_use:
+  - Source target for level coordinated-turn load factor n = 1/cos(phi).
+  - Source target for level coordinated-turn rate omega = g*tan(phi)/V.
+  - Source target for level coordinated-turn radius R = V^2/(g*|tan(phi)|).
+  - Source target for stall speed Vs = sqrt(2W/(rho*S*CLmax)).
+  - Source target for specific excess power Ps = (T-D)*V/W.
+requested_details:
+  - Exact textbook, NASA handbook, FAA/NASA educational source, or other source edition selected for each equation.
+  - Equation numbers, page ranges, symbols, SI units, bank-angle convention, and load-factor convention.
+  - Weight, density, reference-area, CLmax, thrust, drag, and velocity sign/units conventions.
+  - Applicability limits for steady level coordinated turns, preliminary stall-speed estimates, and point-mass performance bookkeeping.
+  - Representative values and tolerances suitable for pure-Rust unit and validation tests.
+implementation_notes:
+  - Microtask 17 reviews scalar flight-dynamics and performance helpers only.
+  - No flight-envelope solver, trim solver, 6-DOF simulation, control-law model, aircraft database, native library, or foreign runtime dependency is included.
+  - Current source status remains research_required until exact source locators and tolerances are reviewed.
+limits:
+  - Not a certification claim.
+  - Not evidence of operational, flight, or mission readiness.
+notes: "Research target for Phase 0.001 flight-dynamics basic-performance helpers."

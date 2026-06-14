@@ -1,0 +1,37 @@
+id: gasdyn.isentropic.core_relations
+name: Isentropic perfect-gas flow core relations
+category: gas_dynamics
+status: research_required
+source:
+  id: source.gasdynamics.naca_report_1135.research_required
+  status: research_required
+  locator_notes: "Exact report edition, equation numbers, table references, and tolerance targets pending review."
+assumptions:
+  - calorically perfect gas with constant gamma
+  - steady one-dimensional isentropic flow
+  - scalar nonnegative Mach number for total-to-static ratios
+  - positive Mach number for direct area-Mach ratio
+  - no inverse area-Mach branch selection in this Microtask 9 API
+domain: "Mach >= 0 for T0/T, p0/p, rho0/rho, and mass-flow parameter; Mach > 0 for A/A*; gamma > 1"
+inputs:
+  - mach
+  - gamma
+outputs:
+  - t0_over_t
+  - p0_over_p
+  - rho0_over_rho
+  - area_over_area_star
+  - mass_flow_parameter
+tests:
+  - total-to-static ratios equal 1 at Mach 0
+  - total-to-static ratios increase with Mach for gamma greater than 1
+  - area-Mach ratio equals 1 at Mach 1
+  - area-Mach ratio is greater than 1 away from Mach 1 for representative subsonic and supersonic inputs
+  - mass-flow parameter is zero at Mach 0 and positive for positive Mach
+  - invalid gamma, negative Mach, zero Mach for area-Mach, and nonfinite inputs are rejected
+failure_modes:
+  - negative Mach rejected
+  - nonpositive Mach rejected for area-Mach ratio
+  - invalid gamma rejected
+  - nonfinite computed output reported as numerical failure
+notes: "Phase 0.001 scalar perfect-gas scaffold only; source and reference-table validation remain research_required."

@@ -1,213 +1,164 @@
 #![forbid(unsafe_code)]
-//! Core result, evidence, validity, and error types for AeroCodex.
+//! Shared core types for AeroCodex.
+//!
+//! This crate intentionally contains no external dependencies. It defines the
+//! common result, error, verification, warning, and unit-scalar vocabulary used
+//! by the Phase 0.001 equation crates.
 
-use std::fmt;
+mod error;
+mod result;
+pub mod units;
+pub mod validation;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct VerificationId(&'static str);
+pub use error::AeroError;
+pub use result::{
+    Assumption, EngineeringResult, ModelWarning, ParseStatusError, ValidityStatus,
+    VerificationRecord, VerificationStatus,
+};
+pub use units::{
+    Acceleration, Angle, Area, Density, Force, Gamma, HeatFlux, Length, Mach, Mass, Pressure,
+    Temperature, Time, Velocity,
+};
 
-impl VerificationId {
-    #[must_use]
-    pub const fn new(value: &'static str) -> Self {
-        Self(value)
-    }
-
-    #[must_use]
-    pub const fn as_str(self) -> &'static str {
-        self.0
-    }
-}
-
-impl fmt::Display for VerificationId {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(self.0)
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum EvidenceLevel {
-    Proposed,
-    EquationTraceable,
-    ImplementationVerified,
-    ReferenceValidated,
-    ExperimentValidated,
-    DeprecatedOrWithdrawn,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ValidityStatus {
-    NotAssessed,
-    WithinDeclaredDomain,
-    ReferenceValidated,
-    ExperimentValidated,
-    OutsideValidityRange,
-    InvalidInput,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Assumption {
-    pub id: &'static str,
-    pub text: &'static str,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ModelWarning {
-    pub id: &'static str,
-    pub text: &'static str,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Uncertainty {
-    pub standard_uncertainty: f64,
-    pub coverage_factor: Option<f64>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct VerificationRecord {
-    pub id: VerificationId,
-    pub evidence_level: EvidenceLevel,
-    pub report_id: &'static str,
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct EngineeringResult<T> {
-    pub value: T,
-    pub assumptions: Vec<Assumption>,
-    pub warnings: Vec<ModelWarning>,
-    pub validity: ValidityStatus,
-    pub verification: VerificationRecord,
-    pub uncertainty: Option<Uncertainty>,
-}
-
-impl<T> EngineeringResult<T> {
-    #[must_use]
-    pub fn new(value: T, verification_id: &'static str, evidence_level: EvidenceLevel) -> Self {
-        Self {
-            value,
-            assumptions: Vec::new(),
-            warnings: Vec::new(),
-            validity: ValidityStatus::WithinDeclaredDomain,
-            verification: VerificationRecord {
-                id: VerificationId::new(verification_id),
-                evidence_level,
-                report_id: "founder-baseline-v0.0.0",
-            },
-            uncertainty: None,
-        }
-    }
-
-    #[must_use]
-    pub fn with_assumption(mut self, id: &'static str, text: &'static str) -> Self {
-        self.assumptions.push(Assumption { id, text });
-        self
-    }
-
-    #[must_use]
-    pub fn with_warning(mut self, id: &'static str, text: &'static str) -> Self {
-        self.warnings.push(ModelWarning { id, text });
-        self
-    }
-
-    #[must_use]
-    pub fn with_validity(mut self, validity: ValidityStatus) -> Self {
-        self.validity = validity;
-        self
-    }
-
-    #[must_use]
-    pub fn with_uncertainty(mut self, uncertainty: Uncertainty) -> Self {
-        self.uncertainty = Some(uncertainty);
-        self
-    }
-}
-
+/// Standard AeroCodex result alias.
 pub type AeroResult<T> = Result<T, AeroError>;
 
-#[derive(Debug, Clone, PartialEq)]
-pub enum AeroError {
-    InvalidInput {
-        parameter: &'static str,
-        value: f64,
-        reason: &'static str,
-    },
-    RequiresSupersonic {
-        parameter: &'static str,
-        value: f64,
-    },
-    RequiresSubsonic {
-        parameter: &'static str,
-        value: f64,
-    },
-    OutsideValidityRange {
-        model: &'static str,
-        variable: &'static str,
-        value: f64,
-    },
-    AmbiguousBranch {
-        model: &'static str,
-        valid_branches: &'static [&'static str],
-    },
-    NoConvergence {
-        solver: &'static str,
-        iterations: usize,
-        residual: f64,
-    },
-    NonPhysicalState {
-        reason: &'static str,
-    },
-    MissingEvidenceCard {
-        id: VerificationId,
-    },
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl fmt::Display for AeroError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::InvalidInput {
-                parameter,
-                value,
-                reason,
-            } => write!(f, "invalid input {parameter}={value}: {reason}"),
-            Self::RequiresSupersonic { parameter, value } => {
-                write!(f, "{parameter}={value} must be supersonic")
-            }
-            Self::RequiresSubsonic { parameter, value } => {
-                write!(f, "{parameter}={value} must be subsonic")
-            }
-            Self::OutsideValidityRange {
-                model,
-                variable,
-                value,
-            } => write!(
-                f,
-                "{model} is outside validity range for {variable}={value}"
-            ),
-            Self::AmbiguousBranch {
-                model,
-                valid_branches,
-            } => write!(
-                f,
-                "{model} requires an explicit branch from {valid_branches:?}"
-            ),
-            Self::NoConvergence {
-                solver,
-                iterations,
-                residual,
-            } => write!(
-                f,
-                "{solver} did not converge after {iterations} iterations; residual={residual}"
-            ),
-            Self::NonPhysicalState { reason } => write!(f, "non-physical state: {reason}"),
-            Self::MissingEvidenceCard { id } => write!(f, "missing evidence card for {id}"),
-        }
+    #[test]
+    fn construct_all_required_error_variants() {
+        let errors = [
+            AeroError::NonPositiveInput {
+                parameter: "radius",
+                value: 0.0,
+            },
+            AeroError::NegativeInput {
+                parameter: "pressure",
+                value: -1.0,
+            },
+            AeroError::OutOfDomain {
+                parameter: "gamma",
+                value: 0.9,
+                expected: "gamma > 1",
+            },
+            AeroError::RequiresSupersonic {
+                mach: 0.8,
+                minimum: 1.0,
+            },
+            AeroError::AmbiguousBranch {
+                model: "theta_beta_mach",
+                branches: &["weak", "strong"],
+            },
+            AeroError::NumericalFailure {
+                solver: "bisection",
+                reason: "failed to bracket root",
+            },
+            AeroError::UnverifiedSource {
+                source_id: "source.pending_review",
+            },
+        ];
+
+        assert_eq!(errors[0].code(), "non_positive_input");
+        assert_eq!(errors[1].code(), "negative_input");
+        assert_eq!(errors[2].parameter(), Some("gamma"));
+        assert!(errors[3].to_string().contains("supersonic"));
+        assert_eq!(errors[4].code(), "ambiguous_branch");
+        assert!(!errors[5].is_domain_error());
+        assert!(errors[6].to_string().contains("pending_review"));
     }
-}
 
-impl std::error::Error for AeroError {}
+    #[test]
+    fn construct_engineering_result() {
+        let record = VerificationRecord::research_required(
+            "demo.codex.id",
+            &["demo.source"],
+            "source pending review",
+        );
+        let result = EngineeringResult::from_verification(42.0, record)
+            .with_assumption("demo.assumption", "idealized scalar demonstration")
+            .with_warning("demo.warning", "not an engineering validation")
+            .with_validity(ValidityStatus::WithinDocumentedDomain);
 
-pub mod prelude {
-    pub use crate::{
-        AeroError, AeroResult, Assumption, EngineeringResult, EvidenceLevel, ModelWarning,
-        Uncertainty, ValidityStatus, VerificationId, VerificationRecord,
-    };
+        assert_eq!(result.value, 42.0);
+        assert_eq!(result.codex_id, "demo.codex.id");
+        assert_eq!(result.assumptions.len(), 1);
+        assert_eq!(result.warnings.len(), 1);
+        assert!(result.has_warnings());
+        assert_eq!(
+            result.verification_status(),
+            VerificationStatus::ResearchRequired
+        );
+        assert_eq!(result.validity, ValidityStatus::WithinDocumentedDomain);
+    }
+
+    #[test]
+    fn engineering_result_defaults_to_not_assessed() {
+        let record = VerificationRecord::new(
+            "demo.default_validity",
+            VerificationStatus::EquationTraceable,
+            &["demo.source"],
+            "demo only",
+        );
+        let result = EngineeringResult::new(1.0, "demo.default_validity", record);
+        assert_eq!(result.validity, ValidityStatus::NotAssessed);
+        assert!(result.validity.requires_attention());
+    }
+
+    #[test]
+    fn verification_statuses_display_as_snake_case() {
+        let cases = [
+            (VerificationStatus::ResearchRequired, "research_required"),
+            (VerificationStatus::EquationTraceable, "equation_traceable"),
+            (
+                VerificationStatus::ImplementationVerified,
+                "implementation_verified",
+            ),
+            (
+                VerificationStatus::ReferenceValidated,
+                "reference_validated",
+            ),
+            (
+                VerificationStatus::ExperimentValidated,
+                "experiment_validated",
+            ),
+        ];
+
+        for (status, text) in cases {
+            assert_eq!(status.as_str(), text);
+            assert_eq!(status.to_string(), text);
+            assert_eq!(text.parse::<VerificationStatus>().unwrap(), status);
+        }
+
+        assert!("unknown".parse::<VerificationStatus>().is_err());
+        assert!(VerificationStatus::ReferenceValidated.has_external_validation_evidence());
+        assert!(!VerificationStatus::ResearchRequired.has_external_validation_evidence());
+    }
+
+    #[test]
+    fn validity_statuses_display_as_snake_case() {
+        let cases = [
+            (
+                ValidityStatus::WithinDocumentedDomain,
+                "within_documented_domain",
+            ),
+            (ValidityStatus::BoundaryCase, "boundary_case"),
+            (
+                ValidityStatus::OutsideDocumentedDomain,
+                "outside_documented_domain",
+            ),
+            (ValidityStatus::NotAssessed, "not_assessed"),
+        ];
+
+        for (status, text) in cases {
+            assert_eq!(status.as_str(), text);
+            assert_eq!(status.to_string(), text);
+            assert_eq!(text.parse::<ValidityStatus>().unwrap(), status);
+        }
+
+        assert!("unknown".parse::<ValidityStatus>().is_err());
+        assert!(!ValidityStatus::WithinDocumentedDomain.requires_attention());
+        assert!(ValidityStatus::NotAssessed.requires_attention());
+    }
 }

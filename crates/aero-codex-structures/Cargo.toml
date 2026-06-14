@@ -1,0 +1,17 @@
+[package]
+name = "aero-codex-structures"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[lib]
+name = "aero_codex_structures"
+path = "src/lib.rs"
+
+[dependencies]
+aero-codex-core = { path = "../aero-codex-core" }
+
+[lints]
+workspace = true

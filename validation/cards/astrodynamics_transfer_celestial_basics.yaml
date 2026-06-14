@@ -1,0 +1,48 @@
+id: astrodynamics.transfer_celestial_basics.phase_0_001
+name: Phase 0.001 astrodynamics Hohmann transfer and celestial helpers
+category: astrodynamics
+status: research_required
+source:
+  id: source.astrodynamics.transfer_celestial_basics.research_required
+  status: research_required
+  locator_notes: "Exact astrodynamics source edition, Hohmann equation IDs, sphere-of-influence source form, distance/mass conventions, representative examples, and tolerance targets remain pending."
+assumptions:
+  - scalar SI-unit astrodynamics bookkeeping only
+  - Hohmann helpers use caller-supplied positive gravitational parameter mu
+  - r1 and r2 are positive circular-orbit radii around the same point-mass central body
+  - Hohmann transfer assumes coplanar circular start and destination orbits
+  - Hohmann impulses are modeled as instantaneous two-burn magnitudes
+  - Hohmann transfer time uses half the transfer ellipse period with transfer semi-major axis equal to 0.5*(r1 + r2)
+  - sphere of influence uses r_soi = primary_distance*(secondary_mass/primary_mass)^(2/5)
+  - primary distance and both masses are caller-supplied positive SI scalars
+  - perturbations, finite burns, phasing, launch windows, ephemerides, coordinate frames, time standards, and mission optimization are out of scope
+  - source traceability and reference numerical validation remain pending
+domain: "mu > 0; r1 > 0; r2 > 0; primary_distance > 0; secondary_mass > 0; primary_mass > 0"
+inputs:
+  - mu
+  - r1
+  - r2
+  - primary_distance
+  - secondary_mass
+  - primary_mass
+outputs:
+  - hohmann_transfer_delta_v1
+  - hohmann_transfer_delta_v2
+  - hohmann_transfer_total_delta_v
+  - hohmann_transfer_time
+  - sphere_of_influence_radius
+tests:
+  - total Hohmann delta-v is positive when r1 differs from r2
+  - both Hohmann delta-v components are approximately zero when r1 equals r2
+  - total Hohmann delta-v is symmetric when r1 and r2 are swapped
+  - transfer time is positive and follows the half-transfer-ellipse period expression
+  - sphere-of-influence radius is positive and less than primary distance for a typical planet/star mass ratio
+  - invalid nonpositive inputs are rejected
+  - nonfinite or overflowing derived arithmetic returns numerical_failure
+failure_modes:
+  - nonpositive or nonfinite mu returns a checked AeroResult error
+  - nonpositive or nonfinite r1 or r2 returns a checked AeroResult error
+  - nonpositive or nonfinite primary distance returns a checked AeroResult error
+  - nonpositive or nonfinite secondary or primary mass returns a checked AeroResult error
+  - overflow, underflow-to-zero for strictly positive derived values, or nonfinite arithmetic returns a checked numerical_failure error
+notes: "This card is a validation-planning scaffold only. It does not validate patched conics, orbit propagation, mission design, finite burns, ephemerides, navigation, flight use, operational use, or certification status."

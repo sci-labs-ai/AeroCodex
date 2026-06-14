@@ -1,0 +1,23 @@
+id: source.propulsion.rocket_nozzle_basics.research_required
+title: Rocket and nozzle basic propulsion source to be selected
+category: propulsion
+status: research_required
+intended_use:
+  - Source target for the Tsiolkovsky ideal rocket equation and mass-ratio inverse.
+  - Source target for ideal thrust with momentum and pressure-thrust terms.
+  - Source target for specific impulse and effective exhaust velocity convention.
+  - Source target for ideal calorically-perfect-gas choked mass flux per throat area.
+requested_details:
+  - Exact textbook, NASA educational page, NASA report, or other source edition selected for each equation.
+  - Equation numbers, page ranges, symbols, units, and standard-gravity convention.
+  - Pressure-thrust sign convention and whether thrust examples use gauge or absolute pressure differences.
+  - Choked-flow assumptions, gamma/R conventions, stagnation-property definitions, and area interpretation.
+  - Representative values and tolerances suitable for pure-Rust unit and validation tests.
+implementation_notes:
+  - Microtask 14 reviews scalar ideal rocket/nozzle helpers only.
+  - No CEA wrapper, combustion chemistry model, real-gas property database, discharge coefficient model, engine-cycle solver, trajectory propagator, or foreign runtime dependency is included.
+  - Current source status remains research_required until exact source locators and tolerances are reviewed.
+limits:
+  - Not a certification claim.
+  - Not evidence of operational, flight, or mission readiness.
+notes: "Research target for Phase 0.001 rocket and ideal nozzle bookkeeping helpers."

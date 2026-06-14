@@ -1,6 +1,6 @@
 AeroCodex
 Copyright (c) 2026 AeroCodex contributors
 
-AeroCodex is a founder-stage Rust workspace for source-traceable aerospace engineering mathematics.
+AeroCodex is provided under a dual MIT OR Apache-2.0 license.
 
-This product includes no certification claim. See docs/CERTIFICATION_CAVEAT.md.
+AeroCodex is an engineering mathematics library for research, education, verification-oriented development, and preliminary design. Safety-critical, regulated, or mission use requires project-specific assurance, validation, qualification, and certification.

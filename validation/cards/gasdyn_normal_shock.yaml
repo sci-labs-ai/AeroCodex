@@ -1,0 +1,40 @@
+id: gasdyn.normal_shock.core_relations
+name: Normal-shock perfect-gas core relations
+category: gas_dynamics
+status: research_required
+source:
+  id: source.gasdynamics.naca_report_1135.research_required
+  status: research_required
+  locator_notes: "Exact NACA Report 1135/equivalent edition, equation numbers, table references, and tolerance targets pending review."
+assumptions:
+  - calorically perfect gas with constant gamma
+  - steady one-dimensional normal shock
+  - plane stationary shock wave normal to the upstream flow
+  - upstream Mach number is strictly supersonic
+  - no real-gas, viscous, heat-transfer, chemical-reaction, or multi-dimensional effects are modeled
+  - source traceability and reference numerical validation remain pending
+domain: "mach1 > 1; gamma > 1"
+inputs:
+  - mach1
+  - gamma
+outputs:
+  - mach2
+  - p2_over_p1
+  - rho2_over_rho1
+  - t2_over_t1
+  - p02_over_p01
+tests:
+  - representative Mach 2 gamma 1.4 values for downstream Mach and pressure, density, temperature, and total-pressure ratios
+  - downstream Mach is subsonic for valid upstream Mach
+  - static pressure, density, and temperature ratios are greater than unity for representative valid inputs
+  - total-pressure ratio is less than unity for representative valid inputs
+  - near-sonic upstream Mach approaches identity ratios
+  - subsonic, sonic, invalid gamma, and nonfinite inputs are rejected
+  - nonfinite derived outputs return numerical_failure
+failure_modes:
+  - upstream Mach less than or equal to 1 rejected
+  - nonfinite upstream Mach rejected
+  - gamma less than or equal to 1 rejected
+  - nonfinite gamma rejected
+  - overflow or nonfinite derived values rejected as numerical_failure
+notes: "Phase 0.001 scalar perfect-gas scaffold only; normal-shock card and NACA/equivalent source seed remain research_required until exact source equations, reference values, and tolerances are reviewed."

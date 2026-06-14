@@ -1,0 +1,27 @@
+id: source.astrodynamics.transfer_celestial_basics.research_required
+title: Hohmann transfer and scalar celestial mechanics equation source to be selected
+category: astrodynamics
+status: research_required
+intended_use:
+  - Source target for Hohmann first impulse magnitude delta_v1.
+  - Source target for Hohmann second impulse magnitude delta_v2.
+  - Source target for total Hohmann two-impulse delta-v magnitude.
+  - Source target for Hohmann half-transfer-ellipse time of flight.
+  - Source target for scalar sphere-of-influence radius r_soi = d*(m_secondary/m_primary)^(2/5).
+requested_details:
+  - Exact astrodynamics textbook, NASA educational source, JPL/NASA reference, or other source edition selected for each equation.
+  - Equation numbers, page ranges, symbols, SI units, gravitational-parameter convention, circular-orbit radius convention, and transfer-direction convention.
+  - Whether Hohmann delta-v terms are published as signed burns or magnitudes and how same-radius transfers are handled.
+  - Exact source form and applicability limits for the sphere-of-influence approximation, including mass and distance definitions.
+  - Representative Earth-orbit transfer and planet/star sphere-of-influence examples with tolerances suitable for pure-Rust unit and validation tests.
+  - Relationship to the separate NASA/JPL parameter source seed used for gravitational parameters, radii, distances, and masses.
+implementation_notes:
+  - Microtask 19 reviews scalar Hohmann-transfer and sphere-of-influence helpers only.
+  - Hohmann helpers assume coplanar circular start/end orbits, impulsive burns, a point-mass central body, and no perturbations or maneuver losses.
+  - The sphere-of-influence helper is a simple scalar approximation and does not include ephemeris variation, barycentric frames, or restricted three-body dynamics.
+  - No ephemeris engine, mission-design optimizer, propagator, astrodynamics toolkit wrapper, native library, SPICE interface, FFI, or foreign runtime dependency is included.
+  - Current source status remains research_required until exact source locators and tolerances are reviewed.
+limits:
+  - Not a certification claim.
+  - Not evidence of operational, flight, or mission readiness.
+notes: "Research target for Phase 0.001 Hohmann-transfer and scalar celestial mechanics helpers."

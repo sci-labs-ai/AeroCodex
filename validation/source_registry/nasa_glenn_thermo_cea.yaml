@@ -1,0 +1,21 @@
+id: source.thermo.nasa_glenn_cea.research_required
+title: NASA Glenn thermodynamics material and NASA CEA as future validation target
+category: thermodynamics_propulsion
+status: research_required
+intended_use:
+  - Research target for perfect-gas thermodynamics, nozzle, and propulsion examples.
+  - Future external reference target for selected validation cases.
+requested_details:
+  - Exact NASA Glenn pages, CEA documentation/version, and access/licensing constraints.
+  - Sign conventions, units, assumptions, and thermodynamic property definitions.
+  - Perfect-gas scalar relations used by Microtask 8: density, speed of sound, heat-capacity ratio, and molar-mass gas-constant conversion.
+  - Example cases suitable for pure-Rust comparison tests without wrapping CEA.
+implementation_notes:
+  - Future validation target only.
+  - Microtask 8 uses simple scalar perfect-gas equations only; no property database or chemical-equilibrium solver is included.
+  - Microtask 14 added a separate propulsion rocket/nozzle source seed; NASA Glenn/CEA remains a possible future validation target without any wrapper or native dependency.
+  - No CEA wrapper, foreign-function interface, native linkage, or runtime dependency is included.
+limits:
+  - Not a certification claim.
+  - Not evidence of operational, flight, or mission readiness.
+notes: "Future validation target only; no CEA wrapper, native linkage, or runtime dependency is included."

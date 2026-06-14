@@ -1,14 +1,17 @@
 [package]
 name = "aero-codex-constants"
-
 version.workspace = true
 edition.workspace = true
-rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-authors.workspace = true
-publish = false
-
+rust-version.workspace = true
 
 [lib]
+name = "aero_codex_constants"
 path = "src/lib.rs"
+
+[dependencies]
+
+
+[lints]
+workspace = true

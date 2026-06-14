@@ -1,0 +1,46 @@
+id: astrodynamics.two_body_basics.phase_0_001
+name: Phase 0.001 astrodynamics two-body basics
+category: astrodynamics
+status: research_required
+source:
+  id: source.astrodynamics.two_body_basics.research_required
+  status: research_required
+  locator_notes: "Exact astrodynamics source edition, equation IDs, gravitational-parameter source, radius convention, representative examples, and tolerance targets remain pending."
+assumptions:
+  - scalar SI-unit two-body astrodynamics bookkeeping only
+  - central body is represented by caller-supplied positive gravitational parameter mu
+  - orbital radius is caller-supplied as positive distance from the central-body centre
+  - circular orbit speed uses v = sqrt(mu/r)
+  - circular period uses T = 2*pi*sqrt(r^3/mu)
+  - escape velocity uses v_e = sqrt(2*mu/r)
+  - vis-viva speed uses v = sqrt(mu*(2/r - 1/a)) for positive semi-major axis
+  - specific orbital energy uses epsilon = -mu/(2*a) for positive semi-major axis
+  - perturbations, non-spherical gravity, third-body effects, ephemerides, coordinate frames, time standards, finite burns, and mission design constraints are out of scope
+  - source traceability and reference numerical validation remain pending
+domain: "mu > 0; radius > 0; semi_major_axis > 0 for elliptic two-body formulas; vis-viva radicand must be nonnegative for real speed"
+inputs:
+  - mu
+  - radius
+  - semi_major_axis
+outputs:
+  - circular_orbit_speed
+  - orbital_period_circular
+  - escape_velocity
+  - vis_viva_speed
+  - specific_orbital_energy
+tests:
+  - circular orbit speed around Earth radius plus 400 km is plausible
+  - escape velocity equals sqrt(2) times circular speed for the same radius
+  - vis-viva speed equals circular speed when semi-major axis equals radius
+  - circular orbital period is positive and follows the two-body period expression
+  - specific orbital energy is negative for positive semi-major axis
+  - invalid nonpositive inputs are rejected
+  - negative vis-viva radicand returns a checked out-of-domain error
+  - nonfinite derived values return numerical_failure
+failure_modes:
+  - nonpositive or nonfinite mu returns a checked AeroResult error
+  - nonpositive or nonfinite radius returns a checked AeroResult error
+  - nonpositive or nonfinite semi_major_axis returns a checked AeroResult error for elliptic formulas
+  - vis-viva input combinations with negative radicand return an out-of-domain error
+  - overflow, underflow-to-zero for strictly positive results, or nonfinite derived arithmetic returns a checked numerical_failure error
+notes: "This card is a validation-planning scaffold only. It does not validate orbit determination, flight dynamics propagation, mission design, navigation, ephemeris use, operational use, or certification status. Hohmann-transfer and sphere-of-influence helpers are covered by the separate Microtask 19 transfer/celestial card."

@@ -1,27 +1,28 @@
 [workspace]
+resolver = "2"
 members = [
-    "crates/aero-codex",
     "crates/aero-codex-core",
-    "crates/aero-codex-units",
     "crates/aero-codex-constants",
-    "crates/aero-codex-numerics",
-    "crates/aero-codex-validation",
-    "crates/aero-codex-data",
-    "crates/aero-codex-gasdynamics",
+    "crates/aero-codex-atmosphere",
+    "crates/aero-codex-thermo",
+    "crates/aero-codex-gas-dynamics",
+    "crates/aero-codex-aerodynamics",
+    "crates/aero-codex-propulsion",
+    "crates/aero-codex-heat-transfer",
+    "crates/aero-codex-structures",
+    "crates/aero-codex-flight-dynamics",
+    "crates/aero-codex-astrodynamics",
+    "crates/aero-codex-life-support",
     "xtask",
 ]
-resolver = "2"
 
 [workspace.package]
-version = "0.0.0"
+version = "0.0.1"
 edition = "2021"
-rust-version = "1.75"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/ConorMcGibboney/AeroCodex"
-authors = ["AeroCodex contributors"]
-description = "Verified aerospace engineering mathematics in pure Rust."
+readme = "README.md"
+rust-version = "1.74"
 
-[workspace.metadata.aerocodex]
-status = "founder-baseline"
-no_wrapper_policy = true
-certification_claim = false
+[workspace.lints.rust]
+unsafe_code = "forbid"

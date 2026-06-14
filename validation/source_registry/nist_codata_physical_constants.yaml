@@ -1,0 +1,18 @@
+id: source.constants.nist_codata_physical_constants.research_required
+title: NIST/CODATA physical constants
+category: constants
+status: research_required
+intended_use:
+  - Research target for the universal molar gas constant and Stefan-Boltzmann constant.
+  - Research target for exact value, uncertainty, and edition tracking in later releases.
+requested_details:
+  - Exact CODATA adjustment edition and NIST page or dataset identifier.
+  - Value, uncertainty, exactness status, units, and citation requirements.
+  - Licensing/provenance notes for redistribution in generated documentation.
+implementation_notes:
+  - Current constants are seed values only.
+  - No source-registry or validation-card status should be upgraded before exact source review.
+limits:
+  - Not a certification claim.
+  - Not evidence of operational, flight, or mission readiness.
+notes: "Research target for physical constants used by Phase 0.001 seed equations."

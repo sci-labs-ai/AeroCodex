@@ -1,0 +1,50 @@
+id: heat_transfer.basic_primitives.phase_0_001
+name: Phase 0.001 heat-transfer basic helpers
+category: heat_transfer
+status: research_required
+source:
+  id: source.heat_transfer.basic_primitives.research_required
+  status: research_required
+  locator_notes: "Exact source edition, equation IDs, sign conventions, representative examples, and tolerance targets remain pending."
+assumptions:
+  - scalar heat-transfer bookkeeping only
+  - radiative helper uses q = epsilon*sigma*(T_hot^4 - T_cold^4) with caller-supplied signed temperature ordering
+  - convective helper uses q = h*(T_recovery_or_fluid - T_wall) with caller-supplied positive heat-flux convention
+  - conduction resistance uses one-dimensional R = thickness/(conductivity*area)
+  - conduction heat rate uses q_dot = DeltaT/R with supplied signed temperature difference
+  - view factors, participating media, transient networks, multidimensional conduction, temperature-dependent material properties, and CFD heat-transfer correlations are out of scope
+  - source traceability and reference numerical validation remain pending
+domain: "0 <= emissivity <= 1; absolute temperatures >= 0; h >= 0; thickness >= 0; conductivity > 0; area > 0; resistance > 0; delta_t finite"
+inputs:
+  - emissivity
+  - t_hot
+  - t_cold
+  - h
+  - t_recovery_or_fluid
+  - t_wall
+  - thickness
+  - conductivity
+  - area
+  - delta_t
+  - resistance
+outputs:
+  - stefan_boltzmann_radiative_flux
+  - convective_heat_flux
+  - thermal_resistance_conduction
+  - conduction_heat_rate
+tests:
+  - radiative flux is zero when temperatures are equal
+  - radiative flux increases with hot-side temperature for fixed cold-side temperature and emissivity
+  - radiative and convective helpers preserve signed temperature-ordering conventions
+  - zero emissivity, zero heat-transfer coefficient, and zero thickness boundary cases are checked
+  - thermal resistance is positive for positive thickness, conductivity, and area
+  - conduction heat rate preserves the sign of delta_t
+  - invalid domain cases return checked AeroResult errors instead of unchecked arithmetic
+  - nonfinite derived values return numerical_failure
+failure_modes:
+  - emissivity outside [0, 1] returns an out-of-domain error
+  - negative or nonfinite absolute temperatures return a domain error
+  - negative heat-transfer coefficient or thickness returns a domain error
+  - nonpositive conductivity, area, or resistance returns a nonpositive-input error
+  - overflow or nonfinite derived values report numerical_failure
+notes: "This card is a validation-planning scaffold only. It does not validate thermal-protection design, spacecraft thermal control, aeroheating predictions, operational use, or certification status."

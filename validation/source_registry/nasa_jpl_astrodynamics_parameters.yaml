@@ -1,0 +1,23 @@
+id: source.astrodynamics.nasa_jpl_parameters.research_required
+title: NASA/JPL astrodynamics parameter and two-body reference sources
+category: astrodynamics
+status: research_required
+intended_use:
+  - Source target for Earth and solar gravitational parameters, radii, and two-body reference values.
+  - Source target for Microtask 18 circular speed, circular period, escape speed, vis-viva, and specific orbital energy helpers.
+  - Source target for Microtask 19 review of Hohmann transfer and sphere-of-influence helper examples and parameter conventions.
+requested_details:
+  - Exact source dataset, release date, epoch, body definitions, and parameter uncertainties.
+  - Radius definition used by each equation or example.
+  - Exact two-body equation references, page or section locators, symbols, and SI-unit conventions.
+  - Representative circular-orbit, escape-speed, vis-viva, and specific-energy examples with tolerances.
+  - Whether constants are intended for educational examples, preliminary design, or higher-fidelity analysis.
+implementation_notes:
+  - Microtask 18 reviews scalar two-body equations only.
+  - Current Earth constants and solar gravitational-parameter placeholder are seed values only.
+  - The solar placeholder is explicitly not marked verified and is not used by Phase 0.001 equation implementations.
+  - Hohmann-transfer and sphere-of-influence helpers now have a separate transfer/celestial source seed; this file remains a parameter-source seed.
+limits:
+  - Not a certification claim.
+  - Not evidence of operational, flight, or mission readiness.
+notes: "Exact source, epoch, parameter standardization, equation locators, reference examples, and tolerances remain pending review."

@@ -1,0 +1,24 @@
+id: source.heat_transfer.basic_primitives.research_required
+title: Basic heat-transfer equation source to be selected
+category: heat_transfer
+status: research_required
+intended_use:
+  - Source target for net Stefan-Boltzmann radiative heat flux.
+  - Source target for Newton-law convective heat flux.
+  - Source target for one-dimensional conduction thermal resistance.
+  - Source target for conduction heat rate from supplied thermal resistance.
+requested_details:
+  - Exact textbook, NASA educational page, engineering handbook, or other source edition selected for each equation.
+  - Equation numbers, page ranges, symbols, SI units, and sign conventions.
+  - Emissivity convention, absolute-temperature convention, and whether any examples include view-factor assumptions.
+  - Heat-transfer coefficient interpretation, recovery/fluid temperature convention, and wall-temperature convention.
+  - Conduction geometry assumptions, area interpretation, material-property assumptions, and resistance-network convention.
+  - Representative values and tolerances suitable for pure-Rust unit and validation tests.
+implementation_notes:
+  - Microtask 15 reviews scalar radiation, convection, and one-dimensional conduction helpers only.
+  - No CFD solver, thermal network solver, ablation model, radiation enclosure solver, material-property database, native library, or foreign runtime dependency is included.
+  - Current source status remains research_required until exact source locators and tolerances are reviewed.
+limits:
+  - Not a certification claim.
+  - Not evidence of operational, flight, or mission readiness.
+notes: "Research target for Phase 0.001 basic heat-transfer helpers."

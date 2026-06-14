@@ -1,0 +1,31 @@
+id: source.gasdynamics.naca_report_1135.research_required
+title: NACA Report 1135 or equivalent compressible-flow reference
+category: gas_dynamics
+status: research_required
+intended_use:
+  - Source target for isentropic-flow, normal-shock, oblique-shock, Mach-angle, and Prandtl-Meyer equations.
+  - Direct isentropic relations for total-to-static ratios, area-Mach, and mass-flow parameter.
+  - Direct normal-shock relations for downstream Mach and static/total pressure, density, and temperature ratios.
+  - Direct Mach-angle and Prandtl-Meyer expansion relations, including inverse-Mach solution conventions.
+  - Branch-explicit oblique-shock theta-beta-Mach relations, upstream normal-Mach component, and downstream Mach composition.
+  - Source target for constant-gamma dry-air conventions used by early gas-dynamics helpers.
+requested_details:
+  - Exact report edition and publication metadata.
+  - Equation numbers, table numbers, page ranges, and assumptions.
+  - Isentropic equation normalization conventions for A/A* and mass-flow parameter.
+  - Normal-shock equations, total-pressure convention, example values, and tolerance targets.
+  - Mach-angle and Prandtl-Meyer equations, maximum-angle convention, inverse examples, limiting behavior, example values, and tolerance targets.
+  - Branch conventions for subsonic/supersonic area-Mach and weak/strong oblique-shock calculations.
+  - Oblique-shock theta-beta-Mach relation, detachment-limit examples, weak/strong beta examples, downstream Mach examples, and tolerance targets.
+  - Verification examples and acceptable numerical tolerances.
+implementation_notes:
+  - Current implementations should remain preliminary until equation-level traceability is added.
+  - Constant-gamma dry-air usage remains a documented assumption, not a broad gas model.
+  - Microtask 9 reviewed direct isentropic scalar helpers; inverse area-Mach branch solving is deferred.
+  - Microtask 10 reviewed direct normal-shock scalar helpers; source status remains research_required.
+  - Microtask 11 reviewed direct Mach-angle and Prandtl-Meyer scalar helpers plus the bounded inverse helper; source status remains research_required.
+  - Microtask 12 reviewed branch-explicit attached oblique-shock scalar helpers; detached-shock modeling and source status upgrades remain deferred.
+limits:
+  - Not a certification claim.
+  - Not evidence of operational, flight, or mission readiness.
+notes: "Exact equation and table provenance pending."

@@ -1,9 +1,0 @@
-# Adjust maintainers after the GitHub organization/repo is finalized.
-* @ConorMcGibboney
-
-/docs/ @ConorMcGibboney
-/validation/ @ConorMcGibboney
-/crates/aero-codex-core/ @ConorMcGibboney
-/crates/aero-codex-units/ @ConorMcGibboney
-/crates/aero-codex-numerics/ @ConorMcGibboney
-/crates/aero-codex-validation/ @ConorMcGibboney

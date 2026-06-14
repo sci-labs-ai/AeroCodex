@@ -1,0 +1,30 @@
+id: life_support.bioregenerative.closure_fraction
+name: Bio-regenerative closure fraction
+category: life_support
+status: research_required
+source:
+  id: source.life_support.nasa_bvad_eclss.research_required
+  status: research_required
+assumptions:
+  - steady daily or rate-normalized mass-balance interval
+  - recycled and required mass rates use consistent units
+  - boundary definition, storage, overproduction, losses, and reserves are external to this primitive
+domain: "recycled_mass_rate >= 0, total_required_mass_rate > 0; values above 1 warn and are marked outside ordinary closure domain for accounting-boundary review"
+inputs:
+  - recycled_mass_rate
+  - total_required_mass_rate
+outputs:
+  - closure_fraction
+  - validity_status
+  - warning when closure_fraction > 1
+tests:
+  - closure fraction equals recycled divided by required
+  - closure fraction greater than one is marked as warning-bearing and outside ordinary closure domain
+  - warning produced when closure fraction exceeds one
+  - nonfinite derived closure returns numerical failure
+failure_modes:
+  - negative recycled rate rejected
+  - nonpositive required rate rejected
+  - nonfinite input rejected
+  - nonfinite derived output rejected
+notes: "Phase 0.001 primitive only, not a validated ECLSS design model, habitat safety analysis, medical model, operational model, or mission-readiness claim."

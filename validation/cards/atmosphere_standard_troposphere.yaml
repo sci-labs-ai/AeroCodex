@@ -1,0 +1,38 @@
+id: atmosphere.standard.troposphere
+name: Simplified standard-atmosphere troposphere
+category: atmosphere
+status: research_required
+source:
+  id: source.atmosphere.us_standard_atmosphere_1976.research_required
+  status: research_required
+  locator_notes: "Exact layer/table provenance and geometric/geopotential altitude convention review pending."
+assumptions:
+  - dry air with constant gas constant and gamma where speed of sound is requested
+  - constant troposphere lapse rate over the Phase 0.001 domain
+  - supplied geometric altitude is used directly as the standard-atmosphere altitude variable
+  - altitude conversion between geometric and geopotential altitude is deferred
+domain: "0 m <= altitude_m <= 11000 m; gamma > 1; gas_constant > 0; temperature > 0"
+inputs:
+  - altitude_m
+  - gamma
+  - gas_constant
+  - temperature
+outputs:
+  - temperature_k
+  - pressure_pa
+  - density_kg_m3
+  - speed_of_sound_m_s
+tests:
+  - sea-level temperature, pressure, and density match Phase 0.001 seed constants
+  - temperature decreases with altitude in the accepted troposphere domain
+  - pressure decreases with altitude in the accepted troposphere domain
+  - density decreases with altitude in the accepted troposphere domain
+  - speed of sound is positive for positive gamma, gas constant, and temperature
+failure_modes:
+  - negative altitude rejected
+  - altitude above 11000 m rejected
+  - nonfinite altitude rejected
+  - invalid gamma rejected
+  - nonpositive gas constant rejected
+  - nonpositive temperature rejected
+notes: "Implementation scaffold only; card and source remain research_required until source equations, tables, and tolerances are reviewed."

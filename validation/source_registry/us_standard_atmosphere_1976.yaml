@@ -1,0 +1,19 @@
+id: source.atmosphere.us_standard_atmosphere_1976.research_required
+title: U.S. Standard Atmosphere 1976
+category: atmosphere
+status: research_required
+intended_use:
+  - Source target for sea-level constants and early troposphere equations.
+  - Source target for later atmosphere validation cards and tolerances.
+requested_details:
+  - Exact publication identifier and edition.
+  - Layer definitions, lapse rates, sea-level constants, and table references.
+  - Geometric versus geopotential altitude conventions.
+  - Reproducible tolerances for derived Phase 0.001 functions.
+implementation_notes:
+  - Current constants are seed values only.
+  - No validation-card status should be upgraded from research_required until source details are reviewed.
+limits:
+  - Not a certification claim.
+  - Not evidence of operational, flight, or mission readiness.
+notes: "Exact constants, layers, tables, and altitude definitions need source review."

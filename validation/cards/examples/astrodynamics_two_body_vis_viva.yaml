@@ -1,0 +1,27 @@
+id: astrodynamics.two_body.vis_viva
+name: Vis-viva orbital speed
+category: astrodynamics
+status: research_required
+source:
+  id: source.astrodynamics.nasa_jpl_parameters.research_required
+  status: research_required
+assumptions:
+  - two-body point-mass dynamics
+  - conic orbit
+  - positive gravitational parameter
+  - positive radius and semi-major axis for Phase 0.001 ellipse helper
+domain: "mu > 0, radius > 0, semi_major_axis > 0"
+inputs:
+  - mu
+  - radius
+  - semi_major_axis
+outputs:
+  - speed
+tests:
+  - equals circular speed when semi_major_axis equals radius
+  - rejects nonpositive inputs
+failure_modes:
+  - nonpositive gravitational parameter
+  - nonpositive radius
+  - nonpositive semi-major axis
+notes: "Common equation implemented; exact source provenance pending review."

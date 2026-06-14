@@ -1,0 +1,23 @@
+id: source.structures.basic_mechanics.research_required
+title: Elementary structures equation source to be selected
+category: structures
+status: research_required
+intended_use:
+  - Source target for axial stress sigma = F/A.
+  - Source target for elastic bending stress sigma = M*y/I.
+  - Source target for cantilever tip deflection under an end load.
+  - Source target for ideal Euler column buckling load.
+requested_details:
+  - Exact textbook, NASA handbook, engineering handbook, or other source edition selected for each equation.
+  - Equation numbers, page ranges, symbols, SI units, sign conventions, and section-axis conventions.
+  - Effective-length factor convention and end-condition examples for Euler buckling.
+  - Applicability limits for slender beams, Euler-Bernoulli assumptions, ideal columns, linear elasticity, and small deflections.
+  - Representative values and tolerances suitable for pure-Rust unit and validation tests.
+implementation_notes:
+  - Microtask 16 reviews scalar elementary structures helpers only.
+  - No finite-element solver, structural optimization solver, material-property database, composite layup model, fatigue/fracture solver, native library, or foreign runtime dependency is included.
+  - Current source status remains research_required until exact source locators and tolerances are reviewed.
+limits:
+  - Not a certification claim.
+  - Not evidence of operational, flight, or mission readiness.
+notes: "Research target for Phase 0.001 elementary structures helpers."

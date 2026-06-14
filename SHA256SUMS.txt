@@ -1,1 +1,0 @@
-The final zip checksum is distributed alongside the archive as AeroCodex_repository_foundation_v0_0_1_SHA256.txt.

@@ -1,0 +1,44 @@
+id: gasdyn.oblique_shock.branch_explicit_solver
+name: Branch-explicit oblique-shock theta-beta-Mach solver
+category: gas_dynamics
+status: research_required
+source:
+  id: source.gasdynamics.naca_report_1135.research_required
+  status: research_required
+  locator_notes: "Exact NACA Report 1135/equivalent edition, theta-beta-Mach equation numbers, branch convention, detachment examples, and tolerance targets pending review."
+assumptions:
+  - calorically perfect gas with constant gamma
+  - steady inviscid attached oblique shock
+  - two-dimensional scalar theta-beta-Mach relation
+  - upstream Mach number is strictly supersonic
+  - weak or strong branch is selected explicitly by the caller
+  - no detached-shock model, shock-polar construction, viscous effects, real-gas effects, or three-dimensional effects are modeled
+  - source traceability and reference numerical validation remain pending
+domain: "mach > 1; gamma > 1; 0 < theta < pi/2 for beta solve; Mach angle < beta < pi/2 for residual, normal component, and downstream projection"
+inputs:
+  - mach
+  - beta
+  - gamma
+  - theta
+  - branch
+outputs:
+  - theta_beta_mach_residual
+  - beta
+  - upstream_normal_mach
+  - downstream_mach
+tests:
+  - weak and strong branches produce distinct beta values for a representative attached case
+  - solved beta values make theta-beta-Mach residual approximately zero
+  - upstream normal Mach component is supersonic for representative attached weak and strong shock roots
+  - downstream Mach is finite and positive for representative attached weak and strong shock roots
+  - subsonic upstream Mach and invalid gamma are rejected
+  - beta below Mach angle and invalid beta-minus-theta projection are rejected
+  - too-large finite theta returns numerical_failure rather than NaN
+failure_modes:
+  - upstream Mach less than or equal to 1 rejected
+  - gamma less than or equal to 1 rejected
+  - nonpositive theta rejected by beta solver
+  - beta at or below Mach angle rejected for attached-shock normal component
+  - no attached weak or strong solution reported as numerical_failure
+  - nonfinite intermediate or derived values reported as numerical_failure
+notes: "Phase 0.001 branch-explicit oblique-shock scaffold only; source equation traceability, detachment-limit validation, branch-table comparison, and tolerances remain research_required."
