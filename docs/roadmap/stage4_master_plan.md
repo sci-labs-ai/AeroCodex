@@ -43,6 +43,8 @@ Chunk 4 records that boundary in `docs/assurance/biosim_rs_license_architecture.
 
 Orekit is an Apache-2.0 reference source for space-flight-dynamics architecture and validation thinking. It may guide terminology, test-oracle selection, and architecture review. It must not be copied class-for-class or used to preserve Java inheritance structures in Rust.
 
+Chunk 5 records that boundary in `docs/assurance/orekit_reference_oracle_mapping.md` and `docs/source_intake/orekit_reference_oracle_boundary.md`. Those files define allowed oracle-planning use, future evidence fields, reference-oracle test families, and non-copying architecture rules; they do not run Orekit, generate fixtures, port Java classes, or promote new astrodynamics APIs.
+
 ## Chunk sequence
 
 | Chunk | Name | Scope | Public code impact |
@@ -52,7 +54,7 @@ Orekit is an Apache-2.0 reference source for space-flight-dynamics architecture 
 | 2 | Validation/status vocabulary normalization | Add the canonical status vocabulary registry, human guidance, and `cargo run -p xtask -- verify status-vocabulary` gate across validation cards, source-registry seeds, and data-governance fields. | None. Governance and verifier only. |
 | 3 | Formula-vault staging design | Plan quarantined M07 ingestion shape, equation contracts, tolerance policy, and certification queue. Chunk 3 adds `docs/assurance/formula_vault_staging.md`, `docs/source_intake/m07_formula_vault_intake.md`, and the empty `formula-vault/` skeleton. | No public API promotion; no M07 source-code import. |
 | 4 | BioSim-RS license-bound architecture | Define clean-room, GPL-compatible, and permissioned paths; record workspace boundary and validation plan in `docs/assurance/biosim_rs_license_architecture.md`, `docs/source_intake/biosim_rs_source_boundary.md`, and the README-only `biosim-rs/` placeholder. | No dual-core mixing without a licensing decision; no implementation import. |
-| 5 | Orekit reference-oracle mapping | Define reference-oracle use, test families, and non-copying architecture notes. | No class hierarchy cloning. |
+| 5 | Orekit reference-oracle mapping | Define reference-oracle use, test families, future oracle evidence records, and non-copying architecture notes in `docs/assurance/orekit_reference_oracle_mapping.md` and `docs/source_intake/orekit_reference_oracle_boundary.md`. | No class hierarchy cloning; no Orekit execution, fixtures, Java source import, or new APIs. |
 | 6+ | Implementation slices | Only after governance, source IDs, validation status, and license boundaries are in place. | Bounded by per-slice gates. |
 
 ## Promotion gates for any future capability

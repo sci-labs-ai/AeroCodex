@@ -39,6 +39,12 @@ Chunk 4 defines the BioSim-RS license and source boundary in `docs/assurance/bio
 
 The BioSim-RS source artifacts remain the registered external archives `stage4.biosim_rs_bootstrap.2026_06_15` and `stage4.biosim_java_reference.2026_06_15`. Later BioSim-RS slices must choose a GPL-compatible, permissioned, or clean-room path before implementation promotion.
 
+## Chunk 5 Orekit reference-oracle mapping
+
+Chunk 5 defines the Orekit reference-oracle mapping in `docs/assurance/orekit_reference_oracle_mapping.md` and records the source boundary in `docs/source_intake/orekit_reference_oracle_boundary.md`. It does not import Orekit source code, does not run Orekit, does not create fixtures, does not add public APIs, and does not copy the Java class hierarchy.
+
+The Orekit source artifact remains the registered external archive `stage4.orekit_reference.2026_06_15`. Future Orekit-backed checks must create slice-specific oracle evidence records with source IDs, units, frames, epochs, valid domains, expected outputs, tolerances, fixture hashes where applicable, validation/status vocabulary values, and the research/preliminary-design caveat.
+
 ## M07 astrodynamics release-candidate observations
 
 - The M07 artifact manifest reports 1,350 represented function rows.
@@ -58,6 +64,7 @@ The BioSim-RS source artifacts remain the registered external archives `stage4.b
 - The Orekit archive was observed with 4,865 total files, including 3,584 Java source files, 83 markup files, and 64 PlantUML files.
 - Orekit is Apache-2.0 source material and can serve as a reference oracle and architecture guide.
 - Stage 4 must not copy Orekit design class-for-class or preserve Java class hierarchy structure in Rust.
+- Chunk 5 maps permitted oracle families at a capability/test-family level only; future slices still need fixture manifests, source IDs, units, domains, tolerances, validation cards, and promotion gates before any Orekit-backed comparison can support public behavior.
 
 ## Intake rules for future chunks
 

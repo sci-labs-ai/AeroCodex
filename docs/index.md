@@ -14,6 +14,8 @@ Start with:
 - [BioSim-RS license-bound architecture](assurance/biosim_rs_license_architecture.md)
 - [BioSim-RS source boundary](source_intake/biosim_rs_source_boundary.md)
 - [BioSim-RS boundary placeholder](../biosim-rs/)
+- [Orekit reference-oracle mapping](assurance/orekit_reference_oracle_mapping.md)
+- [Orekit reference-oracle source boundary](source_intake/orekit_reference_oracle_boundary.md)
 - [Stage 4 agent operating rules](deployment/stage4_agent_operating_rules.md)
 - [Math correctness policy](assurance/math_correctness_policy.md)
 - [Merge and release policy](assurance/merge_and_release_policy.md)
