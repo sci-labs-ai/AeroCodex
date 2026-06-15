@@ -1,0 +1,200 @@
+# AeroCodex Stage 4 data/source governance registry.
+# External Stage 4 source archives use logical external://stage4/... paths so public
+# repo files do not depend on user-specific local Windows paths.
+artifacts:
+  - id: in_repo.data_manifest
+    title: AeroCodex thin-film BLSS data manifest
+    local_path: DATA_MANIFEST.toml
+    artifact_kind: repo_file_manifest
+    origin: current_repo
+    license: MIT OR Apache-2.0 with source-material attribution boundaries
+    sha256: 3a1b6b85ba3a5bb6f551fcb860f48c27348fba2a9c2e95dcfdd8f70a0342c7c4
+    hash_status: sha256_verified_current_repo_file
+    allowed_use: in-repository provenance and thin-film source manifest tracking only
+    bundling_decision: bundled repo-relative governance artifact; not an external-code import
+    validation_status: repository_tracked_manifest
+    owner: AeroCodex maintainers
+    update_cadence: refresh when tracked thin-film artifact manifest changes
+    notes: Existing repository manifest for thin-film BLSS materials; does not certify operational, flight, habitat, medical, or regulated use.
+  - id: in_repo.citations
+    title: Citation bibliography directory
+    local_path: citations/
+    artifact_kind: repo_directory_bibliography
+    origin: current_repo
+    license: citation metadata and referenced-source licenses remain source-specific
+    sha256: 464372a2a6d32a61dc3ff53ac292b0b92f26965eaac91ad5959ecd670860346e
+    hash_status: aggregate_sha256_current_tracked_tree
+    allowed_use: citation traceability and source attribution support only
+    bundling_decision: bundled repo-relative citation material; not implementation code
+    validation_status: repository_tracked_citation_support
+    owner: AeroCodex maintainers
+    update_cadence: refresh when bibliography entries change
+    notes: Directory aggregate covers tracked citation files only; source-specific licenses and attribution remain authoritative.
+  - id: in_repo.data_thinfilm
+    title: Thin-film data cards, scenarios, and equation manifest
+    local_path: data/thinfilm/
+    artifact_kind: repo_directory_data
+    origin: current_repo
+    license: MIT OR Apache-2.0 with cited-source attribution boundaries
+    sha256: 35bd385aef29827a24eb42332051e4f18a028f66aa4351de3e52bfd1d9c54146
+    hash_status: aggregate_sha256_current_tracked_tree
+    allowed_use: research data cards and source-verification support for thin-film BLSS kernels only
+    bundling_decision: bundled repo-relative data material; not certification evidence by itself
+    validation_status: repository_tracked_research_data
+    owner: AeroCodex maintainers
+    update_cadence: refresh when thin-film parameter cards, scenarios, or equation manifests change
+    notes: Supports research/preliminary-design kernels only; not habitat-safe, medical, operational, or regulated-use evidence.
+  - id: in_repo.validation_cards
+    title: Validation card registry
+    local_path: validation/cards/
+    artifact_kind: repo_directory_validation_cards
+    origin: current_repo
+    license: MIT OR Apache-2.0
+    sha256: d7d7e2161a0bee583a210338aa4befa6071d0a0aa8b8e11981621065cfede404
+    hash_status: aggregate_sha256_current_tracked_tree
+    allowed_use: validation-card metadata and source-status tracking only
+    bundling_decision: bundled repo-relative validation metadata; no external archive import
+    validation_status: verified_by_xtask_cards
+    owner: AeroCodex maintainers
+    update_cadence: refresh when validation cards are added or changed
+    notes: Cards retain research/preliminary-design caveats and must not claim certification or operational approval.
+  - id: in_repo.validation_source_registry
+    title: Validation source-registry seeds
+    local_path: validation/source_registry/
+    artifact_kind: repo_directory_source_registry
+    origin: current_repo
+    license: MIT OR Apache-2.0 metadata with cited-source boundaries
+    sha256: 665ecfb1629daccaba294088cdcf4fc9f3adfd0640cc34618bb7c0c3d44a332c
+    hash_status: aggregate_sha256_current_tracked_tree
+    allowed_use: source seed registry and validation-card linkage only
+    bundling_decision: bundled repo-relative source metadata; not external source-code import
+    validation_status: verified_by_xtask_source_registry
+    owner: AeroCodex maintainers
+    update_cadence: refresh when source-registry seeds change
+    notes: Source IDs support traceability; cited sources remain authoritative for licensing, equations, limits, and use restrictions.
+  - id: in_repo.nomenclature_generated
+    title: Generated nomenclature and acronym inventories
+    local_path: nomenclature/generated/
+    artifact_kind: repo_directory_generated_inventory
+    origin: current_repo
+    license: MIT OR Apache-2.0 generated metadata
+    sha256: 836b18970a556be326affc0c169ed8e4d947e2afa7726576d642cbea7b9c298e
+    hash_status: aggregate_sha256_current_tracked_tree
+    allowed_use: terminology, acronym, and generated inventory consistency checks only
+    bundling_decision: bundled generated registry output; regenerated by nomenclature tooling
+    validation_status: governed_generated_inventory
+    owner: AeroCodex maintainers
+    update_cadence: refresh when nomenclature registry or terminology export changes
+    notes: Generated files are checked by nomenclature tooling and must remain consistent after terminology export.
+  - id: in_repo.source_material_current_repo
+    title: Current-repo source material snapshot
+    local_path: source_material/current_repo/
+    artifact_kind: repo_directory_source_material
+    origin: current_repo
+    license: MIT OR Apache-2.0 repository snapshot material
+    sha256: f2e2161b38aef08c4a6c10c9bca6274ce77f5c0df515084008db3a4c74d659dc
+    hash_status: aggregate_sha256_current_tracked_tree
+    allowed_use: source-material provenance and comparison only
+    bundling_decision: bundled source-material snapshot already tracked by repo manifest; not a public API import
+    validation_status: repository_tracked_source_material
+    owner: AeroCodex maintainers
+    update_cadence: refresh only through explicit source-material update chunks
+    notes: Existing in-repo source-material snapshot; not a reason to overwrite crates or bypass review gates.
+  - id: in_repo.source_material_new_thinfilm
+    title: New thin-film source material bundle directory
+    local_path: source_material/new_thinfilm/
+    artifact_kind: repo_directory_source_material
+    origin: current_repo
+    license: mixed source material with citation and artifact-specific boundaries
+    sha256: a3ff4cfe364e793e0734d57779922093a335a713d478ce7fc8424c02cab1fb73
+    hash_status: aggregate_sha256_current_tracked_tree
+    allowed_use: thin-film BLSS source traceability and research-kernel provenance only
+    bundling_decision: bundled source-material directory; no certification or public API promotion by itself
+    validation_status: repository_tracked_source_material
+    owner: AeroCodex maintainers
+    update_cadence: refresh only through explicit source-material update chunks
+    notes: Supports source traceability for research/preliminary-design material; not habitat-safe, medical-use, operational, or regulated-use evidence.
+  - id: stage4.aerocodex_main_reference.2026_06_15
+    title: AeroCodex main reference archive
+    local_path: external://stage4/AeroCodex-main (3).zip
+    artifact_kind: external_archive_reference_snapshot
+    origin: stage4_external_materials
+    license: MIT OR Apache-2.0 AeroCodex repository snapshot
+    sha256: 48e3a8bea47a9093e43538e7c2a47637f15278bffdadff63e2a603e2efa7d12c
+    hash_status: sha256_verified_from_stage4_local_source
+    allowed_use: reference comparison and planning context only; no bulk promotion to crates
+    bundling_decision: not bundled in repo; not promoted as AeroCodex API source
+    validation_status: planning_reference_compared_in_chunk0
+    owner: AeroCodex maintainers
+    update_cadence: refresh only if a newer Stage 4 reference archive is supplied
+    notes: Logical path replaces the observed local Stage 4 source location; GitHub main remains the source of truth.
+  - id: stage4.m07_rust_port_v14.2026_06_15
+    title: M07 Scilab-to-Rust astrodynamics release-candidate bundle
+    local_path: external://stage4/aerocodex_rust_port_v14_m07_final_bundle.zip
+    artifact_kind: external_archive_release_candidate
+    origin: stage4_m07_astrodynamics_formula_vault_candidate
+    license: license_pending_review_release_candidate_source_material_only
+    sha256: 15b1ca3a39267187167c43ea1228f28fd4736c4456f65d072dc42a32a7b19190
+    hash_status: sha256_verified_from_stage4_local_source
+    allowed_use: quarantined formula-vault candidate and reference material only
+    bundling_decision: not public API and not merged into crates until Rust CI, Scilab equivalence, and SGP4 certification gates pass
+    validation_status: release_candidate_not_certified
+    owner: AeroCodex maintainers
+    update_cadence: refresh only when a new M07 bundle is supplied and re-hashed
+    notes: Bundle reports 1,350 represented function rows and 188 Scilab equivalence jobs; do not overwrite crates/aero-codex-astrodynamics and do not certify until full release gates pass.
+  - id: stage4.biosim_rs_bootstrap.2026_06_15
+    title: BioSim-RS GPL-boundaried Rust scaffold
+    local_path: external://stage4/aerocodex-biosim-rs-bootstrap.zip
+    artifact_kind: external_archive_scaffold
+    origin: stage4_biosim_rs_workstream
+    license: GPL-3.0-or-later
+    sha256: 4e8912dabe1e0a41a0ad397e4b4b57a81749a4c7bbfbebedcfd944d44288183e
+    hash_status: sha256_verified_from_stage4_local_source
+    allowed_use: GPL-boundaried reference and rewrite planning material only
+    bundling_decision: not bundled in repo; do not mix GPL-bound scaffold code into the dual MIT/Apache AeroCodex core
+    validation_status: source_material_registered_not_promoted
+    owner: AeroCodex maintainers
+    update_cadence: refresh only when a new BioSim-RS scaffold archive is supplied and re-hashed
+    notes: First-class Stage 4 workstream candidate, but license boundaries must be resolved before any implementation promotion.
+  - id: stage4.biosim_java_reference.2026_06_15
+    title: Original Java BioSim source reference
+    local_path: external://stage4/biosim-main (1).zip
+    artifact_kind: external_archive_reference_source
+    origin: stage4_biosim_java_reference
+    license: GPL-3.0
+    sha256: 4168c9147ccdc14890b497a944354f615119f2908996805559d61c11991414c5
+    hash_status: sha256_verified_from_stage4_local_source
+    allowed_use: GPL-boundaried reference and clean rewrite planning material only
+    bundling_decision: not bundled in repo; do not import GPL Java implementation code into the dual MIT/Apache AeroCodex core
+    validation_status: source_material_registered_not_promoted
+    owner: AeroCodex maintainers
+    update_cadence: refresh only when a new BioSim Java reference archive is supplied and re-hashed
+    notes: Original GPL-3.0 Java BioSim source/reference; future work needs GPL-compatible, permissioned, or clean-room licensing path before implementation use.
+  - id: stage4.orekit_reference.2026_06_15
+    title: Orekit develop reference archive
+    local_path: external://stage4/Orekit-develop.zip
+    artifact_kind: external_archive_reference_source
+    origin: stage4_orekit_reference_oracle
+    license: Apache-2.0
+    sha256: f4b36d8a8df7d293724fb3ffbd07264d4bc984ab36506bc223a6545cc27bd574
+    hash_status: sha256_verified_from_stage4_local_source
+    allowed_use: reference oracle and architecture comparison only
+    bundling_decision: not bundled in repo; do not clone Orekit class hierarchy or architecture class-for-class
+    validation_status: source_material_registered_not_promoted
+    owner: AeroCodex maintainers
+    update_cadence: refresh only when a new Orekit reference archive is supplied and re-hashed
+    notes: Apache-2.0 reference material for comparison and oracle planning; no direct class-for-class porting.
+  - id: stage4.talk_plan.2026_06_15
+    title: Stage 4 talk/planning archive
+    local_path: external://stage4/talk.zip
+    artifact_kind: external_archive_planning_notes
+    origin: stage4_external_materials
+    license: planning_material_license_pending_review
+    sha256: fef17836f1074602b40850ad1fe4a821ae9fa589b2fae14b9bc160df11fc5c18
+    hash_status: sha256_verified_from_stage4_local_source
+    allowed_use: planning context and governance reference only
+    bundling_decision: not bundled in repo; not implementation code and not promoted as AeroCodex API source
+    validation_status: planning_material_registered_not_promoted
+    owner: AeroCodex maintainers
+    update_cadence: refresh only when updated planning archive is supplied and re-hashed
+    notes: Prior consolidated planning notes; registry inclusion does not imply any implementation, certification, operational, habitat-safe, medical, or regulated-use approval.

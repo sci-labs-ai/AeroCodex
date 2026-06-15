@@ -1,7 +1,7 @@
 #![forbid(unsafe_code)]
 
 use std::{
-    collections::BTreeSet,
+    collections::{BTreeMap, BTreeSet},
     env, fs,
     path::{Path, PathBuf},
 };
@@ -128,6 +128,22 @@ const FORBIDDEN_READINESS_MARKERS: &[&str] = &[
     "status: mission_ready",
 ];
 
+const REQUIRED_DATA_REGISTRY_FIELDS: &[&str] = &[
+    "id",
+    "title",
+    "local_path",
+    "artifact_kind",
+    "origin",
+    "license",
+    "hash_status",
+    "allowed_use",
+    "bundling_decision",
+    "validation_status",
+    "owner",
+    "update_cadence",
+    "notes",
+];
+
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
     let arg_refs: Vec<&str> = args.iter().map(String::as_str).collect();
@@ -144,6 +160,10 @@ fn main() {
         ["verify", "source-registry"] => {
             let root = repo_root();
             verify_source_registry(&root).map(|_| ())
+        }
+        ["verify", "data-registry"] => {
+            let root = repo_root();
+            verify_data_registry(&root).map(|_| ())
         }
         ["dependency-policy"] => dependency_policy(),
         ["help"] | ["--help"] | ["-h"] => {
@@ -164,7 +184,7 @@ fn main() {
 
 fn print_usage() {
     eprintln!(
-        "usage:\n  cargo run -p xtask -- verify --all\n  cargo run -p xtask -- verify cards\n  cargo run -p xtask -- verify source-registry\n  cargo run -p xtask -- dependency-policy"
+        "usage:\n  cargo run -p xtask -- verify --all\n  cargo run -p xtask -- verify cards\n  cargo run -p xtask -- verify source-registry\n  cargo run -p xtask -- verify data-registry\n  cargo run -p xtask -- dependency-policy"
     );
 }
 
@@ -180,6 +200,7 @@ fn verify_all() -> Result<(), String> {
     verify_schema(&root)?;
     let source_ids = verify_source_registry(&root)?;
     verify_cards(&root, Some(&source_ids))?;
+    verify_data_registry(&root)?;
     Ok(())
 }
 
@@ -339,6 +360,323 @@ fn verify_source_registry(root: &Path) -> Result<BTreeSet<String>, String> {
 
     println!("verified {count} source-registry seeds");
     Ok(ids)
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct DataRegistryEntry {
+    line: usize,
+    fields: BTreeMap<String, String>,
+}
+
+impl DataRegistryEntry {
+    fn get(&self, field: &str) -> Option<&str> {
+        self.fields.get(field).map(String::as_str)
+    }
+}
+
+fn verify_data_registry(root: &Path) -> Result<Vec<DataRegistryEntry>, String> {
+    let registry = root.join("data-governance/DATA_REGISTRY.yaml");
+    if !registry.is_file() {
+        return Err(format!("missing data registry: {}", registry.display()));
+    }
+
+    let text = fs::read_to_string(&registry).map_err(|e| format!("{}: {e}", registry.display()))?;
+    let entries = verify_data_registry_text(&registry, &text)?;
+    for entry in &entries {
+        let local_path = entry.get("local_path").unwrap_or_default();
+        if is_external_path(local_path) {
+            continue;
+        }
+        let candidate = root.join(local_path);
+        if !candidate.exists() {
+            return Err(format!(
+                "{} entry `{}` local_path `{local_path}` does not exist in the repository",
+                registry.display(),
+                entry.get("id").unwrap_or("<missing>")
+            ));
+        }
+    }
+
+    println!(
+        "verified {} data-governance registry entries",
+        entries.len()
+    );
+    Ok(entries)
+}
+
+fn verify_data_registry_text(path: &Path, text: &str) -> Result<Vec<DataRegistryEntry>, String> {
+    let entries = parse_data_registry_entries(path, text)?;
+    let mut ids = BTreeSet::new();
+
+    for entry in &entries {
+        for field in REQUIRED_DATA_REGISTRY_FIELDS {
+            match entry.get(field) {
+                Some(value) if !value.is_empty() => {}
+                _ => {
+                    return Err(format!(
+                        "{} entry starting line {} missing required field `{field}:`",
+                        path.display(),
+                        entry.line
+                    ));
+                }
+            }
+        }
+
+        let id = entry.get("id").unwrap_or_default();
+        if !is_valid_artifact_id(id) {
+            return Err(format!(
+                "{} entry starting line {} has invalid artifact id `{id}`",
+                path.display(),
+                entry.line
+            ));
+        }
+        if !ids.insert(id.to_string()) {
+            return Err(format!("duplicate data-registry artifact id `{id}`"));
+        }
+
+        let local_path = entry.get("local_path").unwrap_or_default();
+        validate_data_registry_local_path(path, entry, local_path)?;
+
+        let hash_status = entry.get("hash_status").unwrap_or_default();
+        match entry.get("sha256") {
+            Some(hash) if !hash.is_empty() => {
+                if !is_valid_sha256(hash) {
+                    return Err(format!(
+                        "{} entry `{id}` has invalid sha256 `{hash}`",
+                        path.display()
+                    ));
+                }
+            }
+            _ => {
+                if !is_pending_hash_status(hash_status) {
+                    return Err(format!(
+                        "{} entry `{id}` missing `sha256:` without `hash_status: pending_with_reason`",
+                        path.display()
+                    ));
+                }
+            }
+        }
+
+        if is_external_archive(entry) && has_unsafe_external_archive_decision(entry) {
+            return Err(format!(
+                "{} entry `{id}` has unsafe external archive import decision",
+                path.display()
+            ));
+        }
+    }
+
+    Ok(entries)
+}
+
+fn parse_data_registry_entries(path: &Path, text: &str) -> Result<Vec<DataRegistryEntry>, String> {
+    let mut entries = Vec::new();
+    let mut current: Option<DataRegistryEntry> = None;
+    let mut saw_artifacts = false;
+
+    for (index, raw_line) in text.lines().enumerate() {
+        let line_no = index + 1;
+        let trimmed = raw_line.trim();
+        if trimmed.is_empty() || trimmed.starts_with('#') {
+            continue;
+        }
+        if trimmed == "artifacts:" {
+            if saw_artifacts {
+                return Err(format!(
+                    "{} line {line_no}: duplicate `artifacts:` root",
+                    path.display()
+                ));
+            }
+            saw_artifacts = true;
+            continue;
+        }
+        if !saw_artifacts {
+            return Err(format!(
+                "{} line {line_no}: expected top-level `artifacts:` before registry entries",
+                path.display()
+            ));
+        }
+
+        if let Some(rest) = trimmed.strip_prefix("- ") {
+            finish_data_registry_entry(path, &mut entries, current.take())?;
+            let mut entry = DataRegistryEntry {
+                line: line_no,
+                fields: BTreeMap::new(),
+            };
+            if !rest.trim().is_empty() {
+                insert_data_registry_field(path, &mut entry, line_no, rest.trim())?;
+            }
+            current = Some(entry);
+            continue;
+        }
+
+        if trimmed == "-" {
+            finish_data_registry_entry(path, &mut entries, current.take())?;
+            current = Some(DataRegistryEntry {
+                line: line_no,
+                fields: BTreeMap::new(),
+            });
+            continue;
+        }
+
+        if raw_line.starts_with(' ') || raw_line.starts_with('\t') {
+            let entry = current.as_mut().ok_or_else(|| {
+                format!(
+                    "{} line {line_no}: registry field appears before an artifact entry",
+                    path.display()
+                )
+            })?;
+            insert_data_registry_field(path, entry, line_no, trimmed)?;
+            continue;
+        }
+
+        return Err(format!(
+            "{} line {line_no}: malformed data-registry line `{trimmed}`",
+            path.display()
+        ));
+    }
+
+    finish_data_registry_entry(path, &mut entries, current.take())?;
+    if entries.is_empty() {
+        return Err(format!("{} has no data-registry entries", path.display()));
+    }
+
+    Ok(entries)
+}
+
+fn finish_data_registry_entry(
+    path: &Path,
+    entries: &mut Vec<DataRegistryEntry>,
+    entry: Option<DataRegistryEntry>,
+) -> Result<(), String> {
+    if let Some(entry) = entry {
+        if entry.fields.is_empty() {
+            return Err(format!(
+                "{} entry starting line {} is empty or malformed",
+                path.display(),
+                entry.line
+            ));
+        }
+        entries.push(entry);
+    }
+    Ok(())
+}
+
+fn insert_data_registry_field(
+    path: &Path,
+    entry: &mut DataRegistryEntry,
+    line_no: usize,
+    text: &str,
+) -> Result<(), String> {
+    let (field, raw_value) = text.split_once(':').ok_or_else(|| {
+        format!(
+            "{} line {line_no}: malformed registry field `{text}`",
+            path.display()
+        )
+    })?;
+    let field = field.trim();
+    if field.is_empty()
+        || !field
+            .chars()
+            .all(|ch| ch.is_ascii_lowercase() || ch.is_ascii_digit() || ch == '_')
+    {
+        return Err(format!(
+            "{} line {line_no}: invalid registry field name `{field}`",
+            path.display()
+        ));
+    }
+    let value = clean_scalar(raw_value).to_string();
+    if entry.fields.insert(field.to_string(), value).is_some() {
+        return Err(format!(
+            "{} line {line_no}: duplicate field `{field}:` in one registry entry",
+            path.display()
+        ));
+    }
+    Ok(())
+}
+
+fn validate_data_registry_local_path(
+    path: &Path,
+    entry: &DataRegistryEntry,
+    local_path: &str,
+) -> Result<(), String> {
+    if is_external_path(local_path) {
+        return Ok(());
+    }
+    let lowered = local_path.to_ascii_lowercase();
+    if local_path.starts_with('/')
+        || lowered.starts_with("c:\\")
+        || lowered.contains("c:\\users")
+        || lowered.starts_with("/mnt/")
+        || local_path.split('/').any(|part| part == "..")
+        || local_path.split('\\').any(|part| part == "..")
+    {
+        return Err(format!(
+            "{} entry `{}` local_path `{local_path}` must be repo-relative or external://stage4/...",
+            path.display(),
+            entry.get("id").unwrap_or("<missing>")
+        ));
+    }
+    Ok(())
+}
+
+fn is_external_path(value: &str) -> bool {
+    value.starts_with("external://")
+}
+
+fn is_pending_hash_status(value: &str) -> bool {
+    value
+        .to_ascii_lowercase()
+        .starts_with("pending_with_reason")
+}
+
+fn is_valid_sha256(value: &str) -> bool {
+    value.len() == 64 && value.chars().all(|ch| ch.is_ascii_hexdigit())
+}
+
+fn is_valid_artifact_id(value: &str) -> bool {
+    if value.is_empty()
+        || value.starts_with(['.', '_', '-'])
+        || value.ends_with(['.', '_', '-'])
+        || value.contains("..")
+    {
+        return false;
+    }
+    value.chars().all(|ch| {
+        ch.is_ascii_lowercase() || ch.is_ascii_digit() || ch == '.' || ch == '_' || ch == '-'
+    })
+}
+
+fn is_external_archive(entry: &DataRegistryEntry) -> bool {
+    let local_path = entry.get("local_path").unwrap_or_default();
+    let artifact_kind = entry
+        .get("artifact_kind")
+        .unwrap_or_default()
+        .to_ascii_lowercase();
+    is_external_path(local_path)
+        && (artifact_kind.contains("archive") || local_path.to_ascii_lowercase().ends_with(".zip"))
+}
+
+fn has_unsafe_external_archive_decision(entry: &DataRegistryEntry) -> bool {
+    let allowed_use = entry
+        .get("allowed_use")
+        .unwrap_or_default()
+        .to_ascii_lowercase();
+    let bundling_decision = entry
+        .get("bundling_decision")
+        .unwrap_or_default()
+        .to_ascii_lowercase();
+    let blocked_markers = [
+        "direct public api import",
+        "public api import",
+        "import archive into public crates",
+        "import into public crates",
+        "merge into public crates",
+        "bundled in public crates",
+        "bulk import into crates",
+    ];
+    [allowed_use.as_str(), bundling_decision.as_str()]
+        .iter()
+        .any(|value| blocked_markers.iter().any(|marker| value.contains(marker)))
 }
 
 fn dependency_policy() -> Result<(), String> {
@@ -625,5 +963,93 @@ mod tests {
         assert!(!is_valid_dotted_id("LifeSupport.closure"));
         assert!(!is_valid_dotted_id("life_support..closure"));
         assert!(!is_valid_dotted_id("life-support.closure"));
+    }
+
+    fn minimal_data_registry_entry(id: &str) -> String {
+        format!(
+            "artifacts:\n  - id: {id}\n    title: Minimal registry fixture\n    local_path: data/example.txt\n    artifact_kind: repo_file\n    origin: unit_test\n    license: MIT OR Apache-2.0\n    sha256: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n    hash_status: sha256_verified\n    allowed_use: documentation and source-governance fixture only\n    bundling_decision: bundled repo-relative governance fixture\n    validation_status: registered_fixture_only\n    owner: AeroCodex maintainers\n    update_cadence: per governance update\n    notes: Minimal valid dependency-free parser fixture.\n"
+        )
+    }
+
+    fn assert_data_registry_error_contains(text: &str, expected: &str) {
+        let err = verify_data_registry_text(Path::new("DATA_REGISTRY.yaml"), text)
+            .expect_err("registry fixture should fail");
+        assert!(
+            err.contains(expected),
+            "expected error containing `{expected}`, got `{err}`"
+        );
+    }
+
+    #[test]
+    fn valid_minimal_data_registry_entry_passes() {
+        let text = minimal_data_registry_entry("artifact.valid_minimal");
+        let entries = verify_data_registry_text(Path::new("DATA_REGISTRY.yaml"), &text)
+            .expect("minimal registry entry should pass");
+        assert_eq!(entries.len(), 1);
+    }
+
+    #[test]
+    fn duplicate_data_registry_id_fails() {
+        let text = format!(
+            "{}{}",
+            minimal_data_registry_entry("artifact.duplicate"),
+            minimal_data_registry_entry("artifact.duplicate").replace("artifacts:\n", "")
+        );
+        assert_data_registry_error_contains(&text, "duplicate data-registry artifact id");
+    }
+
+    #[test]
+    fn missing_data_registry_local_path_fails() {
+        let text = minimal_data_registry_entry("artifact.missing_path")
+            .replace("    local_path: data/example.txt\n", "");
+        assert_data_registry_error_contains(&text, "missing required field `local_path:`");
+    }
+
+    #[test]
+    fn missing_data_registry_hash_without_pending_reason_fails() {
+        let text = minimal_data_registry_entry("artifact.missing_hash").replace(
+            "    sha256: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n",
+            "",
+        );
+        assert_data_registry_error_contains(
+            &text,
+            "missing `sha256:` without `hash_status: pending_with_reason`",
+        );
+    }
+
+    #[test]
+    fn missing_data_registry_license_or_status_fails() {
+        let missing_license = minimal_data_registry_entry("artifact.missing_license")
+            .replace("    license: MIT OR Apache-2.0\n", "");
+        assert_data_registry_error_contains(&missing_license, "missing required field `license:`");
+
+        let missing_status = minimal_data_registry_entry("artifact.missing_status")
+            .replace("    validation_status: registered_fixture_only\n", "");
+        assert_data_registry_error_contains(
+            &missing_status,
+            "missing required field `validation_status:`",
+        );
+    }
+
+    #[test]
+    fn external_archive_with_public_import_decision_fails() {
+        let text = minimal_data_registry_entry("stage4.unsafe_external_archive")
+            .replace(
+                "    local_path: data/example.txt\n",
+                "    local_path: external://stage4/unsafe.zip\n",
+            )
+            .replace(
+                "    artifact_kind: repo_file\n",
+                "    artifact_kind: external_archive\n",
+            )
+            .replace(
+                "    allowed_use: documentation and source-governance fixture only\n",
+                "    allowed_use: direct public API import into AeroCodex crates\n",
+            )
+            .replace(
+                "    bundling_decision: bundled repo-relative governance fixture\n",
+                "    bundling_decision: import archive into public crates\n",
+            );
+        assert_data_registry_error_contains(&text, "unsafe external archive import decision");
     }
 }

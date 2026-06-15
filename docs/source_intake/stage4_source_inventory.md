@@ -17,6 +17,10 @@ AeroCodex remains research and preliminary-design software. It is not certified,
 | `stage4:orekit-reference:2026-06-15` | `Orekit-develop.zip` | `f4b36d8a8df7d293724fb3ffbd07264d4bc984ab36506bc223a6545cc27bd574` | Orekit source reference. | Reference oracle and architecture guide only; no class-for-class clone. |
 | `stage4:talk-plan:2026-06-15` | `talk.zip` | `fef17836f1074602b40850ad1fe4a821ae9fa589b2fae14b9bc160df11fc5c18` | Prior consolidated planning notes. | Planning context only. |
 
+## Chunk 1 governance registry
+
+Chunk 1 registers the in-repo manifests/directories and external Stage 4 archives in `data-governance/DATA_REGISTRY.yaml`. The companion data/source governance policy defines repo-relative versus `external://stage4/...` paths, directory aggregate SHA256 handling, license/status fields, quarantine decisions, and the dependency-free `cargo run -p xtask -- verify data-registry` gate.
+
 ## M07 astrodynamics release-candidate observations
 
 - The M07 artifact manifest reports 1,350 represented function rows.

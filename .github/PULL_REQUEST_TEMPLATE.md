@@ -8,6 +8,7 @@ Describe the change and list the affected crates, docs, validation cards, data f
 - [ ] `cargo clippy --workspace --all-targets --all-features -- -D warnings`
 - [ ] `cargo test --workspace --all-features`
 - [ ] `cargo run -p xtask -- verify --all`
+- [ ] `cargo run -p xtask -- verify data-registry`
 - [ ] `cargo run -p xtask -- dependency-policy`
 - [ ] `python nomenclature/tooling/aerocodex_nom_lint.py --root nomenclature`
 - [ ] `python nomenclature/tooling/aerocodex_acronym_inventory.py --repo-root . --nomenclature-root nomenclature --check-new --baseline nomenclature/generated/current_repo_acronym_baseline.json`

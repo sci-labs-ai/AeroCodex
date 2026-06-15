@@ -46,7 +46,7 @@ Orekit is an Apache-2.0 reference source for space-flight-dynamics architecture 
 | Chunk | Name | Scope | Public code impact |
 | --- | --- | --- | --- |
 | 0 | Planning and governance freeze | Add Stage 4 planning, assurance, merge, and source-intake docs; update indexes. | None. Docs only. |
-| 1 | Data/source governance skeleton | Define source IDs, intake manifests, quarantine states, evidence-card schema, and license-boundary labels. | No feature code unless explicitly approved. |
+| 1 | Data/source governance skeleton | Define source IDs, intake manifests, quarantine states, evidence-card schema, and license-boundary labels. Chunk 1 adds the data/source governance policy, `data-governance/DATA_REGISTRY.yaml`, and the dependency-free `cargo run -p xtask -- verify data-registry` gate. | No feature code unless explicitly approved. |
 | 2 | Formula-vault staging design | Plan quarantined M07 ingestion shape, equation contracts, tolerance policy, and certification queue. | No public API promotion by default. |
 | 3 | BioSim-RS license-bound architecture | Define clean-room or GPL-compatible path, workspace boundary, and validation plan. | No dual-core mixing without a licensing decision. |
 | 4 | Orekit reference-oracle mapping | Define reference-oracle use, test families, and non-copying architecture notes. | No class hierarchy cloning. |
