@@ -27,6 +27,12 @@ Chunk 2 adds the canonical status vocabulary in `validation/status_vocabulary.ya
 
 No source bundle, validation card, source-registry seed, or data-governance artifact is promoted by this chunk.
 
+## Chunk 3 formula-vault staging
+
+Chunk 3 defines the quarantined M07 formula-vault staging shape in `docs/assurance/formula_vault_staging.md`, records the M07 intake boundary in `docs/source_intake/m07_formula_vault_intake.md`, and adds the empty `formula-vault/` skeleton for future reviewed metadata. It does not import M07 source code, does not promote public APIs, and does not overwrite `crates/aero-codex-astrodynamics`.
+
+The M07 source artifact remains the registered external archive `stage4.m07_rust_port_v14.2026_06_15`; the formula-vault states are quarantine lifecycle labels only and do not upgrade validation or certification status.
+
 ## M07 astrodynamics release-candidate observations
 
 - The M07 artifact manifest reports 1,350 represented function rows.

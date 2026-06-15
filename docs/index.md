@@ -9,6 +9,8 @@ Start with:
 - [Stage 4 data/source registry](../data-governance/DATA_REGISTRY.yaml)
 - [Status vocabulary](../validation/status_vocabulary.md)
 - [Status vocabulary registry](../validation/status_vocabulary.yaml)
+- [Formula-vault staging design](assurance/formula_vault_staging.md)
+- [M07 formula-vault intake](source_intake/m07_formula_vault_intake.md)
 - [Stage 4 agent operating rules](deployment/stage4_agent_operating_rules.md)
 - [Math correctness policy](assurance/math_correctness_policy.md)
 - [Merge and release policy](assurance/merge_and_release_policy.md)
