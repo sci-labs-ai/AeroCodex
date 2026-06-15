@@ -13,3 +13,24 @@ Generated artifacts for the final Microtasks 001-020 delivery:
 The repository ZIP contains repository root contents directly at ZIP root, not an extra nested `AeroCodex/` folder.
 
 The SHA256 for the final bundle is provided as an external sidecar because including a ZIP's own final digest inside itself would change the ZIP bytes.
+
+
+## Thin-film BLSS Rust conversion artifact
+
+This package extends the repository with the thin-film and biofilm BLSS Rust implementation requested after Microtasks 001-020. The repository ZIP generated from this folder should contain repository root contents directly at ZIP root. Added artifact files include:
+
+- `DATA_MANIFEST.toml`
+- `citations/blss_thinfilm_refs.bib`
+- `data/thinfilm/equation_manifest.csv`
+- `data/thinfilm/source_verification.csv`
+- `data/thinfilm/parameter_cards/*.toml`
+- `data/thinfilm/scenarios/thinfilm_panel_smoke.toml`
+- `source_material/new_thinfilm/*`
+- `crates/aero-codex-life-support/src/brlss_backbone.rs`
+- `crates/aero-codex-life-support/src/melissa_photobioreactor.rs`
+- `crates/aero-codex-life-support/src/nitrifying_biofilm.rs`
+- `crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs`
+- `crates/aero-codex-life-support/src/thinfilm_provenance.rs`
+- `validation/cards/life_support_thinfilm_*.yaml`
+- `validation/source_registry/life_support_{thinfilm,poughon,garcia,perez,montras,polizzi,blanken,detrell,vermeulen}*.yaml`
+- `scripts/verify_thinfilm_artifact.py`

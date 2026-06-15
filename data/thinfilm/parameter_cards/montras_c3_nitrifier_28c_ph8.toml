@@ -1,0 +1,19 @@
+# Representative kinetic values from the supplied thin-film report, Eq. (24)-(25).
+# Source key: montras2009. Units depend on concentration basis; keep the model basis explicit.
+[metadata]
+id = "data.life_support.thinfilm.c3.montras_28c_ph8"
+status = "equation_traceable_parameter_seed"
+source_keys = ["montras2009", "perez2005"]
+report_equations = [24, 25]
+notes = "Representative values at 28 C and pH 8 from the report; calibration required before design use."
+
+[parameters]
+k_nh4 = 0.0175
+k_no2 = 5.04e-3
+k_o2_nts = 1.616e-4
+k_o2_ntb = 5.44e-4
+ki_fa_nts = 0.116
+ki_fna_ntb = 1.56e-4
+mu_nts_per_d = 1.368
+mu_ntb_per_d = 0.864
+i_fa_ntb = 1.0

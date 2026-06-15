@@ -1,0 +1,52 @@
+equation,codex_id,rust_function,bib_keys,report_locator,notes
+1,life_support.thinfilm.generic_compartment.derivative,brlss_backbone::generic_compartment_derivative,"poughon2021,garcia2021,montras2009",section 4,State-vector structure and scalar derivative helper for Eq. (2).
+2,life_support.thinfilm.generic_compartment.derivative,brlss_backbone::generic_compartment_derivative,"poughon2021,garcia2021,montras2009",section 4,Mass-balanced compartment synthesis.
+3,life_support.thinfilm.stoichiometry.element_balance_residual,brlss_backbone::element_balance_residual,vermeulen2023,section 4,Static elemental closure residual A xi.
+4,life_support.thinfilm.stoichiometry.loop_balance_residual,brlss_backbone::loop_balance_residual,vermeulen2023,section 4,Commodity loop balance residual B xi + crew + stores.
+5,life_support.thinfilm.control.dynamic_bounds_check,brlss_backbone::within_componentwise_bounds,,section 4,Componentwise control/domain bound check.
+6,life_support.thinfilm.pbr.flat_two_flux_irradiance_ratio,melissa_photobioreactor::flat_two_flux_irradiance_ratio,poughon2021,section 5.2,Flat two-flux light-transfer ratio.
+7,life_support.thinfilm.pbr.cylindrical_two_flux_irradiance_ratio,melissa_photobioreactor::cylindrical_two_flux_irradiance_ratio,poughon2021,section 5.2,Cylindrical two-flux ratio with internal Bessel-series evaluator.
+8,life_support.thinfilm.pbr.geometric_correction,melissa_photobioreactor::geometric_correction,poughon2021,section 5.2,"Geometric correction min(1, L0/L)."
+9,life_support.thinfilm.pbr.limnospira_biomass_rate,melissa_photobioreactor::limnospira_biomass_rate,poughon2021,section 5.3,Reduced biomass growth balance.
+10,life_support.thinfilm.pbr.limnospira_tic_rate,melissa_photobioreactor::limnospira_tic_rate,poughon2021,section 5.3,Reduced total inorganic carbon balance.
+11,life_support.thinfilm.pbr.limnospira_oxygen_rate,melissa_photobioreactor::limnospira_oxygen_rate,poughon2021,section 5.3,Reduced dissolved oxygen balance.
+12,life_support.thinfilm.pbr.carbonate_species,melissa_photobioreactor::carbonate_species_from_total_and_ph,poughon2021,section 5.3,Total inorganic carbon closure over carbonate species.
+13,life_support.thinfilm.pbr.carbonate_species,melissa_photobioreactor::carbonate_species_from_total_and_ph,poughon2021,section 5.3,TIC split using supplied pKa values.
+14,life_support.thinfilm.pbr.eps_fraction,melissa_photobioreactor::eps_fraction_from_photon_requirement,poughon2021,section 5.3,EPS feasibility relation.
+15,life_support.thinfilm.pbr.tank_series_rate,melissa_photobioreactor::tank_series_concentration_rate,poughon2021,section 5.4,Tank-in-series PBR concentration balance.
+16,life_support.thinfilm.pbr.feasible_region,melissa_photobioreactor::pbr_operating_point_feasible,poughon2021,section 5.4,Boolean feasibility-map predicate.
+17,life_support.thinfilm.c3.nitrification_aob_stoichiometry,nitrifying_biofilm::nitrification_fluxes,garcia2021,section 6.1,AOB stoichiometric flux contribution.
+18,life_support.thinfilm.c3.nitrification_nob_stoichiometry,nitrifying_biofilm::nitrification_fluxes,garcia2021,section 6.1,NOB stoichiometric flux contribution.
+19,life_support.thinfilm.c3.spherical_diffusion_rate,nitrifying_biofilm::spherical_diffusion_reaction_rate,"montras2009,perez2005",section 6.2,Spherical Fickian diffusion plus reaction.
+20,life_support.thinfilm.c3.fick_biofilm_flux,nitrifying_biofilm::fick_liquid_flux,montras2009,section 6.2,Fick-law liquid flux.
+21,life_support.thinfilm.c3.biofilm_solids_rate,nitrifying_biofilm::biofilm_solids_local_rate,montras2009,section 6.2,Solids balance rearranged as local time derivative.
+22,life_support.thinfilm.c3.biofilm_thickness_rate,nitrifying_biofilm::biofilm_thickness_rate,montras2009,section 6.2,Biofilm thickness kinematic rate.
+23,life_support.thinfilm.c3.oxygen_transfer,nitrifying_biofilm::gas_liquid_transfer_flux,montras2009,section 6.2,Oxygen gas-liquid transfer flux.
+24,life_support.thinfilm.c3.nitrifier_rates,nitrifying_biofilm::nitrifier_rates,montras2009,section 6.3,Nitrosomonas growth-rate term.
+25,life_support.thinfilm.c3.nitrifier_rates,nitrifying_biofilm::nitrifier_rates,montras2009,section 6.3,Nitrobacter growth-rate term.
+26,life_support.thinfilm.c3.tank_biofilm_rate,nitrifying_biofilm::bulk_tank_biofilm_coupled_rate,montras2009,section 6.4,Tank-in-series bulk balance coupled to surface flux.
+27,life_support.thinfilm.integration.oxygen_production_disconnected,melissa_photobioreactor::oxygen_production_rate_disconnected_gas,garcia2021,section 7.2,Disconnected gas oxygen-production balance.
+28,life_support.thinfilm.integration.oxygen_production_connected,melissa_photobioreactor::oxygen_production_rate_connected_gas,garcia2021,section 7.2,Connected gas oxygen-production balance.
+29,life_support.thinfilm.control.oxygen_fraction_error,melissa_photobioreactor::oxygen_fraction_error,garcia2021,section 7.3,Oxygen fraction set-point error.
+30,life_support.thinfilm.control.pi_light_command,melissa_photobioreactor::pi_light_command,garcia2021,section 7.3,Saturated PI light command.
+31,life_support.thinfilm.control.nitrate_dilution_command,melissa_photobioreactor::nitrate_dilution_command,garcia2021,section 7.3,Saturated nitrate-feedback dilution command.
+32,life_support.thinfilm.system.element_inventory_balance,brlss_backbone::element_inventory_rate,vermeulen2023,section 8.1,Open-system elemental inventory rate.
+33,life_support.thinfilm.system.closure_metric,brlss_backbone::thinfilm_closure_metric,vermeulen2023,section 8.1,Commodity closure metric.
+34,life_support.thinfilm.system.equivalent_system_mass,brlss_backbone::equivalent_system_mass,detrell2021,section 8.2,Equivalent System Mass expression.
+35,life_support.thinfilm.system.esm_breakeven,brlss_backbone::esm_biological_is_favorable,detrell2021,section 8.2,ESM comparison predicate.
+36,life_support.thinfilm.algal_biofilm.growth_rate,thinfilm_algal_biofilm::local_biofilm_growth_rate,"blanken2014,blanken2016",section 9.1,Local attached-algal growth rate.
+37,life_support.thinfilm.algal_biofilm.light_profile,thinfilm_algal_biofilm::biofilm_light_from_layers,"blanken2014,polizzi2022",section 9.1,Depth-integrated Beer attenuation.
+38,life_support.thinfilm.algal_biofilm.areal_productivity,thinfilm_algal_biofilm::areal_productivity_trapezoid,"blanken2014,blanken2016",section 9.1,Areal productivity integral using trapezoidal quadrature.
+39,life_support.thinfilm.algal_biofilm.harvest_reset_thickness,thinfilm_algal_biofilm::harvest_reset_thickness,blanken2016,section 9.1,Post-harvest film-thickness reset.
+40,life_support.thinfilm.algal_biofilm.mixture_component_rate,thinfilm_algal_biofilm::mixture_component_local_rate,polizzi2022,section 9.2,Mixture volume-fraction local rate.
+41,life_support.thinfilm.algal_biofilm.mixture_closure_residual,thinfilm_algal_biofilm::mixture_closure_residual,polizzi2022,section 9.2,Volume-fraction sum residual.
+42,life_support.thinfilm.algal_biofilm.dissolved_species_rate,thinfilm_algal_biofilm::dissolved_species_local_rate,polizzi2022,section 9.2,Dissolved-species advection-diffusion-reaction rate.
+43,life_support.thinfilm.algal_biofilm.light_2d,thinfilm_algal_biofilm::two_dimensional_light_attenuation,polizzi2022,section 9.2,2D light closure with path integral supplied by caller.
+44,life_support.thinfilm.algal_biofilm.carbon_boundary_flux,thinfilm_algal_biofilm::boundary_mass_transfer_residual,polizzi2022,section 9.2,Carbon boundary flux residual.
+45,life_support.thinfilm.algal_biofilm.oxygen_boundary_flux,thinfilm_algal_biofilm::boundary_mass_transfer_residual,polizzi2022,section 9.2,Oxygen boundary flux residual.
+46,life_support.thinfilm.algal_biofilm.nitrate_boundary_residual,thinfilm_algal_biofilm::nitrate_boundary_residual,polizzi2022,section 9.2,Dirichlet wetted-boundary residual.
+47,life_support.thinfilm.rom.service_projection,thinfilm_algal_biofilm::linear_rom_service,"polizzi2022,poughon2021,garcia2021",section 9.3,Reduced-order service projection.
+48,life_support.thinfilm.rom.habitat_coupled_derivative,thinfilm_algal_biofilm::habitat_coupled_derivative,"garcia2021,vermeulen2023",section 9.3,"Habitat derivative from crew forcing, service vector, and losses."
+49,life_support.thinfilm.rom.service_vector,thinfilm_algal_biofilm::thinfilm_service_vector,polizzi2022,appendix B,Operational service-vector constructor.
+50,life_support.thinfilm.rom.linear_service,thinfilm_algal_biofilm::linear_rom_service,polizzi2022,appendix B,Linear basis ROM y = W Phi + epsilon.
+51,life_support.thinfilm.rom.validated_domain_check,thinfilm_algal_biofilm::validated_domain_contains,"poughon2021,polizzi2022,garcia2021",appendix B,Validated-domain membership predicate.

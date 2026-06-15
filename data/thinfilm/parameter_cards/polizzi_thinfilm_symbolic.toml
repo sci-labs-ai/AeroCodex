@@ -1,0 +1,21 @@
+# Symbolic attached-algal thin-film/PDE parameter seed.
+# Source keys: polizzi2022, blanken2014, blanken2016.
+[metadata]
+id = "data.life_support.thinfilm.algal_pde.polizzi_symbolic"
+status = "symbolic_parameter_seed"
+source_keys = ["polizzi2022", "blanken2014", "blanken2016"]
+report_equations = [36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46]
+notes = "Use for PDE calibration and reduced-order map identification; not flight validated."
+
+[parameters]
+kappa_active = "calibrate"
+kappa_nongrowing = "calibrate"
+kappa_eps = "calibrate"
+diffusivity_carbon_m2_per_s = "calibrate"
+diffusivity_oxygen_m2_per_s = "calibrate"
+diffusivity_nitrate_m2_per_s = "calibrate"
+maximum_specific_growth_rate_per_s = "calibrate"
+decay_rate_per_s = "calibrate"
+harvest_interval_s = "scenario"
+post_harvest_thickness_m = "scenario"
+validated_domain = "required_for_operation"

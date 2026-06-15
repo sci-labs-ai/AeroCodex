@@ -1,0 +1,19 @@
+id: source.life_support.montras_2009.equation_traceable
+title: Montras i Boet 2009 nitrifying packed-bed biofilm thesis
+category: life_support
+status: equation_traceable
+intended_use:
+  - Source traceability for the AeroCodex thin-film, biofilm, and MELiSSA BLSS implementation.
+  - Preserve citation keys and source provenance for functions generated from the supplied report.
+requested_details:
+  - Verify exact equations, model domains, units, sign conventions, and calibration constants before mission-specific design use.
+  - Retain DOI, URL, BibTeX key, report locator, and validation-card linkage in future source-registry upgrades.
+implementation_notes:
+  - Universitat Autonoma de Barcelona PhD dissertation record and full thesis PDFs.
+  - Used for radial diffusion, biofilm growth/detachment, kinetic constants, and AQUASIM/tank-in-series anatomy.
+  - This source supports equation-traceable code only; reference validation requires numerical examples or experimental datasets.
+limits:
+  - Not a certification claim.
+  - Not a flight, habitat-safety, medical, or mission-readiness validation.
+  - Not a substitute for system-specific calibration, hazard analysis, or experimental verification.
+notes: "Added for the thin-film BLSS Rust conversion package."

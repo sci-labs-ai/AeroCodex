@@ -7,13 +7,29 @@
 //! scalar rates or daily quantities unless the function name states otherwise;
 //! callers must keep units consistent.
 //!
-//! Phase 0.001 deliberately does not model biology, crop growth dynamics,
-//! microbial kinetics, crew metabolic variability, habitat safety margins,
-//! trace-contaminant control, humidity control, storage sizing, reliability,
-//! controls, emergency modes, human health, certification, flight readiness, or
-//! mission readiness. Traceability metadata remains conservative
-//! `research_required` until exact BVAD/ECLSS source editions, equations,
-//! tables, representative examples, and tolerances are reviewed.
+//! Phase 0.001 still treats life-support code as research and preliminary
+//! engineering mathematics, not as flight, habitat-safety, medical, or mission
+//! readiness software. The original scalar helpers remain conservative
+//! `research_required`; the thin-film and MELiSSA-derived helpers added here are
+//! equation-traceable implementations whose biological parameters, operating
+//! domains, and validation tolerances must be calibrated for the target system.
+
+/// Common BLSS mass-balance, stoichiometric, closure, and ESM helpers derived from the thin-film report.
+pub mod brlss_backbone;
+/// MELiSSA C4a photobioreactor, gas-balance, carbonate, and controller helpers.
+pub mod melissa_photobioreactor;
+/// MELiSSA C3 nitrifying fixed-bed biofilm and reaction-diffusion helpers.
+pub mod nitrifying_biofilm;
+/// Strict attached algal thin-film, mixture/PDE, boundary, and reduced-order service helpers.
+pub mod thinfilm_algal_biofilm;
+/// Equation, source, and BibTeX-key traceability for the thin-film BLSS implementation.
+pub mod thinfilm_provenance;
+
+pub use thinfilm_provenance::{
+    equation_reference as thinfilm_equation_reference,
+    verification_record as thinfilm_verification_record, EquationReference, EQUATION_REFERENCES,
+    THINFILM_SOURCE_IDS,
+};
 
 use aero_codex_core::{
     validation, AeroError, AeroResult, EngineeringResult, ValidityStatus, VerificationRecord,

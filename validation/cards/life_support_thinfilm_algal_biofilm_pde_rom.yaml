@@ -1,0 +1,27 @@
+id: life_support.thinfilm.algal_biofilm_pde_rom
+name: Attached algal thin-film PDE and reduced-order service equations
+category: life_support
+status: equation_traceable
+source:
+  id: source.life_support.polizzi_2022.equation_traceable
+  status: equation_traceable
+assumptions:
+  - caller supplies consistent units, sign conventions, and model basis for all rates and concentrations
+  - biological parameters are calibration targets, not universal constants
+  - functions are equation-traceable kernel helpers, not autonomous habitat controllers
+  - results require system-level safety, reliability, and validation review before operational use
+domain: "finite scalar inputs; nonnegative concentrations, masses, flows, and rates where physically required; documented equation domains and calibration limits supplied by caller"
+inputs:
+  - scalar rates, flows, concentrations, stoichiometric coefficients, light terms, operating points, or reduced-order features as documented in Rustdoc
+outputs:
+  - AeroResult-wrapped EngineeringResult values with Codex IDs, verification records, validity status, and warnings where appropriate
+tests:
+  - local growth, light attenuation, areal productivity, and harvest reset implement Eq. 36 through Eq. 39
+  - mixture/PDE local rates and boundary residuals implement Eq. 40 through Eq. 46
+  - ROM service, habitat coupling, service vector, and validated-domain checks implement Eq. 47 through Eq. 51
+failure_modes:
+  - negative nonnegative-domain inputs rejected
+  - nonpositive denominators and invalid bounds rejected
+  - nonfinite intermediate or output values returned as numerical failures
+  - equation-traceable status must not be interpreted as external validation
+notes: "Planning and traceability card for the thin-film BLSS Rust conversion. Not certified, not flight ready, and not mission ready."

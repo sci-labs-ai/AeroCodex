@@ -1,7 +1,7 @@
 # AeroCodex
 
 <p align="center">
-  <img src="assets/aerocodex_patch.png" alt="AeroCodex project patch showing a terminal prompt, rocket, orbital paths, and a PURE RUST / SOURCE TRACEABLE banner." width="220">
+  <img src="assets/aerocodex_patch.png" alt="AeroCodex project patch showing a terminal prompt, rocket, orbital paths, and a RESEARCH READY / MEMORY SAFE banner." width="220">
 </p>
 
 **AeroCodex: Verified Aerospace Engineering Mathematics in Pure Rust**
@@ -10,7 +10,7 @@ AeroCodex is a Phase 0.001 Rust workspace for source-traceable aerospace enginee
 
 ## Safety and certification caveat
 
-AeroCodex is an engineering mathematics library for research, education, verification-oriented development, and preliminary design. Safety-critical, regulated, or mission use requires project-specific assurance, validation, qualification, and certification.
+AeroCodex is provided for research purposes only as an engineering mathematics library for research, education, verification-oriented development, and preliminary design. Safety-critical, regulated, operational, or mission use requires project-specific assurance, validation, qualification, and certification.
 
 AeroCodex is **not** certified, flight-ready, mission-ready, or approved for aircraft or spacecraft operations.
 
@@ -31,7 +31,7 @@ The core repository is intentionally pure Rust. The repository does not include 
 - `aero-codex-structures`: reviewed axial stress, bending stress, cantilever end-load deflection, and Euler column buckling helpers with conservative trace metadata.
 - `aero-codex-flight-dynamics`: reviewed level coordinated-turn, stall-speed, and specific-excess-power helpers with conservative trace metadata.
 - `aero-codex-astrodynamics`: reviewed circular-orbit speed, circular period, escape velocity, vis-viva, specific orbital energy, Hohmann transfer, and sphere-of-influence helpers with conservative trace metadata.
-- `aero-codex-life-support`: reviewed Phase 0.001 bio-regenerative closure-fraction, production-area, buffer-residence-time, crew-requirement, net-balance, oxygen/carbon-dioxide, and water-recovery mass-balance primitives with conservative trace metadata.
+- `aero-codex-life-support`: reviewed Phase 0.001 bio-regenerative closure-fraction, production-area, buffer-residence-time, crew-requirement, net-balance, oxygen/carbon-dioxide, and water-recovery mass-balance primitives with conservative trace metadata; now also includes equation-traceable thin-film/biofilm BLSS kernels for MELiSSA C4a photobioreactor models, MELiSSA C3 nitrifying biofilm models, attached algal thin-film/PDE helpers, reduced-order service vectors, and source-preserved citation maps.
 - `xtask`: local validation and dependency-policy checks.
 
 ## Validation artifacts
@@ -56,3 +56,16 @@ cargo doc --workspace --all-features --no-deps
 ```
 
 The generation environment for this package did not have `rustc` or `cargo`, so these checks must be run by the deployment agent.
+
+## Thin-film BLSS extension
+
+The thin-film BLSS conversion package adds source materials, citation manifests, validation cards, and pure-Rust equation kernels derived from the supplied `blss_thinfilm_report` materials. Key files:
+
+- `DATA_MANIFEST.toml` - package data manifest with key-file hashes.
+- `citations/blss_thinfilm_refs.bib` - preserved supplied BibTeX.
+- `data/thinfilm/equation_manifest.csv` - equation-to-function-to-citation map.
+- `data/thinfilm/source_verification.csv` - bibliographic verification notes.
+- `crates/aero-codex-life-support/src/thinfilm_provenance.rs` - runtime source/citation map.
+- `scripts/verify_thinfilm_artifact.py` - dependency-free static artifact verifier.
+
+The added equations are equation-traceable research kernels for research purposes only. They are not calibrated life-support designs and do not imply flight, habitat-safety, medical, or mission readiness.

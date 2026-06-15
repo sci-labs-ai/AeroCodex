@@ -1,0 +1,534 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{bm}
+\usepackage[version=4]{mhchem}
+\usepackage{siunitx}
+\sisetup{per-mode=symbol,detect-all=true}
+\usepackage{booktabs,longtable,tabularx,array,makecell}
+\usepackage{ragged2e}
+\usepackage{pdflscape}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{csquotes}
+\usepackage[hidelinks]{hyperref}
+\usepackage[nameinlink,noabbrev]{cleveref}
+\usepackage[authordate,backend=biber,natbib=true,ibidtracker=false]{biblatex-chicago}
+\addbibresource{blss_thinfilm_refs.bib}
+
+\setlist[itemize]{leftmargin=1.3em,itemsep=0.25em,topsep=0.35em}
+\setlist[enumerate]{leftmargin=1.5em,itemsep=0.25em,topsep=0.35em}
+\renewcommand{\arraystretch}{1.15}
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+\sloppy
+\emergencystretch=3em
+
+\newcommand{\MEL}{MELiSSA}
+\newcommand{\BLSS}{BLSS}
+\newcommand{\BRLSS}{BRLSS}
+\newcommand{\Limno}{\textit{Limnospira indica}}
+\newcommand{\Chl}{\textit{Chlorella vulgaris}}
+\newcommand{\Soro}{\textit{Chlorella sorokiniana}}
+\newcommand{\Nts}{\textit{Nitrosomonas europaea}}
+\newcommand{\Ntb}{\textit{Nitrobacter winogradskyi}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\ee}{\mathrm{e}}
+\newcommand{\ESM}{\ensuremath{\mathrm{ESM}}}
+\newcommand{\TIC}{\ensuremath{\mathrm{TIC}}}
+
+\title{Microscopic Thin-Film and Biofilm Models for Bioregenerative Life Support\\
+\large Verified MELiSSA Baselines, Thin-Film Algal Biofilm Algorithms, and a Control-Oriented Mathematical Synthesis}
+\author{Compiled technical report}
+\date{14 June 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+The best present answer to the question ``what is the strongest thin-film microbial breakthrough for astronautical bioregenerative life support?'' is not a single device. It is a verified modeling stack. The most astronautically verified microbial models are the \MEL{} photobioreactor and nitrifying fixed-bed biofilm lineages: they have mechanistic mass balances, light-transfer or biofilm-diffusion submodels, calibrated kinetics, pilot-plant validation, and, for the \Limno{} photobioreactor model, interpretation of an International Space Station membrane-photobioreactor experiment. The strictest thin-film algal-biofilm mathematics is more often found in terrestrial attached-growth systems and open partial-differential-equation simulations; these are algorithmically transparent and relevant to reactor design, but their space validation is weaker. This report therefore treats \MEL{} as the validated systems-engineering baseline and treats thin-film algal-biofilm models as the most promising mathematical design layer to be coupled into that baseline.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Scope, evidence standard, and main conclusion}
+
+This report synthesizes seven candidate breakthrough areas for microscopic, thin-film, and biofilm life-support research. The term \BRLSS{} is used broadly for bioregenerative life-support systems; \BLSS{} is used when the emphasis is specifically on regenerative spacecraft or habitat support. The key distinction is between two kinds of evidence:
+
+\begin{enumerate}
+  \item \textbf{Astronautical verification}: model predictions and control logic have been tested in a life-support context, at \MEL{} pilot scale, under integrated animal-compartment operation, or in a flight experiment.
+  \item \textbf{Thin-film mathematical transparency}: the attached microbial layer is represented explicitly by reaction--diffusion, mixture theory, active-layer depth, light attenuation, harvesting, or biofilm-thickness dynamics.
+\end{enumerate}
+
+The strongest single starting point is the \MEL{} C4a \Limno{} photobioreactor model, because it combines radiative transfer, light-transfer-induced physiology, carbonate chemistry, hydrodynamic assumptions, gas-liquid mass transfer, pilot-scale operation, and ISS flight-experiment interpretation \parencite[1--3, 6, 8--9]{poughon2021}. The most directly ``biofilm'' \MEL{} component is C3, the nitrifying packed/fixed-bed biofilm reactor containing attached \Nts{} and \Ntb{}; its reactor model was developed for steady and dynamic operation, and later integration work showed robust ammonium conversion under coupled operation \parencite[2359--2369]{perez2005}\parencite[2, 11, 13]{garcia2021}. The most inspectable strict thin-film algal-biofilm mathematics appears in terrestrial rotating or scraped phototrophic biofilm systems and open 2D mixture-theory simulations \parencite[1, 3--5]{polizzi2022}\parencite[2436--2445]{blanken2014}.
+
+The conclusion is therefore deliberately nuanced. Microbial biofilm and thin-film models are mature enough for rigorous reactor-level design and control. However, the fully space-verified examples remain mostly \MEL{}-style fixed-bed nitrification and suspended or membrane photobioreactor cultivation, not fully space-tested algal thin-film panels. The most defensible research direction is to combine the open thin-film biofilm PDE models with \MEL{}-style mass-balanced control architecture.
+
+\section{Nomenclature guide}
+
+\begin{longtable}{P{0.18\linewidth}P{0.47\linewidth}P{0.25\linewidth}}
+\caption{Symbols used in the report. Units vary by implementation; default concentration units are mass or mole per reactor volume unless stated otherwise.}\\
+\toprule
+\textbf{Symbol} & \textbf{Meaning} & \textbf{Typical units}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Symbol} & \textbf{Meaning} & \textbf{Typical units}\\
+\midrule
+\endhead
+$A,N,E,L$ & Active algal cells, non-growing algal cells, extracellular polymeric substances, and liquid volume fractions in a photosynthetic biofilm mixture model & dimensionless volume fraction\\
+$C,O,S$ & Dissolved inorganic carbon, oxygen, and nitrate fields in the photosynthetic biofilm model & \si{mol.m^{-3}}\\
+$C_i$ & Concentration of soluble species $i$ in bulk liquid or biofilm pore liquid & \si{mol.m^{-3}} or \si{kg.m^{-3}}\\
+$C_{\ce{NH4}}, C_{\ce{NO2}}, C_{\ce{NO3}}, C_{\ce{O2}}$ & Ammonium, nitrite, nitrate, and dissolved oxygen concentrations in the nitrifying biofilm reactor & usually N or O$_2$ concentration\\
+$C_T$ or \TIC{} & Total inorganic carbon, $[\ce{CO2}]+[\ce{HCO3-}]+[\ce{CO3^{2-}}]$ & \si{mol.m^{-3}}\\
+$c$ & Radiative-transfer geometric correction, commonly $c=\min(1,L_0/L)$ in the \Limno{} two-flux model & dimensionless\\
+$D$ & Dilution rate or, with subscript $i$, molecular diffusion coefficient & \si{d^{-1}} or \si{m^2.s^{-1}}\\
+$E_a,E_s,b$ & Mass absorption coefficient, mass scattering coefficient, and scattering backward fraction in the two-flux photobioreactor model & \si{m^2.kg^{-1}}, \si{m^2.kg^{-1}}, dimensionless\\
+$F_{\rm in},F_{\rm out}$ & Inlet and outlet gas flow rates & \si{L.h^{-1}} or \si{mol.s^{-1}}\\
+$G_z,G_r$ & Local hemispherical irradiance in flat and cylindrical geometries & \si{\micro mol.m^{-2}.s^{-1}}\\
+$I(z)$ & Light intensity at depth $z$ in a biofilm or culture & \si{\micro mol.m^{-2}.s^{-1}}\\
+$J_{L,i},J_{G,i}$ & Liquid diffusive flux and gas-liquid transfer flux of species $i$ & concentration flux\\
+$K_i$ & Half-saturation or inhibition constant for species $i$ & concentration\\
+$k_La$ & Volumetric liquid-side mass-transfer coefficient & \si{s^{-1}} or \si{h^{-1}}\\
+$L$ & Optical path length or biofilm height, depending on context & \si{m}\\
+$L_F$ & Biofilm thickness in the nitrifying fixed-bed reactor model & \si{m}\\
+$MW_{O_2}$ & Molecular weight of oxygen & \si{g.mol^{-1}}\\
+$P/2e^-$ & Photon requirement per two electrons transferred in the \Limno{} light physiology model & dimensionless\\
+$q_0$ & Incident light flux density at the photobioreactor boundary & \si{\micro mol.m^{-2}.s^{-1}}\\
+$q_C,q_N,q_{O_2}$ & Specific consumption or production rates for carbon, nitrogen, or oxygen & concentration per biomass per time\\
+$Q$ & Liquid volumetric flow rate & \si{m^3.s^{-1}} or \si{L.d^{-1}}\\
+$r_j$ & Volumetric rate of biological process $j$ & \si{mol.m^{-3}.s^{-1}}\\
+$r_{O_2}$ & Volumetric oxygen production rate in the integrated pilot photobioreactor & \si{g_{O2}.L^{-1}.h^{-1}} or equivalent\\
+$u_F,u_{\rm det}$ & Solids growth velocity and detachment velocity in a biofilm & \si{m.s^{-1}}\\
+$V_R$ & Reactor liquid volume & \si{L} or \si{m^3}\\
+$X, X_{\rm Nts}, X_{\rm Ntb}$ & Biomass concentration; biomass of \Nts{} and \Ntb{} & \si{kg.m^{-3}}\\
+$Y_j$ & Yield coefficient for biological process $j$ & biomass/substrate\\
+$\alpha,\delta,\gamma$ & Two-flux radiative-transfer parameters combining absorption, scattering, geometry, and biomass concentration & variable\\
+$\eta_j$ & Closure, recovery, or utilization efficiency for species or service $j$ & dimensionless\\
+$\mu,\mu_{\max}$ & Specific growth rate and maximum specific growth rate & \si{d^{-1}}\\
+$\nu_{ij}$ & Stoichiometric coefficient of species $i$ in process $j$ & dimensionless\\
+$\bm N$ & Stoichiometric matrix mapping process rates into species balances & dimensionless\\
+\bottomrule
+\end{longtable}
+
+\section{Ranked landscape of breakthroughs}
+
+\begin{landscape}
+\small
+\begin{longtable}{P{0.05\linewidth}P{0.18\linewidth}P{0.27\linewidth}P{0.26\linewidth}P{0.18\linewidth}}
+\caption{Best-matching model breakthroughs for astronautical microbial thin-film and biofilm \BLSS{} research.}\\
+\toprule
+\textbf{Rank} & \textbf{Breakthrough area} & \textbf{Why it matters for astronautical \BLSS{}} & \textbf{Accessible mathematical content} & \textbf{Verification assessment}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Rank} & \textbf{Breakthrough area} & \textbf{Why it matters for astronautical \BLSS{}} & \textbf{Accessible mathematical content} & \textbf{Verification assessment}\\
+\midrule
+\endhead
+1 & \MEL{} C4a \Limno{} photobioreactor model & Best single starting point for a verified microbial oxygen/biomass compartment. It covers light delivery, growth, oxygen production, carbon chemistry, and scale transfer from pilot plant to ISS microreactor interpretation. & Two-flux radiative transfer, light-transfer-induced physiology, stoichiometric growth, carbonate equilibrium, hydrodynamic tank-in-series assumptions, gas-liquid balances, operating maps for control. & Strong. The model was applied to an \SI{80}{L} pilot reactor and a \SI{50}{mL} ISS membrane photobioreactor experiment \parencite[1, 6, 8--9]{poughon2021}.\\
+2 & \MEL{} C3 nitrifying fixed-bed biofilm reactor & Most directly attached-biofilm component of the \MEL{} loop. It converts ammonium waste to nitrate nutrient while avoiding nitrite accumulation. & Radial biofilm diffusion, multispecies kinetics, oxygen transfer, biofilm growth/detachment, tanks-in-series hydrodynamics, calibrated nitrifier kinetics. & Strong ground verification. The fixed-bed model was calibrated/validated for steady and dynamic modes, and integration studies reported robust ammonium conversion \parencite[2359--2369]{perez2005}\parencite[96--115]{montras2009}\parencite[11, 13]{garcia2021}.\\
+3 & Integrated \MEL{} pilot plant: C3 + C4a + animal crew mock-up & Shows models functioning as life-support system engineering, not isolated culture productivity. It links nitrogen closure, oxygen production, carbon dioxide uptake, and animal respiration. & Compartment mass balances, gas-phase oxygen/CO$_2$ equations, light-intensity control, nitrogen balance, microbial load changes, disturbance recovery. & Very strong ground integration: continuous C3--C4a operation over 276 days and gas integration with animal compartment over 111 days \parencite[5--6, 8, 11, 13]{garcia2021}.\\
+4 & \MEL{} system-level stoichiometric and dynamic loop models & Provides mission sizing and closure bookkeeping across crew, waste, gases, water, microbes, crops, and food. & Stoichiometric matrices, element balances, linear/nonlinear mass-balance constraints, compartment process maps. & Moderate-to-strong. Several submodels have pilot evidence; complete autonomous human-scale closure remains a target rather than a finished demonstration \parencite[Abstract, sec. 5]{vermeulen2023}.\\
+5 & \Chl{} / PBR@LSR hybrid life-support and ESM analysis & Useful for NASA/ESA-style trade studies of oxygen, food substitution, power, cooling, volume, launch mass, and crew time. & Equivalent system mass, productivity-to-reactor-volume sizing, food-substitution fraction, oxygen-production sizing, break-even mission duration. & Strong but narrower. ISS algal cultivation and long-duration ground cultivation exist, but public first-principles reactor models are less exposed than the \MEL{} \Limno{} line \parencite[3--5, 7--8]{detrell2021}.\\
+6 & Rotating or attached algal biofilm photobioreactors, including Algadisk-style systems & Directly relevant to strict thin-film microbial life because biomass is attached, harvestable, and potentially compact with reduced water inventory. & Light-limited biofilm growth models, day/night operation, reactor staging, CO$_2$ utilization, harvesting interval and biofilm-thickness effects. & Strong terrestrial verification, weak space verification. Rotating biofilm tests achieved high areal productivity and long retention, but are not yet flight-validated \BLSS{} hardware \parencite[2436--2445]{blanken2014}\parencite[abstract]{blanken2016}.\\
+7 & Open 2D PDE / mixture-theory photosynthetic biofilm simulation & Clearest algorithmic route for strict thin-film design questions: light penetration, nutrient gradients, active-layer depth, harvesting interval, and patterning. & Multi-component mass and momentum balances, reaction--diffusion--advection equations, light and substrate limitation, mortality, extracellular matrix, gas/liquid boundary conditions. & Good mathematical verification, limited \BLSS{} verification. Treat as a rigorous design model to be adapted into validated \MEL{}-style architecture \parencite[1, 3--5]{polizzi2022}.\\
+\bottomrule
+\end{longtable}
+\end{landscape}
+
+\section{Common mathematical backbone for microbial \BLSS{} compartments}
+
+Even when the hardware differs, the models share a small set of mathematical structures. A compartment-level state vector
+\begin{equation}
+  \bm x(t)=\begin{bmatrix}m_{\ce{O2}} & m_{\ce{CO2}} & m_{\ce{NH4}} & m_{\ce{NO2}} & m_{\ce{NO3}} & m_X & \cdots\end{bmatrix}^{\mathsf T}
+\end{equation}
+can be written as
+\begin{equation}
+  \frac{\dd \bm x}{\dd t}
+  = \bm F_{\rm in}(t)-\bm F_{\rm out}(t)+V\bm N^{\mathsf T}\bm r(\bm x,\bm u,\bm \theta)
+    + \bm T_g(\bm x,p,T)+\bm d(t),
+  \label{eq:generic_compartment}
+\end{equation}
+where $\bm N$ is a stoichiometric matrix, $\bm r$ contains biological rates, $\bm u$ contains manipulated variables such as light flux, dilution rate, gas flow, or feed concentration, $\bm \theta$ contains kinetic and transport parameters, and $\bm T_g$ accounts for gas-liquid exchange. \Cref{eq:generic_compartment} is not a single published equation; it is a compact synthesis of the mass-balanced compartment logic used in the \MEL{} photobioreactor, nitrifying biofilm, and integration literature \parencite[2--3, 6]{poughon2021}\parencite[5--6]{garcia2021}\parencite[96--115]{montras2009}.
+
+For system closure, a static stoichiometric model can be written as
+\begin{align}
+  \bm A \bm \xi &= \bm 0, \label{eq:element_balance}\\
+  \bm B\bm \xi + \bm s_{\rm crew}+\bm s_{\rm stores} &= \bm 0, \label{eq:loop_balance}
+\end{align}
+where $\bm A$ maps reactions to conserved elements such as C, H, O, and N, $\bm \xi$ is a vector of reaction extents or process throughputs, and $\bm B$ maps process throughputs to life-support commodities. A dynamic control layer then enforces acceptable bounds:
+\begin{equation}
+  \bm x_{\min}\le \bm x(t)\le \bm x_{\max},\qquad
+  \bm u_{\min}\le \bm u(t)\le \bm u_{\max}.
+  \label{eq:bounds}
+\end{equation}
+The 2023 \MEL{} stoichiometric review is important because it explicitly treats the loop as a mass-balanced, multi-compartment chemical and biological network and identifies which published models expose equations and stoichiometric coefficients \parencite[Abstract, sec. 2--5]{vermeulen2023}. The limitation is equally important: static closure can be written at 100 percent in a model, but actual biological systems have leakage, recalcitrant products, digestibility limits, maintenance dynamics, and control failures \parencite[sec. 5]{vermeulen2023}.
+
+\section{MELiSSA C4a \Limno{} photobioreactor model}
+
+\subsection{Why this is the strongest verified microbial modeling baseline}
+
+The C4a \Limno{} compartment is the best single starting point because the model connects photobiology to astronautical operating variables. Poughon and colleagues describe the model as a mechanistic, mass-balanced approach combining radiative transfer and light-transfer-induced physiology, then apply it to an \SI{80}{L} \MEL{} pilot photobioreactor and to a \SI{50}{mL} ISS membrane photobioreactor experiment \parencite[1, 6, 8--9]{poughon2021}. The reactor function is not merely biomass production. In \MEL{} it is an air-revitalization and edible-biomass compartment: it consumes carbon dioxide, produces oxygen, and contributes microbial food or feedstock.
+
+\subsection{Radiative-transfer submodel}
+
+The core input to cyanobacterial physiology is not only incident light but the local light actually seen by cells. For a flat, one- or two-sided illuminated culture, the two-flux expression can be represented as
+\begin{equation}
+\frac{G_z}{q_0}
+=2\frac{n+2}{n+1}
+\frac{(1+\alpha)\exp[\delta(L-z)]-(1-\alpha)\exp[-\delta(L-z)]}
+{(1+\alpha)^2\exp(\delta L)-(1-\alpha)^2\exp(-\delta L)},
+\label{eq:flat_radiative}
+\end{equation}
+while for a cylindrical reactor the analogous expression uses modified Bessel functions:
+\begin{equation}
+\frac{G_r}{q_0}
+=2\frac{n+2}{n+1}
+\frac{I_0(\delta r)}{I_0(\delta L)+\alpha I_1(\delta L)}.
+\label{eq:cyl_radiative}
+\end{equation}
+Here $q_0$ is incident light flux density, $G$ is local irradiance, $L$ is optical path length, $n$ is a phase-function exponent, and $\alpha$ and $\delta$ bundle absorption, scattering, and biomass effects. The published \MEL{} implementation uses mass absorption and scattering coefficients for \Limno{} and a geometric correction
+\begin{equation}
+  c=\min\left(1,\frac{L_0}{L}\right),
+  \label{eq:geometric_correction}
+\end{equation}
+which prevents overinterpreting optical behavior outside the calibrated thickness regime \parencite[2]{poughon2021}. The biological implication is direct: any thin-film or panel model has to treat light as a spatial field, not as a scalar imposed on the whole reactor.
+
+\subsection{Light-transfer-induced physiology and growth}
+
+The biological model links the absorbed photon field to growth, storage, oxygen production, and biomass composition. A compact reactor-scale representation is
+\begin{align}
+  \frac{\dd X}{\dd t} &= \left[\mu(\bar G,C_T,N,pH,T)-D-k_d\right]X,\label{eq:c4a_biomass}\\
+  \frac{\dd C_T}{\dd t} &=D(C_{T,\rm in}-C_T)-q_C(\bar G,C_T)X+k_La_{\ce{CO2}}(C^*_{\ce{CO2}}-C_{\ce{CO2}}),\label{eq:c4a_carbon}\\
+  \frac{\dd C_{\ce{O2}}}{\dd t} &=q_{O_2}(\bar G,C_T)X-D C_{\ce{O2}}+k_La_{\ce{O2}}(C^*_{\ce{O2}}-C_{\ce{O2}}),\label{eq:c4a_oxygen}
+\end{align}
+where $D$ is the dilution rate, $\bar G$ is a culture-averaged light term derived from \cref{eq:flat_radiative,eq:cyl_radiative}, $C_T$ is total inorganic carbon, and $q_C$ and $q_{O_2}$ are specific carbon uptake and oxygen production functions.
+
+The carbonate speciation layer is necessary because pH controls carbon availability:
+\begin{align}
+C_T&=[\ce{CO2}]+[\ce{HCO3-}]+[\ce{CO3^{2-}}],\label{eq:tic}\\
+[\ce{CO2}]&=\alpha_0(pH)C_T,
+\qquad [\ce{HCO3-}]=\alpha_1(pH)C_T,
+\qquad [\ce{CO3^{2-}}]=\alpha_2(pH)C_T.
+\end{align}
+The ISS application is especially instructive because pH was not directly measured or controlled in the microreactor; it had to be inferred from the model and gas-pressure behavior \parencite[8--9]{poughon2021}. This is a design warning for any future thin-film BLSS panel: a phototrophic model with elegant light physics but weak pH and carbonate accounting is not mission ready.
+
+The \MEL{} model also uses a feasibility check based on the photon requirement per two electrons transferred, $P/2e^-$. One published relation links exopolysaccharide fraction to the light physiology variable:
+\begin{equation}
+  x_{\rm EPS}=1.33\left(\frac{P}{2e^-}-1.23\right).
+  \label{eq:eps_photon}
+\end{equation}
+Poughon and colleagues use this kind of constraint to separate mathematically possible model solutions from biologically feasible ones; this is important because control maps may otherwise include operating points where the equations solve but the cells cannot maintain the predicted metabolism \parencite[2, 4]{poughon2021}.
+
+\subsection{Hydrodynamics, gas transfer, and control maps}
+
+At pilot scale the reactor is not simply a well-mixed flask. The \MEL{} model represents the airlift photobioreactor using riser/downcomer assumptions, gas plug-flow treatment, carbonate equilibrium, and gas-liquid transfer terms \parencite[6]{poughon2021}. In reduced form, for a tank-in-series discretization $n=1,\ldots,N$,
+\begin{equation}
+  \frac{\dd C_{i,n}}{\dd t}=\frac{Q}{V_n}(C_{i,n-1}-C_{i,n})+\sum_j \nu_{ij}r_{j,n}+k_La_i(C^*_{i,n}-C_{i,n}).
+  \label{eq:tanks_series_pbr}
+\end{equation}
+The same model family can be reduced to operating maps, sometimes called ``abaci,'' for control. For example, a controller can use light input $q_0$, dilution rate $D$, and inlet gas composition to keep carbon limitation and oxygen output within an acceptable region:
+\begin{equation}
+  \mathcal{F}_{\rm feasible}=\{(q_0,D,F_g,C_{T,\rm in}): C_T>C_{T,\min},\ pH<pH_{\max},\ P/2e^-<\Pi_{\max},\ r_{O_2}\ge r_{O_2,\rm req}\}.
+  \label{eq:feasible_region}
+\end{equation}
+This is exactly the move that makes the model astronautical rather than merely biological: the output is a controllable operating envelope, not just a growth curve \parencite[7--9]{poughon2021}.
+
+\section{MELiSSA C3 nitrifying fixed-bed biofilm model}
+
+\subsection{Why C3 is the most directly attached-biofilm breakthrough}
+
+The \MEL{} C3 reactor is a compact packed-bed/fixed-bed biofilm system. It hosts immobilized \Nts{} and \Ntb{} that convert ammonium to nitrate. The biochemical purpose is nitrogen closure: ammonium-rich waste streams must be oxidized to nitrate without accumulating nitrite, because nitrate is the preferred nutrient form for downstream phototrophic or higher-plant compartments. Garcia-Gragera and colleagues describe the integrated C3 reactor as a \SI{7}{L} cylindrical packed-bed with polystyrene beads and co-cultured nitrifiers forming a biofilm \parencite[2]{garcia2021}. The oxygen demand for complete nitrification is approximately two moles of oxygen per mole of ammonium nitrogen oxidized \parencite[2]{garcia2021}:
+\begin{align}
+  \ce{NH4+ + 1.5O2 -> NO2- + 2H+ + H2O},\label{eq:aob}\\
+  \ce{NO2- + 0.5O2 -> NO3-}.\label{eq:nob}
+\end{align}
+
+The 2005 fixed-bed model is a major breakthrough because it was written for both steady-state and dynamic operation and explicitly for a BLSS nitrogen compartment \parencite[2359--2369]{perez2005}. The later UAB thesis exposes the model anatomy in greater detail: soluble species, particulate species, diffusion, biofilm growth, detachment, oxygen gas-liquid transfer, reactor hydrodynamics, and AQUASIM implementation \parencite[96--115]{montras2009}.
+
+\subsection{Radial diffusion and biofilm balance equations}
+
+Inside an attached spherical or bead-supported biofilm, soluble species obey Fickian diffusion plus reaction. In spherical coordinates a generic soluble species balance is
+\begin{equation}
+  \frac{\partial C_i}{\partial t}
+  =\frac{1}{r^2}\frac{\partial}{\partial r}\left(r^2D_i\frac{\partial C_i}{\partial r}\right)
+   +\sum_j \nu_{ij}r_j(C_i,X_k),
+  \label{eq:spherical_diffusion}
+\end{equation}
+with liquid diffusive flux
+\begin{equation}
+  J_{L,i}=-D_i\frac{\partial C_i}{\partial r}.
+  \label{eq:fick_biofilm}
+\end{equation}
+Montr\`as reports this Fick-law treatment, biofilm matrix/pore-water partition, and radial biofilm discretization as part of the packed-bed model \parencite[96--97, 114--115]{montras2009}. Biofilm solids move because cells grow, decay, detach, and displace one another. A compact representation is
+\begin{align}
+  \frac{\partial X_k}{\partial t}+\frac{1}{r^2}\frac{\partial}{\partial r}\left(r^2u_FX_k\right)&=R_{X,k},\label{eq:solids_balance}\\
+  \frac{\dd L_F}{\dd t}&=u_F-u_{\rm det},\label{eq:biofilm_thickness}
+\end{align}
+where $L_F$ is film thickness, $u_F$ is net growth velocity, and $u_{\rm det}$ is detachment velocity. This is the core difference between an attached-growth BLSS reactor and a suspended culture: the local reaction environment is a spatially structured film.
+
+Oxygen transfer enters through the bulk liquid as
+\begin{equation}
+  J_{G,\ce{O2}}=k_La_{\ce{O2}}(C^*_{\ce{O2}}-C_{\ce{O2}}),
+  \label{eq:oxygen_transfer_c3}
+\end{equation}
+which must be coupled to oxygen consumption by nitrifiers \parencite[97--98]{montras2009}. Operationally, this is why C3 control cannot be reduced to ammonium feed alone; dissolved oxygen steps can create nitrite accumulation if \Ntb{} becomes oxygen-limited.
+
+\subsection{Nitrifier kinetics}
+
+A compact version of the calibrated nitrifier kinetics is
+\begin{align}
+  r_{\rm Nts} &=\mu_{\rm Nts}X_{\rm Nts}
+  \frac{C_{\ce{NH4}}}{K_{\ce{NH4}}+C_{\ce{NH4}}+C_{\ce{NH4}}^2/K_{I,FA,\rm Nts}}
+  \frac{C_{\ce{O2}}}{K_{\ce{O2},\rm Nts}+C_{\ce{O2}}},\label{eq:nts_rate}\\
+  r_{\rm Ntb} &=\mu_{\rm Ntb}X_{\rm Ntb}
+  \frac{C_{\ce{NO2}}}{K_{\ce{NO2}}+C_{\ce{NO2}}+C_{\ce{NO2}}^2/K_{I,FNA,\rm Ntb}}
+  \frac{C_{\ce{O2}}}{K_{\ce{O2},\rm Ntb}+C_{\ce{O2}}}I_{FA,\rm Ntb}.
+  \label{eq:ntb_rate}
+\end{align}
+At \SI{28}{\celsius} and pH 8, the thesis reports representative kinetic values such as $K_{\ce{NH4}}=0.0175$, $K_{\ce{NO2}}=5.04\times10^{-3}$, $K_{\ce{O2},\rm Nts}=1.616\times10^{-4}$, $K_{\ce{O2},\rm Ntb}=5.44\times10^{-4}$, $K_{I,FA,\rm Nts}=0.116$, $K_{I,FNA,\rm Ntb}=1.56\times10^{-4}$, $\mu_{\rm Nts}=1.368\,\si{d^{-1}}$, and $\mu_{\rm Ntb}=0.864\,\si{d^{-1}}$ \parencite[112]{montras2009}. The exact units depend on the model concentration basis, but the structure is clear: ammonium oxidation and nitrite oxidation are limited by substrate and oxygen and inhibited by free ammonia or free nitrous acid.
+
+\subsection{Reactor hydrodynamics and numerical implementation}
+
+The fixed-bed reactor can be represented as a series of bulk-liquid compartments coupled to local biofilm modules:
+\begin{equation}
+  \frac{\dd C_{i,n}^{\rm bulk}}{\dd t}
+  =\frac{Q}{V_n}\left(C_{i,n-1}^{\rm bulk}-C_{i,n}^{\rm bulk}\right)
+  -a_nJ_{L,i}\big|_{r=L_F}
+  +k_La_i(C_i^*-C_{i,n}^{\rm bulk}),
+  \label{eq:c3_tanks}
+\end{equation}
+where $a_n$ is a support-area-to-volume factor for compartment $n$. Montr\`as describes a seven-compartment tank-in-series representation estimated from residence-time-distribution data and implemented in AQUASIM with bulk liquid, biofilm matrix, and pore-water compartments \parencite[105, 114--115]{montras2009}. This gives enough information to build a reproducible method-of-lines model even without the original AQUASIM files.
+
+\section{Integrated \MEL{} pilot plant: from reactor equations to life-support control}
+
+\subsection{Integration is the astronautical systems breakthrough}
+
+The integrated \MEL{} pilot plant matters because it couples microbial subsystems under control. Garcia-Gragera and colleagues connected the nitrifying compartment, the photosynthetic compartment, and an animal compartment in staged integration. The liquid C3--C4a connection ran in continuous mode for 276 days, and gas integration between the photobioreactor and the animal compartment ran for 111 days \parencite[5, 8]{garcia2021}. During the integrated campaign, ammonium conversion was maintained at 100 percent for roughly 200 days despite load changes and disturbance events, with nitrite peaks recovering after operational adjustments \parencite[11, 13]{garcia2021}.
+
+This is the mathematical threshold that thin-film BLSS prototypes must meet. A thin biofilm panel is not astronautically convincing merely because it grows biomass per area. It must accept coupled disturbances: crew CO$_2$ production, O$_2$ demand, variable nitrogen loading, pH drift, light limits, gas exchange, and microbial stability.
+
+\subsection{Oxygen-production balance used in integration}
+
+The integrated photobioreactor oxygen production can be computed from inlet and outlet gas flows. A representative disconnected-gas expression is
+\begin{equation}
+  r_{O_2}=\frac{(F_{\rm in}-F_{\ce{CO2}})0.2089-F_{\rm out}y_{O_2,\rm out}}
+  {22.4\,MW_{O_2}\,V_R},
+  \label{eq:oxygen_unconnected}
+\end{equation}
+where $0.2089$ is the molar fraction of oxygen in air, $F_{\ce{CO2}}$ accounts for carbon dioxide feed contribution, $y_{O_2,\rm out}$ is oxygen molar fraction in the outlet, and $V_R$ is reactor volume. In connected operation the measured inlet oxygen fraction is used:
+\begin{equation}
+  r_{O_2}=\frac{F_{\rm in}y_{O_2,\rm in}-F_{\rm out}y_{O_2,\rm out}}
+  {22.4\,MW_{O_2}\,V_R}.
+  \label{eq:oxygen_connected}
+\end{equation}
+These equations are a useful bridge from biology to crew support because they convert a photobioreactor state into an animal-compartment oxygen service \parencite[5]{garcia2021}.
+
+\subsection{A reduced control structure}
+
+A simple control abstraction for the C4a--animal gas loop is
+\begin{align}
+  e_{O_2}(t)&=y_{O_2,\rm sp}-y_{O_2,\rm animal}(t),\label{eq:error}\\
+  q_0(t)&=\operatorname{sat}_{[q_{\min},q_{\max}]}
+  \left(q_{0,0}+K_Pe_{O_2}(t)+K_I\int_0^t e_{O_2}(\tau)\,\dd \tau\right),\label{eq:pi_light}\\
+  D(t)&=\operatorname{sat}_{[D_{\min},D_{\max}]}
+  \left(D_0+K_N(C_{\ce{NO3},\rm sp}-C_{\ce{NO3}})\right).
+\end{align}
+The exact \MEL{} control architecture is richer, but \cref{eq:error,eq:pi_light} captures the principle: light, feed, and gas flow are manipulated to make a biological compartment deliver a life-support service. Garcia-Gragera and colleagues report that the photobioreactor oxygen production was able to fulfill the rat-compartment oxygen need during the gas-integration period, while the nitrifying reactor maintained ammonium conversion and recovered from nitrite events \parencite[11, 13]{garcia2021}.
+
+\section{System-level stoichiometry and equivalent system mass}
+
+\subsection{Stoichiometric closure models}
+
+At mission scale, the question is not only ``does the film grow?'' It is ``does the loop close with acceptable mass, energy, volume, time, and reliability?'' A stoichiometric closure model treats all compartments as a linked reaction network. A simplified element balance for C, H, O, and N is
+\begin{equation}
+\begin{bmatrix}
+\text{C}\
+\text{H}\
+\text{O}\
+\text{N}
+\end{bmatrix}_{\rm in}
++\bm A\bm \xi
+=\begin{bmatrix}
+\text{C}\
+\text{H}\
+\text{O}\
+\text{N}
+\end{bmatrix}_{\rm out}.
+\label{eq:elemental_matrix}
+\end{equation}
+A closure metric for commodity $j$ can be written as
+\begin{equation}
+  \eta_j=1-\frac{F_{j,\rm resupply}+F_{j,\rm loss}}{F_{j,\rm demand}},
+  \label{eq:closure_eta}
+\end{equation}
+where $\eta_j=1$ is ideal closure and $\eta_j=0$ means no regenerative contribution. The \MEL{} stoichiometric review is valuable because it surveys how published compartment equations and stoichiometric coefficients can be assembled into a whole-loop mass model \parencite[Abstract, sec. 2--5]{vermeulen2023}.
+
+\subsection{Equivalent system mass for algal photobioreactors}
+
+NASA- and ESA-style mission trades often use equivalent system mass:
+\begin{equation}
+  \ESM=M+\lambda_VV+\lambda_PP+\lambda_QQ+\lambda_tt_{\rm crew},
+  \label{eq:esm}
+\end{equation}
+where $M$ is mass, $V$ is volume, $P$ is power, $Q$ is cooling or heat-rejection load, $t_{\rm crew}$ is crew time, and $\lambda$ terms convert non-mass penalties to equivalent mass. A bioregenerative subsystem is favorable when
+\begin{equation}
+  \ESM_{\rm biological}(T)<\ESM_{\rm physicochemical}(T)
+  \label{eq:esm_breakeven}
+\end{equation}
+for mission duration $T$.
+
+Detrell's \Chl{} lunar-base analysis is important because it makes this trade explicit. The article estimates that \SIrange{50}{100}{L} of reactor volume per person could provide roughly 10--30 percent food substitution, and break-even durations were reported in the approximate range of 4.0--6.5 years for a 30 percent food case and 4.8--7.3 years for a 10 percent food case \parencite[3--5]{detrell2021}. The same review cautions that most space photobioreactor experiments are short and small, and that biofilm formation and long-term stability must be understood before full life-support use \parencite[7--8]{detrell2021}. This is an important warning for thin-film systems: attachment can be a design feature when intentional, but an operational fault when it clogs or fouls a suspended-culture photobioreactor.
+
+\section{Strict thin-film algal biofilm models}
+
+\subsection{Rotating and attached phototrophic biofilms}
+
+Attached microalgal films are attractive for BLSS because they can reduce liquid inventory, simplify harvesting, increase areal productivity, and separate biomass retention from hydraulic residence time. In rotating biological contactor or Algadisk-style designs, a thin algal film alternates between liquid nutrient exposure and gas/light exposure. Blanken and colleagues demonstrated \Soro{} growth in a rotating biological contactor photobioreactor with sustained attached cultivation, while the thesis line develops models for biofilm growth, day/night operation, CO$_2$ utilization, and staged operation \parencite[2436--2445]{blanken2014}\parencite[abstract]{blanken2016}.
+
+A minimal areal biofilm production model can be written as
+\begin{align}
+  \frac{\partial X(z,t)}{\partial t}
+  &=\mu\big(I(z,t),C(z,t),N(z,t)\big)X-k_dX,\label{eq:areal_biofilm_growth}\\
+  I(z,t)&=I_0(t)\exp\left[-\int_0^z \kappa_X X(\zeta,t)+\kappa_EE(\zeta,t)\,\dd\zeta\right],\label{eq:biofilm_light}\\
+  P_A(t)&=\int_0^{h(t)}\left[\mu(I,C,N)-k_d\right]X(z,t)\,\dd z,\label{eq:areal_productivity}\\
+  h(t_n^+)&=h_H\quad \text{after harvest at }t=t_n.\label{eq:harvest_reset}
+\end{align}
+Here $P_A$ is areal productivity and $h_H$ is post-harvest film thickness. This class of model is directly relevant to spacecraft design because the state variable of interest is not only cell concentration but film thickness and illuminated active depth.
+
+\subsection{Open 2D PDE and mixture-theory simulations}
+
+Polizzi and colleagues provide the clearest open algorithmic route for strict photosynthetic biofilm modeling. Their model represents active cells, non-growing cells, extracellular matrix, and liquid as volume fractions; dissolved carbon, oxygen, and nitrate diffuse and react; kinetics are regulated by light, nitrate, oxygen, and inorganic carbon \parencite[1, 3--5]{polizzi2022}. In compact notation,
+\begin{align}
+  \frac{\partial \phi_k}{\partial t}+\nabla\cdot(\phi_k\bm v_k)&=R_k(\bm \phi,C,O,S,I),\qquad k\in\{A,N,E,L\},\label{eq:mixture_phi}\\
+  \sum_{k\in\{A,N,E,L\}}\phi_k&=1,\label{eq:sum_phi}\\
+  \frac{\partial \psi}{\partial t}+\nabla\cdot(\psi\bm v_L)-\nabla\cdot(D_\psi\nabla\psi)&=R_\psi(\bm \phi,C,O,S,I),\qquad \psi\in\{C,O,S\}.\label{eq:dissolved_pde}
+\end{align}
+A useful light closure is
+\begin{equation}
+  I(x,z,t)=I_0(x,t)\exp\left[-\int_0^z \left(\kappa_A\phi_A+\kappa_N\phi_N+\kappa_E\phi_E\right)(x,\zeta,t)\,\dd\zeta\right].
+  \label{eq:2d_light}
+\end{equation}
+Boundary conditions couple the film to gas or medium:
+\begin{align}
+  -D_C\nabla C\cdot \bm n&=k_C(C-C^*),\label{eq:carbon_bc}\\
+  -D_O\nabla O\cdot \bm n&=k_O(O-O^*),\label{eq:oxygen_bc}\\
+  S&=S_{\rm medium}\quad \text{on wetted nutrient boundaries}.\label{eq:nitrate_bc}
+\end{align}
+The value of this model family for BLSS is that it exposes design variables hidden by well-mixed models: active-layer depth, substrate-gradient failure, oxygen inhibition, extracellular matrix accumulation, and harvesting pattern. Polizzi and colleagues report that an active region of roughly \SI{75}{\micro m}, optimized harvesting at roughly week scale, and patterned harvesting can materially affect productivity \parencite[1, 5, 15--16]{polizzi2022}. The astronautical limitation is that this is a terrestrial design model, not a flight-validated life-support compartment.
+
+\subsection{How the thin-film PDE layer should be coupled to \MEL{} control}
+
+The most promising synthesis is a two-level model:
+\begin{enumerate}
+  \item a high-fidelity biofilm PDE that predicts areal oxygen production, carbon uptake, biomass harvest, nitrogen demand, and fouling risk as functions of light, wetting, gas composition, film thickness, and harvesting; and
+  \item a reduced-order \MEL{}-style compartment model that embeds those predictions into mass-balance control for crew oxygen, carbon dioxide, ammonium, nitrate, water, and food.
+\end{enumerate}
+Mathematically, the PDE can be projected into a low-dimensional service model:
+\begin{equation}
+  \begin{bmatrix}
+  R_{\ce{O2}}\\R_{\ce{CO2}}\\R_{\ce{NO3}}\\R_X\\R_{\rm risk}
+  \end{bmatrix}
+  =\mathcal{R}_{\rm ROM}\left(q_0,F_g,Q,h,t_{\rm harvest},\theta_{\rm film}\right),
+  \label{eq:rom_projection}
+\end{equation}
+where $\mathcal{R}_{\rm ROM}$ is a reduced-order map trained or fitted from PDE simulations and experiments. The compartment-level controller then uses
+\begin{equation}
+  \frac{\dd \bm x_{\rm habitat}}{\dd t}=\bm f_{\rm crew}(t)+\bm B\mathcal{R}_{\rm ROM}(\bm u,t)-\bm g_{\rm losses}(t).
+  \label{eq:habitat_coupled}
+\end{equation}
+This approach preserves the design value of thin-film spatial models while avoiding the computational burden of solving a full 2D or 3D biofilm PDE inside every mission-level controller.
+
+\section{Validation ladder for a future thin-film BLSS panel}
+
+A rigorous validation program should not jump directly from a productive terrestrial biofilm to a flight claim. A credible ladder is:
+
+\begin{enumerate}
+  \item \textbf{Bench PDE calibration}: estimate light attenuation, diffusion, uptake, EPS, mortality, and harvesting parameters using controlled films.
+  \item \textbf{Closed-gas service tests}: show predictable oxygen production and carbon dioxide uptake from gas balances similar to \cref{eq:oxygen_unconnected,eq:oxygen_connected}.
+  \item \textbf{Nitrogen coupling}: link the phototrophic film to nitrified waste streams and measure nitrate uptake, pH drift, and nitrite sensitivity.
+  \item \textbf{Dynamic disturbance tests}: impose crew-like CO$_2$ loads, day/night cycles, flow interruptions, pH disturbances, and harvesting events.
+  \item \textbf{Reduced-gravity risk tests}: characterize wetting, bubble behavior, capillary retention, gas exchange, film sloughing, and sensor reliability.
+  \item \textbf{Integrated pilot closure}: connect the panel to a C3-like nitrifying unit and a crew metabolic simulator.
+  \item \textbf{Flight demonstration}: operate a small film reactor with measured gas exchange, pH/carbonate accounting, imaging of film morphology, and postflight biomass composition.
+\end{enumerate}
+
+The ladder is intentionally patterned after the \MEL{} precedent: model, pilot verification, integration, and flight interpretation. The \Limno{} model demonstrates this path for a suspended/membrane photobioreactor \parencite[1, 6, 8--9]{poughon2021}; the C3 reactor demonstrates it for attached nitrifying biofilms in ground integration \parencite[11, 13]{garcia2021}; the thin-film algal literature supplies the missing spatial algorithms \parencite[3--5]{polizzi2022}\parencite[2436--2445]{blanken2014}.
+
+\section{Research gaps and design recommendations}
+
+\subsection{Gaps}
+
+\begin{enumerate}
+  \item \textbf{Public code gap}. The most verified \MEL{} models are described in papers and theses, but complete reusable code is not generally available. The Polizzi model is more open algorithmically, but less flight-validated \parencite[5]{polizzi2022}.
+  \item \textbf{Partial-gravity gap}. ISS microgravity and 1-g ground validation do not automatically resolve lunar or Martian partial-gravity wetting, bubble, and film-stability behavior.
+  \item \textbf{Biofilm control gap}. In C3, biofilm is the reactor. In suspended PBRs, unwanted biofilm formation can become fouling. A thin-film algal BLSS system must distinguish controlled attachment from failure-mode attachment.
+  \item \textbf{pH/carbonate gap}. The \Limno{} ISS application shows that pH and carbonate equilibria can dominate interpretation when pH is not directly controlled \parencite[8--9]{poughon2021}.
+  \item \textbf{Harvesting and food-quality gap}. Thin-film productivity must be tied to stable, safe, edible, and processable biomass, not only to dry mass per area.
+  \item \textbf{Reliability gap}. Long-duration life support needs stable sensor calibration, contamination resistance, film morphology control, and recovery from disturbances.
+\end{enumerate}
+
+\subsection{Recommendations}
+
+The strongest near-term study would implement a thin-film algal photobioreactor as a \MEL{}-compatible service module. The model should expose five outputs: oxygen production, carbon dioxide uptake, nitrate uptake, biomass harvest, and risk or fouling state. The model should include a spatial PDE layer for development and a reduced-order control map for operation. It should be benchmarked against \MEL{} standards: mass-balanced equations, identifiable parameters, dynamic disturbance validation, and gas-balance closure. The C3 nitrifying model should be treated as the nitrogen input generator, not as a peripheral subsystem; otherwise a phototrophic panel cannot close the waste-to-food loop.
+
+\section{Conclusion}
+
+The strongest evidence supports a layered conclusion. The verified astronautical breakthrough is the \MEL{} modeling stack, especially the C4a \Limno{} photobioreactor and the C3 nitrifying fixed-bed biofilm reactor. The strongest strict thin-film mathematics is the terrestrial attached-algal-biofilm and open PDE literature. The best future architecture is not to choose one over the other, but to combine them: use thin-film PDEs to design compact photosynthetic biofilm hardware, then embed reduced-order outputs in \MEL{}-style mass-balanced, dynamically controlled life-support loops.
+
+In practical terms, the first three readings should be: Poughon et al. for the \Limno{} photobioreactor model and ISS/pilot transfer \parencite[1--3, 6, 8--9]{poughon2021}; P\'{e}rez et al. and Montr\`as for the nitrifying fixed-bed biofilm mathematics \parencite[2359--2369]{perez2005}\parencite[96--115]{montras2009}; and Garcia-Gragera et al. for the integrated pilot plant that turns reactor models into controlled life-support behavior \parencite[5--6, 11, 13]{garcia2021}. For strict thin-film algorithmic work, Polizzi et al. and Blanken's attached-culture work are the most useful next step \parencite[1, 3--5]{polizzi2022}\parencite[2436--2445]{blanken2014}.
+
+\appendix
+\section{Implementation sketch for a nitrifying biofilm prototype}
+
+The following pseudocode states the local kinetics from \cref{eq:nts_rate,eq:ntb_rate}; a full reactor model then embeds these rates in radial finite volumes and tank-in-series bulk-liquid compartments.
+
+\begin{verbatim}
+def nitrifier_rates(C_NH4, C_NO2, C_O2, X_Nts, X_Ntb,
+                    K_NH4=0.0175, K_NO2=5.04e-3,
+                    K_O2_Nts=1.616e-4, K_O2_Ntb=5.44e-4,
+                    KI_FA_Nts=0.116, KI_FNA_Ntb=1.56e-4,
+                    mu_Nts=1.368, mu_Ntb=0.864,
+                    I_FA_Ntb=1.0):
+    r_Nts = (mu_Nts * X_Nts
+             * C_NH4/(K_NH4 + C_NH4 + C_NH4**2/KI_FA_Nts)
+             * C_O2/(K_O2_Nts + C_O2))
+    r_Ntb = (mu_Ntb * X_Ntb
+             * C_NO2/(K_NO2 + C_NO2 + C_NO2**2/KI_FNA_Ntb)
+             * C_O2/(K_O2_Ntb + C_O2) * I_FA_Ntb)
+    return r_Nts, r_Ntb
+\end{verbatim}
+
+A method-of-lines implementation would discretize \cref{eq:spherical_diffusion} into $M$ radial shells for each support bead, compute boundary fluxes to the bulk liquid using \cref{eq:c3_tanks}, update biofilm thickness with \cref{eq:biofilm_thickness}, and solve the stiff ODE system with an implicit integrator.
+
+\section{Reduced-order outputs for a thin-film algal BLSS module}
+
+A mission controller does not need the full PDE state at every time step. It needs a compact service vector:
+\begin{equation}
+\bm y_{\rm service}=\begin{bmatrix}
+\dot n_{\ce{O2}} & -\dot n_{\ce{CO2}} & -\dot n_{\ce{NO3}} & \dot m_{X,\rm harvest} & \rho_{\rm risk}
+\end{bmatrix}^{\mathsf T}.
+\end{equation}
+A reduced-order model can be identified from simulations and experiments:
+\begin{equation}
+\bm y_{\rm service}=\bm W\bm \Phi(q_0,F_g,Q,h,t_{\rm harvest},pH,T)+\bm \varepsilon,
+\end{equation}
+where $\bm \Phi$ is a basis of nonlinear features and $\bm \varepsilon$ is model error. The operational rule is then to control the film only inside the validated region:
+\begin{equation}
+(q_0,F_g,Q,h,t_{\rm harvest},pH,T)\in \mathcal{D}_{\rm validated}.
+\end{equation}
+This condition is the thin-film analogue of the \MEL{} photobioreactor feasibility maps and C3 biofilm disturbance-validation logic.
+
+\section{Citation note}
+
+Chicago author-date in-text citations are used throughout. Page locators refer to PDF or article pagination when available. For web-first articles or online materials where conventional pagination is absent, section, abstract, or range locators are used instead of page numbers.
+
+\printbibliography
+
+\end{document}

@@ -1,0 +1,22 @@
+# Minimal smoke scenario for the Rust examples/tests. Values are illustrative only.
+[metadata]
+id = "scenario.life_support.thinfilm.panel_smoke"
+status = "illustrative_only"
+source_keys = ["polizzi2022", "poughon2021", "garcia2021"]
+notes = "Do not use as design data. Demonstrates API wiring and unit-basis placeholders."
+
+[domain]
+light_flux_min = 0.0
+light_flux_max = 500.0
+gas_flow_min = 0.0
+gas_flow_max = 1.0
+liquid_flow_min = 0.0
+liquid_flow_max = 1.0
+film_thickness_min = 0.0
+film_thickness_max = 0.005
+harvest_interval_min = 86400.0
+harvest_interval_max = 1209600.0
+ph_min = 6.0
+ph_max = 9.0
+temperature_k_min = 293.15
+temperature_k_max = 303.15

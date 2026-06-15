@@ -1,0 +1,230 @@
+# AeroCodex thin-film BLSS data manifest
+# Generated for the Rust conversion of the supplied thin-film/biofilm BLSS materials.
+schema_version = "1.0"
+artifact_id = "aerocodex-thinfilm-blss-rust-pack"
+generated_utc = "2026-06-15T00:00:00Z"
+phase = "0.001"
+source_materials = ["blss_thinfilm_report.pdf", "blss_thinfilm_report.tex", "blss_thinfilm_refs.bib", "blss_thinfilm_latex_source.zip", "AeroCodex-main.zip"]
+equation_count = 51
+rust_crate = "aero-codex-life-support"
+status = "equation_traceable_research_kernel"
+limitations = [
+  "Cargo and rustc were unavailable in the packaging sandbox; run cargo test in a Rust environment.",
+  "Thin-film algal PDE functions are design-layer equations and require calibration before mission use.",
+  "MELiSSA-derived equations preserve citation traceability but do not certify flight readiness.",
+]
+
+[[files]]
+path = "ARTIFACT_MANIFEST.md"
+bytes = 2183
+sha256 = "79fbc0b2fe4643fbf2adf8fb4c3885d6f9cdc2e7fa0aea03ba6660bf0b1bf752"
+
+[[files]]
+path = "README.md"
+bytes = 5921
+sha256 = "394abfeada8f58b8859809b625be9fa770e59fcf096ac8770d1aa1ff4fed7c01"
+
+[[files]]
+path = "checksums/SHA256SUMS"
+bytes = 4903
+sha256 = "e1047d4785bbf35dac5fb309268e09ada98ceab6273e2b51dff1b39ab997ff2f"
+
+[[files]]
+path = "citations/blss_thinfilm_refs.bib"
+bytes = 4044
+sha256 = "d1c00264c747f4bc2539a6cc3387045b2279f4351974845c5b17712dfc5ad380"
+
+[[files]]
+path = "crates/aero-codex-life-support/examples/thinfilm_demo.rs"
+bytes = 2724
+sha256 = "0279dc162d32fa618320b060c4fce164f5a5246d7d14e5e69bf6b23939bfa76c"
+
+[[files]]
+path = "crates/aero-codex-life-support/src/brlss_backbone.rs"
+bytes = 15248
+sha256 = "a484c41759df5dcf91cf417f45a3107e7482645b897a8de9ffe8af49935edca3"
+
+[[files]]
+path = "crates/aero-codex-life-support/src/lib.rs"
+bytes = 22045
+sha256 = "b4afa4c02f864e1ac6819f8a168dbb781d2a888e0a4f64596cf83d0f4326abab"
+
+[[files]]
+path = "crates/aero-codex-life-support/src/melissa_photobioreactor.rs"
+bytes = 26919
+sha256 = "7e0b6c4e80573f24ab6a1f445dd9e5b9f48ea4834c72046ab34a549e6d330daa"
+
+[[files]]
+path = "crates/aero-codex-life-support/src/nitrifying_biofilm.rs"
+bytes = 15551
+sha256 = "cc36434bb25c3d5688b24a75ccc01c04a0a6c54c4abef45e6d8c627625c4cde3"
+
+[[files]]
+path = "crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs"
+bytes = 24066
+sha256 = "0eea4678f878cf86b02645d9a9dba524cca811cdab76478054daa323da42965e"
+
+[[files]]
+path = "crates/aero-codex-life-support/src/thinfilm_provenance.rs"
+bytes = 32018
+sha256 = "3328ed715546584bafba60a78e12a764fbe1faf9fd2d63c9ebf5d0fd6ce667e0"
+
+[[files]]
+path = "data/thinfilm/equation_manifest.csv"
+bytes = 8669
+sha256 = "833e3e16f7e469f17cc9e0a5c99e3803ce101bf70aee13708078e75894512c42"
+
+[[files]]
+path = "data/thinfilm/parameter_cards/montras_c3_nitrifier_28c_ph8.toml"
+bytes = 644
+sha256 = "351ccadf1ffe9272f514c0b559e9c90639b2da201abd4679d538f27bc26da0eb"
+
+[[files]]
+path = "data/thinfilm/parameter_cards/polizzi_thinfilm_symbolic.toml"
+bytes = 852
+sha256 = "3b0f77b24e00169684480fa22d67dbefbe6d7f85ba13ad5628f1ebe2b441f770"
+
+[[files]]
+path = "data/thinfilm/parameter_cards/poughon_c4a_symbolic.toml"
+bytes = 934
+sha256 = "5d8715bb023e83a93a08195f22920fdf77f3e4c4f99357dd1d40d6524b642d53"
+
+[[files]]
+path = "data/thinfilm/scenarios/thinfilm_panel_smoke.toml"
+bytes = 655
+sha256 = "7c2218f5c40c394a8cb499fd61c355d8360e410e712944e33ae8327e2372f740"
+
+[[files]]
+path = "data/thinfilm/source_verification.csv"
+bytes = 2820
+sha256 = "7a871b192f8bcfb650533b51c5e8d3bb2bc66d41b0fe227bb3374485aa839842"
+
+[[files]]
+path = "docs/phase_0_001/microtask_021_thinfilm_biofilm_models.md"
+bytes = 2729
+sha256 = "a782baf5879a21caee425542d041be5f6a21f5461c7f0743b9eab7f8a1907909"
+
+[[files]]
+path = "docs/phase_0_001/thinfilm_citation_verification.md"
+bytes = 1346
+sha256 = "d4de82f05971a12ad6b9bed685f2fb670ef761ab0e400d92132cd25d1be34c0d"
+
+[[files]]
+path = "docs/phase_0_001/thinfilm_equation_traceability.md"
+bytes = 1195
+sha256 = "0cbdebc4bb142eb33c492ed82a83d0cda43ca3e5d907770cb5e6eb1188a8a396"
+
+[[files]]
+path = "docs/phase_0_001/thinfilm_implementation_plan.md"
+bytes = 1511
+sha256 = "f859301478202ee2055a2449ed38bfb6f63f6ca07d2b3c43515745c820b68ea2"
+
+[[files]]
+path = "scripts/verify_thinfilm_artifact.py"
+bytes = 6125
+sha256 = "135cda9db62abeabcb60cc7c243c7a9ac3ad2b7abba5dd2380200edd63003812"
+
+[[files]]
+path = "source_material/current_repo/AeroCodex-main.zip"
+bytes = 214446
+sha256 = "1624fa364ef8460ea9b8cc8f1e8838dc758bb4f2ddf6809b3c25537020160221"
+
+[[files]]
+path = "source_material/new_thinfilm/blss_thinfilm_latex_source.zip"
+bytes = 17331
+sha256 = "24e01b7d0ec7b3248b9db24586c1af736d726ad27846874dda52d25446ecf667"
+
+[[files]]
+path = "source_material/new_thinfilm/blss_thinfilm_refs.bib"
+bytes = 4044
+sha256 = "d1c00264c747f4bc2539a6cc3387045b2279f4351974845c5b17712dfc5ad380"
+
+[[files]]
+path = "source_material/new_thinfilm/blss_thinfilm_report.pdf"
+bytes = 426821
+sha256 = "6194f1bbc26539b0c44f8afee543e4d96736d2aae0985ad01183e511ba9b1c0f"
+
+[[files]]
+path = "source_material/new_thinfilm/blss_thinfilm_report.tex"
+bytes = 45460
+sha256 = "36c2e5e795be6e9b5c5edcb24f44b1be59e6f4d04575b2bf1a858cc33d2a4cf0"
+
+[[files]]
+path = "validation/cards/life_support_thinfilm_algal_biofilm_pde_rom.yaml"
+bytes = 1845
+sha256 = "7cbf85702f9d832cf5df9bc4b5bfe1a9aea5d71b08725f94391adb839cbdabd9"
+
+[[files]]
+path = "validation/cards/life_support_thinfilm_brlss_backbone.yaml"
+bytes = 1764
+sha256 = "67e719489b977c754214813c9b46eaefb9be5ca5f998dd21c04f3931fe21e00d"
+
+[[files]]
+path = "validation/cards/life_support_thinfilm_citation_manifest.yaml"
+bytes = 1829
+sha256 = "094c7ceede6d2c0d755bfd971b0b872004fd67ee3482229da25b0fa468959f4d"
+
+[[files]]
+path = "validation/cards/life_support_thinfilm_melissa_c3_nitrifying_biofilm.yaml"
+bytes = 1788
+sha256 = "f476633fee5bd17596dace20e645d721aff2eb3ecc53e30c90895686462db38d"
+
+[[files]]
+path = "validation/cards/life_support_thinfilm_melissa_c4a_photobioreactor.yaml"
+bytes = 1775
+sha256 = "aab479b8277927ffdfb558ee3bd61e5e7105dc968de968e39627bf5620221086"
+
+[[files]]
+path = "validation/source_registry/life_support_bioregenerative_mass_balance.yaml"
+bytes = 1617
+sha256 = "d787e4cdf2c8c3515f9cc7c6089e5bdc4ede03cb0e74eb2d597a05d7bbfd5d64"
+
+[[files]]
+path = "validation/source_registry/life_support_blanken_2014.yaml"
+bytes = 1266
+sha256 = "7d57d7408250d7466be183717301e22d7ccdc941ba43a516fa01860e2be791e1"
+
+[[files]]
+path = "validation/source_registry/life_support_blanken_2016.yaml"
+bytes = 1227
+sha256 = "7c95fb8892e6b2650e71c451007d280ec3f3596e443aed04ef687fed40e22b6f"
+
+[[files]]
+path = "validation/source_registry/life_support_detrell_2021.yaml"
+bytes = 1217
+sha256 = "8c7dff204f5a799190cb17e578eaac88d9dcb05e0d8df277402584343e011f97"
+
+[[files]]
+path = "validation/source_registry/life_support_garcia_2021.yaml"
+bytes = 1240
+sha256 = "dbc6b2c25d63848185a6b5c2dee02d73a2cb136bd37b6a66998e45a33173fcb9"
+
+[[files]]
+path = "validation/source_registry/life_support_montras_2009.yaml"
+bytes = 1268
+sha256 = "7d5af686a7accdb50c9971734a07997fb187d55103b2d94ac3b86e5a87879a35"
+
+[[files]]
+path = "validation/source_registry/life_support_perez_2005.yaml"
+bytes = 1226
+sha256 = "1042d5d6eeb289f9237da9707cae596d9db1f24e3f776a47e00953106719975e"
+
+[[files]]
+path = "validation/source_registry/life_support_polizzi_2022.yaml"
+bytes = 1274
+sha256 = "3dc5875b4780dc1264a674e5a3f2cfdda25a426013fd7f1aa62dddd7486b408a"
+
+[[files]]
+path = "validation/source_registry/life_support_poughon_2021.yaml"
+bytes = 1279
+sha256 = "b4f42838f0d6a83fa0c430d1d9a2ebdec2e62216de7afcd57444cc5ccedb65d3"
+
+[[files]]
+path = "validation/source_registry/life_support_thinfilm_blss_report_2026.yaml"
+bytes = 1307
+sha256 = "95a3d55b654c5c48933ac44a5507f8ffe96f288f35410aa261fe3535aa92db70"
+
+[[files]]
+path = "validation/source_registry/life_support_vermeulen_2023.yaml"
+bytes = 1225
+sha256 = "04aea134d70750d9acbedb4ee93ce7016b1634c2b5a967676c458f4ec8a9722e"

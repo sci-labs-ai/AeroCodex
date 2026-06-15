@@ -1,0 +1,22 @@
+# Symbolic C4a photobioreactor parameter seed.
+# Source key: poughon2021. Numeric coefficients must be selected from the specific reactor/culture calibration.
+[metadata]
+id = "data.life_support.thinfilm.c4a.poughon_symbolic"
+status = "symbolic_parameter_seed"
+source_keys = ["poughon2021"]
+report_equations = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+notes = "Use this as a schema for calibrated light-transfer, LTIP/physiology, carbonate, kLa, and feasibility-map parameters."
+
+[parameters]
+phase_exponent_n = "calibrate"
+alpha = "calibrate"
+delta_per_m = "calibrate"
+calibrated_path_length_m = "calibrate"
+mu_model = "calibrate_function_of_light_tic_nutrients_ph_temperature"
+dilution_rate_per_s = "scenario"
+decay_rate_per_s = "calibrate"
+kla_co2_per_s = "calibrate"
+kla_o2_per_s = "calibrate"
+p_ka1 = "temperature_and_activity_basis"
+p_ka2 = "temperature_and_activity_basis"
+photon_requirement_limit = "validated_operating_region"

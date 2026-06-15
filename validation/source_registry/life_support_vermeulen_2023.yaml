@@ -1,0 +1,19 @@
+id: source.life_support.vermeulen_2023.equation_traceable
+title: Vermeulen et al. 2023 stoichiometric BLSS model
+category: life_support
+status: equation_traceable
+intended_use:
+  - Source traceability for the AeroCodex thin-film, biofilm, and MELiSSA BLSS implementation.
+  - Preserve citation keys and source provenance for functions generated from the supplied report.
+requested_details:
+  - Verify exact equations, model domains, units, sign conventions, and calibration constants before mission-specific design use.
+  - Retain DOI, URL, BibTeX key, report locator, and validation-card linkage in future source-registry upgrades.
+implementation_notes:
+  - Frontiers in Astronomy and Space Sciences article DOI 10.3389/fspas.2023.1198689.
+  - Used for whole-loop stoichiometric and elemental closure traceability.
+  - This source supports equation-traceable code only; reference validation requires numerical examples or experimental datasets.
+limits:
+  - Not a certification claim.
+  - Not a flight, habitat-safety, medical, or mission-readiness validation.
+  - Not a substitute for system-specific calibration, hazard analysis, or experimental verification.
+notes: "Added for the thin-film BLSS Rust conversion package."
