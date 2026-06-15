@@ -33,6 +33,12 @@ The following categories are locked as required roadmap categories for AeroCodex
 | validation | Codex Card schema, examples, source registry seeds, and xtask checks. |
 | agentic optimization | Roadmap category only in Phase 0.001; no operational optimization claim. |
 
+## Stage 4 governance milestone
+
+Stage 4 is a human planning and governance label, not a Cargo version and not a certification state. Chunk 0 freezes documentation-only operating rules in [Stage 4 master plan](stage4_master_plan.md), [Stage 4 agent operating rules](../deployment/stage4_agent_operating_rules.md), [Math correctness policy](../assurance/math_correctness_policy.md), [Merge and release policy](../assurance/merge_and_release_policy.md), and [Stage 4 source inventory](../source_intake/stage4_source_inventory.md).
+
+Stage 4 keeps one canonical `main`, requires the deployment agent to manage sync/update/verify/merge/push, treats external bundles as source material rather than automatic public API, keeps M07 quarantined until Rust/Scilab/SGP4 gates pass, keeps BioSim-RS first-class but license-boundaried, and uses Orekit as a reference oracle rather than a Java class hierarchy to clone.
+
 ## Milestone interpretation rules
 
 - Roadmap levels are not deployment certifications and are not certification gates.

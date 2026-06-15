@@ -1539,3 +1539,69 @@ records:
     confidence: medium
   notes:
   - Candidate record added during current AeroCodex repository nomenclature adoption.
+- acronym_id: acx:acr:orbit:sgp4:v1
+  token: SGP4
+  preferred_token: SGP4
+  expansion: Simplified General Perturbations 4
+  namespace: acronym
+  domains:
+  - astrodynamics
+  - orbit_propagation
+  - source_traceability
+  status: candidate
+  source:
+    authority: AeroCodex Stage 4 source intake
+    source_id: acx:source:current_repo_scan:v1
+    authority_rank: repository_evidence
+    evidence: Stage 4 M07 governance docs use SGP4 as a certification-gate label.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - orbit propagation
+    - two-line element
+    - Vallado
+    - certification
+    - astrodynamics
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: SGP4 refers to Simplified General Perturbations 4 in Stage 4 astrodynamics certification contexts.
+    confidence: medium
+  notes:
+  - Candidate record added for Stage 4 planning and governance docs.
+- acronym_id: acx:acr:license:gpl:v1
+  token: GPL
+  preferred_token: GPL
+  expansion: General Public License
+  namespace: acronym
+  domains:
+  - licensing
+  - source_traceability
+  - governance
+  status: candidate
+  source:
+    authority: AeroCodex Stage 4 source intake
+    source_id: acx:source:current_repo_scan:v1
+    authority_rank: repository_evidence
+    evidence: Stage 4 BioSim source-boundary docs use GPL as a license-boundary label.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - license
+    - source boundary
+    - BioSim
+    - copyleft
+    - clean-room
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: GPL refers to the General Public License in Stage 4 source-boundary and BioSim licensing contexts.
+    confidence: medium
+  notes:
+  - Candidate record added for Stage 4 planning and governance docs.

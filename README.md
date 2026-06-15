@@ -12,7 +12,7 @@ AeroCodex is a Phase 0.001 Rust workspace for source-traceable aerospace enginee
 
 AeroCodex is provided for research purposes only as an engineering mathematics library for research, education, verification-oriented development, and preliminary design. Safety-critical, regulated, operational, or mission use requires project-specific assurance, validation, qualification, and certification.
 
-AeroCodex is **not** certified, flight-ready, mission-ready, or approved for aircraft or spacecraft operations.
+AeroCodex is **not** certified, flight-ready, mission-ready, habitat-safe, medical, operational, or regulated-use approved.
 
 ## Pure Rust policy
 
@@ -44,6 +44,12 @@ Validation cards live under `validation/cards/`, source-registry seed files live
 AeroCodex now treats nomenclature as a governed repository artifact. The policy and registries live under `nomenclature/`, with the canonical protocol in `nomenclature/docs/ACX-NOM-001.md`. New durable acronyms, initialisms, shorthand tokens, source-authority labels, aliases, and math-symbol mappings must be registered, explicitly waived, or covered by the adoption baseline.
 
 The repository-wide adoption scan is captured in `nomenclature/generated/current_repo_acronym_inventory.*` and `nomenclature/generated/current_repo_acronym_baseline.json`. The baseline is not an approval list; it only prevents future changes from silently adding unregistered acronym-like tokens. The AI-facing terminology index is `nomenclature/generated/terminology/index.jsonl`.
+
+## Stage 4 planning and governance
+
+Stage 4 planning docs are now frozen as documentation-only governance. Start with `docs/roadmap/stage4_master_plan.md`, `docs/deployment/stage4_agent_operating_rules.md`, `docs/assurance/math_correctness_policy.md`, `docs/assurance/merge_and_release_policy.md`, and `docs/source_intake/stage4_source_inventory.md`.
+
+Stage 4 keeps one canonical GitHub `main`, treats external bundles as source material rather than automatic public API, keeps M07 quarantined until Rust/Scilab/SGP4 gates pass, keeps BioSim-RS first-class but license-boundaried, and uses Orekit as a reference oracle rather than a Java class hierarchy to clone.
 
 ## Citation guidelines
 
