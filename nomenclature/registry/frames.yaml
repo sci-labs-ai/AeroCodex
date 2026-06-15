@@ -1,0 +1,52 @@
+version: 0.1.0-draft
+kind: acx.frames
+records:
+  - frame_id: acx:frame:local_tangent_ned:v1
+    canonical: local_tangent_ned
+    display_label: Local Tangent NED
+    axes:
+      x: north
+      y: east
+      z: down
+    origin_required: true
+    origin_description: Local geodetic reference point.
+    handedness: right_handed
+    status: approved
+
+  - frame_id: acx:frame:body:v1
+    canonical: body_frame
+    display_label: Aircraft Body Frame
+    axes:
+      x: forward
+      y: right
+      z: down
+    origin_required: true
+    origin_description: Aircraft body reference point.
+    handedness: right_handed
+    status: approved
+
+  - frame_id: acx:frame:wgs84_ellipsoid:v1
+    canonical: wgs84_ellipsoid
+    display_label: WGS84 Ellipsoid
+    axes: null
+    origin_required: false
+    status: approved
+
+  - frame_id: acx:frame:mean_sea_level:v1
+    canonical: mean_sea_level
+    display_label: Mean Sea Level
+    axes: null
+    origin_required: false
+    status: approved
+
+  - frame_id: acx:frame:true_north:v1
+    canonical: true_north
+    display_label: True North Reference
+    status: approved
+
+  - frame_id: acx:frame:magnetic_north:v1
+    canonical: magnetic_north
+    display_label: Magnetic North Reference
+    status: approved
+    notes:
+      - Magnetic heading values require model/date provenance if converted to true heading.

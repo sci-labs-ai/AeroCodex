@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aerocodex.internal/schemas/waiver.schema.json",
+  "title": "AeroCodex Waiver Registry",
+  "type": "object",
+  "required": [
+    "version",
+    "kind",
+    "records"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "kind": {
+      "const": "acx.waivers"
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "waiver_id",
+          "rule",
+          "context",
+          "reason",
+          "approved_by",
+          "expires",
+          "status"
+        ],
+        "properties": {
+          "waiver_id": {
+            "type": "string",
+            "pattern": "^ACX-NOM-WAIVER-"
+          },
+          "rule": {
+            "type": "string",
+            "pattern": "^ACX-NOM-[EW]"
+          },
+          "surface_form": {
+            "type": "string"
+          },
+          "context": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "approved_by": {
+            "type": "string"
+          },
+          "expires": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  }
+}

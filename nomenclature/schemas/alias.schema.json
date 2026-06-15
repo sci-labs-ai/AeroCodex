@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aerocodex.internal/schemas/alias.schema.json",
+  "title": "AeroCodex Alias Registry",
+  "type": "object",
+  "required": [
+    "version",
+    "kind",
+    "records"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "kind": {
+      "const": "acx.aliases"
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "alias",
+          "namespace",
+          "status"
+        ],
+        "properties": {
+          "alias": {
+            "type": "string"
+          },
+          "namespace": {
+            "type": "string"
+          },
+          "canonical": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "resolution_required": {
+            "type": "boolean"
+          },
+          "allowed_contexts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "forbidden_contexts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "ambiguous"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "candidates",
+                "resolution_required"
+              ]
+            }
+          },
+          {
+            "if": {
+              "not": {
+                "properties": {
+                  "status": {
+                    "const": "ambiguous"
+                  }
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "canonical"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

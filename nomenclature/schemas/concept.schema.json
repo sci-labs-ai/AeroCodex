@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aerocodex.internal/schemas/concept.schema.json",
+  "title": "AeroCodex Concept Registry",
+  "type": "object",
+  "required": [
+    "version",
+    "kind",
+    "records"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "kind": {
+      "const": "acx.concepts"
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "canonical",
+          "namespace",
+          "display_label",
+          "definition",
+          "status"
+        ],
+        "properties": {
+          "canonical": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "namespace": {
+            "type": "string"
+          },
+          "display_label": {
+            "type": "string"
+          },
+          "definition": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_terms": {
+            "type": "array"
+          },
+          "rust": {
+            "type": "object"
+          },
+          "schema": {
+            "type": "object"
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  }
+}

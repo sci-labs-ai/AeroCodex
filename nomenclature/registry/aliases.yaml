@@ -1,0 +1,237 @@
+version: 0.1.0-draft
+kind: acx.aliases
+records:
+  - alias: tail_number
+    namespace: alias
+    canonical: aircraft_registration
+    status: deprecated
+    allowed_contexts:
+      - source_original_text
+      - user_search_alias
+    forbidden_contexts:
+      - schema_field
+      - rust_identifier
+      - canonical_documentation_heading
+
+  - alias: n_number
+    namespace: alias
+    canonical: aircraft_registration
+    status: source_term
+    allowed_contexts:
+      - source_original_text
+      - user_search_alias
+    forbidden_contexts:
+      - schema_field
+      - rust_identifier
+
+  - alias: registration_mark
+    namespace: alias
+    canonical: aircraft_registration
+    status: approved
+    allowed_contexts:
+      - source_original_text
+      - user_search_alias
+
+  - alias: dt
+    namespace: alias
+    canonical: sample_interval
+    status: deprecated
+    allowed_contexts:
+      - math_local_symbol_if_declared
+    forbidden_contexts:
+      - rust_identifier
+      - schema_field
+
+  - alias: delta_t
+    namespace: alias
+    canonical: sample_interval
+    status: approved
+    allowed_contexts:
+      - math_local_symbol_if_declared
+      - documentation
+    forbidden_contexts:
+      - primitive_rust_identifier_without_unit
+
+  - alias: station
+    namespace: alias
+    status: ambiguous
+    candidates:
+      - airport_station
+      - maintenance_station
+      - fuselage_station
+      - reporting_station
+    resolution_required: true
+    forbidden_contexts:
+      - schema_field
+      - rust_identifier
+      - canonical_documentation_heading
+
+  - alias: gs
+    namespace: alias
+    canonical: ground_speed
+    status: deprecated
+    allowed_contexts:
+      - source_original_text
+      - math_local_symbol_if_declared
+    forbidden_contexts:
+      - schema_field
+      - durable_rust_identifier
+
+  - alias: GNC
+    namespace: acronym
+    canonical: guidance_navigation_and_control
+    status: candidate
+    allowed_contexts:
+      - aerospace_documentation
+      - flight_systems
+    forbidden_contexts:
+      - schema_field
+      - durable_rust_identifier_without_expansion
+
+  - alias: GN&C
+    namespace: acronym
+    canonical: guidance_navigation_and_control
+    status: candidate
+    allowed_contexts:
+      - aerospace_documentation
+      - source_original_text
+    forbidden_contexts:
+      - schema_field
+      - rust_identifier
+
+  - alias: EDL
+    namespace: acronym
+    canonical: entry_descent_and_landing
+    status: candidate
+    allowed_contexts:
+      - planetary_mission_documentation
+      - source_original_text
+    forbidden_contexts:
+      - schema_field
+      - durable_rust_identifier_without_expansion
+
+  - alias: LEO
+    namespace: acronym
+    canonical: low_earth_orbit
+    status: candidate
+    allowed_contexts:
+      - mission_design_documentation
+      - source_original_text
+    forbidden_contexts:
+      - schema_field
+      - durable_rust_identifier_without_expansion
+
+  - alias: MEO
+    namespace: acronym
+    canonical: medium_earth_orbit
+    status: candidate
+    allowed_contexts:
+      - mission_design_documentation
+      - source_original_text
+    forbidden_contexts:
+      - schema_field
+      - durable_rust_identifier_without_expansion
+
+  - alias: GEO
+    namespace: acronym
+    canonical: geostationary_earth_orbit
+    status: candidate
+    allowed_contexts:
+      - mission_design_documentation
+      - source_original_text
+    forbidden_contexts:
+      - schema_field
+      - durable_rust_identifier_without_expansion
+
+  - alias: PDR
+    namespace: acronym
+    canonical: preliminary_design_review
+    status: candidate
+    allowed_contexts:
+      - systems_engineering_documentation
+      - review_package
+      - source_original_text
+    forbidden_contexts:
+      - schema_field
+      - durable_rust_identifier_without_expansion
+
+  - alias: CDR
+    namespace: acronym
+    status: ambiguous
+    candidates:
+      - critical_design_review
+      - command_data_recorder
+    resolution_required: true
+    allowed_contexts:
+      - source_original_text
+      - systems_engineering_documentation_if_defined
+      - data_system_documentation_if_defined
+    forbidden_contexts:
+      - schema_field
+      - durable_rust_identifier_without_expansion
+
+  - alias: TRR
+    namespace: acronym
+    canonical: test_readiness_review
+    status: candidate
+    allowed_contexts:
+      - systems_engineering_documentation
+      - test_documentation
+      - source_original_text
+    forbidden_contexts:
+      - schema_field
+      - durable_rust_identifier_without_expansion
+
+  - alias: TRL
+    namespace: acronym
+    canonical: technology_readiness_level
+    status: candidate
+    allowed_contexts:
+      - systems_engineering_documentation
+      - technology_maturation_documentation
+      - source_original_text
+    forbidden_contexts:
+      - schema_field
+      - durable_rust_identifier_without_expansion
+
+  - alias: RCS
+    namespace: acronym
+    status: ambiguous
+    candidates:
+      - reaction_control_system
+      - radar_cross_section
+    resolution_required: true
+    allowed_contexts:
+      - source_original_text
+      - spacecraft_subsystem_documentation_if_defined
+      - radar_documentation_if_defined
+    forbidden_contexts:
+      - schema_field
+      - durable_rust_identifier_without_expansion
+
+  - alias: AC
+    namespace: acronym
+    status: ambiguous
+    candidates:
+      - advisory_circular
+      - alternating_current
+    resolution_required: true
+    allowed_contexts:
+      - source_original_text
+      - faa_documentation_if_defined
+      - electrical_documentation_if_defined
+    forbidden_contexts:
+      - schema_field
+      - durable_rust_identifier_without_expansion
+
+  - alias: ADS-B
+    namespace: acronym
+    canonical: automatic_dependent_surveillance_broadcast
+    status: candidate
+    allowed_contexts:
+      - aviation_documentation
+      - air_traffic_documentation
+      - source_original_text
+    forbidden_contexts:
+      - schema_field
+      - durable_rust_identifier_without_expansion

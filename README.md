@@ -38,6 +38,13 @@ The core repository is intentionally pure Rust. The repository does not include 
 
 Validation cards live under `validation/cards/`, source-registry seed files live under `validation/source_registry/`, and the Codex Card schema lives under `validation/schema/`. See `validation/README.md` for the Phase 0.001 validation scaffold and status ladder. Current cards and source-registry seeds intentionally remain conservative `research_required` artifacts unless exact source, test, and validation evidence has been reviewed. The Phase 0.001 non-example cards are planning artifacts only; they cover atmosphere, thermodynamics, gas dynamics, aerodynamics, propulsion, heat transfer, structures, flight dynamics, astrodynamics, and life-support mass-balance scaffolding. Their presence does not imply source validation, certification, flight readiness, mission readiness, or operational approval.
 
+
+## Nomenclature and acronym policy
+
+AeroCodex now treats nomenclature as a governed repository artifact. The policy and registries live under `nomenclature/`, with the canonical protocol in `nomenclature/docs/ACX-NOM-001.md`. New durable acronyms, initialisms, shorthand tokens, source-authority labels, aliases, and math-symbol mappings must be registered, explicitly waived, or covered by the adoption baseline.
+
+The repository-wide adoption scan is captured in `nomenclature/generated/current_repo_acronym_inventory.*` and `nomenclature/generated/current_repo_acronym_baseline.json`. The baseline is not an approval list; it only prevents future changes from silently adding unregistered acronym-like tokens. The AI-facing terminology index is `nomenclature/generated/terminology/index.jsonl`.
+
 ## Citation guidelines
 
 These citation guidelines are part of the root README landing page and should remain visible on `main`.
@@ -58,6 +65,9 @@ cargo run -p xtask -- verify --all
 cargo run -p xtask -- verify cards
 cargo run -p xtask -- verify source-registry
 cargo run -p xtask -- dependency-policy
+python nomenclature/tooling/aerocodex_nom_lint.py --root nomenclature
+python nomenclature/tooling/aerocodex_acronym_inventory.py --repo-root . --nomenclature-root nomenclature --check-new --baseline nomenclature/generated/current_repo_acronym_baseline.json
+python nomenclature/tooling/aerocodex_terminology.py --root nomenclature export-jsonl --output nomenclature/generated/terminology/index.jsonl
 # Version lock sanity checks:
 grep -n 'version = "0.0.1"' Cargo.toml
 grep -RIn '0\.001' --include Cargo.toml . && exit 1 || true

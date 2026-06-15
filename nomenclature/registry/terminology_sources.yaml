@@ -1,0 +1,203 @@
+version: 0.2.0-draft
+kind: acx.terminology_sources
+records:
+- source_id: acx:source:internal_seed:v1
+  authority: AeroCodex Seed Vocabulary
+  source_type: project_seed
+  title: AeroCodex internal starter vocabulary
+  url: null
+  domains:
+  - aerospace
+  - aviation
+  - spacecraft
+  - systems_engineering
+  authority_rank: project_seed
+  ingestion_mode: manual_review_required
+  status: candidate_source
+  license_notes: Internal seed entries are placeholders until approved by the nomenclature owner.
+  retrieval_notes:
+  - Use only as bootstrap evidence.
+  - Replace with program glossary, contract glossary, or official source references wherever available.
+  last_verified: null
+- source_id: acx:source:nasa_thesaurus:v1
+  authority: NASA
+  source_type: controlled_vocabulary
+  title: NASA Thesaurus
+  url: https://catalog.data.gov/dataset/nasa-thesaurus
+  domains:
+  - aerospace
+  - aeronautics
+  - space_science
+  - earth_science
+  - engineering
+  authority_rank: agency_controlled_vocabulary
+  ingestion_mode: controlled_import_then_review
+  status: candidate_source
+  license_notes: Verify current distribution and reuse terms before bulk ingestion.
+  retrieval_notes:
+  - Prefer NASA subject terms for canonical concept labels when AeroCodex scope matches NASA indexing semantics.
+  - Do not treat subject terms as acronym expansions unless an acronym is explicitly represented.
+  last_verified: null
+- source_id: acx:source:nasa_acronyms:v1
+  authority: NASA
+  source_type: glossary_or_acronym_list
+  title: NASA acronym and glossary pages
+  url: https://science.nasa.gov/acronyms/
+  domains:
+  - space_science
+  - missions
+  - instruments
+  - programs
+  authority_rank: agency_source
+  ingestion_mode: exact_source_capture_then_review
+  status: candidate_source
+  license_notes: Verify page terms and reuse permissions before ingestion.
+  retrieval_notes:
+  - Preserve source page and retrieval date in every imported record.
+  - Keep NASA mission/program meanings scoped to NASA or mission context unless adopted by AeroCodex.
+  last_verified: null
+- source_id: acx:source:ecss_glossary:v1
+  authority: ECSS
+  source_type: standards_glossary
+  title: ECSS definitions and abbreviated terms
+  url: https://ecss.nl/glossary/glossary-definitions-abbreviated-terms/
+  domains:
+  - space_systems_engineering
+  - standards
+  - assurance
+  - operations
+  authority_rank: standards_body
+  ingestion_mode: standards_export_then_review
+  status: candidate_source
+  license_notes: Verify ECSS terms of use before ingestion or redistribution.
+  retrieval_notes:
+  - Use when an ECSS standard is the governing authority for a project or contract.
+  - Preserve standard/source context because the same abbreviation may differ across authorities.
+  last_verified: null
+- source_id: acx:source:faa_acronyms:v1
+  authority: FAA
+  source_type: acronym_list
+  title: FAA abbreviations and acronyms
+  url: https://www.faa.gov/about/abbreviations
+  domains:
+  - aviation
+  - air_traffic
+  - certification
+  - regulation
+  - airports
+  authority_rank: agency_source
+  ingestion_mode: exact_source_capture_then_review
+  status: candidate_source
+  license_notes: Verify current page terms and reuse status before ingestion.
+  retrieval_notes:
+  - Prefer FAA meanings for FAA documents, Advisory Circulars, AIM references, airspace, airports, ATC, and certification material.
+  - Do not project FAA meanings into spacecraft-only contexts without explicit review.
+  last_verified: null
+- source_id: acx:source:faa_aim_appendix_3:v1
+  authority: FAA
+  source_type: manual_appendix
+  title: Aeronautical Information Manual Appendix 3 abbreviations and acronyms
+  url: https://www.faa.gov/air_traffic/publications/atpubs/aim_html/appendix_3.html
+  domains:
+  - aviation
+  - air_traffic
+  - flight_operations
+  authority_rank: agency_manual
+  ingestion_mode: exact_source_capture_then_review
+  status: candidate_source
+  license_notes: Verify current manual version and reuse status before ingestion.
+  retrieval_notes:
+  - Scope imported meanings to AIM usage unless promoted by the nomenclature owner.
+  - Treat AIM definitions as source-authoritative for documents governed by the AIM.
+  last_verified: null
+- source_id: acx:source:ccsds:v1
+  authority: CCSDS
+  source_type: standards_corpus
+  title: Consultative Committee for Space Data Systems publications
+  url: https://ccsds.org/
+  domains:
+  - space_communications
+  - space_data_systems
+  - mission_operations
+  - interoperability
+  authority_rank: standards_body
+  ingestion_mode: standard_specific_import_then_review
+  status: candidate_source
+  license_notes: Verify publication-specific terms before ingestion or redistribution.
+  retrieval_notes:
+  - Prefer CCSDS terms for packets, telemetry, telecommand, archive, cross-support, and space link topics governed by CCSDS standards.
+  - Capture document identifier, color/book type, issue, and section for each imported term.
+  last_verified: null
+- source_id: acx:source:dod_dictionary:v1
+  authority: Department of Defense
+  source_type: official_dictionary
+  title: DoD Dictionary and terminology program resources
+  url: https://www.jcs.mil/doctrine/dod-terminology-program/
+  domains:
+  - defense
+  - joint_operations
+  - acquisition
+  - range_operations
+  - space_operations
+  authority_rank: government_dictionary
+  ingestion_mode: exact_source_capture_then_review
+  status: candidate_source
+  license_notes: Verify current distribution and use constraints before ingestion.
+  retrieval_notes:
+  - Use when defense, range, acquisition, or joint terminology governs the document.
+  - Note that acronym/initialism coverage may be separate from definition coverage.
+  last_verified: null
+- source_id: acx:source:aiaa_nomenclature_guidance:v1
+  authority: AIAA
+  source_type: author_guidance
+  title: AIAA nomenclature guidance
+  url: https://aiaa.org/publications/journals/journal-author/nomenclature-guidelines/
+  domains:
+  - aerospace_publications
+  - notation
+  - authoring
+  authority_rank: professional_guidance
+  ingestion_mode: reference_only
+  status: candidate_source
+  license_notes: Use as process guidance; do not bulk-ingest as a glossary.
+  retrieval_notes:
+  - Useful for distinguishing symbol nomenclature from glossary/acronym handling in publications.
+  - Keep as guidance rather than term authority unless a project explicitly adopts it.
+  last_verified: null
+- source_id: acx:source:current_repo_scan:v1
+  authority: AeroCodex current repository scan
+  source_type: repository_scan
+  title: AeroCodex current-repository acronym and nomenclature scan
+  url: null
+  domains:
+  - aerocodex
+  - repository_governance
+  - validation
+  - life_support
+  - software
+  authority_rank: repository_evidence
+  ingestion_mode: automated_scan_then_human_review
+  status: candidate_source
+  license_notes: Internal repository evidence. Use as discovery evidence, not as external authority.
+  retrieval_notes:
+  - Generated from durable text/code files already present in the repository at policy adoption.
+  - Tokens discovered here must be promoted into registry/acronyms.yaml or waived before they are used as approved terminology.
+  last_verified: '2026-06-15'
+- source_id: acx:source:aerocodex_validation_registry:v1
+  authority: AeroCodex validation/source registry
+  source_type: project_registry
+  title: AeroCodex validation cards and source-registry seeds
+  url: null
+  domains:
+  - aerocodex
+  - validation
+  - source_traceability
+  - research_scaffold
+  authority_rank: project_registry
+  ingestion_mode: manual_review_required
+  status: candidate_source
+  license_notes: Internal project registry evidence. Do not treat as external source authority.
+  retrieval_notes:
+  - Use for AeroCodex-internal acronyms, artifact IDs, validation-card tokens, and source-registry references.
+  - External source entries in validation/source_registry still require source-specific review before promotion.
+  last_verified: '2026-06-15'

@@ -34,3 +34,25 @@ This package extends the repository with the thin-film and biofilm BLSS Rust imp
 - `validation/cards/life_support_thinfilm_*.yaml`
 - `validation/source_registry/life_support_{thinfilm,poughon,garcia,perez,montras,polizzi,blanken,detrell,vermeulen}*.yaml`
 - `scripts/verify_thinfilm_artifact.py`
+
+
+## Nomenclature and acronym policy upgrade
+
+This package adds the repository-level nomenclature/acronym policy and AI terminology integration. Added artifact files include:
+
+- `nomenclature/docs/ACX-NOM-001.md`
+- `nomenclature/docs/acronym_terminology_protocol.md`
+- `nomenclature/docs/ai_terminology_integration.md`
+- `nomenclature/registry/acronyms.yaml`
+- `nomenclature/registry/terminology_sources.yaml`
+- `nomenclature/registry/{concepts,aliases,symbols,units,frames,bridges,waivers}.yaml`
+- `nomenclature/tooling/aerocodex_nom_lint.py`
+- `nomenclature/tooling/aerocodex_terminology.py`
+- `nomenclature/tooling/aerocodex_acronym_inventory.py`
+- `nomenclature/generated/current_repo_acronym_inventory.{md,csv,json}`
+- `nomenclature/generated/current_repo_acronym_baseline.json`
+- `nomenclature/generated/terminology/index.jsonl`
+- `docs/nomenclature_policy.md`
+- `.github/PULL_REQUEST_TEMPLATE.md`
+
+The current-repository baseline is an adoption guard, not an approval list. Future new acronym-like tokens must be registered, waived, or explicitly baseline-updated by the nomenclature owner.

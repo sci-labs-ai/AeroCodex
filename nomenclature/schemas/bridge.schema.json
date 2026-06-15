@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aerocodex.internal/schemas/bridge.schema.json",
+  "title": "AeroCodex Rust-Math Bridge Registry",
+  "type": "object",
+  "required": [
+    "version",
+    "kind",
+    "records"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "kind": {
+      "const": "acx.bridges"
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "bridge_id",
+          "equation_id",
+          "scope",
+          "status",
+          "bindings"
+        ],
+        "properties": {
+          "bridge_id": {
+            "type": "string",
+            "pattern": "^acx:bridge:"
+          },
+          "equation_id": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "implemented_by": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "math_symbol",
+                "symbol_id",
+                "rust_identifier",
+                "rust_type"
+              ],
+              "properties": {
+                "math_symbol": {
+                  "type": "string"
+                },
+                "symbol_id": {
+                  "type": "string"
+                },
+                "rust_identifier": {
+                  "type": "string"
+                },
+                "rust_type": {
+                  "type": "string"
+                },
+                "unit": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "frame": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "additionalProperties": true
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  }
+}

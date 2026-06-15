@@ -4,6 +4,7 @@ AeroCodex Phase 0.001 establishes a pure-Rust workspace for source-traceable aer
 
 Start with:
 
+- [Nomenclature and acronym policy](nomenclature_policy.md)
 - [Versioning](roadmap/versioning.md)
 - [Milestones](roadmap/milestones.md)
 - [Post-1.0 expansion concepts](roadmap/post_1_0_expansion.md)

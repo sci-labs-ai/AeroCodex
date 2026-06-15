@@ -16,18 +16,18 @@ limitations = [
 
 [[files]]
 path = "ARTIFACT_MANIFEST.md"
-bytes = 2183
-sha256 = "79fbc0b2fe4643fbf2adf8fb4c3885d6f9cdc2e7fa0aea03ba6660bf0b1bf752"
+bytes = 3281
+sha256 = "cbca8994de4ffe26e4ba28d9b004f6745195b3172f7839b3510f0be27c3be37d"
 
 [[files]]
 path = "README.md"
-bytes = 7122
-sha256 = "84deee9ed565ce08df966272e2b8a6ee225d0fc729f5edb21ae8865bc50f2a33"
+bytes = 8320
+sha256 = "be1a3a5d4b1f06fbc6c3c0f73a3fd9838cc0925b92fa09be3642bfc47b744b61"
 
 [[files]]
 path = "checksums/SHA256SUMS"
-bytes = 4903
-sha256 = "91ba7d62dbd845dbfeabec522365deba152961eb4c93d9cab85ccd159be0f923"
+bytes = 6583
+sha256 = "aa0cec03cb46c5c0e0a3f07623fc9749f64b6cb114cee3882d45fc56a5e18acc"
 
 [[files]]
 path = "citations/blss_thinfilm_refs.bib"

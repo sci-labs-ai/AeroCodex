@@ -1,0 +1,35 @@
+version: 0.1.0-draft
+kind: acx.waivers
+records:
+- waiver_id: ACX-NOM-WAIVER-0001
+  rule: ACX-NOM-W001
+  surface_form: i
+  context: examples/rust/good_bad_examples.rs
+  reason: Demonstrates allowed tiny local loop variable.
+  approved_by: nomenclature_owner
+  expires: never
+  status: approved
+- waiver_id: ACX-NOM-WAIVER-0002
+  rule: ACX-NOM-E011
+  surface_form: r#type
+  context: generated/external_binding.rs
+  reason: Example only. External schema field named type may require generated raw identifier.
+  approved_by: nomenclature_owner
+  expires: never
+  status: example
+- waiver_id: ACX-NOM-WAIVER-0100
+  rule: ACX-NOM-W008
+  surface_form: MEL
+  context: source_material/new_thinfilm/blss_thinfilm_report.tex
+  reason: Source-preserved LaTeX macro name expanding to MELiSSA; not a standalone AeroCodex acronym.
+  approved_by: nomenclature_owner
+  expires: never
+  status: approved
+- waiver_id: ACX-NOM-WAIVER-0101
+  rule: ACX-NOM-W008
+  surface_form: F/A
+  context: source material and engineering equations
+  reason: Source-preserved fuel-to-air ratio notation; treat as equation notation, not acronym expansion.
+  approved_by: nomenclature_owner
+  expires: never
+  status: approved

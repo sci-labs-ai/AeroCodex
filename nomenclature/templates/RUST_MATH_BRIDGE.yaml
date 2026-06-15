@@ -1,0 +1,20 @@
+bridge_id: acx:bridge:domain.artifact:E000:v1
+equation_id: E-domain-artifact-000
+scope: acx.math.domain.artifact.E000
+status: draft
+implemented_by:
+  - crate::module::function_name
+bindings:
+  - math_symbol: n_s
+    symbol_id: acx:math:domain.artifact:E000:sample_count:v1
+    rust_identifier: sample_count
+    rust_type: usize
+    unit: count
+    frame: null
+
+  - math_symbol: Δt
+    symbol_id: acx:math:domain.artifact:E000:sample_interval:v1
+    rust_identifier: sample_interval_seconds
+    rust_type: f64
+    unit: seconds
+    frame: null

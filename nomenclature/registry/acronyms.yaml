@@ -1,0 +1,1541 @@
+version: 0.2.0-draft
+kind: acx.acronyms
+records:
+- acronym_id: acx:acr:space:g_nc:v1
+  token: GNC
+  preferred_token: GNC
+  expansion: Guidance, Navigation, and Control
+  namespace: acronym
+  canonical: guidance_navigation_and_control
+  canonical_namespace: domain.term
+  domains:
+  - spacecraft
+  - flight_systems
+  - autonomy
+  status: candidate
+  source:
+    authority: AeroCodex seed
+    source_id: acx:source:internal_seed:v1
+    authority_rank: project_seed
+    evidence: Common aerospace usage; verify against program glossary before approving.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - guidance
+    - navigation
+    - control
+    - flight software
+    - attitude
+    - trajectory
+    reject_if_near:
+    - general navigation company
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: GNC usually means Guidance, Navigation, and Control in aerospace flight-system contexts.
+    confidence: medium
+- acronym_id: acx:acr:space:edl:v1
+  token: EDL
+  preferred_token: EDL
+  expansion: Entry, Descent, and Landing
+  namespace: acronym
+  canonical: entry_descent_and_landing
+  canonical_namespace: domain.term
+  domains:
+  - spacecraft
+  - planetary_missions
+  - mission_phase
+  status: candidate
+  source:
+    authority: AeroCodex seed
+    source_id: acx:source:internal_seed:v1
+    authority_rank: project_seed
+    evidence: Common planetary mission usage; verify against mission glossary before approving.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - entry
+    - descent
+    - landing
+    - aeroshell
+    - parachute
+    - terminal descent
+    - planetary surface
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: EDL usually means Entry, Descent, and Landing for planetary mission phases.
+    confidence: medium
+- acronym_id: acx:acr:orbit:leo:v1
+  token: LEO
+  preferred_token: LEO
+  expansion: Low Earth Orbit
+  namespace: acronym
+  canonical: low_earth_orbit
+  canonical_namespace: domain.term
+  domains:
+  - spacecraft
+  - orbital_mechanics
+  - mission_design
+  status: candidate
+  source:
+    authority: AeroCodex seed
+    source_id: acx:source:internal_seed:v1
+    authority_rank: project_seed
+    evidence: Common orbital regime usage; verify altitude convention against applicable project standard.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - orbit
+    - altitude
+    - inclination
+    - satellite
+    - Earth orbit
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: LEO usually means Low Earth Orbit; exact altitude bounds are authority/project dependent.
+    confidence: medium
+- acronym_id: acx:acr:orbit:meo:v1
+  token: MEO
+  preferred_token: MEO
+  expansion: Medium Earth Orbit
+  namespace: acronym
+  canonical: medium_earth_orbit
+  canonical_namespace: domain.term
+  domains:
+  - spacecraft
+  - orbital_mechanics
+  - mission_design
+  status: candidate
+  source:
+    authority: AeroCodex seed
+    source_id: acx:source:internal_seed:v1
+    authority_rank: project_seed
+    evidence: Common orbital regime usage; verify altitude convention against applicable project standard.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - orbit
+    - navigation constellation
+    - GNSS
+    - altitude
+    - satellite
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: MEO usually means Medium Earth Orbit; exact altitude bounds are authority/project dependent.
+    confidence: medium
+- acronym_id: acx:acr:orbit:geo:v1
+  token: GEO
+  preferred_token: GEO
+  expansion: Geostationary Earth Orbit
+  namespace: acronym
+  canonical: geostationary_earth_orbit
+  canonical_namespace: domain.term
+  domains:
+  - spacecraft
+  - orbital_mechanics
+  - mission_design
+  - communications
+  status: candidate
+  source:
+    authority: AeroCodex seed
+    source_id: acx:source:internal_seed:v1
+    authority_rank: project_seed
+    evidence: Common orbital regime usage; verify against applicable project standard.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - geostationary
+    - communications satellite
+    - longitude slot
+    - equatorial orbit
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: GEO usually means Geostationary Earth Orbit in spacecraft mission-design contexts.
+    confidence: medium
+- acronym_id: acx:acr:systems:pdr:v1
+  token: PDR
+  preferred_token: PDR
+  expansion: Preliminary Design Review
+  namespace: acronym
+  canonical: preliminary_design_review
+  canonical_namespace: domain.term
+  domains:
+  - systems_engineering
+  - program_lifecycle
+  - reviews
+  status: candidate
+  source:
+    authority: AeroCodex seed
+    source_id: acx:source:internal_seed:v1
+    authority_rank: project_seed
+    evidence: Common program review usage; verify against contract or program lifecycle document.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - design review
+    - lifecycle
+    - requirements baseline
+    - review package
+    - program milestone
+  ai:
+    inject_when:
+    - token_detected
+    - document_type_match
+    summary: PDR usually means Preliminary Design Review in aerospace systems-engineering review contexts.
+    confidence: medium
+- acronym_id: acx:acr:systems:cdr:critical_design_review:v1
+  token: CDR
+  preferred_token: CDR
+  expansion: Critical Design Review
+  namespace: acronym
+  canonical: critical_design_review
+  canonical_namespace: domain.term
+  domains:
+  - systems_engineering
+  - program_lifecycle
+  - reviews
+  status: candidate
+  collision_group: acx:collision:acr:cdr:v1
+  source:
+    authority: AeroCodex seed
+    source_id: acx:source:internal_seed:v1
+    authority_rank: project_seed
+    evidence: Common program review usage; verify against contract or program lifecycle document.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - design review
+    - review board
+    - design maturity
+    - baseline
+    - lifecycle milestone
+    reject_if_near:
+    - recorder
+    - data recorder
+    - call detail record
+  ai:
+    inject_when:
+    - token_detected
+    - document_type_match
+    summary: CDR often means Critical Design Review in program lifecycle contexts, but the token is ambiguous.
+    confidence: medium
+- acronym_id: acx:acr:data:cdr:command_data_recorder:v1
+  token: CDR
+  preferred_token: CDR
+  expansion: Command/Data Recorder
+  namespace: acronym
+  canonical: command_data_recorder
+  canonical_namespace: domain.term
+  domains:
+  - avionics
+  - spacecraft_data_systems
+  - onboard_storage
+  status: candidate
+  collision_group: acx:collision:acr:cdr:v1
+  source:
+    authority: AeroCodex seed
+    source_id: acx:source:internal_seed:v1
+    authority_rank: project_seed
+    evidence: Example collision record; replace or remove if not used in AeroCodex program vocabulary.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - recorder
+    - onboard storage
+    - telemetry
+    - command history
+    - data handling
+    reject_if_near:
+    - design review
+    - review board
+    - program milestone
+  ai:
+    inject_when:
+    - token_detected
+    - collision_detected
+    summary: CDR can refer to a recorder/data-system meaning in avionics contexts; do not assume design review.
+    confidence: low
+- acronym_id: acx:acr:systems:trr:v1
+  token: TRR
+  preferred_token: TRR
+  expansion: Test Readiness Review
+  namespace: acronym
+  canonical: test_readiness_review
+  canonical_namespace: domain.term
+  domains:
+  - systems_engineering
+  - test
+  - reviews
+  status: candidate
+  source:
+    authority: AeroCodex seed
+    source_id: acx:source:internal_seed:v1
+    authority_rank: project_seed
+    evidence: Common review usage; verify against program lifecycle document.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - test readiness
+    - test plan
+    - procedure
+    - review board
+  ai:
+    inject_when:
+    - token_detected
+    - document_type_match
+    summary: TRR usually means Test Readiness Review in test program contexts.
+    confidence: medium
+- acronym_id: acx:acr:systems:trl:v1
+  token: TRL
+  preferred_token: TRL
+  expansion: Technology Readiness Level
+  namespace: acronym
+  canonical: technology_readiness_level
+  canonical_namespace: domain.term
+  domains:
+  - systems_engineering
+  - technology_maturation
+  - program_lifecycle
+  status: candidate
+  source:
+    authority: AeroCodex seed
+    source_id: acx:source:internal_seed:v1
+    authority_rank: project_seed
+    evidence: Common aerospace acquisition and technology maturation usage; verify scale definitions against applicable authority.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - readiness level
+    - maturity
+    - technology maturation
+    - risk reduction
+  ai:
+    inject_when:
+    - token_detected
+    - document_type_match
+    summary: TRL usually means Technology Readiness Level; scale semantics depend on the governing authority.
+    confidence: medium
+- acronym_id: acx:acr:space:rcs:reaction_control_system:v1
+  token: RCS
+  preferred_token: RCS
+  expansion: Reaction Control System
+  namespace: acronym
+  canonical: reaction_control_system
+  canonical_namespace: domain.term
+  domains:
+  - spacecraft
+  - propulsion
+  - attitude_control
+  status: candidate
+  collision_group: acx:collision:acr:rcs:v1
+  source:
+    authority: AeroCodex seed
+    source_id: acx:source:internal_seed:v1
+    authority_rank: project_seed
+    evidence: Common spacecraft subsystem usage; verify against vehicle subsystem glossary.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - thruster
+    - attitude control
+    - propellant
+    - impulse bit
+    - spacecraft control
+    reject_if_near:
+    - radar
+    - cross section
+    - signature
+  ai:
+    inject_when:
+    - token_detected
+    - collision_detected
+    summary: RCS can mean Reaction Control System in spacecraft propulsion/attitude-control contexts.
+    confidence: medium
+- acronym_id: acx:acr:radar:rcs:radar_cross_section:v1
+  token: RCS
+  preferred_token: RCS
+  expansion: Radar Cross Section
+  namespace: acronym
+  canonical: radar_cross_section
+  canonical_namespace: domain.term
+  domains:
+  - radar
+  - electromagnetics
+  - signatures
+  status: candidate
+  collision_group: acx:collision:acr:rcs:v1
+  source:
+    authority: AeroCodex seed
+    source_id: acx:source:internal_seed:v1
+    authority_rank: project_seed
+    evidence: Common radar/signature usage; verify against applicable radar or survivability glossary.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - radar
+    - scattering
+    - signature
+    - square meters
+    - monostatic
+    - bistatic
+    reject_if_near:
+    - thruster
+    - propellant
+    - attitude control
+  ai:
+    inject_when:
+    - token_detected
+    - collision_detected
+    summary: RCS can mean Radar Cross Section in radar/electromagnetic-signature contexts.
+    confidence: medium
+- acronym_id: acx:acr:aviation:ac:advisory_circular:v1
+  token: AC
+  preferred_token: AC
+  expansion: Advisory Circular
+  namespace: acronym
+  canonical: advisory_circular
+  canonical_namespace: source.term
+  domains:
+  - aviation
+  - regulation
+  - certification
+  status: candidate
+  collision_group: acx:collision:acr:ac:v1
+  source:
+    authority: AeroCodex seed
+    source_id: acx:source:faa_acronyms:v1
+    authority_rank: agency_source
+    evidence: FAA-facing candidate; verify in applicable FAA source before approving.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - FAA
+    - circular
+    - advisory
+    - certification
+    - compliance
+    reject_if_near:
+    - voltage
+    - alternating current
+    - aircraft shorthand
+  ai:
+    inject_when:
+    - token_detected
+    - collision_detected
+    summary: AC can mean Advisory Circular in FAA/regulatory contexts; the token is ambiguous.
+    confidence: medium
+- acronym_id: acx:acr:electrical:ac:alternating_current:v1
+  token: AC
+  preferred_token: AC
+  expansion: Alternating Current
+  namespace: acronym
+  canonical: alternating_current
+  canonical_namespace: domain.term
+  domains:
+  - electrical_power
+  - avionics
+  - test
+  status: candidate
+  collision_group: acx:collision:acr:ac:v1
+  source:
+    authority: AeroCodex seed
+    source_id: acx:source:internal_seed:v1
+    authority_rank: project_seed
+    evidence: Common electrical usage; verify against electrical design standard.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - voltage
+    - inverter
+    - frequency
+    - hertz
+    - phase
+    - power bus
+    reject_if_near:
+    - advisory circular
+    - FAA
+  ai:
+    inject_when:
+    - token_detected
+    - collision_detected
+    summary: AC can mean Alternating Current in electrical power contexts.
+    confidence: medium
+- acronym_id: acx:acr:aviation:ads_b:v1
+  token: ADS-B
+  preferred_token: ADS-B
+  expansion: Automatic Dependent Surveillance-Broadcast
+  namespace: acronym
+  canonical: automatic_dependent_surveillance_broadcast
+  canonical_namespace: domain.term
+  domains:
+  - aviation
+  - surveillance
+  - air_traffic
+  status: candidate
+  source:
+    authority: AeroCodex seed
+    source_id: acx:source:faa_acronyms:v1
+    authority_rank: agency_source
+    evidence: FAA-facing candidate; verify in applicable FAA source before approving.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - surveillance
+    - transponder
+    - broadcast
+    - air traffic
+    - traffic display
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: ADS-B usually means Automatic Dependent Surveillance-Broadcast in aviation surveillance contexts.
+    confidence: medium
+- acronym_id: acx:acr:life_support:blss:v1
+  token: BLSS
+  preferred_token: BLSS
+  expansion: Bioregenerative Life Support System
+  namespace: acronym
+  canonical: bioregenerative_life_support_system
+  canonical_namespace: domain.term
+  domains:
+  - life_support
+  - spacecraft
+  - habitat_systems
+  status: candidate
+  source:
+    authority: AeroCodex validation/source registry
+    source_id: acx:source:aerocodex_validation_registry:v1
+    authority_rank: project_registry
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - life support
+    - bioregenerative
+    - closure fraction
+    - thin-film
+    - biofilm
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: BLSS appears throughout the current repository in life-support and thin-film/biofilm contexts.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:life_support:eclss:v1
+  token: ECLSS
+  preferred_token: ECLSS
+  expansion: Environmental Control and Life Support System
+  namespace: acronym
+  canonical: environmental_control_and_life_support_system
+  canonical_namespace: domain.term
+  domains:
+  - life_support
+  - spacecraft
+  - habitat_systems
+  status: candidate
+  source:
+    authority: AeroCodex validation/source registry
+    source_id: acx:source:aerocodex_validation_registry:v1
+    authority_rank: project_registry
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - life support
+    - environmental control
+    - crew
+    - habitat
+    - BVAD
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: ECLSS appears in current validation/source-registry and life-support contexts.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:life_support:bvad:v1
+  token: BVAD
+  preferred_token: BVAD
+  expansion: Baseline Values and Assumptions Document
+  namespace: acronym
+  canonical: baseline_values_and_assumptions_document
+  canonical_namespace: domain.term
+  domains:
+  - life_support
+  - source_traceability
+  - planning
+  status: candidate
+  source:
+    authority: AeroCodex validation/source registry
+    source_id: acx:source:aerocodex_validation_registry:v1
+    authority_rank: project_registry
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - baseline values
+    - assumptions
+    - ECLSS
+    - life support
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: BVAD appears in current source references and must remain source-scoped.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:life_support:melissa:v1
+  token: MELiSSA
+  preferred_token: MELiSSA
+  expansion: Micro-Ecological Life Support System Alternative
+  namespace: acronym
+  canonical: micro_ecological_life_support_system_alternative
+  canonical_namespace: domain.term
+  domains:
+  - life_support
+  - bioregenerative
+  - source_material
+  status: candidate
+  source:
+    authority: AeroCodex validation/source registry
+    source_id: acx:source:aerocodex_validation_registry:v1
+    authority_rank: project_registry
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - MELiSSA
+    - C3
+    - C4a
+    - photobioreactor
+    - nitrifying biofilm
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: MELiSSA is mixed-case; exact source spelling should be preserved.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:life_support:pbr:v1
+  token: PBR
+  preferred_token: PBR
+  expansion: Photobioreactor
+  namespace: acronym
+  canonical: photobioreactor
+  canonical_namespace: domain.term
+  domains:
+  - life_support
+  - bioprocess
+  - modeling
+  status: candidate
+  source:
+    authority: AeroCodex current repository scan
+    source_id: acx:source:current_repo_scan:v1
+    authority_rank: repository_evidence
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - photobioreactor
+    - irradiance
+    - algal
+    - thin-film
+    - culture
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: PBR appears in current thin-film and life-support source material.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:math:pde:v1
+  token: PDE
+  preferred_token: PDE
+  expansion: Partial Differential Equation
+  namespace: acronym
+  canonical: partial_differential_equation
+  canonical_namespace: domain.term
+  domains:
+  - mathematics
+  - modeling
+  - simulation
+  status: candidate
+  source:
+    authority: AeroCodex current repository scan
+    source_id: acx:source:current_repo_scan:v1
+    authority_rank: repository_evidence
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - partial differential
+    - equation
+    - reduced-order
+    - state
+    - derivative
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: PDE appears in current thin-film model documentation.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:modeling:rom:v1
+  token: ROM
+  preferred_token: ROM
+  expansion: Reduced-Order Model
+  namespace: acronym
+  canonical: reduced_order_model
+  canonical_namespace: domain.term
+  domains:
+  - modeling
+  - simulation
+  - life_support
+  status: candidate
+  source:
+    authority: AeroCodex current repository scan
+    source_id: acx:source:current_repo_scan:v1
+    authority_rank: repository_evidence
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - reduced-order
+    - service vector
+    - state
+    - model
+    - PDE
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: ROM appears in current thin-film model documentation.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:propulsion:cea:v1
+  token: CEA
+  preferred_token: CEA
+  expansion: Chemical Equilibrium with Applications
+  namespace: acronym
+  canonical: chemical_equilibrium_with_applications
+  canonical_namespace: domain.term
+  domains:
+  - thermodynamics
+  - propulsion
+  - source_traceability
+  status: candidate
+  source:
+    authority: AeroCodex validation/source registry
+    source_id: acx:source:aerocodex_validation_registry:v1
+    authority_rank: project_registry
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - NASA Glenn
+    - chemical equilibrium
+    - thermodynamics
+    - propulsion
+    - wrapper
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: CEA appears as a source/tool name in the current repository and dependency policy.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:source:naca:v1
+  token: NACA
+  preferred_token: NACA
+  expansion: National Advisory Committee for Aeronautics
+  namespace: acronym
+  canonical: national_advisory_committee_for_aeronautics
+  canonical_namespace: domain.term
+  domains:
+  - aerodynamics
+  - gas_dynamics
+  - source_traceability
+  status: candidate
+  source:
+    authority: AeroCodex validation/source registry
+    source_id: acx:source:aerocodex_validation_registry:v1
+    authority_rank: project_registry
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - report
+    - gas dynamics
+    - aeronautics
+    - normal shock
+    - source registry
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: NACA appears in current source-registry and gas-dynamics contexts.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:source:jpl:v1
+  token: JPL
+  preferred_token: JPL
+  expansion: Jet Propulsion Laboratory
+  namespace: acronym
+  canonical: jet_propulsion_laboratory
+  canonical_namespace: domain.term
+  domains:
+  - astrodynamics
+  - source_traceability
+  - spacecraft
+  status: candidate
+  source:
+    authority: AeroCodex validation/source registry
+    source_id: acx:source:aerocodex_validation_registry:v1
+    authority_rank: project_registry
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - NASA/JPL
+    - astrodynamics
+    - parameters
+    - orbit
+    - celestial
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: JPL appears in current astrodynamics source-registry contexts.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:source:nist:v1
+  token: NIST
+  preferred_token: NIST
+  expansion: National Institute of Standards and Technology
+  namespace: acronym
+  canonical: national_institute_of_standards_and_technology
+  canonical_namespace: domain.term
+  domains:
+  - constants
+  - source_traceability
+  - units
+  status: candidate
+  source:
+    authority: AeroCodex validation/source registry
+    source_id: acx:source:aerocodex_validation_registry:v1
+    authority_rank: project_registry
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - CODATA
+    - constants
+    - physical constants
+    - units
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: NIST appears in current constants source-registry contexts.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:source:codata:v1
+  token: CODATA
+  preferred_token: CODATA
+  expansion: Committee on Data for Science and Technology
+  namespace: acronym
+  canonical: committee_on_data_for_science_and_technology
+  canonical_namespace: domain.term
+  domains:
+  - constants
+  - source_traceability
+  - units
+  status: candidate
+  source:
+    authority: AeroCodex validation/source registry
+    source_id: acx:source:aerocodex_validation_registry:v1
+    authority_rank: project_registry
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - NIST
+    - constants
+    - physical constants
+    - recommended values
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: CODATA appears in current constants source-registry contexts.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:source:doi:v1
+  token: DOI
+  preferred_token: DOI
+  expansion: Digital Object Identifier
+  namespace: acronym
+  canonical: digital_object_identifier
+  canonical_namespace: domain.term
+  domains:
+  - citations
+  - source_traceability
+  - documentation
+  status: candidate
+  source:
+    authority: AeroCodex current repository scan
+    source_id: acx:source:current_repo_scan:v1
+    authority_rank: repository_evidence
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - citation
+    - source
+    - reference
+    - bibliography
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: DOI appears in current citation and bibliography source material.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:units:si:v1
+  token: SI
+  preferred_token: SI
+  expansion: International System of Units
+  namespace: acronym
+  canonical: international_system_of_units
+  canonical_namespace: domain.term
+  domains:
+  - units
+  - validation
+  - engineering_math
+  status: candidate
+  source:
+    authority: AeroCodex current repository scan
+    source_id: acx:source:current_repo_scan:v1
+    authority_rank: repository_evidence
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - unit
+    - units
+    - kg
+    - mps
+    - source registry
+    - validation
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: SI appears in current unit and validation documentation.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:source:iss:v1
+  token: ISS
+  preferred_token: ISS
+  expansion: International Space Station
+  namespace: acronym
+  canonical: international_space_station
+  canonical_namespace: domain.term
+  domains:
+  - spacecraft
+  - life_support
+  - source_traceability
+  status: candidate
+  source:
+    authority: AeroCodex current repository scan
+    source_id: acx:source:current_repo_scan:v1
+    authority_rank: repository_evidence
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - space station
+    - crew
+    - life support
+    - habitat
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: ISS appears in current source material and life-support references.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:software:api:v1
+  token: API
+  preferred_token: API
+  expansion: Application Programming Interface
+  namespace: acronym
+  canonical: application_programming_interface
+  canonical_namespace: domain.term
+  domains:
+  - software
+  - documentation
+  - rust
+  status: candidate
+  source:
+    authority: AeroCodex current repository scan
+    source_id: acx:source:current_repo_scan:v1
+    authority_rank: repository_evidence
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - crate
+    - function
+    - module
+    - public
+    - docs
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: API appears in current documentation and generated API summaries.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:software:ci:v1
+  token: CI
+  preferred_token: CI
+  expansion: Continuous Integration
+  namespace: acronym
+  canonical: continuous_integration
+  canonical_namespace: domain.term
+  domains:
+  - software
+  - governance
+  - repository
+  status: candidate
+  source:
+    authority: AeroCodex current repository scan
+    source_id: acx:source:current_repo_scan:v1
+    authority_rank: repository_evidence
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - github actions
+    - workflow
+    - checks
+    - pull request
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: CI appears in repository governance and workflow contexts.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:data:csv:v1
+  token: CSV
+  preferred_token: CSV
+  expansion: Comma-Separated Values
+  namespace: acronym
+  canonical: comma_separated_values
+  canonical_namespace: domain.term
+  domains:
+  - data
+  - documentation
+  - source_traceability
+  status: candidate
+  source:
+    authority: AeroCodex current repository scan
+    source_id: acx:source:current_repo_scan:v1
+    authority_rank: repository_evidence
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - manifest
+    - table
+    - source verification
+    - data
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: CSV appears in current data manifests and source verification files.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:data:json:v1
+  token: JSON
+  preferred_token: JSON
+  expansion: JavaScript Object Notation
+  namespace: acronym
+  canonical: javascript_object_notation
+  canonical_namespace: domain.term
+  domains:
+  - data
+  - software
+  - generated_index
+  status: candidate
+  source:
+    authority: AeroCodex current repository scan
+    source_id: acx:source:current_repo_scan:v1
+    authority_rank: repository_evidence
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - manifest
+    - schema
+    - index
+    - machine-readable
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: JSON appears in current schemas, manifests, and generated indexes.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:data:yaml:v1
+  token: YAML
+  preferred_token: YAML
+  expansion: YAML Ain't Markup Language
+  namespace: acronym
+  canonical: yaml_aint_markup_language
+  canonical_namespace: domain.term
+  domains:
+  - data
+  - software
+  - registry
+  - validation
+  status: candidate
+  source:
+    authority: AeroCodex current repository scan
+    source_id: acx:source:current_repo_scan:v1
+    authority_rank: repository_evidence
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - registry
+    - validation card
+    - source registry
+    - schema
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: YAML appears in current validation and nomenclature registry contexts.
+    confidence: medium
+  notes:
+  - Candidate record added from current AeroCodex repository adoption scan.
+- acronym_id: acx:acr:source:nasa:v1
+  token: NASA
+  preferred_token: NASA
+  expansion: National Aeronautics and Space Administration
+  namespace: acronym
+  canonical: national_aeronautics_and_space_administration
+  canonical_namespace: domain.term
+  domains:
+  - aerospace
+  - spacecraft
+  - source_traceability
+  status: candidate
+  source:
+    authority: AeroCodex terminology source registry
+    source_id: acx:source:nasa_acronyms:v1
+    authority_rank: agency_source
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - NASA
+    - agency
+    - source
+    - space
+    - aeronautics
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: NASA is used as a source authority and agency label in current AeroCodex materials.
+    confidence: medium
+  notes:
+  - Candidate record added during current AeroCodex repository nomenclature adoption.
+- acronym_id: acx:acr:source:faa:v1
+  token: FAA
+  preferred_token: FAA
+  expansion: Federal Aviation Administration
+  namespace: acronym
+  canonical: federal_aviation_administration
+  canonical_namespace: domain.term
+  domains:
+  - aviation
+  - regulation
+  - source_traceability
+  status: candidate
+  source:
+    authority: AeroCodex terminology source registry
+    source_id: acx:source:faa_acronyms:v1
+    authority_rank: agency_source
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - FAA
+    - aviation
+    - AIM
+    - advisory circular
+    - air traffic
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: FAA is used as a source authority and aviation context marker.
+    confidence: medium
+  notes:
+  - Candidate record added during current AeroCodex repository nomenclature adoption.
+- acronym_id: acx:acr:source:ecss:v1
+  token: ECSS
+  preferred_token: ECSS
+  expansion: European Cooperation for Space Standardization
+  namespace: acronym
+  canonical: european_cooperation_for_space_standardization
+  canonical_namespace: domain.term
+  domains:
+  - space_systems_engineering
+  - standards
+  - source_traceability
+  status: candidate
+  source:
+    authority: AeroCodex terminology source registry
+    source_id: acx:source:ecss_glossary:v1
+    authority_rank: standards_body
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - ECSS
+    - space systems
+    - standard
+    - definition
+    - abbreviated terms
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: ECSS is used as a standards authority and glossary source family.
+    confidence: medium
+  notes:
+  - Candidate record added during current AeroCodex repository nomenclature adoption.
+- acronym_id: acx:acr:source:ccsds:v1
+  token: CCSDS
+  preferred_token: CCSDS
+  expansion: Consultative Committee for Space Data Systems
+  namespace: acronym
+  canonical: consultative_committee_for_space_data_systems
+  canonical_namespace: domain.term
+  domains:
+  - space_communications
+  - space_data_systems
+  - standards
+  status: candidate
+  source:
+    authority: AeroCodex terminology source registry
+    source_id: acx:source:ccsds:v1
+    authority_rank: standards_body
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - CCSDS
+    - space data
+    - telemetry
+    - telecommand
+    - packet
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: CCSDS is used as a standards authority for space data and communications.
+    confidence: medium
+  notes:
+  - Candidate record added during current AeroCodex repository nomenclature adoption.
+- acronym_id: acx:acr:source:aiaa:v1
+  token: AIAA
+  preferred_token: AIAA
+  expansion: American Institute of Aeronautics and Astronautics
+  namespace: acronym
+  canonical: american_institute_of_aeronautics_and_astronautics
+  canonical_namespace: domain.term
+  domains:
+  - aerospace_publications
+  - notation
+  - source_traceability
+  status: candidate
+  source:
+    authority: AeroCodex terminology source registry
+    source_id: acx:source:aiaa_nomenclature_guidance:v1
+    authority_rank: professional_guidance
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - AIAA
+    - journal
+    - nomenclature
+    - symbol
+    - author guidance
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: AIAA is used as a publication and nomenclature-guidance source authority.
+    confidence: medium
+  notes:
+  - Candidate record added during current AeroCodex repository nomenclature adoption.
+- acronym_id: acx:acr:source:dod:v1
+  token: DOD
+  preferred_token: DOD
+  expansion: Department of Defense
+  namespace: acronym
+  canonical: department_of_defense
+  canonical_namespace: domain.term
+  domains:
+  - defense
+  - range_operations
+  - space_operations
+  - source_traceability
+  status: candidate
+  source:
+    authority: AeroCodex terminology source registry
+    source_id: acx:source:dod_dictionary:v1
+    authority_rank: government_dictionary
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - DoD
+    - DOD
+    - defense
+    - dictionary
+    - joint terminology
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: DOD/DoD is used as a defense terminology source authority.
+    confidence: medium
+  notes:
+  - Candidate record added during current AeroCodex repository nomenclature adoption.
+- acronym_id: acx:acr:life_support:esm:v1
+  token: ESM
+  preferred_token: ESM
+  expansion: Equivalent System Mass
+  namespace: acronym
+  canonical: equivalent_system_mass
+  canonical_namespace: domain.term
+  domains:
+  - life_support
+  - systems_engineering
+  - trade_studies
+  status: candidate
+  source:
+    authority: AeroCodex validation/source registry
+    source_id: acx:source:aerocodex_validation_registry:v1
+    authority_rank: project_registry
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - equivalent system mass
+    - mass equivalent
+    - lambda_V
+    - lambda_P
+    - lambda_Q
+    - crew time
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: ESM appears in current life-support and thin-film trade-study code.
+    confidence: medium
+  notes:
+  - Candidate record added during current AeroCodex repository nomenclature adoption.
+- acronym_id: acx:acr:life_support:tic:v1
+  token: TIC
+  preferred_token: TIC
+  expansion: Total Inorganic Carbon
+  namespace: acronym
+  canonical: total_inorganic_carbon
+  canonical_namespace: domain.term
+  domains:
+  - life_support
+  - chemistry
+  - bioreactor
+  status: candidate
+  source:
+    authority: AeroCodex validation/source registry
+    source_id: acx:source:aerocodex_validation_registry:v1
+    authority_rank: project_registry
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - total inorganic carbon
+    - carbonate
+    - pKa
+    - DIC
+    - photobioreactor
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: TIC appears in current photobioreactor carbonate-chemistry code.
+    confidence: medium
+  notes:
+  - Candidate record added during current AeroCodex repository nomenclature adoption.
+- acronym_id: acx:acr:software:nan:v1
+  token: NAN
+  preferred_token: NAN
+  expansion: Not a Number
+  namespace: acronym
+  canonical: not_a_number
+  canonical_namespace: domain.term
+  domains:
+  - software
+  - numerical_methods
+  - rust
+  status: candidate
+  source:
+    authority: AeroCodex current repository scan
+    source_id: acx:source:current_repo_scan:v1
+    authority_rank: repository_evidence
+    evidence: Repository-wide nomenclature policy adoption scan; verify before approval.
+  first_use:
+    requires_definition: true
+    allowed_after_definition: true
+  disambiguation:
+    signals:
+    - f64::NAN
+    - not finite
+    - finite
+    - numerical failure
+  ai:
+    inject_when:
+    - token_detected
+    - domain_match
+    summary: NAN appears as Rust floating-point NaN handling in current code.
+    confidence: medium
+  notes:
+  - Candidate record added during current AeroCodex repository nomenclature adoption.

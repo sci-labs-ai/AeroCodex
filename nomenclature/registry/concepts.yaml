@@ -1,0 +1,499 @@
+version: 0.1.0-draft
+kind: acx.concepts
+records:
+- canonical: aircraft_registration
+  namespace: domain.term
+  display_label: Aircraft Registration
+  definition: Civil registration identifier assigned to an aircraft.
+  status: approved
+  aliases:
+  - tail_number
+  - n_number
+  - registration_mark
+  source_terms:
+  - source: FAA
+    term: N-number
+  - source: ICAO
+    term: registration mark
+  rust:
+    type_name: AircraftRegistration
+    field_name: aircraft_registration
+  schema:
+    field_name: aircraft_registration
+  notes:
+  - Do not use tail_number in canonical schemas or durable Rust identifiers.
+- canonical: sample_count
+  namespace: domain.term
+  display_label: Sample Count
+  definition: Number of samples in a collection, window, or buffer when the collection context is explicitly declared.
+  status: approved
+  aliases:
+  - n_samples
+  - observation_count
+  rust:
+    field_name: sample_count
+  schema:
+    field_name: sample_count
+  notes:
+  - Avoid bare n in Rust. Use sample_count or a context-specific count identifier.
+- canonical: node_count
+  namespace: domain.term
+  display_label: Node Count
+  definition: Number of nodes in a graph, tree, network, or topology object.
+  status: approved
+  aliases:
+  - n_nodes
+  - vertex_count
+  rust:
+    field_name: node_count
+  schema:
+    field_name: node_count
+- canonical: sample_interval
+  namespace: domain.term
+  display_label: Sample Interval
+  definition: Time interval between adjacent samples in a regularly sampled sequence.
+  status: approved
+  aliases:
+  - delta_t
+  - dt
+  unit_required: true
+  rust:
+    field_name: sample_interval_seconds
+  schema:
+    field_name: sample_interval_seconds
+  notes:
+  - In Rust, prefer sample_interval_seconds unless a unit-bearing type is used.
+- canonical: ground_speed
+  namespace: domain.term
+  display_label: Ground Speed
+  definition: Magnitude of horizontal velocity relative to the ground.
+  status: approved
+  aliases:
+  - groundspeed
+  - gs
+  unit_required: true
+  frame_required: true
+  rust:
+    type_name: GroundSpeed
+    field_name: ground_speed
+  schema:
+    field_name: ground_speed_mps
+- canonical: station
+  namespace: domain.term
+  display_label: Station
+  definition: Ambiguous term requiring context. Do not use as a canonical field without qualifier.
+  status: ambiguous
+  candidates:
+  - airport_station
+  - maintenance_station
+  - fuselage_station
+  - reporting_station
+  resolution_required: true
+  notes:
+  - The bare term station is forbidden in schemas and durable Rust identifiers.
+- canonical: guidance_navigation_and_control
+  namespace: domain.term
+  display_label: Guidance, Navigation, and Control
+  definition: Integrated flight-system functions that estimate state, plan or follow guidance objectives, and command control actions.
+  status: candidate
+  aliases:
+  - GNC
+  - GN&C
+  rust:
+    module_name: gnc
+  schema:
+    field_prefix: gnc
+  notes:
+  - Candidate seed. Approve only within a declared spacecraft, aircraft, or flight-software project scope.
+- canonical: entry_descent_and_landing
+  namespace: domain.term
+  display_label: Entry, Descent, and Landing
+  definition: Mission phase spanning atmospheric entry, controlled descent, and landing or touchdown operations.
+  status: candidate
+  aliases:
+  - EDL
+  notes:
+  - Candidate seed. Scope to planetary mission usage unless a program glossary says otherwise.
+- canonical: low_earth_orbit
+  namespace: domain.term
+  display_label: Low Earth Orbit
+  definition: Earth-orbit regime commonly called LEO; exact altitude bounds must be supplied by the governing source or project.
+  status: candidate
+  aliases:
+  - LEO
+  notes:
+  - Do not encode numeric altitude thresholds without a cited authority.
+- canonical: medium_earth_orbit
+  namespace: domain.term
+  display_label: Medium Earth Orbit
+  definition: Earth-orbit regime commonly called MEO; exact altitude bounds must be supplied by the governing source or project.
+  status: candidate
+  aliases:
+  - MEO
+  notes:
+  - Do not encode numeric altitude thresholds without a cited authority.
+- canonical: geostationary_earth_orbit
+  namespace: domain.term
+  display_label: Geostationary Earth Orbit
+  definition: Earth orbit commonly called GEO in mission-design and communications-satellite contexts.
+  status: candidate
+  aliases:
+  - GEO
+- canonical: preliminary_design_review
+  namespace: domain.term
+  display_label: Preliminary Design Review
+  definition: Program lifecycle review commonly used to assess whether a preliminary design is ready to proceed toward detailed design.
+  status: candidate
+  aliases:
+  - PDR
+  notes:
+  - Review entrance/exit criteria are project- or authority-specific.
+- canonical: critical_design_review
+  namespace: domain.term
+  display_label: Critical Design Review
+  definition: Program lifecycle review commonly used to assess whether a detailed design is mature enough to proceed toward fabrication, integration, or implementation.
+  status: candidate
+  aliases:
+  - CDR
+  notes:
+  - Token CDR is ambiguous; use only in program-review context or after explicit definition.
+- canonical: command_data_recorder
+  namespace: domain.term
+  display_label: Command/Data Recorder
+  definition: Candidate avionics or spacecraft data-system meaning for CDR; keep project-local unless approved by a governing glossary.
+  status: candidate
+  aliases:
+  - CDR
+  notes:
+  - Included to demonstrate acronym collisions. Remove or replace if not part of the AeroCodex vocabulary.
+- canonical: test_readiness_review
+  namespace: domain.term
+  display_label: Test Readiness Review
+  definition: Review commonly used to assess whether test objectives, configuration, procedures, resources, and risks are ready for execution.
+  status: candidate
+  aliases:
+  - TRR
+- canonical: technology_readiness_level
+  namespace: domain.term
+  display_label: Technology Readiness Level
+  definition: Readiness or maturity level assigned to a technology under a governing scale.
+  status: candidate
+  aliases:
+  - TRL
+  notes:
+  - Scale definitions depend on the governing authority and must not be inferred by token alone.
+- canonical: reaction_control_system
+  namespace: domain.term
+  display_label: Reaction Control System
+  definition: Spacecraft subsystem or function that uses control effectors such as thrusters for attitude or small translational control.
+  status: candidate
+  aliases:
+  - RCS
+  notes:
+  - Token RCS collides with radar_cross_section.
+- canonical: radar_cross_section
+  namespace: domain.term
+  display_label: Radar Cross Section
+  definition: Radar-signature quantity or model term associated with electromagnetic scattering from a target.
+  status: candidate
+  aliases:
+  - RCS
+  notes:
+  - Token RCS collides with reaction_control_system.
+- canonical: advisory_circular
+  namespace: source.term
+  display_label: Advisory Circular
+  definition: FAA-facing source term for an advisory circular; use only when the governing source context is FAA or aviation regulation.
+  status: candidate
+  aliases:
+  - AC
+  notes:
+  - Token AC collides with alternating_current and other shorthand uses.
+- canonical: alternating_current
+  namespace: domain.term
+  display_label: Alternating Current
+  definition: Electrical current whose direction or polarity varies periodically; use in electrical-power contexts.
+  status: candidate
+  aliases:
+  - AC
+  notes:
+  - Token AC collides with advisory_circular and aircraft shorthand.
+- canonical: automatic_dependent_surveillance_broadcast
+  namespace: domain.term
+  display_label: Automatic Dependent Surveillance-Broadcast
+  definition: Aviation surveillance concept commonly abbreviated ADS-B; verify operational meaning against applicable FAA or aviation source.
+  status: candidate
+  aliases:
+  - ADS-B
+- canonical: bioregenerative_life_support_system
+  namespace: domain.term
+  display_label: Bioregenerative Life Support System
+  definition: Life-support system concept using biological processes to close or reduce consumable loops.
+  status: candidate
+  aliases:
+  - BLSS
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: environmental_control_and_life_support_system
+  namespace: domain.term
+  display_label: Environmental Control and Life Support System
+  definition: Habitat or spacecraft system domain concerned with atmosphere, water, waste, thermal, and crew-support functions.
+  status: candidate
+  aliases:
+  - ECLSS
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: baseline_values_and_assumptions_document
+  namespace: source.term
+  display_label: Baseline Values and Assumptions Document
+  definition: Project or agency reference document containing baseline values, assumptions, and planning factors.
+  status: candidate
+  aliases:
+  - BVAD
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: micro_ecological_life_support_system_alternative
+  namespace: domain.term
+  display_label: Micro-Ecological Life Support System Alternative
+  definition: Life-support research program or architecture family referred to as MELiSSA in source material.
+  status: candidate
+  aliases:
+  - MELiSSA
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: photobioreactor
+  namespace: domain.term
+  display_label: Photobioreactor
+  definition: Reactor or cultivation system using light-driven biological production.
+  status: candidate
+  aliases:
+  - PBR
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: partial_differential_equation
+  namespace: domain.term
+  display_label: Partial Differential Equation
+  definition: Equation involving derivatives of one or more dependent variables with respect to multiple independent variables.
+  status: candidate
+  aliases:
+  - PDE
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: reduced_order_model
+  namespace: domain.term
+  display_label: Reduced-Order Model
+  definition: Simplified model intended to approximate a higher-fidelity model with fewer states, modes, equations, or computational cost.
+  status: candidate
+  aliases:
+  - ROM
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: chemical_equilibrium_with_applications
+  namespace: source.term
+  display_label: Chemical Equilibrium with Applications
+  definition: NASA chemical-equilibrium analysis program family commonly referred to as CEA in thermodynamics and propulsion contexts.
+  status: candidate
+  aliases:
+  - CEA
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: national_advisory_committee_for_aeronautics
+  namespace: source.term
+  display_label: National Advisory Committee for Aeronautics
+  definition: Historical aeronautics authority whose reports and airfoil data are commonly cited in aerospace engineering.
+  status: candidate
+  aliases:
+  - NACA
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: jet_propulsion_laboratory
+  namespace: source.term
+  display_label: Jet Propulsion Laboratory
+  definition: NASA-affiliated laboratory and source authority frequently cited for astrodynamics and spacecraft materials.
+  status: candidate
+  aliases:
+  - JPL
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: international_space_station
+  namespace: domain.term
+  display_label: International Space Station
+  definition: Crewed orbital facility used as a spacecraft and life-support reference context.
+  status: candidate
+  aliases:
+  - ISS
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: digital_object_identifier
+  namespace: source.term
+  display_label: Digital Object Identifier
+  definition: Persistent identifier used for scholarly and technical source references.
+  status: candidate
+  aliases:
+  - DOI
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: international_system_of_units
+  namespace: domain.term
+  display_label: International System of Units
+  definition: International measurement-unit system used for SI units and unit symbols.
+  status: candidate
+  aliases:
+  - SI
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: national_institute_of_standards_and_technology
+  namespace: source.term
+  display_label: National Institute of Standards and Technology
+  definition: United States standards institute and source authority for physical constants and measurement references.
+  status: candidate
+  aliases:
+  - NIST
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: committee_on_data_for_science_and_technology
+  namespace: source.term
+  display_label: Committee on Data for Science and Technology
+  definition: International scientific data committee acronym used in CODATA physical constants references.
+  status: candidate
+  aliases:
+  - CODATA
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: application_programming_interface
+  namespace: domain.term
+  display_label: Application Programming Interface
+  definition: Software interface exposed by a crate, module, service, or tool.
+  status: candidate
+  aliases:
+  - API
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: continuous_integration
+  namespace: domain.term
+  display_label: Continuous Integration
+  definition: Software practice and automation context for running checks on repository changes.
+  status: candidate
+  aliases:
+  - CI
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: comma_separated_values
+  namespace: domain.term
+  display_label: Comma-Separated Values
+  definition: Plain-text tabular data format used in manifests and source maps.
+  status: candidate
+  aliases:
+  - CSV
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: javascript_object_notation
+  namespace: domain.term
+  display_label: JavaScript Object Notation
+  definition: Machine-readable data serialization format used in manifests and generated indexes.
+  status: candidate
+  aliases:
+  - JSON
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: yaml_aint_markup_language
+  namespace: domain.term
+  display_label: YAML Ain't Markup Language
+  definition: Human-readable data serialization format used for registry and validation-card files.
+  status: candidate
+  aliases:
+  - YAML
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: extensible_task_runner
+  namespace: domain.term
+  display_label: AeroCodex xtask
+  definition: Repository-local Rust task runner used for validation scaffold checks.
+  status: candidate
+  aliases:
+  - xtask
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: national_aeronautics_and_space_administration
+  namespace: source.term
+  display_label: National Aeronautics and Space Administration
+  definition: United States civil space and aeronautics agency frequently used as a source authority.
+  status: candidate
+  aliases:
+  - NASA
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: federal_aviation_administration
+  namespace: source.term
+  display_label: Federal Aviation Administration
+  definition: United States civil aviation agency and regulatory/source authority.
+  status: candidate
+  aliases:
+  - FAA
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: european_cooperation_for_space_standardization
+  namespace: source.term
+  display_label: European Cooperation for Space Standardization
+  definition: European space standards cooperation and standards source authority.
+  status: candidate
+  aliases:
+  - ECSS
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: consultative_committee_for_space_data_systems
+  namespace: source.term
+  display_label: Consultative Committee for Space Data Systems
+  definition: International space data and communications standards body/source authority.
+  status: candidate
+  aliases:
+  - CCSDS
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: american_institute_of_aeronautics_and_astronautics
+  namespace: source.term
+  display_label: American Institute of Aeronautics and Astronautics
+  definition: Aerospace professional society and publication/source-guidance authority.
+  status: candidate
+  aliases:
+  - AIAA
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: department_of_defense
+  namespace: source.term
+  display_label: Department of Defense
+  definition: Defense source authority for terminology, acquisition, range, and space-operation contexts.
+  status: candidate
+  aliases:
+  - DOD
+  - DoD
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: equivalent_system_mass
+  namespace: domain.term
+  display_label: Equivalent System Mass
+  definition: Systems-analysis metric that converts mass, volume, power, cooling, and crew-time penalties into a common mass-equivalent basis.
+  status: candidate
+  aliases:
+  - ESM
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: total_inorganic_carbon
+  namespace: domain.term
+  display_label: Total Inorganic Carbon
+  definition: Carbonate-system concentration or rate variable used in water, bioreactor, and life-support chemistry contexts.
+  status: candidate
+  aliases:
+  - TIC
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.
+- canonical: not_a_number
+  namespace: software
+  display_label: Not a Number
+  definition: Floating-point value category representing undefined or unrepresentable numeric results.
+  status: candidate
+  aliases:
+  - NaN
+  - NAN
+  notes:
+  - Added during repository-wide nomenclature policy adoption; review before promoting to approved.

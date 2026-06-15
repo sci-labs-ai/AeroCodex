@@ -1,0 +1,122 @@
+version: 0.1.0-draft
+kind: acx.symbols
+records:
+  - symbol_id: acx:math:trajectory.fit.window:E014:sample_count:v1
+    namespace: math.symbol
+    scope: acx.math.trajectory.fit.window.E014
+    surface_form: n
+    display_form: n_s
+    latex_macro: SampleCount
+    semantic_role: sample_count
+    definition: Number of samples in the fitting window.
+    domain: natural_number
+    constraints:
+      - n_s >= 2
+    unit: count
+    frame: null
+    time_scale: null
+    rust:
+      identifier: sample_count
+      type: usize
+      module: crate::trajectory::fit
+    status: approved
+    provenance:
+      introduced_by: NOM-2026-0014
+      approved_by: nomenclature_owner
+
+  - symbol_id: acx:math:trajectory.fit.window:E014:sample_index:v1
+    namespace: math.symbol
+    scope: acx.math.trajectory.fit.window.E014
+    surface_form: i
+    display_form: i
+    latex_macro: SampleIndex
+    semantic_role: sample_index
+    definition: Index into the fitting-window sample array.
+    domain: integer
+    constraints:
+      - 0 <= i
+      - i < n_s
+    unit: count
+    indexes: position_samples
+    rust:
+      identifier: sample_index
+      type: usize
+      module: crate::trajectory::fit
+    status: approved
+
+  - symbol_id: acx:math:trajectory.fit.window:E014:sample_interval:v1
+    namespace: math.symbol
+    scope: acx.math.trajectory.fit.window.E014
+    surface_form: Δt
+    display_form: Δt
+    latex_macro: SampleInterval
+    semantic_role: sample_interval
+    definition: Time interval between adjacent samples in the fitting window.
+    domain: positive_real
+    constraints:
+      - Δt > 0
+    unit: seconds
+    frame: null
+    time_scale: utc_elapsed_seconds
+    rust:
+      identifier: sample_interval_seconds
+      type: f64
+      module: crate::trajectory::fit
+    status: approved
+
+  - symbol_id: acx:math:trajectory.fit.window:E014:position_sample:v1
+    namespace: math.symbol
+    scope: acx.math.trajectory.fit.window.E014
+    surface_form: x_i
+    display_form: x_i
+    latex_macro: PositionSample
+    semantic_role: position_sample_at_index
+    definition: Position vector at sample index i.
+    domain: vector3
+    unit: meters
+    frame: local_tangent_ned
+    index: acx:math:trajectory.fit.window:E014:sample_index:v1
+    rust:
+      identifier: position_samples[sample_index]
+      type: PositionNedMeters
+      module: crate::trajectory::fit
+    status: approved
+
+  - symbol_id: acx:math:trajectory.fit.window:E014:estimated_velocity:v1
+    namespace: math.symbol
+    scope: acx.math.trajectory.fit.window.E014
+    surface_form: v_hat
+    display_form: v̂
+    latex_macro: EstimatedVelocity
+    semantic_role: estimated_velocity
+    definition: Estimated average velocity over the fitting window.
+    domain: vector3
+    unit: meters_per_second
+    frame: local_tangent_ned
+    rust:
+      identifier: estimated_velocity_mps
+      type: VelocityNedMetersPerSecond
+      module: crate::trajectory::fit
+    status: approved
+
+  - symbol_id: acx:math:graph.topology:E003:node_count:v1
+    namespace: math.symbol
+    scope: acx.math.graph.topology.E003
+    surface_form: n
+    display_form: n_v
+    latex_macro: NodeCount
+    semantic_role: node_count
+    definition: Number of nodes in the graph.
+    domain: natural_number
+    constraints:
+      - n_v >= 0
+    unit: count
+    frame: null
+    time_scale: null
+    rust:
+      identifier: node_count
+      type: usize
+      module: crate::graph::topology
+    status: approved
+    notes:
+      - Shares surface_form n with trajectory sample_count but has disjoint scope and different display_form.

@@ -1,0 +1,253 @@
+{
+  "package": "aerocodex_nomenclature_protocol",
+  "version": "0.2.0-draft",
+  "protocol_id": "ACX-NOM-001",
+  "integration": "repository_root/nomenclature",
+  "files": [
+    {
+      "path": "ADOPTION_PLAN.md",
+      "bytes": 3745,
+      "sha256": "a92706e7bb3a9c7620667c73d62ad1d07daa2c4c69316aef5426dc281cc0e5e0"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "bytes": 1577,
+      "sha256": "64984af46684284aadc7314c37b04553a25ddfe56fb68551cb33e90a6ebd519c"
+    },
+    {
+      "path": "INTEGRATION_SUMMARY.md",
+      "bytes": 2711,
+      "sha256": "56b5966eb294538a10ca135da43f246dfe3fd8fa964936a258288f786c74bffe"
+    },
+    {
+      "path": "README.md",
+      "bytes": 6849,
+      "sha256": "c4176f2384369673fa91e5cc743cc9538bd6513c6197f143e49fa17c6cf60362"
+    },
+    {
+      "path": "REFERENCES.md",
+      "bytes": 1937,
+      "sha256": "77d6966b7105cc65088371a7b2301ba2aafa466b4fab7832e9ff7e09cf073ab1"
+    },
+    {
+      "path": "ci/github-actions-example.yml",
+      "bytes": 1228,
+      "sha256": "db9b22a1689bdc7ee86493387085c8ed9b54148f7d351dfc6ccbf4edbc0e92b8"
+    },
+    {
+      "path": "ci/nom-rules.yaml",
+      "bytes": 4270,
+      "sha256": "108d1e437b18a5630c020fbe1dd22d0b4094f1fd98c3a1155ccc8fb5211c34e6"
+    },
+    {
+      "path": "docs/ACX-NOM-001.md",
+      "bytes": 22516,
+      "sha256": "fd14d56bc5105c4928aec670f7898172e42b9d457106905fa8df17fdf7de9f51"
+    },
+    {
+      "path": "docs/acronym_terminology_protocol.md",
+      "bytes": 6745,
+      "sha256": "e1c6c9d6a28b52ace43a9c0516c52fd8a47603c6ef98ff5b714dbf861d98a43e"
+    },
+    {
+      "path": "docs/ai_terminology_integration.md",
+      "bytes": 4442,
+      "sha256": "35d2d638979b33f96b55ed8e764d4f1e6cc1773d9cc731f20b3781d9eff35d5d"
+    },
+    {
+      "path": "docs/math_symbol_protocol.md",
+      "bytes": 3221,
+      "sha256": "59f8234f383e0f2e6919be8b0f239c679734a8b15743301063e5de4a39ca66a7"
+    },
+    {
+      "path": "docs/rust_identifier_profile.md",
+      "bytes": 3613,
+      "sha256": "6764e11d9f04d4310b588a649ce40f4167f67cd182e95b6e29786adafae8dd22"
+    },
+    {
+      "path": "docs/source_ingestion_protocol.md",
+      "bytes": 2946,
+      "sha256": "abdc96d32d1ae073b3089204a2675aa2179da579c101e67b539eab4d2793bc79"
+    },
+    {
+      "path": "examples/ai/terminology_pack_for_acronym_demo.generated.md",
+      "bytes": 3818,
+      "sha256": "6cc69a919f26f9388f42cdf98193a5e155326aaac3a46a1e0c1b44f47422c3eb"
+    },
+    {
+      "path": "examples/ai/terminology_pack_for_acronym_demo.md",
+      "bytes": 658,
+      "sha256": "360f1d7c483e352124a37f4b2484a531d6d73118660f0c7429d7fcff8e366234"
+    },
+    {
+      "path": "examples/rust/good_bad_examples.rs",
+      "bytes": 1896,
+      "sha256": "1757397b32a99a80af34073aa649c1667cc004c24e94f594628ba4107b1d9c9f"
+    },
+    {
+      "path": "examples/specs/acronym_resolution_demo.md",
+      "bytes": 633,
+      "sha256": "19c37f41a7cc421a27a5a566805b095bbf8fabb50c4c76b29e8acbdbc651a9be"
+    },
+    {
+      "path": "examples/specs/trajectory_fit_E014.md",
+      "bytes": 1678,
+      "sha256": "da43eb284d1bf21e55347c3a4e6c2f31649b93346987aa26747b139e71cede19"
+    },
+    {
+      "path": "generated/current_repo_acronym_baseline.json",
+      "bytes": 7620,
+      "sha256": "af399faf1d89ff550c20f739eae8893472b4af1a0d8b8d42b690c6949335aea9"
+    },
+    {
+      "path": "generated/current_repo_acronym_inventory.csv",
+      "bytes": 96975,
+      "sha256": "61ec4986e423a8160ab0b2abb8b74f65c13a5102dd845003b2af560df82e7ed0"
+    },
+    {
+      "path": "generated/current_repo_acronym_inventory.json",
+      "bytes": 666536,
+      "sha256": "8997d5da898357c695ae04a6427594702f81c676c5438bd30ba617f0abe890c6"
+    },
+    {
+      "path": "generated/current_repo_acronym_inventory.md",
+      "bytes": 32504,
+      "sha256": "e26839a2225c5b16c1f7ca336d0c069a0b310d82248cd44311b6294a9a38a714"
+    },
+    {
+      "path": "generated/terminology/index.jsonl",
+      "bytes": 39204,
+      "sha256": "512c2b53bf6ea1318f26e8eb9706818f3542bc300628b6606f3b8d7de9deb448"
+    },
+    {
+      "path": "registry/acronyms.yaml",
+      "bytes": 42955,
+      "sha256": "533b693a12e806612b1cf99491a281a902c5e3b45374840bb1c6628b4b79b470"
+    },
+    {
+      "path": "registry/aliases.yaml",
+      "bytes": 5977,
+      "sha256": "5c58dc28c91a6b9b873ff160cb257f7817c2359bf8638f3c4396a5ea6de9350c"
+    },
+    {
+      "path": "registry/bridges.yaml",
+      "bytes": 1363,
+      "sha256": "b21caea6c42c12958dba8cbf4604d0742480524cedf83b99273e88bd7f092318"
+    },
+    {
+      "path": "registry/concepts.yaml",
+      "bytes": 18969,
+      "sha256": "91d6596d5d8345294512d53f9349030f36a1389516a0a3a8bab3c018a34b5627"
+    },
+    {
+      "path": "registry/frames.yaml",
+      "bytes": 1342,
+      "sha256": "e3e49fb85983fcfd2d1388424b6889bd8cdf4f6cf2cbac5bdbb91015fe7681c8"
+    },
+    {
+      "path": "registry/symbols.yaml",
+      "bytes": 3565,
+      "sha256": "c5f8c4c3ec91d20e7a49e59323d7c11390ed256161c9be4d65150840a7c96d4e"
+    },
+    {
+      "path": "registry/terminology_sources.yaml",
+      "bytes": 7941,
+      "sha256": "64568aa3ad06ba7b280dfac82f5a1320829f264634378072a85f03810ba60847"
+    },
+    {
+      "path": "registry/units.yaml",
+      "bytes": 2132,
+      "sha256": "c189d39a9aa74e7b319c8b30c6ebdb43437d49506fe80f9c6ae0507074ba535c"
+    },
+    {
+      "path": "registry/waivers.yaml",
+      "bytes": 1189,
+      "sha256": "075ea87bfb298828ebd03e2099b52e3cb587bc948c8bb009132b126293a5bfc1"
+    },
+    {
+      "path": "schemas/acronym.schema.json",
+      "bytes": 4692,
+      "sha256": "20fa79c100d27d6034d946df79e0346f9b0be59be2af4b73716e9b4a8571d44a"
+    },
+    {
+      "path": "schemas/alias.schema.json",
+      "bytes": 2109,
+      "sha256": "0c2e8e06c3363b62f7a8b81923498252d574cbcdb61bdd68faa966e40e7000cc"
+    },
+    {
+      "path": "schemas/bridge.schema.json",
+      "bytes": 2174,
+      "sha256": "6ade3b833153b27f4d1ea0648811c4738bab1d7ac2895b7cb6d654b85fd7e67c"
+    },
+    {
+      "path": "schemas/concept.schema.json",
+      "bytes": 1532,
+      "sha256": "504f71ac7fc6552731e46c2d1d892d9b0de9bae6b403f2758fdb99116ce84802"
+    },
+    {
+      "path": "schemas/symbol.schema.json",
+      "bytes": 2033,
+      "sha256": "db446a184c881a64dac52ab81c0cfeeaa1787dc00793e506caace51820c118f6"
+    },
+    {
+      "path": "schemas/terminology_source.schema.json",
+      "bytes": 1948,
+      "sha256": "f91400274d53622e685a9052b8a6c6c4ce483bb14436bb2aa38d06b06d832078"
+    },
+    {
+      "path": "schemas/waiver.schema.json",
+      "bytes": 1329,
+      "sha256": "398a96fba7afdea589d7f9a98adcc51729c083a87fb2e68b8043d955146511c5"
+    },
+    {
+      "path": "templates/ACRONYM_PROPOSAL.md",
+      "bytes": 1791,
+      "sha256": "e36012a266072c82f6ae1e898639a8a6f8008b6532e060174147bb3d9e92fa28"
+    },
+    {
+      "path": "templates/AI_TERMINOLOGY_PACK.md",
+      "bytes": 1308,
+      "sha256": "7e2fcee344c39562f3b1310d83b7d676e10207880e47d54a073d4ec7bfab8c02"
+    },
+    {
+      "path": "templates/EQUATION_SYMBOL_TABLE.yaml",
+      "bytes": 1068,
+      "sha256": "96b59e2da33f4f1e0146632c944b518cff234e33c778ccbba8afd0ec4e810bcd"
+    },
+    {
+      "path": "templates/NOM_PROPOSAL.md",
+      "bytes": 1206,
+      "sha256": "80a4708410a7bd948772176c42bee54c080cff88e165a3eb739dd0e527b18001"
+    },
+    {
+      "path": "templates/PR_CHECKLIST.md",
+      "bytes": 2658,
+      "sha256": "12bfeeeed41498da4c41a66a7e172b5cbba98e8d1495cf94491062e90c048fc6"
+    },
+    {
+      "path": "templates/RUST_MATH_BRIDGE.yaml",
+      "bytes": 544,
+      "sha256": "4c8fc26bb35895627665b89b5201e30c0f2802ec3885f68395dacb3f713251ca"
+    },
+    {
+      "path": "templates/SYMBOL_PROPOSAL.md",
+      "bytes": 974,
+      "sha256": "3f9f79f908c6efc3701dd25bfc9e3da12f41191b7fbaa7152321f79bc8b0e529"
+    },
+    {
+      "path": "tooling/aerocodex_acronym_inventory.py",
+      "bytes": 17673,
+      "sha256": "05d92930ffedfc203b47953e9d207c8c3e6d70db4ad996f768aa6a72844eb157"
+    },
+    {
+      "path": "tooling/aerocodex_nom_lint.py",
+      "bytes": 16388,
+      "sha256": "42937c69385860c4a96fe61dfa7bafbc4a89c915dd421ea0032bf121cc1e933d"
+    },
+    {
+      "path": "tooling/aerocodex_terminology.py",
+      "bytes": 14413,
+      "sha256": "887c964b7d77dbd6d1b95b48442b500b2a325f2b25e044d7d467846f1c32b4a5"
+    }
+  ]
+}

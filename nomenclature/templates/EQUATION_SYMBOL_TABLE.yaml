@@ -1,0 +1,45 @@
+equation_id: E-domain-artifact-000
+scope: acx.math.domain.artifact.E000
+status: draft
+formula_source: |
+  # Prefer semantic LaTeX macros here.
+  \Output = \Input / \SampleCount
+formula_rendered: |
+  y = x / n_s
+symbols:
+  - symbol_id: acx:math:domain.artifact:E000:output:v1
+    namespace: math.symbol
+    surface_form: y
+    display_form: y
+    latex_macro: Output
+    semantic_role: output_value
+    definition: TODO
+    domain: TODO
+    constraints: []
+    unit: null
+    frame: null
+    time_scale: null
+    rust:
+      identifier: output_value
+      type: TODO
+      module: TODO
+    status: draft
+
+  - symbol_id: acx:math:domain.artifact:E000:sample_count:v1
+    namespace: math.symbol
+    surface_form: n
+    display_form: n_s
+    latex_macro: SampleCount
+    semantic_role: sample_count
+    definition: Number of samples in the local equation scope.
+    domain: natural_number
+    constraints:
+      - n_s >= 1
+    unit: count
+    frame: null
+    time_scale: null
+    rust:
+      identifier: sample_count
+      type: usize
+      module: TODO
+    status: draft

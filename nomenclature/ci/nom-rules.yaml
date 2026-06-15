@@ -1,0 +1,107 @@
+version: 0.2.0-draft
+kind: acx.nom_rules
+errors:
+  - code: ACX-NOM-E001
+    title: Unbound symbol
+    description: A symbol occurrence has no declared binding in its namespace and scope.
+
+  - code: ACX-NOM-E002
+    title: Ambiguous symbol
+    description: A symbol occurrence resolves to multiple candidate bindings.
+
+  - code: ACX-NOM-E003
+    title: Ambiguous alias
+    description: Alias maps to multiple canonical terms without required context.
+
+  - code: ACX-NOM-E004
+    title: Missing unit
+    description: Physical quantity lacks a declared unit.
+
+  - code: ACX-NOM-E005
+    title: Missing frame
+    description: Frame-dependent quantity lacks a declared frame.
+
+  - code: ACX-NOM-E006
+    title: Forbidden bare Rust identifier
+    description: Durable Rust identifier uses an unsafe bare symbol such as n, x, dt, v, or m.
+
+  - code: ACX-NOM-E007
+    title: Deprecated term in durable context
+    description: Deprecated term appears in schema, public API, or durable Rust identifier.
+
+  - code: ACX-NOM-E008
+    title: Equation lacks symbol table
+    description: Durable equation does not define a symbol table.
+
+  - code: ACX-NOM-E009
+    title: Missing Rust-math bridge
+    description: Implemented mathematical symbol lacks a bridge record.
+
+  - code: ACX-NOM-E010
+    title: Meaning changed without new version
+    description: Definition, unit, frame, domain, or Rust bridge changed without superseding the old record.
+
+  - code: ACX-NOM-E011
+    title: Raw Rust identifier without waiver
+    description: Raw identifier such as r#type appears without an approved waiver.
+
+  - code: ACX-NOM-E012
+    title: Heuristic source mapping
+    description: Source field mapped by spelling heuristic instead of approved rule.
+
+  - code: ACX-NOM-E013
+    title: Unregistered acronym
+    description: Durable documentation or code contains an acronym-like token that is absent from the acronym registry, alias registry, or waiver list.
+
+  - code: ACX-NOM-E014
+    title: Ambiguous acronym
+    description: Acronym token has multiple plausible meanings and no context, first-use definition, or terminology-pack resolution.
+
+  - code: ACX-NOM-E015
+    title: Missing terminology source
+    description: Acronym or external term record references a missing terminology source.
+
+  - code: ACX-NOM-E016
+    title: Acronym missing first-use policy
+    description: Acronym record does not define whether expansion is required at first durable use.
+
+  - code: ACX-NOM-E017
+    title: Collision lacks disambiguation
+    description: Acronym token appears in multiple records but at least one colliding record lacks disambiguation signals.
+
+warnings:
+  - code: ACX-NOM-W001
+    title: Single-letter local loop variable
+    description: Single-letter local index variable appears. Allowed only in tiny local loops or with waiver.
+
+  - code: ACX-NOM-W002
+    title: Primitive numeric lacks unit suffix
+    description: Primitive numeric identifier appears to represent a physical quantity without unit suffix.
+
+  - code: ACX-NOM-W003
+    title: Deprecated alias in documentation
+    description: Deprecated alias appears in documentation outside approved source-original or search contexts.
+
+  - code: ACX-NOM-W004
+    title: Same glyph reused in disjoint scope
+    description: Same surface form appears in multiple symbol records. Verify display forms and scopes disambiguate.
+
+  - code: ACX-NOM-W005
+    title: Generic parameter could be more semantic
+    description: Generic parameter has a short name where a semantic name might improve clarity.
+
+  - code: ACX-NOM-W006
+    title: Shadowing detected
+    description: Shadowing detected. Verify semantic role is unchanged or explicitly declared.
+
+  - code: ACX-NOM-W007
+    title: Candidate acronym used in durable context
+    description: Candidate acronym meaning appears in durable documentation or code. Approve or define it locally.
+
+  - code: ACX-NOM-W008
+    title: Acronym should be expanded at first use
+    description: Acronym token appears without nearby expansion and the record requires first-use definition.
+
+  - code: ACX-NOM-W009
+    title: AI pack includes unresolved candidate
+    description: Generated AI terminology pack includes candidate-only or ambiguous records that require reviewer attention.

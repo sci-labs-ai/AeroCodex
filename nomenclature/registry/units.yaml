@@ -1,0 +1,94 @@
+version: 0.1.0-draft
+kind: acx.units
+base_units:
+  - unit_id: acx:unit:meter:v1
+    symbol: m
+    dimension: length
+    canonical: true
+
+  - unit_id: acx:unit:second:v1
+    symbol: s
+    dimension: time
+    canonical: true
+
+  - unit_id: acx:unit:count:v1
+    symbol: count
+    dimension: dimensionless_count
+    canonical: true
+
+  - unit_id: acx:unit:radian:v1
+    symbol: rad
+    dimension: angle
+    canonical: true
+
+  - unit_id: acx:unit:degree:v1
+    symbol: deg
+    dimension: angle
+    canonical: false
+
+  - unit_id: acx:unit:knot:v1
+    symbol: kt
+    dimension: length / time
+    canonical: false
+
+  - unit_id: acx:unit:foot:v1
+    symbol: ft
+    dimension: length
+    canonical: false
+
+quantities:
+  - quantity_id: acx:quantity:time.sample_interval:v1
+    canonical: sample_interval
+    dimension: time
+    canonical_unit: seconds
+    allowed_display_units:
+      - seconds
+      - milliseconds
+    frame_required: false
+    time_scale_required: true
+    rust_type: SampleInterval
+
+  - quantity_id: acx:quantity:velocity.ground_speed:v1
+    canonical: ground_speed
+    dimension: length / time
+    canonical_unit: meters_per_second
+    allowed_display_units:
+      - knots
+      - kilometers_per_hour
+      - miles_per_hour
+    frame_required: true
+    time_scale_required: false
+    rust_type: GroundSpeed
+
+  - quantity_id: acx:quantity:position.local_tangent:v1
+    canonical: local_tangent_position
+    dimension: length
+    canonical_unit: meters
+    allowed_display_units:
+      - meters
+      - feet
+    frame_required: true
+    time_scale_required: false
+    rust_type: PositionNedMeters
+
+  - quantity_id: acx:quantity:altitude.msl:v1
+    canonical: altitude_msl
+    dimension: length
+    canonical_unit: meters
+    allowed_display_units:
+      - meters
+      - feet
+    frame_required: true
+    time_scale_required: false
+    rust_type: AltitudeMsl
+
+  - quantity_id: acx:quantity:heading.true:v1
+    canonical: heading_true
+    dimension: angle
+    canonical_unit: radians
+    allowed_display_units:
+      - degrees
+      - radians
+    frame_required: true
+    time_scale_required: false
+    rust_type: TrueHeading

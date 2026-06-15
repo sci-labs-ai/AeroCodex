@@ -1,0 +1,568 @@
+token,count,files,category,registered,builtin_allowed,baseline_allowed,first_file,first_line,first_context
+ID,831,36,software_or_repo_infrastructure,false,true,false,archive/prompts/Pasted markdown.md,182,- add a Codex ID constant where practical;
+CODEX,489,14,uppercase_word_or_heading,false,false,false,archive/prompts/Pasted markdown.md,255,"pub const CODEX_ID: &str = ""astrodynamics.two_body.vis_viva"";"
+SOURCES,150,11,uppercase_word_or_heading,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,40,const AERODYNAMIC_COEFFICIENT_SOURCES: &[&str] = &[SOURCE_ID_AERODYNAMIC_COEFFICIENTS];
+SOURCE,149,21,uppercase_word_or_heading,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,35,pub const SOURCE_ID_AERODYNAMIC_COEFFICIENTS: &str =
+SHOCK,108,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,32,"pub const CODEX_ID_NORMAL_SHOCK_DOWNSTREAM_MACH: &str = ""gasdyn.normal_shock.mach2"";"
+STANDARD,100,4,uppercase_word_or_heading,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,16,"SOURCE_ID_US_STANDARD_ATMOSPHERE_1976, STANDARD_AIR_GAS_CONSTANT_J_PER_KG_K,"
+BLSS,92,35,registered,true,false,false,ARTIFACT_MANIFEST.md,18,## Thin-film BLSS Rust conversion artifact
+NASA,83,31,registered,true,false,false,archive/prompts/Pasted markdown.md,553,NASA Glenn thermodynamics / CEA as future validation target
+AI,79,19,software_or_repo_infrastructure,false,true,false,ARTIFACT_MANIFEST.md,41,This package adds the repository-level nomenclature/acronym policy and AI terminology integration. Added artifact files include:
+MAX,75,11,uppercase_word_or_heading,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,316,"assert_numerical_failure(dynamic_pressure(f64::MAX, f64::MAX));"
+AC-P0,70,1,compound_registered_or_known,false,false,false,docs/phase_0_001/tracked_tasks.md,40,### AC-P0.001-T001 — Source registry review checklist
+RATIO,63,4,uppercase_word_or_heading,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,21,"pub const CODEX_ID_ISENTROPIC_TEMPERATURE_RATIO: &str = ""gasdyn.isentropic.temperature_ratio"";"
+OBLIQUE,60,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,55,"pub const CODEX_ID_OBLIQUE_SHOCK_RESIDUAL: &str = ""gasdyn.oblique_shock.theta_beta_mach_residual"";"
+README,60,16,software_or_repo_infrastructure,false,true,false,Cargo.toml,24,"readme = ""README.md"""
+TRANSFER,60,5,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,31,"pub const CODEX_ID_HOHMANN_TRANSFER_DELTA_V1: &str = ""astrodynamics.transfer.hohmann.delta_v1"";"
+LEVEL,58,5,uppercase_word_or_heading,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,17,"STANDARD_GAMMA_DRY_AIR, STANDARD_GRAVITY_M_S2, STANDARD_SEA_LEVEL_DENSITY_KG_M3,"
+GAS,54,5,uppercase_word_or_heading,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,16,"SOURCE_ID_US_STANDARD_ATMOSPHERE_1976, STANDARD_AIR_GAS_CONSTANT_J_PER_KG_K,"
+NORMAL,53,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,32,"pub const CODEX_ID_NORMAL_SHOCK_DOWNSTREAM_MACH: &str = ""gasdyn.normal_shock.mach2"";"
+API,51,29,registered,true,true,false,archive/prompts/Pasted markdown.md,363,Phase 1.0   — stable verified core API
+RATE,50,7,uppercase_word_or_heading,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,38,pub const TROPOSPHERE_LAPSE_RATE_K_PER_M: f64 = -0.0065;
+M3,48,5,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,553,"use aero_codex_constants::{EARTH_GRAVITATIONAL_PARAMETER_M3_S2, EARTH_MEAN_RADIUS_M};"
+SEA,48,4,uppercase_word_or_heading,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,17,"STANDARD_GAMMA_DRY_AIR, STANDARD_GRAVITY_M_S2, STANDARD_SEA_LEVEL_DENSITY_KG_M3,"
+EARTH,47,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,553,"use aero_codex_constants::{EARTH_GRAVITATIONAL_PARAMETER_M3_S2, EARTH_MEAN_RADIUS_M};"
+FLUX,46,6,uppercase_word_or_heading,false,false,false,crates/aero-codex-heat-transfer/src/lib.rs,20,pub const CODEX_ID_STEFAN_BOLTZMANN_RADIATIVE_FLUX: &str =
+O2,46,6,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-life-support/examples/thinfilm_demo.rs,33,"""overall nitrification O2 flux = {:.3}"","
+PARAMETER,46,7,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,553,"use aero_codex_constants::{EARTH_GRAVITATIONAL_PARAMETER_M3_S2, EARTH_MEAN_RADIUS_M};"
+PRESSURE,46,6,uppercase_word_or_heading,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,20,"pub const CODEX_ID_DYNAMIC_PRESSURE: &str = ""aero.forces.dynamic_pressure"";"
+CONSTANT,45,6,uppercase_word_or_heading,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,16,"SOURCE_ID_US_STANDARD_ATMOSPHERE_1976, STANDARD_AIR_GAS_CONSTANT_J_PER_KG_K,"
+DELTA,45,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,31,"pub const CODEX_ID_HOHMANN_TRANSFER_DELTA_V1: &str = ""astrodynamics.transfer.hohmann.delta_v1"";"
+S2,45,5,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,553,"use aero_codex_constants::{EARTH_GRAVITATIONAL_PARAMETER_M3_S2, EARTH_MEAN_RADIUS_M};"
+HOHMANN,44,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,31,"pub const CODEX_ID_HOHMANN_TRANSFER_DELTA_V1: &str = ""astrodynamics.transfer.hohmann.delta_v1"";"
+C3,43,12,chemical_formula_or_unit_symbol,false,false,false,README.md,34,"- `aero-codex-life-support`: reviewed Phase 0.001 bio-regenerative closure-fraction, production-area, buffer-residence-time, crew-requirement, net-balance, oxygen/carbon-dioxide, and water-recovery mass-balance primitives with conservative "
+PER,43,6,uppercase_word_or_heading,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,16,"SOURCE_ID_US_STANDARD_ATMOSPHERE_1976, STANDARD_AIR_GAS_CONSTANT_J_PER_KG_K,"
+DOI,39,14,registered,true,false,false,data/thinfilm/source_verification.csv,2,"poughon2021,Poughon et al.,Photobioreactor Limnospira indica Growth Model,10.3389/fspas.2021.700277,verified_against_frontiers_and_sckcen,""Frontiers and SCK CEN records confirm title, journal, volume, article number, and DOI."""
+RCS,39,15,registered,true,false,false,docs/deployment/deploy_agent_prompt_nomenclature_policy_v0_002.md,58,- `RCS` has multiple candidate meanings.
+SI,39,22,registered,true,false,false,crates/aero-codex-aerodynamics/src/lib.rs,6,//! outputs use SI units where the quantity has dimensions. The functions do not
+BALANCE,38,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/brlss_backbone.rs,164,const ID: &str = ids::ELEMENT_BALANCE_RESIDUAL;
+CEA,38,15,registered,true,false,false,archive/prompts/Pasted markdown.md,90,CEA wrappers
+GRAVITATIONAL,38,4,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,553,"use aero_codex_constants::{EARTH_GRAVITATIONAL_PARAMETER_M3_S2, EARTH_MEAN_RADIUS_M};"
+ISENTROPIC,38,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,21,"pub const CODEX_ID_ISENTROPIC_TEMPERATURE_RATIO: &str = ""gasdyn.isentropic.temperature_ratio"";"
+NACA,38,14,registered,true,false,false,archive/prompts/Pasted markdown.md,552,NACA Report 1135 or equivalent compressible-flow reference
+ASTRODYNAMICS,37,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,46,pub const SOURCE_ID_ASTRODYNAMICS_NASA_JPL_PARAMETERS: &str =
+MEL,37,2,registered,true,false,false,nomenclature/registry/waivers.yaml,22,surface_form: MEL
+E014,36,7,chemical_formula_or_unit_symbol,false,false,false,nomenclature/README.md,87,└── trajectory_fit_E014.md
+MASS,36,6,uppercase_word_or_heading,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,29,"pub const CODEX_ID_ISENTROPIC_MASS_FLOW_PARAMETER: &str = ""gasdyn.isentropic.mass_flow_parameter"";"
+AIR,35,4,uppercase_word_or_heading,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,16,"SOURCE_ID_US_STANDARD_ATMOSPHERE_1976, STANDARD_AIR_GAS_CONSTANT_J_PER_KG_K,"
+DENSITY,35,5,uppercase_word_or_heading,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,17,"STANDARD_GAMMA_DRY_AIR, STANDARD_GRAVITY_M_S2, STANDARD_SEA_LEVEL_DENSITY_KG_M3,"
+FAA,35,13,registered,true,false,false,docs/deployment/deploy_agent_prompt_nomenclature_policy_v0_002.md,35,"6. Do not bulk-approve external acronym lists. Source registries may identify NASA, ECSS, FAA, CCSDS, DoD, AIAA, and AeroCodex seed families, but imported terms must remain candidate/source-scoped until reviewed."
+ECLSS,33,17,registered,true,false,false,archive/prompts/Pasted markdown.md,555,NASA life-support / BVAD / ECLSS sources as research targets
+CDR,32,14,registered,true,false,false,docs/deployment/deploy_agent_prompt_nomenclature_policy_v0_002.md,57,- `CDR` has multiple candidate meanings.
+KG,32,4,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,16,"SOURCE_ID_US_STANDARD_ATMOSPHERE_1976, STANDARD_AIR_GAS_CONSTANT_J_PER_KG_K,"
+PBR,32,7,registered,true,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,407,/// Tank-in-series PBR concentration rate for species `i`.
+RESIDUAL,32,4,uppercase_word_or_heading,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,55,"pub const CODEX_ID_OBLIQUE_SHOCK_RESIDUAL: &str = ""gasdyn.oblique_shock.theta_beta_mach_residual"";"
+ZIP,32,6,software_or_repo_infrastructure,false,true,false,ARTIFACT_MANIFEST.md,5,- Repository ZIP: `AeroCodex_repository_foundation_v0_001_microtasks_001_020.zip`
+MACH,31,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,27,"pub const CODEX_ID_ISENTROPIC_AREA_MACH_RATIO: &str = ""gasdyn.isentropic.area_mach_ratio"";"
+REQUIRED,31,4,uppercase_word_or_heading,false,false,false,crates/aero-codex-constants/src/lib.rs,14,"pub const RESEARCH_REQUIRED_STATUS: &str = ""research_required"";"
+SHA256,31,6,software_or_repo_infrastructure,false,true,false,ARTIFACT_MANIFEST.md,6,- Repository SHA256 sidecar: `AeroCodex_repository_foundation_v0_001_microtasks_001_020_SHA256.txt`
+TEMPERATURE,31,5,uppercase_word_or_heading,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,18,"STANDARD_SEA_LEVEL_PRESSURE_PA, STANDARD_SEA_LEVEL_TEMPERATURE_K,"
+FROM,30,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-propulsion/src/lib.rs,21,"pub const CODEX_ID_MASS_RATIO_FROM_DELTA_V: &str = ""propulsion.rocket.mass_ratio_from_delta_v"";"
+NAN,30,12,registered,true,false,false,crates/aero-codex-aerodynamics/src/lib.rs,249,"assert!(dynamic_pressure(f64::NAN, 10.0).is_err());"
+ESM,29,11,registered,true,false,false,crates/aero-codex-life-support/examples/thinfilm_demo.rs,67,"println!(""illustrative ESM = {:.3} kg-equivalent"", esm.value);"
+PDE,29,13,registered,true,false,false,DATA_MANIFEST.toml,13,"""Thin-film algal PDE functions are design-layer equations and require calibration before mission use."","
+PI,29,9,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,17,use std::f64::consts::PI;
+RADIUS,28,4,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,553,"use aero_codex_constants::{EARTH_GRAVITATIONAL_PARAMETER_M3_S2, EARTH_MEAN_RADIUS_M};"
+GAMMA,27,4,uppercase_word_or_heading,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,17,"STANDARD_GAMMA_DRY_AIR, STANDARD_GRAVITY_M_S2, STANDARD_SEA_LEVEL_DENSITY_KG_M3,"
+THINFILM,27,6,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/brlss_backbone.rs,73,"source_id: provenance::SOURCE_THINFILM_REPORT_2026,"
+AC,26,13,registered,true,false,false,docs/deployment/deploy_agent_prompt_nomenclature_policy_v0_002.md,59,- `AC` has multiple candidate meanings.
+MEYER,26,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,49,"pub const CODEX_ID_PRANDTL_MEYER_NU: &str = ""gasdyn.prandtl_meyer.nu"";"
+PRANDTL,26,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,49,"pub const CODEX_ID_PRANDTL_MEYER_NU: &str = ""gasdyn.prandtl_meyer.nu"";"
+PROCEED,26,1,uppercase_word_or_heading,false,false,false,archive/prompts/Pasted markdown.md,1,"Use this as the **master development-session prompt**. Paste it into the coding assistant session where you will upload the current AeroCodex files. It is designed for the exact workflow you described: develop the first 20 microtasks here, "
+ALGAL,25,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,75,const ID: &str = ids::ALGAL_BIOFILM_GROWTH_RATE;
+BETA,25,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,57,pub const CODEX_ID_OBLIQUE_SHOCK_THETA_BETA_MACH_RESIDUAL: &str = CODEX_ID_OBLIQUE_SHOCK_RESIDUAL;
+SPECIFIC,25,4,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,29,"pub const CODEX_ID_SPECIFIC_ORBITAL_ENERGY: &str = ""astrodynamics.two_body.specific_orbital_energy"";"
+BASICS,24,8,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,52,pub const SOURCE_ID_ASTRODYNAMICS_TWO_BODY_BASICS: &str =
+OXYGEN,24,4,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/lib.rs,52,"pub const CODEX_ID_OXYGEN_DAILY_BALANCE: &str = ""life_support.bioregenerative.oxygen_daily_balance"";"
+SPEED,24,4,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,21,"pub const CODEX_ID_CIRCULAR_ORBIT_SPEED: &str = ""astrodynamics.two_body.circular_orbit_speed"";"
+TURN,24,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-flight-dynamics/src/lib.rs,21,"pub const CODEX_ID_LEVEL_TURN_LOAD_FACTOR: &str = ""flight_dynamics.turn.load_factor_level_turn"";"
+DYNAMICS,23,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-flight-dynamics/src/lib.rs,33,pub const SOURCE_ID_FLIGHT_DYNAMICS_BASIC_PERFORMANCE: &str =
+REPORT,23,7,uppercase_word_or_heading,false,false,false,crates/aero-codex-constants/src/lib.rs,23,pub const SOURCE_ID_NACA_REPORT_1135: &str =
+DAILY,22,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/lib.rs,47,pub const CODEX_ID_CREW_DAILY_REQUIREMENT: &str =
+COEFFICIENT,21,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,26,"pub const CODEX_ID_LIFT_COEFFICIENT: &str = ""aero.coefficients.lift_coefficient"";"
+HEAT,21,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-heat-transfer/src/lib.rs,25,"pub const CODEX_ID_CONVECTIVE_HEAT_FLUX: &str = ""heat_transfer.convection.convective_heat_flux"";"
+ROM,21,10,registered,true,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,440,const ID: &str = ids::LINEAR_ROM_SERVICE;
+TROPOSPHERE,21,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,25,"pub const CODEX_ID_TROPOSPHERE_TEMPERATURE: &str = ""atmosphere.standard.troposphere.temperature"";"
+CO2,20,6,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-life-support/examples/thinfilm_demo.rs,27,"""carbonate species: CO2={:.4}, HCO3={:.4}, CO3={:.4}"","
+DRAG,20,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,24,"pub const CODEX_ID_DRAG: &str = ""aero.forces.drag"";"
+LIFE,20,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/lib.rs,65,pub const SOURCE_ID_LIFE_SUPPORT_NASA_BVAD_ECLSS: &str =
+MEAN,20,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,553,"use aero_codex_constants::{EARTH_GRAVITATIONAL_PARAMETER_M3_S2, EARTH_MEAN_RADIUS_M};"
+SUPPORT,20,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/lib.rs,65,pub const SOURCE_ID_LIFE_SUPPORT_NASA_BVAD_ECLSS: &str =
+CI,19,10,registered,true,true,false,docs/deployment/deploy_agent_prompt_nomenclature_policy_v0_002.md,13,- CI enforcement so future additions cannot silently introduce unregistered acronym-like tokens;
+TWO,19,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,52,pub const SOURCE_ID_ASTRODYNAMICS_TWO_BODY_BASICS: &str =
+BIOFILM,18,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/nitrifying_biofilm.rs,177,const ID: &str = ids::FICK_BIOFILM_FLUX;
+BVAD/ECLSS,17,11,compound_registered_or_known,false,false,false,crates/aero-codex-constants/src/lib.rs,30,/// Source-registry seed for NASA BVAD/ECLSS life-support review.
+RESEARCH,17,3,uppercase_word_or_heading,false,false,false,README.md,4,"<img src=""assets/aerocodex_patch.png"" alt=""AeroCodex project patch showing a terminal prompt, rocket, orbital paths, and a RESEARCH READY / MEMORY SAFE banner."" width=""220"">"
+ACX-NOM-001,16,12,compound_registered_or_known,false,false,false,ARTIFACT_MANIFEST.md,43,- `nomenclature/docs/ACX-NOM-001.md`
+FLOW,16,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,29,"pub const CODEX_ID_ISENTROPIC_MASS_FLOW_PARAMETER: &str = ""gasdyn.isentropic.mass_flow_parameter"";"
+INVERSE,16,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,53,"pub const CODEX_ID_PRANDTL_MEYER_INVERSE: &str = ""gasdyn.prandtl_meyer.inverse_mach"";"
+OF,16,3,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,43,"pub const CODEX_ID_SPHERE_OF_INFLUENCE: &str = ""astrodynamics.celestial.sphere_of_influence_radius"";"
+STATUS,16,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-constants/src/lib.rs,14,"pub const RESEARCH_REQUIRED_STATUS: &str = ""research_required"";"
+TIME,16,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,41,"pub const CODEX_ID_HOHMANN_TRANSFER_TIME: &str = ""astrodynamics.transfer.hohmann.transfer_time"";"
+YAML,16,9,registered,true,true,false,docs/phase_0_001/final_microtasks_001_020_report.md,113,- 21 validation-card YAML files under `validation/cards/`
+ATMOSPHERE,15,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,16,"SOURCE_ID_US_STANDARD_ATMOSPHERE_1976, STANDARD_AIR_GAS_CONSTANT_J_PER_KG_K,"
+CIRCULAR,15,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,21,"pub const CODEX_ID_CIRCULAR_ORBIT_SPEED: &str = ""astrodynamics.two_body.circular_orbit_speed"";"
+DRY,15,4,uppercase_word_or_heading,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,17,"STANDARD_GAMMA_DRY_AIR, STANDARD_GRAVITY_M_S2, STANDARD_SEA_LEVEL_DENSITY_KG_M3,"
+ECSS,15,9,registered,true,false,false,docs/deployment/deploy_agent_prompt_nomenclature_policy_v0_002.md,35,"6. Do not bulk-approve external acronym lists. Source registries may identify NASA, ECSS, FAA, CCSDS, DoD, AIAA, and AeroCodex seed families, but imported terms must remain candidate/source-scoped until reviewed."
+IDEAL,15,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-propulsion/src/lib.rs,23,"pub const CODEX_ID_IDEAL_THRUST: &str = ""propulsion.nozzle.ideal_thrust"";"
+ISS,15,5,registered,true,false,false,citations/blss_thinfilm_refs.bib,3,"title = {Photobioreactor {Limnospira indica} Growth Model: Application from the {MELiSSA} Plant Pilot Scale to {ISS} Flight Experiment},"
+MIN,15,7,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,576,"circular_orbit_speed(f64::MIN_POSITIVE, f64::MAX),"
+NASA/JPL,15,12,compound_registered_or_known,false,false,false,archive/prompts/Pasted markdown.md,554,NASA/JPL astrodynamics parameter sources
+NH4,15,3,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-life-support/src/nitrifying_biofilm.rs,57,/// `NH4+ + 1.5 O2 -> NO2- + 2H+ + H2O` and
+ORBITAL,15,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,23,"pub const CODEX_ID_ORBITAL_PERIOD_CIRCULAR: &str = ""astrodynamics.two_body.orbital_period_circular"";"
+PA,15,4,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,18,"STANDARD_SEA_LEVEL_PRESSURE_PA, STANDARD_SEA_LEVEL_TEMPERATURE_K,"
+PDR,15,8,registered,true,false,false,nomenclature/docs/ACX-NOM-001.md,716,The Preliminary Design Review (PDR) package shall include the interface-control baseline.
+PR,15,9,software_or_repo_infrastructure,false,true,false,archive/prompts/Pasted markdown.md,1428,13. Include in the PR body:
+TIC,15,8,registered,true,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,262,const ID: &str = ids::LIMNOSPIRA_TIC_RATE;
+TOTAL,15,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,39,"pub const CODEX_ID_HOHMANN_TOTAL_DELTA_V: &str = ""astrodynamics.transfer.hohmann.total_delta_v"";"
+BASIC,14,6,uppercase_word_or_heading,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,38,pub const SOURCE_ID_AERODYNAMICS_BASIC_COEFFICIENTS: &str = SOURCE_ID_AERODYNAMIC_COEFFICIENTS;
+BOLTZMANN,14,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-constants/src/lib.rs,89,pub const STEFAN_BOLTZMANN_W_PER_M2_K4: f64 = 5.670_374_419e-8;
+BUCKLING,14,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-structures/src/lib.rs,30,pub const CODEX_ID_EULER_COLUMN_BUCKLING_LOAD: &str =
+BVAD,14,7,registered,true,false,false,archive/prompts/Pasted markdown.md,555,NASA life-support / BVAD / ECLSS sources as research targets
+CCSDS,14,9,registered,true,false,false,docs/deployment/deploy_agent_prompt_nomenclature_policy_v0_002.md,35,"6. Do not bulk-approve external acronym lists. Source registries may identify NASA, ECSS, FAA, CCSDS, DoD, AIAA, and AeroCodex seed families, but imported terms must remain candidate/source-scoped until reviewed."
+EPSILON,14,5,uppercase_word_or_heading,false,false,false,crates/aero-codex-flight-dynamics/src/lib.rs,42,const LEVEL_TURN_COS_EPSILON: f64 = 1.0e-12;
+INFINITY,14,8,uppercase_word_or_heading,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,250,"assert!(dynamic_pressure(1.0, f64::INFINITY).is_err());"
+JPL,14,4,registered,true,false,false,crates/aero-codex-astrodynamics/src/lib.rs,46,pub const SOURCE_ID_ASTRODYNAMICS_NASA_JPL_PARAMETERS: &str =
+STEFAN,14,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-constants/src/lib.rs,89,pub const STEFAN_BOLTZMANN_W_PER_M2_K4: f64 = 5.670_374_419e-8;
+STRUCTURES,14,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-structures/src/lib.rs,36,pub const SOURCE_ID_STRUCTURES_BASIC_MECHANICS: &str =
+AREA,13,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,27,"pub const CODEX_ID_ISENTROPIC_AREA_MACH_RATIO: &str = ""gasdyn.isentropic.area_mach_ratio"";"
+CELESTIAL,13,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,57,pub const SOURCE_ID_ASTRODYNAMICS_TRANSFER_CELESTIAL_BASICS: &str =
+CONDUCTION,13,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-heat-transfer/src/lib.rs,29,pub const CODEX_ID_THERMAL_RESISTANCE_CONDUCTION: &str =
+FLIGHT,13,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-flight-dynamics/src/lib.rs,33,pub const SOURCE_ID_FLIGHT_DYNAMICS_BASIC_PERFORMANCE: &str =
+LOAD,13,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-flight-dynamics/src/lib.rs,21,"pub const CODEX_ID_LEVEL_TURN_LOAD_FACTOR: &str = ""flight_dynamics.turn.load_factor_level_turn"";"
+NO2,13,2,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/thinfilm_implementation_plan.md,26,"- Expose named state schemas for O2, CO2, TIC, NH4, NO2, NO3, biomass, pH, water, temperature, power, and risk."
+POSITIVE,13,6,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,576,"circular_orbit_speed(f64::MIN_POSITIVE, f64::MAX),"
+V1,13,1,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,31,"pub const CODEX_ID_HOHMANN_TRANSFER_DELTA_V1: &str = ""astrodynamics.transfer.hohmann.delta_v1"";"
+V2,13,1,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,35,"pub const CODEX_ID_HOHMANN_TRANSFER_DELTA_V2: &str = ""astrodynamics.transfer.hohmann.delta_v2"";"
+VELOCITY,13,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,25,"pub const CODEX_ID_ESCAPE_VELOCITY: &str = ""astrodynamics.two_body.escape_velocity"";"
+ADS-B,12,8,registered,true,false,false,nomenclature/docs/acronym_terminology_protocol.md,167,token: ADS-B
+AIAA,12,8,registered,true,false,false,docs/deployment/deploy_agent_prompt_nomenclature_policy_v0_002.md,35,"6. Do not bulk-approve external acronym lists. Source registries may identify NASA, ECSS, FAA, CCSDS, DoD, AIAA, and AeroCodex seed families, but imported terms must remain candidate/source-scoped until reviewed."
+CHOKED,12,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-propulsion/src/lib.rs,31,"pub const CODEX_ID_CHOKED_MASS_FLUX: &str = ""propulsion.nozzle.choked_mass_flux_per_area"";"
+CLOSURE,12,4,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/brlss_backbone.rs,282,const ID: &str = ids::THINFILM_CLOSURE_METRIC;
+CODATA,12,5,registered,true,false,false,crates/aero-codex-constants/src/lib.rs,20,pub const SOURCE_ID_NIST_CODATA_PHYSICAL_CONSTANTS: &str =
+EPS,12,6,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,377,/// EPS fraction relation `x_EPS = 1.33(P/2e- - 1.23)`.
+EULER,12,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-structures/src/lib.rs,30,pub const CODEX_ID_EULER_COLUMN_BUCKLING_LOAD: &str =
+FRACTION,12,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/lib.rs,39,"pub const CODEX_ID_CLOSURE_FRACTION: &str = ""life_support.bioregenerative.closure_fraction"";"
+J/,12,3,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-constants/src/lib.rs,76,"/// Universal molar gas constant, J/(mol·K)."
+M2,12,5,chemical_formula_or_unit_symbol,false,false,false,archive/prompts/Pasted markdown.md,781,M2 < 1 for normal shock with M1 > 1
+PROPULSION,12,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-propulsion/src/lib.rs,36,pub const SOURCE_ID_PROPULSION_ROCKET_NOZZLE_BASICS: &str =
+T001,12,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,40,### AC-P0.001-T001 — Source registry review checklist
+AERODYNAMIC,11,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,35,pub const SOURCE_ID_AERODYNAMIC_COEFFICIENTS: &str =
+BODY,11,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,52,pub const SOURCE_ID_ASTRODYNAMICS_TWO_BODY_BASICS: &str =
+CANTILEVER,11,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-structures/src/lib.rs,25,pub const CODEX_ID_CANTILEVER_TIP_DEFLECTION_END_LOAD: &str =
+DEFLECTION,11,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-structures/src/lib.rs,25,pub const CODEX_ID_CANTILEVER_TIP_DEFLECTION_END_LOAD: &str =
+JSON,11,8,registered,true,true,false,ARTIFACT_MANIFEST.md,11,"- Per-microtask checkpoint ZIPs, changed-file ZIPs, patches, checks JSON files, changed-path lists, and SHA256 sidecars preserved in the final bundle under `microtask_artifacts/`."
+LIFT,11,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,22,"pub const CODEX_ID_LIFT: &str = ""aero.forces.lift"";"
+NIST,11,5,registered,true,false,false,crates/aero-codex-constants/src/lib.rs,20,pub const SOURCE_ID_NIST_CODATA_PHYSICAL_CONSTANTS: &str =
+PLACEHOLDER,11,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-constants/src/lib.rs,99,pub const SOLAR_GRAVITATIONAL_PARAMETER_M3_S2_PLACEHOLDER: f64 = 1.327_124_400_18e20;
+PRODUCTION,11,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/lib.rs,41,pub const CODEX_ID_REQUIRED_PRODUCTION_AREA: &str =
+REFERENCES,11,8,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/lib.rs,30,"verification_record as thinfilm_verification_record, EquationReference, EQUATION_REFERENCES,"
+SOLAR,11,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-constants/src/lib.rs,99,pub const SOLAR_GRAVITATIONAL_PARAMETER_M3_S2_PLACEHOLDER: f64 = 1.327_124_400_18e20;
+STRESS,11,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-structures/src/lib.rs,21,"pub const CODEX_ID_AXIAL_STRESS: &str = ""structures.stress.axial"";"
+URL,11,11,software_or_repo_infrastructure,false,true,false,nomenclature/REFERENCES.md,17,"These are candidate source registries for controlled vocabulary, glossary, acronym, and standards terminology ingestion. During formal adoption, re-check each URL, license/reuse terms, current version, and project applicability before bulk "
+ALLOWED,10,1,uppercase_word_or_heading,false,false,false,xtask/src/main.rs,46,const ALLOWED_STATUSES: &[&str] = &[
+CARBON,10,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/lib.rs,56,pub const CODEX_ID_CARBON_DIOXIDE_DAILY_BALANCE: &str =
+CL,10,4,chemical_formula_or_unit_symbol,false,false,false,archive/prompts/Pasted markdown.md,918,induced drag positive for nonzero CL
+EQUATION,10,7,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/lib.rs,30,"verification_record as thinfilm_verification_record, EquationReference, EQUATION_REFERENCES,"
+EXPANSION,10,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,72,pub const SOURCE_ID_GAS_DYNAMICS_EXPANSION_FLOW: &str = SOURCE_ID_NACA_REPORT_1135;
+GNC,10,7,registered,true,false,false,nomenclature/docs/acronym_terminology_protocol.md,126,"Acronym:  GNC -> Guidance, Navigation, and Control"
+NO3,10,4,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,639,"/// `D = sat(D0 + K_N (C_NO3,sp - C_NO3))`."
+PARAMETERS,10,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,46,pub const SOURCE_ID_ASTRODYNAMICS_NASA_JPL_PARAMETERS: &str =
+RADIATIVE,10,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-heat-transfer/src/lib.rs,20,pub const CODEX_ID_STEFAN_BOLTZMANN_RADIATIVE_FLUX: &str =
+STALL,10,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-flight-dynamics/src/lib.rs,27,"pub const CODEX_ID_STALL_SPEED: &str = ""flight_dynamics.performance.stall_speed"";"
+EDL,9,6,registered,true,false,false,nomenclature/examples/ai/terminology_pack_for_acronym_demo.generated.md,18,"- EDL = Entry, Descent, and Landing [candidate; spacecraft, planetary_missions, mission_phase; score=2]"
+GRAVITY,9,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,17,"STANDARD_GAMMA_DRY_AIR, STANDARD_GRAVITY_M_S2, STANDARD_SEA_LEVEL_DENSITY_KG_M3,"
+INDUCED,9,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,30,"pub const CODEX_ID_INDUCED_DRAG: &str = ""aero.drag.induced_drag_coefficient"";"
+K4,9,3,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-constants/src/lib.rs,89,pub const STEFAN_BOLTZMANN_W_PER_M2_K4: f64 = 5.670_374_419e-8;
+LIGHT,9,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,616,const ID: &str = ids::PI_LIGHT_COMMAND;
+LIMNOSPIRA,9,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,228,const ID: &str = ids::LIMNOSPIRA_BIOMASS_RATE;
+MOL,9,3,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-constants/src/lib.rs,77,pub const UNIVERSAL_GAS_CONSTANT_J_PER_MOL_K: f64 = 8.314_462_618_153_24;
+NU,9,1,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,49,"pub const CODEX_ID_PRANDTL_MEYER_NU: &str = ""gasdyn.prandtl_meyer.nu"";"
+PERIOD,9,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,23,"pub const CODEX_ID_ORBITAL_PERIOD_CIRCULAR: &str = ""astrodynamics.two_body.orbital_period_circular"";"
+UNIVERSAL,9,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-constants/src/lib.rs,77,pub const UNIVERSAL_GAS_CONSTANT_J_PER_MOL_K: f64 = 8.314_462_618_153_24;
+ANGLE,8,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,47,"pub const CODEX_ID_MACH_ANGLE: &str = ""gasdyn.mach_angle.mu"";"
+BOUNDARY,8,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,328,const ID: &str = ids::CARBON_BOUNDARY_FLUX;
+COLS,8,5,uppercase_word_or_heading,false,false,false,nomenclature/README.md,141,"N in const generic       -> compile-time value, preferably replaced with SAMPLE_COUNT, ROWS, COLS, etc."
+CONVECTIVE,8,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-heat-transfer/src/lib.rs,25,"pub const CODEX_ID_CONVECTIVE_HEAT_FLUX: &str = ""heat_transfer.convection.convective_heat_flux"";"
+CP,8,1,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-thermo/src/lib.rs,26,"pub const CODEX_ID_CP_FROM_GAMMA_R: &str = ""thermo.perfect_gas.cp_from_gamma_r"";"
+CV,8,1,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-thermo/src/lib.rs,28,"pub const CODEX_ID_CV_FROM_GAMMA_R: &str = ""thermo.perfect_gas.cv_from_gamma_r"";"
+DERIVATIVE,8,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/brlss_backbone.rs,93,const ID: &str = ids::GENERIC_COMPARTMENT_DERIVATIVE;
+DOWNSTREAM,8,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,32,"pub const CODEX_ID_NORMAL_SHOCK_DOWNSTREAM_MACH: &str = ""gasdyn.normal_shock.mach2"";"
+DYNAMIC,8,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,20,"pub const CODEX_ID_DYNAMIC_PRESSURE: &str = ""aero.forces.dynamic_pressure"";"
+ERROR,8,4,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,591,const ID: &str = ids::OXYGEN_FRACTION_ERROR;
+F/A,8,6,registered,true,false,false,archive/prompts/Pasted markdown.md,1054,stress = F/A
+FIELDS,8,1,uppercase_word_or_heading,false,false,false,xtask/src/main.rs,9,const REQUIRED_CARD_FIELDS: &[&str] = &[
+INFLUENCE,8,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,43,"pub const CODEX_ID_SPHERE_OF_INFLUENCE: &str = ""astrodynamics.celestial.sphere_of_influence_radius"";"
+IRRADIANCE,8,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,70,"ids::CYLINDRICAL_TWO_FLUX_IRRADIANCE_RATIO,"
+MACH2,8,1,artifact_id_or_version_token,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,34,pub const CODEX_ID_NORMAL_SHOCK_MACH2: &str = CODEX_ID_NORMAL_SHOCK_DOWNSTREAM_MACH;
+MANIFEST,8,8,uppercase_word_or_heading,false,false,false,ARTIFACT_MANIFEST.md,22,- `DATA_MANIFEST.toml`
+NIST/CODATA,8,6,compound_registered_or_known,false,false,false,docs/phase_0_001/final_microtasks_001_020_report.md,210,"Phase 0.001 is source-traceability scaffolding, not final validation. Exact source editions, equation IDs, table/page references, units, uncertainty conventions, validation values, and tolerances still require review. NASA/JPL, NASA Glenn/C"
+PHASE,8,4,uppercase_word_or_heading,false,false,false,crates/aero-codex-constants/src/lib.rs,104,pub const PHASE_0_001_CONSTANT_SEEDS: &[ConstantSeed] = &[
+PROPOSAL,8,5,uppercase_word_or_heading,false,false,false,nomenclature/ADOPTION_PLAN.md,51,Use `templates/ACRONYM_PROPOSAL.md` for any new acronym meaning or collision.
+RESISTANCE,8,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-heat-transfer/src/lib.rs,29,pub const CODEX_ID_THERMAL_RESISTANCE_CONDUCTION: &str =
+ROWS,8,5,uppercase_word_or_heading,false,false,false,nomenclature/README.md,141,"N in const generic       -> compile-time value, preferably replaced with SAMPLE_COUNT, ROWS, COLS, etc."
+SEEDS,8,4,uppercase_word_or_heading,false,false,false,crates/aero-codex-constants/src/lib.rs,104,pub const PHASE_0_001_CONSTANT_SEEDS: &[ConstantSeed] = &[
+SERVICE,8,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,410,const ID: &str = ids::SERVICE_VECTOR;
+SOUND,8,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,31,"pub const CODEX_ID_SPEED_OF_SOUND: &str = ""atmosphere.speed_of_sound"";"
+SPHERE,8,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,43,"pub const CODEX_ID_SPHERE_OF_INFLUENCE: &str = ""astrodynamics.celestial.sphere_of_influence_radius"";"
+SYSTEM,8,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/thinfilm_provenance.rs,151,const SYSTEM_SOURCES: &[&str] = &[
+THRUST,8,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-propulsion/src/lib.rs,23,"pub const CODEX_ID_IDEAL_THRUST: &str = ""propulsion.nozzle.ideal_thrust"";"
+US,8,2,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,16,"SOURCE_ID_US_STANDARD_ATMOSPHERE_1976, STANDARD_AIR_GAS_CONSTANT_J_PER_KG_K,"
+VIS,8,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,27,"pub const CODEX_ID_VIS_VIVA: &str = ""astrodynamics.two_body.vis_viva"";"
+VIVA,8,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,27,"pub const CODEX_ID_VIS_VIVA: &str = ""astrodynamics.two_body.vis_viva"";"
+ALTITUDE,7,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,34,pub const TROPOSPHERE_MIN_ALTITUDE_M: f64 = 0.0;
+CARD,7,1,uppercase_word_or_heading,false,false,false,xtask/src/main.rs,9,const REQUIRED_CARD_FIELDS: &[&str] = &[
+DIOXIDE,7,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/lib.rs,56,pub const CODEX_ID_CARBON_DIOXIDE_DAILY_BALANCE: &str =
+E000,7,2,chemical_formula_or_unit_symbol,false,false,false,nomenclature/templates/EQUATION_SYMBOL_TABLE.yaml,2,scope: acx.math.domain.artifact.E000
+ESCAPE,7,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,25,"pub const CODEX_ID_ESCAPE_VELOCITY: &str = ""astrodynamics.two_body.escape_velocity"";"
+EXCESS,7,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-flight-dynamics/src/lib.rs,29,pub const CODEX_ID_SPECIFIC_EXCESS_POWER: &str =
+FA,7,1,chemical_formula_or_unit_symbol,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,288,"\frac{C_{\ce{NH4}}}{K_{\ce{NH4}}+C_{\ce{NH4}}+C_{\ce{NH4}}^2/K_{I,FA,\rm Nts}}"
+IMPULSE,7,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-propulsion/src/lib.rs,25,pub const CODEX_ID_SPECIFIC_IMPULSE_FROM_EFFECTIVE_EXHAUST_VELOCITY: &str =
+O2/CO2,7,6,compound_registered_or_known,false,false,false,archive/prompts/Pasted markdown.md,1465,36. Life-support O2/CO2 stoichiometric balances
+POWER,7,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-flight-dynamics/src/lib.rs,29,pub const CODEX_ID_SPECIFIC_EXCESS_POWER: &str =
+SPECIES,7,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,344,const ID: &str = ids::CARBONATE_SPECIES;
+THERMO,7,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-thermo/src/lib.rs,35,const THERMO_SOURCES: &[&str] = &[SOURCE_ID_NASA_GLENN_CEA];
+TSIOLKOVSKY,7,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-propulsion/src/lib.rs,19,"pub const CODEX_ID_TSIOLKOVSKY_DELTA_V: &str = ""propulsion.rocket.tsiolkovsky_delta_v"";"
+ACX-NOM-WAIVER,6,2,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,954,waiver_id: ACX-NOM-WAIVER-0007
+AIM,6,3,needs_registry_or_waiver,false,false,false,nomenclature/REFERENCES.md,23,- FAA AIM Appendix 3 abbreviations and acronyms: https://www.faa.gov/air_traffic/publications/atpubs/aim_html/appendix_3.html
+BENDING,6,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-structures/src/lib.rs,23,"pub const CODEX_ID_BENDING_STRESS: &str = ""structures.stress.bending"";"
+BLANKEN,6,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/thinfilm_provenance.rs,24,"pub const SOURCE_BLANKEN_2014: &str = ""source.life_support.blanken_2014.equation_traceable"";"
+CD,6,1,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,23,/// Codex identifier for `D = q*S*CD`.
+CHECK,6,3,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/brlss_backbone.rs,218,const ID: &str = ids::DYNAMIC_BOUNDS_CHECK;
+COMMAND,6,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,616,const ID: &str = ids::PI_LIGHT_COMMAND;
+COUNT,6,4,uppercase_word_or_heading,false,false,false,nomenclature/README.md,141,"N in const generic       -> compile-time value, preferably replaced with SAMPLE_COUNT, ROWS, COLS, etc."
+EFFECTIVE,6,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-propulsion/src/lib.rs,25,pub const CODEX_ID_SPECIFIC_IMPULSE_FROM_EFFECTIVE_EXHAUST_VELOCITY: &str =
+ELEMENT,6,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/brlss_backbone.rs,164,const ID: &str = ids::ELEMENT_BALANCE_RESIDUAL;
+ENERGY,6,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,29,"pub const CODEX_ID_SPECIFIC_ORBITAL_ENERGY: &str = ""astrodynamics.two_body.specific_orbital_energy"";"
+EXHAUST,6,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-propulsion/src/lib.rs,25,pub const CODEX_ID_SPECIFIC_IMPULSE_FROM_EFFECTIVE_EXHAUST_VELOCITY: &str =
+FFI,6,6,software_or_repo_infrastructure,false,true,false,docs/phase_0_001/final_microtasks_001_020_report.md,221,"- No native libraries, external simulators, wrappers, FFI, property databases, generated binaries, or foreign runtime dependencies are included."
+GEO,6,3,registered,true,false,false,nomenclature/registry/acronyms.yaml,142,token: GEO
+INTEGRATION,6,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/thinfilm_provenance.rs,150,"const INTEGRATION_SOURCES: &[&str] = &[SOURCE_THINFILM_REPORT_2026, SOURCE_GARCIA_2021];"
+LEO,6,3,registered,true,false,false,nomenclature/registry/acronyms.yaml,76,token: LEO
+MEO,6,3,registered,true,false,false,nomenclature/registry/acronyms.yaml,109,token: MEO
+MIXTURE,6,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,223,const ID: &str = ids::MIXTURE_COMPONENT_RATE;
+NITRATE,6,3,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,650,const ID: &str = ids::NITRATE_DILUTION_COMMAND;
+NOM,6,5,software_or_repo_infrastructure,false,true,false,nomenclature/README.md,64,│   ├── NOM_PROPOSAL.md
+NOZZLE,6,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-propulsion/src/lib.rs,36,pub const SOURCE_ID_PROPULSION_ROCKET_NOZZLE_BASICS: &str =
+ORBIT,6,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,21,"pub const CODEX_ID_CIRCULAR_ORBIT_SPEED: &str = ""astrodynamics.two_body.circular_orbit_speed"";"
+R/,6,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-thermo/src/lib.rs,25,/// Codex identifier for `cp = gamma*R/(gamma - 1)`.
+RAD,6,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,303,const EXPANSION_ANGLE_ROUNDING_ALLOWANCE_RAD: f64 = 1.0e-14;
+RECOVERY,6,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/lib.rs,61,pub const CODEX_ID_WATER_RECOVERY_BALANCE: &str =
+ROCKET,6,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-propulsion/src/lib.rs,36,pub const SOURCE_ID_PROPULSION_ROCKET_NOZZLE_BASICS: &str =
+SAMPLE,6,4,needs_registry_or_waiver,false,false,false,nomenclature/README.md,141,"N in const generic       -> compile-time value, preferably replaced with SAMPLE_COUNT, ROWS, COLS, etc."
+T010,6,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,121,### AC-P0.001-T010 — Robust scalar root-solver utilities
+TANK,6,3,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,422,const ID: &str = ids::PBR_TANK_SERIES_RATE;
+THICKNESS,6,3,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/nitrifying_biofilm.rs,220,const ID: &str = ids::BIOFILM_THICKNESS_RATE;
+TOLERANCE,6,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,310,const OBLIQUE_SHOCK_RESIDUAL_TOLERANCE: f64 = 1.0e-13;
+WATER,6,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/lib.rs,61,pub const CODEX_ID_WATER_RECOVERY_BALANCE: &str =
+ZERO,6,4,needs_registry_or_waiver,false,false,false,crates/aero-codex-core/src/units.rs,13,pub const ZERO: Self = Self(0.0);
+A/A,5,4,compound_registered_or_known,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,26,"/// Codex ID for the isentropic area-Mach relation, `A/A*`."
+AOB,5,3,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/nitrifying_biofilm.rs,65,const ID: &str = ids::NITRIFICATION_AOB_STOICHIOMETRY;
+AXIAL,5,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-structures/src/lib.rs,21,"pub const CODEX_ID_AXIAL_STRESS: &str = ""structures.stress.axial"";"
+BUFFER,5,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-life-support/src/lib.rs,44,pub const CODEX_ID_BUFFER_RESIDENCE_TIME: &str =
+CATEGORIES,5,1,needs_registry_or_waiver,false,false,false,xtask/src/main.rs,54,const ALLOWED_CARD_CATEGORIES: &[&str] = &[
+CO,5,1,chemical_formula_or_unit_symbol,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,136,"3 & Integrated \MEL{} pilot plant: C3 + C4a + animal crew mock-up & Shows models functioning as life-support system engineering, not isolated culture productivity. It links nitrogen closure, oxygen production, carbon dioxide uptake, and ani"
+COEFFICIENTS,5,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,35,pub const SOURCE_ID_AERODYNAMIC_COEFFICIENTS: &str =
+COMPARTMENT,5,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/brlss_backbone.rs,93,const ID: &str = ids::GENERIC_COMPARTMENT_DERIVATIVE;
+CONSTANTS,5,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-constants/src/lib.rs,20,pub const SOURCE_ID_NIST_CODATA_PHYSICAL_CONSTANTS: &str =
+CREW,5,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/lib.rs,47,pub const CODEX_ID_CREW_DAILY_REQUIREMENT: &str =
+CYLINDRICAL,5,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,70,"ids::CYLINDRICAL_TWO_FLUX_IRRADIANCE_RATIO,"
+DOD,5,2,registered,true,false,false,nomenclature/registry/acronyms.yaml,1402,token: DOD
+FACTOR,5,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-flight-dynamics/src/lib.rs,21,"pub const CODEX_ID_LEVEL_TURN_LOAD_FACTOR: &str = ""flight_dynamics.turn.load_factor_level_turn"";"
+GENERIC,5,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/brlss_backbone.rs,93,const ID: &str = ids::GENERIC_COMPARTMENT_DERIVATIVE;
+III,5,3,needs_registry_or_waiver,false,false,false,citations/blss_thinfilm_refs.bib,103,"title = {Compartment {III}: The Nitrifying Compartment},"
+JSONL,5,4,software_or_repo_infrastructure,false,true,false,docs/deployment/deploy_agent_prompt_nomenclature_policy_v0_002.md,12,- an AI-facing terminology JSONL index;
+M1,5,2,chemical_formula_or_unit_symbol,false,false,false,archive/prompts/Pasted markdown.md,778,M1 just above 1 produces ratios near 1
+MECHANICS,5,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-structures/src/lib.rs,36,pub const SOURCE_ID_STRUCTURES_BASIC_MECHANICS: &str =
+MIT,5,4,software_or_repo_infrastructure,false,true,false,Cargo.toml,22,"license = ""MIT OR Apache-2.0"""
+MOLAR,5,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-thermo/src/lib.rs,32,pub const CODEX_ID_SPECIFIC_GAS_CONSTANT_FROM_MOLAR_MASS: &str =
+MW,5,2,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,513,"/// `r_O2 = ((F_in - F_CO2) 0.2089 - F_out y_O2,out) / (V_m MW_O2 V_R)`."
+NET,5,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/lib.rs,50,"pub const CODEX_ID_NET_DAILY_BALANCE: &str = ""life_support.bioregenerative.net_daily_balance"";"
+NITRIFICATION,5,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/nitrifying_biofilm.rs,65,const ID: &str = ids::NITRIFICATION_AOB_STOICHIOMETRY;
+PERFORMANCE,5,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-flight-dynamics/src/lib.rs,33,pub const SOURCE_ID_FLIGHT_DYNAMICS_BASIC_PERFORMANCE: &str =
+PHYSICAL,5,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-constants/src/lib.rs,20,pub const SOURCE_ID_NIST_CODATA_PHYSICAL_CONSTANTS: &str =
+REQUIREMENT,5,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/lib.rs,47,pub const CODEX_ID_CREW_DAILY_REQUIREMENT: &str =
+RESIDENCE,5,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/lib.rs,44,pub const CODEX_ID_BUFFER_RESIDENCE_TIME: &str =
+STATUSES,5,1,needs_registry_or_waiver,false,false,false,xtask/src/main.rs,46,const ALLOWED_STATUSES: &[&str] = &[
+STOICHIOMETRY,5,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/nitrifying_biofilm.rs,65,const ID: &str = ids::NITRIFICATION_AOB_STOICHIOMETRY;
+T002,5,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,49,### AC-P0.001-T002 — Constants and unit-source research pass
+T004,5,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,67,### AC-P0.001-T004 — Gas-dynamics source review
+T009,5,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,112,### AC-P0.001-T009 — Bio-regenerative life-support source review
+THERMAL,5,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-heat-transfer/src/lib.rs,29,pub const CODEX_ID_THERMAL_RESISTANCE_CONDUCTION: &str =
+TODO,5,1,needs_registry_or_waiver,false,false,false,nomenclature/templates/EQUATION_SYMBOL_TABLE.yaml,16,definition: TODO
+TOKEN,5,2,needs_registry_or_waiver,false,false,false,nomenclature/templates/ACRONYM_PROPOSAL.md,9,token: <TOKEN>
+TRL,5,3,registered,true,false,false,nomenclature/registry/acronyms.yaml,316,token: TRL
+TRR,5,3,registered,true,false,false,nomenclature/registry/acronyms.yaml,284,token: TRR
+UAB,5,3,needs_registry_or_waiver,false,false,false,data/thinfilm/source_verification.csv,4,"perez2005,Perez et al.,Dynamics and steady state operation of a nitrifying fixed bed biofilm reactor: Mathematical model based description,10.1016/j.procbio.2004.09.022,verified_against_uab_portal_and_references,""UAB portal and secondary in"
+ACRONYM,4,4,needs_registry_or_waiver,false,false,false,nomenclature/ADOPTION_PLAN.md,51,Use `templates/ACRONYM_PROPOSAL.md` for any new acronym meaning or collision.
+ACX-NOM-E011,4,3,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,44,- code: ACX-NOM-E011
+ACX-NOM-E014,4,3,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,56,- code: ACX-NOM-E014
+ACX-NOM-W008,4,3,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,101,- code: ACX-NOM-W008
+ALLOWANCE,4,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,260,const NORMAL_SHOCK_TOTAL_PRESSURE_ROUNDING_ALLOWANCE: f64 = 1.0e-12;
+AQUASIM,4,2,needs_registry_or_waiver,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,253,The 2005 fixed-bed model is a major breakthrough because it was written for both steady-state and dynamic operation and explicitly for a BLSS nitrogen compartment \parencite[2359--2369]{perez2005}. The later UAB thesis exposes the model ana
+AR,4,3,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,29,/// Codex identifier for `CD_i = CL^2/(pi*AR*e)`.
+BIOREGENERATIVE,4,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/lib.rs,70,pub const SOURCE_ID_LIFE_SUPPORT_BIOREGENERATIVE_MASS_BALANCE: &str =
+BLAS/LAPACK,4,4,needs_registry_or_waiver,false,false,false,README.md,19,"The core repository is intentionally pure Rust. The repository does not include C/C++/Fortran source, BLAS/LAPACK native linkage, CEA/REFPROP/CoolProp/Cantera wrappers, Python/Matlab/Julia runtime dependencies, `bindgen`, `cc`, `cmake`, `pk"
+C/C,4,4,compound_registered_or_known,false,false,false,README.md,19,"The core repository is intentionally pure Rust. The repository does not include C/C++/Fortran source, BLAS/LAPACK native linkage, CEA/REFPROP/CoolProp/Cantera wrappers, Python/Matlab/Julia runtime dependencies, `bindgen`, `cc`, `cmake`, `pk"
+CARBONATE,4,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,344,const ID: &str = ids::CARBONATE_SPECIES;
+CASE,4,2,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,291,| Constants | `SCREAMING_SNAKE_CASE` |
+CFD,4,4,needs_registry_or_waiver,false,false,false,crates/aero-codex-heat-transfer/src/lib.rs,12,"//! radiative-convective coupling, or CFD/thermal-solver workflows. Traceability"
+CO3,4,2,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-life-support/examples/thinfilm_demo.rs,27,"""carbonate species: CO2={:.4}, HCO3={:.4}, CO3={:.4}"","
+COLUMN,4,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-structures/src/lib.rs,30,pub const CODEX_ID_EULER_COLUMN_BUCKLING_LOAD: &str =
+CSV,4,2,registered,true,true,false,nomenclature/registry/acronyms.yaml,1124,token: CSV
+DATA,4,4,uppercase_word_or_heading,false,false,false,ARTIFACT_MANIFEST.md,22,- `DATA_MANIFEST.toml`
+DIFFUSION,4,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/nitrifying_biofilm.rs,94,const ID: &str = ids::SPHERICAL_DIFFUSION_RATE;
+E003,4,2,chemical_formula_or_unit_symbol,false,false,false,nomenclature/docs/math_symbol_protocol.md,144,- symbol_id: acx:math:graph:E003:node_count:v1
+END,4,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-structures/src/lib.rs,25,pub const CODEX_ID_CANTILEVER_TIP_DEFLECTION_END_LOAD: &str =
+FNA,4,1,needs_registry_or_waiver,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,291,"\frac{C_{\ce{NO2}}}{K_{\ce{NO2}}+C_{\ce{NO2}}+C_{\ce{NO2}}^2/K_{I,FNA,\rm Ntb}}"
+FORBIDDEN,4,1,needs_registry_or_waiver,false,false,false,xtask/src/main.rs,104,const FORBIDDEN_DEPENDENCY_TOKENS: &[&str] = &[
+GARCIA,4,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_provenance.rs,16,"pub const SOURCE_GARCIA_2021: &str = ""source.life_support.garcia_2021.equation_traceable"";"
+GLENN,4,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-constants/src/lib.rs,26,"pub const SOURCE_ID_NASA_GLENN_CEA: &str = ""source.thermo.nasa_glenn_cea.research_required"";"
+GOOD,4,1,needs_registry_or_waiver,false,false,false,nomenclature/examples/rust/good_bad_examples.rs,11,// GOOD: semantic Rust identifiers that bridge to the equation symbol table.
+HCO3-,4,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,332,"/// Splits total inorganic carbon into CO2, HCO3-, and CO3-- by pH."
+I/,4,3,needs_registry_or_waiver,false,false,false,crates/aero-codex-structures/src/lib.rs,200,"/// Euler elastic column critical buckling load, `P_cr = pi^2*E*I/(K*L)^2`, in newtons."
+I0,4,2,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,71,"""I0 Bessel series overflow"","
+ICD,4,3,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,722,The PDR package shall include the ICD baseline.
+ITERATIONS,4,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,304,const PRANDTL_MEYER_INVERSE_MAX_ITERATIONS: usize = 128;
+J2,4,3,chemical_formula_or_unit_symbol,false,false,false,archive/prompts/Pasted markdown.md,1464,35. J2 perturbation scaffold
+KI,4,1,chemical_formula_or_unit_symbol,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,496,"KI_FA_Nts=0.116, KI_FNA_Ntb=1.56e-4,"
+LICENSE,4,3,needs_registry_or_waiver,false,false,false,archive/prompts/Pasted markdown.md,124,LICENSE
+LIST,4,1,needs_registry_or_waiver,false,false,false,xtask/src/main.rs,24,const REQUIRED_CARD_LIST_FIELDS: &[&str] =
+MARKERS,4,1,needs_registry_or_waiver,false,false,false,xtask/src/main.rs,86,const REQUIRED_SCHEMA_MARKERS: &[&str] = &[
+N123AB,4,2,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,826,source_value: N123AB
+NED,4,3,needs_registry_or_waiver,false,false,false,nomenclature/README.md,140,N in NED frame           -> north component
+NITRIFIER,4,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/nitrifying_biofilm.rs,304,const ID: &str = ids::NITRIFIER_RATES;
+NO2-,4,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/nitrifying_biofilm.rs,57,/// `NH4+ + 1.5 O2 -> NO2- + 2H+ + H2O` and
+NOB,4,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_provenance.rs,69,pub const NITRIFICATION_NOB_STOICHIOMETRY: &str =
+NOTICE,4,4,needs_registry_or_waiver,false,false,false,archive/prompts/Pasted markdown.md,127,NOTICE
+ONLY,4,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_provenance.rs,142,const REPORT_ONLY: &[&str] = &[SOURCE_THINFILM_REPORT_2026];
+OR,4,3,chemical_formula_or_unit_symbol,false,false,false,Cargo.toml,22,"license = ""MIT OR Apache-2.0"""
+PDF,4,4,needs_registry_or_waiver,false,false,false,archive/prompts/Pasted markdown.md,115,LaTeX/PDF planning documents
+PLOS,4,4,needs_registry_or_waiver,false,false,false,citations/blss_thinfilm_refs.bib,43,"journaltitle = {PLOS Computational Biology},"
+PRIMITIVES,4,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-heat-transfer/src/lib.rs,37,pub const SOURCE_ID_HEAT_TRANSFER_BASIC_PRIMITIVES: &str =
+RATES,4,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/nitrifying_biofilm.rs,304,const ID: &str = ids::NITRIFIER_RATES;
+REGISTRY,4,1,needs_registry_or_waiver,false,false,false,xtask/src/main.rs,27,const REQUIRED_SOURCE_REGISTRY_FIELDS: &[&str] = &[
+ROUNDING,4,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,260,const NORMAL_SHOCK_TOTAL_PRESSURE_ROUNDING_ALLOWANCE: f64 = 1.0e-12;
+SCREAMING,4,2,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,291,| Constants | `SCREAMING_SNAKE_CASE` |
+SNAKE,4,2,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,291,| Constants | `SCREAMING_SNAKE_CASE` |
+SPHERICAL,4,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/nitrifying_biofilm.rs,94,const ID: &str = ids::SPHERICAL_DIFFUSION_RATE;
+T-D,4,3,compound_registered_or_known,false,false,false,crates/aero-codex-flight-dynamics/src/lib.rs,28,"/// Codex identifier for specific excess power, `P_s = (T-D)*V/W`."
+T0/T,4,3,compound_registered_or_known,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,20,"/// Codex ID for the isentropic total-to-static temperature ratio, `T0/T`."
+T005,4,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,76,### AC-P0.001-T005 — Thermodynamics and propulsion source review
+T022,4,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,229,### AC-P0.001-T022 — Thin-film BLSS solver and scenario layer
+TIP,4,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-structures/src/lib.rs,25,pub const CODEX_ID_CANTILEVER_TIP_DEFLECTION_END_LOAD: &str =
+V/W,4,3,compound_registered_or_known,false,false,false,crates/aero-codex-flight-dynamics/src/lib.rs,28,"/// Codex identifier for specific excess power, `P_s = (T-D)*V/W`."
+ACX-NOM-E003,3,3,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,12,- code: ACX-NOM-E003
+ACX-NOM-E006,3,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,24,- code: ACX-NOM-E006
+ACX-NOM-W001,3,3,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,73,- code: ACX-NOM-W001
+AREAL,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,155,const ID: &str = ids::ALGAL_AREAL_PRODUCTIVITY;
+ARTIFACT,3,3,needs_registry_or_waiver,false,false,false,DATA_MANIFEST.toml,18,"path = ""ARTIFACT_MANIFEST.md"""
+BAD,3,1,needs_registry_or_waiver,false,false,false,nomenclature/examples/rust/good_bad_examples.rs,4,// BAD: compact math notation leaked into durable Rust code.
+BIOMASS,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,228,const ID: &str = ids::LIMNOSPIRA_BIOMASS_RATE;
+BOUNDS,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/brlss_backbone.rs,218,const ID: &str = ids::DYNAMIC_BOUNDS_CHECK;
+BRACKET,3,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,305,const PRANDTL_MEYER_INVERSE_MAX_BRACKET_MACH: f64 = 1.0e6;
+BREAKEVEN,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/brlss_backbone.rs,355,const ID: &str = ids::THINFILM_ESM_BREAKEVEN;
+BRLSS,3,1,needs_registry_or_waiver,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,34,\newcommand{\BRLSS}{BRLSS}
+CHECKLIST,3,3,needs_registry_or_waiver,false,false,false,nomenclature/ADOPTION_PLAN.md,40,Require `templates/PR_CHECKLIST.md` for PRs that touch:
+CODATA/NIST,3,2,compound_registered_or_known,false,false,false,crates/aero-codex-constants/src/lib.rs,119,"""Seed value only; exact CODATA/NIST edition and uncertainty review pending."","
+COMPONENT,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,223,const ID: &str = ids::MIXTURE_COMPONENT_RATE;
+CONNECTED,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,562,const ID: &str = ids::OXYGEN_PRODUCTION_CONNECTED;
+CORRECTION,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,210,const ID: &str = ids::GEOMETRIC_CORRECTION;
+COUPLED,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,484,const ID: &str = ids::HABITAT_COUPLED_DERIVATIVE;
+DETRELL,3,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_provenance.rs,28,"pub const SOURCE_DETRELL_2021: &str = ""source.life_support.detrell_2021.equation_traceable"";"
+DILUTION,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,650,const ID: &str = ids::NITRATE_DILUTION_COMMAND;
+DISCONNECTED,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,526,const ID: &str = ids::OXYGEN_PRODUCTION_DISCONNECTED;
+DISSOLVED,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,277,const ID: &str = ids::DISSOLVED_SPECIES_RATE;
+DOMAIN,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,563,const ID: &str = ids::VALIDATED_DOMAIN_CHECK;
+FEASIBLE,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,480,const ID: &str = ids::PBR_FEASIBLE_REGION;
+FICK,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/nitrifying_biofilm.rs,177,const ID: &str = ids::FICK_BIOFILM_FLUX;
+FLAT,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,118,const ID: &str = ids::FLAT_TWO_FLUX_IRRADIANCE_RATIO;
+GEOMETRIC,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,210,const ID: &str = ids::GEOMETRIC_CORRECTION;
+GROWTH,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,75,const ID: &str = ids::ALGAL_BIOFILM_GROWTH_RATE;
+HABITAT,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,484,const ID: &str = ids::HABITAT_COUPLED_DERIVATIVE;
+HARVEST,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,204,const ID: &str = ids::HARVEST_RESET_THICKNESS;
+IDS,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/lib.rs,31,"THINFILM_SOURCE_IDS,"
+INTERVALS,3,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,308,const OBLIQUE_SHOCK_BETA_SCAN_INTERVALS: usize = 4_096;
+INVENTORY,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/brlss_backbone.rs,259,const ID: &str = ids::ELEMENT_INVENTORY_BALANCE;
+L/,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,25,/// Codex identifier for `CL = L/(q*S)`.
+LAPSE,3,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-atmosphere/src/lib.rs,38,pub const TROPOSPHERE_LAPSE_RATE_K_PER_M: f64 = -0.0065;
+LICENSE-APACHE,3,3,needs_registry_or_waiver,false,false,false,archive/prompts/Pasted markdown.md,126,LICENSE-APACHE
+LICENSE-MIT,3,3,needs_registry_or_waiver,false,false,false,archive/prompts/Pasted markdown.md,125,LICENSE-MIT
+LINEAR,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,440,const ID: &str = ids::LINEAR_ROM_SERVICE;
+LOOP,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/brlss_backbone.rs,187,const ID: &str = ids::LOOP_BALANCE_RESIDUAL;
+METRIC,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/brlss_backbone.rs,282,const ID: &str = ids::THINFILM_CLOSURE_METRIC;
+MONTRAS,3,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_provenance.rs,20,"pub const SOURCE_MONTRAS_2009: &str = ""source.life_support.montras_2009.equation_traceable"";"
+PACK,3,3,needs_registry_or_waiver,false,false,false,nomenclature/CHANGELOG.md,15,- `templates/AI_TERMINOLOGY_PACK.md`.
+PEREZ,3,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_provenance.rs,18,"pub const SOURCE_PEREZ_2005: &str = ""source.life_support.perez_2005.equation_traceable"";"
+POLIZZI,3,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_provenance.rs,22,"pub const SOURCE_POLIZZI_2022: &str = ""source.life_support.polizzi_2022.equation_traceable"";"
+POUGHON,3,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_provenance.rs,14,"pub const SOURCE_POUGHON_2021: &str = ""source.life_support.poughon_2021.equation_traceable"";"
+PRODUCTIVITY,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,155,const ID: &str = ids::ALGAL_AREAL_PRODUCTIVITY;
+PROFILE,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,97,const ID: &str = ids::ALGAL_BIOFILM_LIGHT_PROFILE;
+REGION,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,480,const ID: &str = ids::PBR_FEASIBLE_REGION;
+RESET,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,204,const ID: &str = ids::HARVEST_RESET_THICKNESS;
+SCAN,3,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,308,const OBLIQUE_SHOCK_BETA_SCAN_INTERVALS: usize = 4_096;
+SERIES,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,422,const ID: &str = ids::PBR_TANK_SERIES_RATE;
+SOLIDS,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/nitrifying_biofilm.rs,197,const ID: &str = ids::BIOFILM_SOLIDS_RATE;
+SYMBOL,3,2,needs_registry_or_waiver,false,false,false,nomenclature/README.md,63,│   ├── EQUATION_SYMBOL_TABLE.yaml
+T008,3,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,103,### AC-P0.001-T008 — Astrodynamics source review
+T011,3,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,130,### AC-P0.001-T011 — Gas dynamics area-Mach inverse
+T020,3,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,211,### AC-P0.001-T020 — Validation report generator
+TERMINOLOGY,3,3,needs_registry_or_waiver,false,false,false,nomenclature/CHANGELOG.md,15,- `templates/AI_TERMINOLOGY_PACK.md`.
+THETA,3,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,57,pub const CODEX_ID_OBLIQUE_SHOCK_THETA_BETA_MACH_RESIDUAL: &str = CODEX_ID_OBLIQUE_SHOCK_RESIDUAL;
+VALIDATED,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,563,const ID: &str = ids::VALIDATED_DOMAIN_CHECK;
+VECTOR,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs,410,const ID: &str = ids::SERVICE_VECTOR;
+VERMEULEN,3,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_provenance.rs,30,"pub const SOURCE_VERMEULEN_2023: &str = ""source.life_support.vermeulen_2023.equation_traceable"";"
+W/,3,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-constants/src/lib.rs,88,"/// Stefan-Boltzmann constant, W/(m²·K⁴)."
+ACX-NOM-E001,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,4,- code: ACX-NOM-E001
+ACX-NOM-E002,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,8,- code: ACX-NOM-E002
+ACX-NOM-E004,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,16,- code: ACX-NOM-E004
+ACX-NOM-E005,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,20,- code: ACX-NOM-E005
+ACX-NOM-E007,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,28,- code: ACX-NOM-E007
+ACX-NOM-E008,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,32,- code: ACX-NOM-E008
+ACX-NOM-E009,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,36,- code: ACX-NOM-E009
+ACX-NOM-E010,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,40,- code: ACX-NOM-E010
+ACX-NOM-E012,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,48,- code: ACX-NOM-E012
+ACX-NOM-E013,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,52,- code: ACX-NOM-E013
+ACX-NOM-E015,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,60,- code: ACX-NOM-E015
+ACX-NOM-E016,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,64,- code: ACX-NOM-E016
+ACX-NOM-E017,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,68,- code: ACX-NOM-E017
+ACX-NOM-W002,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,77,- code: ACX-NOM-W002
+ACX-NOM-W003,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,81,- code: ACX-NOM-W003
+ACX-NOM-W004,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,85,- code: ACX-NOM-W004
+ACX-NOM-W005,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,89,- code: ACX-NOM-W005
+ACX-NOM-W006,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,93,- code: ACX-NOM-W006
+ACX-NOM-W007,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,97,- code: ACX-NOM-W007
+ACX-NOM-W009,2,2,compound_registered_or_known,false,false,false,nomenclature/ci/nom-rules.yaml,105,- code: ACX-NOM-W009
+ADOPTION,2,2,needs_registry_or_waiver,false,false,false,nomenclature/INTEGRATION_SUMMARY.md,20,"- `README.md`, `ADOPTION_PLAN.md`, `REFERENCES.md`, `CHANGELOG.md`, `ci/nom-rules.yaml`, `ci/github-actions-example.yml`, and `templates/PR_CHECKLIST.md` were updated."
+BEAM,2,2,uppercase_word_or_heading,false,false,false,crates/aero-codex-structures/src/lib.rs,39,pub const SOURCE_ID_STRUCTURES_BEAM_BUCKLING_BASICS: &str = SOURCE_ID_STRUCTURES_BASIC_MECHANICS;
+BISECTION,2,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,309,const OBLIQUE_SHOCK_BETA_MAX_BISECTION_ITERATIONS: usize = 128;
+C3-,2,1,needs_registry_or_waiver,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,136,"3 & Integrated \MEL{} pilot plant: C3 + C4a + animal crew mock-up & Shows models functioning as life-support system engineering, not isolated culture productivity. It links nitrogen closure, oxygen production, carbon dioxide uptake, and ani"
+CEN,2,2,needs_registry_or_waiver,false,false,false,data/thinfilm/source_verification.csv,2,"poughon2021,Poughon et al.,Photobioreactor Limnospira indica Growth Model,10.3389/fspas.2021.700277,verified_against_frontiers_and_sckcen,""Frontiers and SCK CEN records confirm title, journal, volume, article number, and DOI."""
+CHANGELOG,2,2,needs_registry_or_waiver,false,false,false,nomenclature/INTEGRATION_SUMMARY.md,20,"- `README.md`, `ADOPTION_PLAN.md`, `REFERENCES.md`, `CHANGELOG.md`, `ci/nom-rules.yaml`, `ci/github-actions-example.yml`, and `templates/PR_CHECKLIST.md` were updated."
+COS,2,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-flight-dynamics/src/lib.rs,42,const LEVEL_TURN_COS_EPSILON: f64 = 1.0e-12;
+D/,2,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,27,/// Codex identifier for `CD = D/(q*S)`.
+DEPENDENCY,2,1,needs_registry_or_waiver,false,false,false,xtask/src/main.rs,104,const FORBIDDEN_DEPENDENCY_TOKENS: &[&str] = &[
+E001,2,1,chemical_formula_or_unit_symbol,false,false,false,nomenclature/docs/math_symbol_protocol.md,21,scope: acx.math.example.E001
+ESA,2,2,needs_registry_or_waiver,false,false,false,data/thinfilm/source_verification.csv,12,"esaC3,European Space Agency,Compartment III: The Nitrifying Compartment,,included_in_supplied_bib_not_implemented_directly,Retained in BibTeX and source material for future ESA page review."
+FRAC,2,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-flight-dynamics/src/lib.rs,18,use std::f64::consts::FRAC_PI_2;
+GN&C,2,2,registered,true,false,false,nomenclature/registry/aliases.yaml,91,- alias: GN&C
+H2O,2,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/nitrifying_biofilm.rs,57,/// `NH4+ + 1.5 O2 -> NO2- + 2H+ + H2O` and
+I1,2,1,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,96,"""I1 Bessel series overflow"","
+JPL/NASA,2,2,compound_registered_or_known,false,false,false,validation/source_registry/astrodynamics_transfer_celestial_basics.yaml,12,"- Exact astrodynamics textbook, NASA educational source, JPL/NASA reference, or other source edition selected for each equation."
+L0/L,2,2,compound_registered_or_known,false,false,false,crates/aero-codex-life-support/src/thinfilm_provenance.rs,243,"notes: ""Geometric correction min(1, L0/L)."","
+NO3-,2,2,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/nitrifying_biofilm.rs,58,/// `NO2- + 0.5 O2 -> NO3-`.
+O2/,2,1,needs_registry_or_waiver,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,501,* C_O2/(K_O2_Nts + C_O2))
+ODE/DAE,2,2,needs_registry_or_waiver,false,false,false,docs/phase_0_001/thinfilm_implementation_plan.md,12,- Add optional feature-gated ODE/DAE and nonlinear algebraic solver backends outside the core kernel.
+PASS,2,1,needs_registry_or_waiver,false,false,false,docs/phase_0_001/version_lock_audit.md,28,Result: PASS. No `Cargo.toml` file contains `0.001`.
+PLAN,2,2,needs_registry_or_waiver,false,false,false,nomenclature/INTEGRATION_SUMMARY.md,20,"- `README.md`, `ADOPTION_PLAN.md`, `REFERENCES.md`, `CHANGELOG.md`, `ci/nom-rules.yaml`, `ci/github-actions-example.yml`, and `templates/PR_CHECKLIST.md` were updated."
+PROJECTION,2,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_provenance.rs,113,"pub const ROM_SERVICE_PROJECTION: &str = ""life_support.thinfilm.rom.service_projection"";"
+PULL,2,2,needs_registry_or_waiver,false,false,false,ARTIFACT_MANIFEST.md,56,- `.github/PULL_REQUEST_TEMPLATE.md`
+Q/V,2,2,compound_registered_or_known,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,410,"/// `Q/V_n(C_{i,n-1} - C_{i,n}) + sum_j nu_ij r_j + kLa_i(C*_i - C_i)`."
+READINESS,2,1,needs_registry_or_waiver,false,false,false,xtask/src/main.rs,120,const FORBIDDEN_READINESS_MARKERS: &[&str] = &[
+REFPROP,2,2,needs_registry_or_waiver,false,false,false,archive/prompts/Pasted markdown.md,91,REFPROP wrappers
+REQUEST,2,2,needs_registry_or_waiver,false,false,false,ARTIFACT_MANIFEST.md,56,- `.github/PULL_REQUEST_TEMPLATE.md`
+SCHEMA,2,1,needs_registry_or_waiver,false,false,false,xtask/src/main.rs,86,const REQUIRED_SCHEMA_MARKERS: &[&str] = &[
+SCK,2,2,needs_registry_or_waiver,false,false,false,data/thinfilm/source_verification.csv,2,"poughon2021,Poughon et al.,Photobioreactor Limnospira indica Growth Model,10.3389/fspas.2021.700277,verified_against_frontiers_and_sckcen,""Frontiers and SCK CEN records confirm title, journal, volume, article number, and DOI."""
+SOI,2,2,needs_registry_or_waiver,false,false,false,archive/prompts/Pasted markdown.md,1196,SOI radius positive and less than primary distance for typical planet/star mass ratio
+SPICE,2,2,needs_registry_or_waiver,false,false,false,validation/source_registry/astrodynamics_transfer_celestial_basics.yaml,22,"- No ephemeris engine, mission-design optimizer, propagator, astrodynamics toolkit wrapper, native library, SPICE interface, FFI, or foreign runtime dependency is included."
+T0,2,2,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-propulsion/src/lib.rs,255,/// Implements `mdot/A = p0*sqrt(gamma/(R*T0)) * (2/(gamma+1))^((gamma+1)/(2*(gamma-1)))`.
+T003,2,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,58,### AC-P0.001-T003 — Atmosphere source review and layer plan
+T006,2,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,85,### AC-P0.001-T006 — Aerodynamics and flight-dynamics source review
+T014,2,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,157,### AC-P0.001-T014 — Nozzle flow with choking
+T019,2,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,202,### AC-P0.001-T019 — Life-support stoichiometry and crop-productivity source research
+T021,2,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,220,### AC-P0.001-T021 — Public docs landing page and examples
+T024,2,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,247,### AC-P0.001-T024 — Thin-film BLSS orchestration boundary
+T2/T1,2,1,compound_registered_or_known,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,39,"/// Codex ID for the normal-shock static-temperature ratio, `T2/T1`."
+TAN,2,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-flight-dynamics/src/lib.rs,43,const LEVEL_TURN_TAN_EPSILON: f64 = 1.0e-12;
+TEMPLATE,2,2,needs_registry_or_waiver,false,false,false,ARTIFACT_MANIFEST.md,56,- `.github/PULL_REQUEST_TEMPLATE.md`
+TOKENS,2,1,needs_registry_or_waiver,false,false,false,xtask/src/main.rs,104,const FORBIDDEN_DEPENDENCY_TOKENS: &[&str] = &[
+VERIFIED,2,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-constants/src/lib.rs,101,pub const SOLAR_GRAVITATIONAL_PARAMETER_PLACEHOLDER_VERIFIED: bool = false;
+WARN,2,1,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,880,11. If candidate is deprecated: WARN or ERROR depending on context.
+YYYY-MM-DD,2,1,needs_registry_or_waiver,false,false,false,nomenclature/templates/ACRONYM_PROPOSAL.md,24,retrieved_at: <YYYY-MM-DD or null>
+ACX-NOM-,1,1,compound_registered_or_known,false,false,false,nomenclature/schemas/waiver.schema.json,38,"""pattern"": ""^ACX-NOM-[EW]"""
+ACX-NOM-WAIVER-,1,1,needs_registry_or_waiver,false,false,false,nomenclature/schemas/waiver.schema.json,34,"""pattern"": ""^ACX-NOM-WAIVER-"""
+AERODYNAMICS,1,1,uppercase_word_or_heading,false,false,false,crates/aero-codex-aerodynamics/src/lib.rs,38,pub const SOURCE_ID_AERODYNAMICS_BASIC_COEFFICIENTS: &str = SOURCE_ID_AERODYNAMIC_COEFFICIENTS;
+ASCII,1,1,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,298,"Durable Rust identifiers must be ASCII `snake_case`, `UpperCamelCase`, or `SCREAMING_SNAKE_CASE` unless a documented exception exists."
+ATC,1,1,needs_registry_or_waiver,false,false,false,nomenclature/registry/terminology_sources.yaml,93,"- Prefer FAA meanings for FAA documents, Advisory Circulars, AIM references, airspace, airports, ATC, and certification material."
+BRIDGE,1,1,needs_registry_or_waiver,false,false,false,nomenclature/README.md,66,│   ├── RUST_MATH_BRIDGE.yaml
+BVAD/ECLSS/ALS,1,1,needs_registry_or_waiver,false,false,false,docs/phase_0_001/microtask_log.md,1175,"- Exact NASA BVAD/ECLSS/ALS source editions, crop-productivity references, equation/table/page locators, units, accounting boundaries, storage and quality assumptions, representative examples, and tolerances remain pending source review."
+C-C,1,1,compound_registered_or_known,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,420,"-D_C\nabla C\cdot \bm n&=k_C(C-C^*),\label{eq:carbon_bc}\\"
+CARGO,1,1,needs_registry_or_waiver,false,false,false,xtask/src/main.rs,172,"PathBuf::from(env!(""CARGO_MANIFEST_DIR""))"
+CEA/REFPROP,1,1,needs_registry_or_waiver,false,false,false,README.md,19,"The core repository is intentionally pure Rust. The repository does not include C/C++/Fortran source, BLAS/LAPACK native linkage, CEA/REFPROP/CoolProp/Cantera wrappers, Python/Matlab/Julia runtime dependencies, `bindgen`, `cc`, `cmake`, `pk"
+CI/PR,1,1,compound_registered_or_known,false,false,false,docs/deployment/deploy_agent_prompt_nomenclature_policy_v0_002.md,120,"Adds ACX-NOM-001 as a governed repository policy, integrates acronym/source registries, captures the current repository acronym inventory and adoption baseline, exports an AI-facing terminology JSONL index, and adds CI/PR checks for future "
+CO3--,1,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,332,"/// Splits total inorganic carbon into CO2, HCO3-, and CO3-- by pH."
+D0,1,1,chemical_formula_or_unit_symbol,false,false,false,crates/aero-codex-life-support/src/melissa_photobioreactor.rs,639,"/// `D = sat(D0 + K_N (C_NO3,sp - C_NO3))`."
+DIC,1,1,needs_registry_or_waiver,false,false,false,nomenclature/registry/acronyms.yaml,1498,- DIC
+DIR,1,1,needs_registry_or_waiver,false,false,false,xtask/src/main.rs,172,"PathBuf::from(env!(""CARGO_MANIFEST_DIR""))"
+DOF,1,1,needs_registry_or_waiver,false,false,false,validation/source_registry/flight_dynamics_basic_performance.yaml,19,"- No flight-envelope solver, trim solver, 6-DOF simulation, control-law model, aircraft database, native library, or foreign runtime dependency is included."
+EE,1,1,chemical_formula_or_unit_symbol,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,399,"I(z,t)&=I_0(t)\exp\left[-\int_0^z \kappa_X X(\zeta,t)+\kappa_EE(\zeta,t)\,\dd\zeta\right],\label{eq:biofilm_light}\\"
+EW,1,1,chemical_formula_or_unit_symbol,false,false,false,nomenclature/schemas/waiver.schema.json,38,"""pattern"": ""^ACX-NOM-[EW]"""
+EXPANSIONS,1,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-gas-dynamics/src/lib.rs,74,pub const SOURCE_ID_GAS_DYNAMICS_EXPANSIONS: &str = SOURCE_ID_GAS_DYNAMICS_EXPANSION_FLOW;
+FAA/NASA,1,1,compound_registered_or_known,false,false,false,validation/source_registry/flight_dynamics_basic_performance.yaml,12,"- Exact textbook, NASA handbook, FAA/NASA educational source, or other source edition selected for each equation."
+FX,1,1,chemical_formula_or_unit_symbol,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,271,"\frac{\partial X_k}{\partial t}+\frac{1}{r^2}\frac{\partial}{\partial r}\left(r^2u_FX_k\right)&=R_{X,k},\label{eq:solids_balance}\\"
+GNSS,1,1,needs_registry_or_waiver,false,false,false,nomenclature/registry/acronyms.yaml,132,- GNSS
+HCO3,1,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/examples/thinfilm_demo.rs,27,"""carbonate species: CO2={:.4}, HCO3={:.4}, CO3={:.4}"","
+HELPERS,1,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-astrodynamics/src/lib.rs,60,pub const SOURCE_ID_ASTRODYNAMICS_HOHMANN_CELESTIAL_HELPERS: &str =
+ICAO,1,1,needs_registry_or_waiver,false,false,false,nomenclature/registry/concepts.yaml,16,- source: ICAO
+IDE,1,1,needs_registry_or_waiver,false,false,false,nomenclature/ADOPTION_PLAN.md,106,## Phase 6 — Generated docs and IDE integration
+INV-001,1,1,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,131,### INV-001 — No context-free symbols
+INV-002,1,1,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,147,### INV-002 — One occurrence resolves to one binding
+INV-003,1,1,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,157,### INV-003 — Same glyph does not imply same meaning
+INV-004,1,1,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,161,### INV-004 — Different glyphs may still represent the same concept
+INV-005,1,1,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,176,"### INV-005 — Units, dimensions, frames, and time scales are semantic identity"
+INV-006,1,1,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,195,### INV-006 — Rust code must use semantic identifiers
+INV-007,1,1,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,218,"### INV-007 — Source terms are preserved, not trusted"
+INV-008,1,1,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,229,"### INV-008 — Meaning changes are versioned, not silently edited"
+INV-009,1,1,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,242,### INV-009 — Acronyms are scoped bindings
+INV-010,1,1,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,258,"### INV-010 — AI receives scoped terminology, not a full glossary dump"
+K/W,1,1,compound_registered_or_known,false,false,false,crates/aero-codex-heat-transfer/src/lib.rs,172,"/// One-dimensional plane-wall conduction thermal resistance, `R = L/(k*A)`, in K/W."
+LSR,1,1,needs_registry_or_waiver,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,138,"5 & \Chl{} / PBR@LSR hybrid life-support and ESM analysis & Useful for NASA/ESA-style trade studies of oxygen, food substitution, power, cooling, volume, launch mass, and crew time. & Equivalent system mass, productivity-to-reactor-volume s"
+LTIP,1,1,needs_registry_or_waiver,false,false,false,data/thinfilm/parameter_cards/poughon_c4a_symbolic.toml,8,"notes = ""Use this as a schema for calibrated light-transfer, LTIP/physiology, carbonate, kLa, and feasibility-map parameters."""
+MATH,1,1,needs_registry_or_waiver,false,false,false,nomenclature/README.md,66,│   ├── RUST_MATH_BRIDGE.yaml
+MEMORY,1,1,needs_registry_or_waiver,false,false,false,README.md,4,"<img src=""assets/aerocodex_patch.png"" alt=""AeroCodex project patch showing a terminal prompt, rocket, orbital paths, and a RESEARCH READY / MEMORY SAFE banner."" width=""220"">"
+MM,1,1,chemical_formula_or_unit_symbol,false,false,false,nomenclature/templates/AI_TERMINOLOGY_PACK.md,4,Generated at: `<YYYY-MM-DDTHH:MM:SSZ>`
+MPC,1,1,needs_registry_or_waiver,false,false,false,docs/phase_0_001/thinfilm_implementation_plan.md,27,"- Keep fast local safety control below any MPC, ROM, or learning layer."
+MPC/ROM,1,1,needs_registry_or_waiver,false,false,false,docs/phase_0_001/tracked_tasks.md,254,- **Acceptance criteria:** State schemas are named and traceable; any control/MPC/ROM/learning layer remains future-bound and clearly outside validated life-support readiness.
+N/M,1,1,compound_registered_or_known,false,false,false,nomenclature/examples/rust/good_bad_examples.rs,36,// BAD: const generics N/M are not self-describing.
+NACA/NASA,1,1,compound_registered_or_known,false,false,false,validation/source_registry/aerodynamics_basic_coefficients.yaml,10,"- Exact textbook, NASA educational page, NACA/NASA report, or other source edition selected for each equation."
+NASA-,1,1,needs_registry_or_waiver,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,375,NASA- and ESA-style mission trades often use equivalent system mass:
+NASA/BVAD/ECLSS,1,1,compound_registered_or_known,false,false,false,archive/prompts/Pasted markdown.md,1271,research_required unless exact NASA/BVAD/ECLSS source data has been verified.
+NASA/ESA,1,1,needs_registry_or_waiver,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,138,"5 & \Chl{} / PBR@LSR hybrid life-support and ESM analysis & Useful for NASA/ESA-style trade studies of oxygen, food substitution, power, cooling, volume, launch mass, and crew time. & Equivalent system mass, productivity-to-reactor-volume s"
+NH4/,1,1,needs_registry_or_waiver,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,500,* C_NH4/(K_NH4 + C_NH4 + C_NH4**2/KI_FA_Nts)
+NITROBACTER,1,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_provenance.rs,77,"pub const NITROBACTER_RATE: &str = ""life_support.thinfilm.c3.nitrobacter_rate"";"
+NITROSOMONAS,1,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/thinfilm_provenance.rs,76,"pub const NITROSOMONAS_RATE: &str = ""life_support.thinfilm.c3.nitrosomonas_rate"";"
+NO2/,1,1,needs_registry_or_waiver,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,503,* C_NO2/(K_NO2 + C_NO2 + C_NO2**2/KI_FNA_Ntb)
+NOM-2026-0014,1,1,compound_registered_or_known,false,false,false,nomenclature/registry/symbols.yaml,24,introduced_by: NOM-2026-0014
+O-O,1,1,compound_registered_or_known,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,421,"-D_O\nabla O\cdot \bm n&=k_O(O-O^*),\label{eq:oxygen_bc}\\"
+ODE,1,1,needs_registry_or_waiver,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,508,"A method-of-lines implementation would discretize \cref{eq:spherical_diffusion} into $M$ radial shells for each support bead, compute boundary fluxes to the bulk liquid using \cref{eq:c3_tanks}, update biofilm thickness with \cref{eq:biofil"
+PLOS/PMC,1,1,needs_registry_or_waiver,false,false,false,docs/phase_0_001/thinfilm_citation_verification.md,15,"- `polizzi2022`: DOI, title, journal, and article number matched PLOS/PMC records."
+PMC,1,1,needs_registry_or_waiver,false,false,false,data/thinfilm/source_verification.csv,6,"polizzi2022,Polizzi et al.,Understanding Photosynthetic Biofilm Productivity and Structure through 2D Simulation,10.1371/journal.pcbi.1009904,verified_against_plos_and_pmc,""PLOS and PMC records confirm title, journal, article number, and DO"
+PP,1,1,chemical_formula_or_unit_symbol,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,377,"\ESM=M+\lambda_VV+\lambda_PP+\lambda_QQ+\lambda_tt_{\rm crew},"
+QQ,1,1,chemical_formula_or_unit_symbol,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,377,"\ESM=M+\lambda_VV+\lambda_PP+\lambda_QQ+\lambda_tt_{\rm crew},"
+RBC,1,1,needs_registry_or_waiver,false,false,false,validation/source_registry/life_support_blanken_2014.yaml,12,- Biotechnology and Bioengineering article on Chlorella sorokiniana in an RBC photobioreactor.
+READY,1,1,needs_registry_or_waiver,false,false,false,README.md,4,"<img src=""assets/aerocodex_patch.png"" alt=""AeroCodex project patch showing a terminal prompt, rocket, orbital paths, and a RESEARCH READY / MEMORY SAFE banner."" width=""220"">"
+RHS,1,1,needs_registry_or_waiver,false,false,false,crates/aero-codex-life-support/src/nitrifying_biofilm.rs,161,"return Err(numerical_failure(ID, ""finite-volume RHS was not finite""));"
+RT,1,1,chemical_formula_or_unit_symbol,false,false,false,archive/prompts/Pasted markdown.md,695,air density near sea level from p/(RT)
+RUST,1,1,needs_registry_or_waiver,false,false,false,nomenclature/README.md,66,│   ├── RUST_MATH_BRIDGE.yaml
+S&,1,1,needs_registry_or_waiver,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,422,S&=S_{\rm medium}\quad \text{on wetted nutrient boundaries}.\label{eq:nitrate_bc}
+SAFE,1,1,needs_registry_or_waiver,false,false,false,README.md,4,"<img src=""assets/aerocodex_patch.png"" alt=""AeroCodex project patch showing a terminal prompt, rocket, orbital paths, and a RESEARCH READY / MEMORY SAFE banner."" width=""220"">"
+SEGMENTS,1,1,needs_registry_or_waiver,false,false,false,nomenclature/docs/ACX-NOM-001.md,273,"| `rs.value` | Value namespace | `sample_count`, `parse_route`, `MAX_SEGMENTS` |"
+SHA256SUMS,1,1,needs_registry_or_waiver,false,false,false,DATA_MANIFEST.toml,28,"path = ""checksums/SHA256SUMS"""
+SSZ,1,1,needs_registry_or_waiver,false,false,false,nomenclature/templates/AI_TERMINOLOGY_PACK.md,4,Generated at: `<YYYY-MM-DDTHH:MM:SSZ>`
+T&,1,1,needs_registry_or_waiver,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,215,"C_T&=[\ce{CO2}]+[\ce{HCO3-}]+[\ce{CO3^{2-}}],\label{eq:tic}\\"
+T007,1,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,94,### AC-P0.001-T007 — Structures and heat-transfer source review
+T012,1,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,139,### AC-P0.001-T012 — Rayleigh-flow primitives
+T013,1,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,148,### AC-P0.001-T013 — Fanno-flow primitives
+T015,1,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,166,### AC-P0.001-T015 — Standard atmosphere layers and Sutherland viscosity
+T016,1,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,175,### AC-P0.001-T016 — Basic aerodynamic model expansion
+T017,1,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,184,### AC-P0.001-T017 — Rocket nozzle expansion and ramjet scaffold
+T018,1,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,193,"### AC-P0.001-T018 — Kepler, state-vector, and J2 scaffold"
+T023,1,1,chemical_formula_or_unit_symbol,false,false,false,docs/phase_0_001/tracked_tasks.md,238,### AC-P0.001-T023 — Thin-film BLSS calibration and validation plan
+T1,1,1,chemical_formula_or_unit_symbol,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,4,\usepackage[T1]{fontenc}
+TABLE,1,1,needs_registry_or_waiver,false,false,false,nomenclature/README.md,63,│   ├── EQUATION_SYMBOL_TABLE.yaml
+VV,1,1,chemical_formula_or_unit_symbol,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,377,"\ESM=M+\lambda_VV+\lambda_PP+\lambda_QQ+\lambda_tt_{\rm crew},"
+WGS84,1,1,needs_registry_or_waiver,false,false,false,nomenclature/registry/frames.yaml,30,display_label: WGS84 Ellipsoid
+X-D,1,1,compound_registered_or_known,false,false,false,source_material/new_thinfilm/blss_thinfilm_report.tex,209,"\frac{\dd C_{\ce{O2}}}{\dd t} &=q_{O_2}(\bar G,C_T)X-D C_{\ce{O2}}+k_La_{\ce{O2}}(C^*_{\ce{O2}}-C_{\ce{O2}}),\label{eq:c4a_oxygen}"
+YAML/JSON,1,1,compound_registered_or_known,false,false,false,validation/README.md,36,"The `xtask` checks intentionally avoid YAML/JSON parser dependencies in Phase 0.001. They check required top-level fields, nonempty list sections, known status/category strings, card-to-source-registry ID links, schema markers, forbidden re"
+YAML/TOML/JSON,1,1,compound_registered_or_known,false,false,false,archive/prompts/Pasted markdown.md,113,YAML/TOML/JSON validation metadata
+YYYY-MM-DDTHH,1,1,needs_registry_or_waiver,false,false,false,nomenclature/templates/AI_TERMINOLOGY_PACK.md,4,Generated at: `<YYYY-MM-DDTHH:MM:SSZ>`
