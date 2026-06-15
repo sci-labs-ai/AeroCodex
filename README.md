@@ -1,7 +1,7 @@
 # AeroCodex
 
 <p align="center">
-  <img src="assets/aerocodex_patch.png" alt="AeroCodex project patch showing a terminal prompt, rocket, orbital paths, and a PURE RUST / SOURCE TRACEABLE banner." width="220">
+  <img src="assets/aerocodex_patch.png" alt="AeroCodex project patch showing a terminal prompt, rocket, orbital paths, and a RESEARCH READY / MEMORY SAFE banner." width="220">
 </p>
 
 **AeroCodex: Verified Aerospace Engineering Mathematics in Pure Rust**
@@ -10,7 +10,7 @@ AeroCodex is a Phase 0.001 Rust workspace for source-traceable aerospace enginee
 
 ## Safety and certification caveat
 
-AeroCodex is an engineering mathematics library for research, education, verification-oriented development, and preliminary design. Safety-critical, regulated, or mission use requires project-specific assurance, validation, qualification, and certification.
+AeroCodex is provided for research purposes only as an engineering mathematics library for research, education, verification-oriented development, and preliminary design. Safety-critical, regulated, operational, or mission use requires project-specific assurance, validation, qualification, and certification.
 
 AeroCodex is **not** certified, flight-ready, mission-ready, or approved for aircraft or spacecraft operations.
 
@@ -68,4 +68,4 @@ The thin-film BLSS conversion package adds source materials, citation manifests,
 - `crates/aero-codex-life-support/src/thinfilm_provenance.rs` - runtime source/citation map.
 - `scripts/verify_thinfilm_artifact.py` - dependency-free static artifact verifier.
 
-The added equations are equation-traceable research kernels. They are not calibrated life-support designs and do not imply flight, habitat-safety, medical, or mission readiness.
+The added equations are equation-traceable research kernels for research purposes only. They are not calibrated life-support designs and do not imply flight, habitat-safety, medical, or mission readiness.
