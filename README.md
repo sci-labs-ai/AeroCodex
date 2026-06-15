@@ -1,5 +1,9 @@
 # AeroCodex
 
+<p align="center">
+  <img src="assets/aerocodex_patch.png" alt="AeroCodex project patch showing a terminal prompt, rocket, orbital paths, and a PURE RUST / SOURCE TRACEABLE banner." width="220">
+</p>
+
 **AeroCodex: Verified Aerospace Engineering Mathematics in Pure Rust**
 
 AeroCodex is a Phase 0.001 Rust workspace for source-traceable aerospace engineering mathematics. The human roadmap phase is `Phase 0.001`; the Cargo-compatible package version for all workspace packages during this phase is locked to `0.0.1`. Do not use `0.001` as a Cargo package version.
