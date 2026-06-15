@@ -58,7 +58,7 @@ Blocked before a licensing decision:
 - public APIs that imply validated habitat, medical, operational, or regulated-use capability;
 - distributing GPL-bound material under the dual `MIT OR Apache-2.0` core license.
 
-The placeholder `biosim-rs/` directory is a Stage 4 boundary marker only. It must remain README-only until a later chunk records the license path and implementation gate.
+The placeholder `biosim-rs/` directory is a Stage 4 boundary marker only. It must remain README-only until a later chunk deliberately adds a BioSim-RS workspace. Chunk 6A clean-room primitives live in `crates/aero-codex-life-support` and do not import the external BioSim-RS scaffold crates.
 
 ## Architecture boundary for future implementation slices
 
@@ -66,13 +66,13 @@ Future BioSim-RS implementation slices should remain Rust-native and determinist
 
 Future slices should be sequenced as:
 
-1. resource identity and tick validation;
+1. resource identity and tick validation — completed in Chunk 6A as clean-room generic identities, positive-duration tick validation, and consecutive transition checks;
 2. atomic transaction commit;
 3. deterministic ordering, digest, and replay proof;
 4. resource ledger and minimal O2-loop conservation;
 5. CLI/API smoke tests and friend-test report.
 
-Each slice must carry its own source IDs, license-path reference, validation status, unit/domain assumptions, mass/energy ledger expectations, deterministic replay evidence, and conservative research caveat.
+Each slice must carry its own source IDs, license-path reference, validation status, unit/domain assumptions, mass/energy ledger expectations, deterministic replay evidence, and conservative research caveat. Chunk 6A intentionally carries no transaction, ledger, replay, or conservation evidence; those expectations remain future work.
 
 ## Clean-room evidence package for future chunks
 

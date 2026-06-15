@@ -12,6 +12,7 @@ Start with:
 - [Formula-vault staging design](assurance/formula_vault_staging.md)
 - [M07 formula-vault intake](source_intake/m07_formula_vault_intake.md)
 - [BioSim-RS license-bound architecture](assurance/biosim_rs_license_architecture.md)
+- [BioSim-RS resource identity and tick validation](assurance/biosim_rs_resource_tick_validation.md)
 - [BioSim-RS source boundary](source_intake/biosim_rs_source_boundary.md)
 - [BioSim-RS boundary placeholder](../biosim-rs/)
 - [Orekit reference-oracle mapping](assurance/orekit_reference_oracle_mapping.md)

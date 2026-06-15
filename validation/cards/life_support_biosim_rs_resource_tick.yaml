@@ -1,0 +1,44 @@
+id: life_support.biosim_rs.resource_tick
+name: BioSim-RS clean-room resource identity and tick validation
+category: life_support
+status: research_required
+source:
+  id: source.life_support.biosim_rs.resource_tick_clean_room.research_required
+  status: research_required
+assumptions:
+  - resource identities are clean-room generic mass and energy buckets, not GPL source translations
+  - tick duration is finite and strictly positive in seconds
+  - tick index ordering is checked one discrete transition at a time
+  - transaction commit, resource ledger behavior, deterministic replay, and conservation checks are deferred to later chunks
+domain:
+  summary: "nonempty unique resource-identity catalogs; finite strictly positive tick durations; consecutive tick indices for transition validation"
+  bounds:
+    - resource catalog contains at least one unique identity
+    - tick_duration_seconds > 0
+    - next_tick_index = previous_tick_index + 1
+  excluded_cases:
+    - resource delta commits
+    - module scheduling or deterministic replay proofs
+    - O2-loop conservation or biological dynamics
+inputs:
+  - clean-room BioSimResourceKind catalog entries
+  - tick index
+  - tick duration in seconds
+  - previous and next validated tick records
+outputs:
+  - catalog identity count with verification metadata
+  - validated tick record
+  - validated consecutive tick transition record
+tests:
+  - duplicate resource identities are rejected
+  - unique resource catalogs return research_required metadata
+  - nonpositive tick durations are rejected
+  - tick index zero is marked as an initialization boundary case with a warning
+  - nonconsecutive tick advances are rejected
+  - consecutive positive-duration tick advances are accepted
+failure_modes:
+  - empty or duplicate resource catalog rejected as out of domain
+  - nonfinite or nonpositive tick durations rejected
+  - overflowed or nonconsecutive tick transitions rejected
+  - status must not be interpreted as external validation
+notes: "Stage 4 Chunk 6A validation card for clean-room primitives only. This card does not promote transaction, replay, ledger, conservation, habitat-control, medical, operational, or regulated-use behavior."

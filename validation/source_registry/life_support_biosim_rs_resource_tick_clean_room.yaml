@@ -1,0 +1,21 @@
+id: source.life_support.biosim_rs.resource_tick_clean_room.research_required
+title: BioSim-RS clean-room resource identity and tick-validation source seed
+category: life_support
+status: research_required
+intended_use:
+  - Clean-room source seed for generic BioSim-RS resource identities and positive-duration discrete tick validation.
+  - Traceability anchor for Stage 4 Chunk 6A implementation primitives in the existing life-support crate.
+  - Boundary record showing that GPL Java BioSim source and GPL-bound BioSim-RS scaffold code were not imported.
+requested_details:
+  - Future GPL-compatible, permissioned, or clean-room specification package identifying any inspected source artifacts by role.
+  - Unit and domain review for each promoted resource family before ledger or conservation behavior is added.
+  - Deterministic replay, transaction, and conservation evidence in later Chunk 6B through Chunk 6D slices.
+implementation_notes:
+  - Current implementation defines generic mass and energy resource identifiers plus tick-index and duration checks only.
+  - It does not execute BioSim scenarios, import external fixtures, translate Java classes, or include GPL-bound scaffold crates.
+  - Status remains research_required pending source review and external validation evidence.
+limits:
+  - Not a habitat controller or life-support simulator.
+  - Not a resource ledger, atomic transaction engine, replay proof, or O2-loop conservation model.
+  - Not evidence of operational, crew-safety, medical, or regulated-use suitability.
+notes: "Stage 4 Chunk 6A clean-room source seed. Later chunks must add separate cards and evidence before transaction, replay, ledger, or conservation behavior is promoted."

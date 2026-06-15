@@ -45,6 +45,12 @@ Chunk 5 defines the Orekit reference-oracle mapping in `docs/assurance/orekit_re
 
 The Orekit source artifact remains the registered external archive `stage4.orekit_reference.2026_06_15`. Future Orekit-backed checks must create slice-specific oracle evidence records with source IDs, units, frames, epochs, valid domains, expected outputs, tolerances, fixture hashes where applicable, validation/status vocabulary values, and the research/preliminary-design caveat.
 
+## Chunk 6A BioSim-RS resource identity and tick validation
+
+Chunk 6A adds the first clean-room implementation slice for BioSim-RS under `crates/aero-codex-life-support/src/biosim_resource_tick.rs`, plus validation card `life_support.biosim_rs.resource_tick` and source seed `source.life_support.biosim_rs.resource_tick_clean_room.research_required`. It validates unique generic resource identity catalogs, finite positive tick durations, and consecutive tick transitions only.
+
+The slice does not import Java BioSim code, does not import the BioSim-RS scaffold crates, does not execute scenarios, does not add fixtures, and does not implement transaction commit, deterministic replay, resource ledgers, or O2-loop conservation. The validation status remains `research_required`.
+
 ## M07 astrodynamics release-candidate observations
 
 - The M07 artifact manifest reports 1,350 represented function rows.

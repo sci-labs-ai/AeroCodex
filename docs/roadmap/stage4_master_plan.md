@@ -39,6 +39,8 @@ BioSim-RS is a first-class Stage 4 candidate for life-support and habitat digita
 
 Chunk 4 records that boundary in `docs/assurance/biosim_rs_license_architecture.md`, `docs/source_intake/biosim_rs_source_boundary.md`, and the README-only `biosim-rs/` placeholder. Those files select no implementation path by themselves; they define the GPL-compatible, permissioned, and clean-room gates that later BioSim-RS slices must satisfy before code promotion.
 
+Chunk 6A starts the clean-room path with generic resource-identity and tick-validation primitives in `crates/aero-codex-life-support`. It adds validation metadata and `research_required` traceability only; it does not import GPL source, add BioSim scaffold crates, commit transactions, prove replay, create a resource ledger, or validate conservation behavior.
+
 ### Lane D: Orekit reference-oracle lane
 
 Orekit is an Apache-2.0 reference source for space-flight-dynamics architecture and validation thinking. It may guide terminology, test-oracle selection, and architecture review. It must not be copied class-for-class or used to preserve Java inheritance structures in Rust.
@@ -55,7 +57,12 @@ Chunk 5 records that boundary in `docs/assurance/orekit_reference_oracle_mapping
 | 3 | Formula-vault staging design | Plan quarantined M07 ingestion shape, equation contracts, tolerance policy, and certification queue. Chunk 3 adds `docs/assurance/formula_vault_staging.md`, `docs/source_intake/m07_formula_vault_intake.md`, and the empty `formula-vault/` skeleton. | No public API promotion; no M07 source-code import. |
 | 4 | BioSim-RS license-bound architecture | Define clean-room, GPL-compatible, and permissioned paths; record workspace boundary and validation plan in `docs/assurance/biosim_rs_license_architecture.md`, `docs/source_intake/biosim_rs_source_boundary.md`, and the README-only `biosim-rs/` placeholder. | No dual-core mixing without a licensing decision; no implementation import. |
 | 5 | Orekit reference-oracle mapping | Define reference-oracle use, test families, future oracle evidence records, and non-copying architecture notes in `docs/assurance/orekit_reference_oracle_mapping.md` and `docs/source_intake/orekit_reference_oracle_boundary.md`. | No class hierarchy cloning; no Orekit execution, fixtures, Java source import, or new APIs. |
-| 6+ | Implementation slices | Only after governance, source IDs, validation status, and license boundaries are in place. | Bounded by per-slice gates. |
+| 6A | BioSim-RS resource identity and tick validation | Add clean-room generic resource identities, positive-duration tick validation, consecutive tick-transition validation, and validation/source-registry metadata. | Public life-support primitives only; no GPL source import, scaffold crate import, transaction commit, replay proof, ledger, conservation model, or readiness claim. |
+| 6B | BioSim-RS atomic transaction commit | Future slice for resource-delta transaction staging after Chunk 6A closes. | Not started; must add separate tests, source IDs, validation card updates, and no GPL mixing. |
+| 6C | BioSim-RS deterministic ordering, digest, and replay proof | Future slice for deterministic module order and replay evidence. | Not started; no replay claim before evidence. |
+| 6D | BioSim-RS resource ledger and minimal O2-loop conservation | Future slice for ledger accounting and minimal conservation checks. | Not started; no habitat-safety or biological validation claim. |
+| 6E | BioSim-RS CLI/API smoke tests and friend-test report | Future slice for user-facing smoke tests after the kernel slices exist. | Not started. |
+| 7+ | Formula-vault and implementation candidates | Continue only after formula-vault gates and per-slice source/validation records exist. | Bounded by per-slice gates. |
 
 ## Promotion gates for any future capability
 
