@@ -61,3 +61,9 @@ A future formula-vault implementation candidate remains quarantined unless all o
 - the active chunk explicitly approves the bounded promotion.
 
 Chunk 7A does not itself authorize any formula implementation, validation-status upgrade, Scilab execution, SGP4 certification, external fixture import, public astrodynamics application programming interface, or release-readiness claim.
+
+## Chunk 7C verifier scaffold
+
+Chunk 7C adds `cargo run -p xtask -- verify formula-vault` as a dependency-free scaffold check for candidate metadata. The verifier checks required candidate sections, existing source/validation cross-links, duplicate slice/formula identifiers, blocked promotion state, required non-claim booleans, and absence of local evidence paths. It is included in `cargo run -p xtask -- verify --all`.
+
+The verifier is not numerical validation, source-equivalence evidence, certification evidence, readiness evidence, or implementation approval.

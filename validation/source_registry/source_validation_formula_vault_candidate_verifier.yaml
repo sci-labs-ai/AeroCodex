@@ -1,0 +1,25 @@
+id: source.validation.formula_vault_candidate_verifier.research_required
+title: Formula-vault candidate verifier scaffold
+category: validation
+status: research_required
+intended_use:
+  - Track the Stage 4 Chunk 7C dependency-free verifier for formula-vault candidate metadata.
+  - Link the verifier scaffold to validation-card and formula-vault governance records.
+  - Preserve metadata verification only; no formula implementation.
+requested_details:
+  - Keep the verifier dependency-free inside xtask.
+  - Check missing required fields and duplicate formula-vault identifiers.
+  - Verify source-registry and validation-card cross-links without importing external source bundles.
+implementation_notes:
+  - Implemented in xtask/src/main.rs as a repository-local metadata verifier.
+  - Exposed through cargo run -p xtask -- verify formula-vault.
+  - Included in cargo run -p xtask -- verify --all.
+limits:
+  - No formula implementation.
+  - No source translation.
+  - No generated Rust.
+  - No public application programming interface.
+  - No Scilab execution output.
+  - No fixture or oracle import.
+  - No certification, flight-readiness, mission-readiness, operational, medical-use, or regulated-use suitability.
+notes: Stage 4 Chunk 7C validation source seed for verifier governance only; candidate records remain research_required until future explicit source-review and validation evidence exist.

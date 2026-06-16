@@ -21,8 +21,8 @@ sha256 = "cbca8994de4ffe26e4ba28d9b004f6745195b3172f7839b3510f0be27c3be37d"
 
 [[files]]
 path = "README.md"
-bytes = 8997
-sha256 = "da0297ee07f023b7259bacbdcc398478828568cb069ffe188c9e0d2e99b8ae91"
+bytes = 9040
+sha256 = "ce0b235821afcca7048389f053a6ebefd79c094a897d124a25a8ad737cd7b070"
 
 [[files]]
 path = "checksums/SHA256SUMS"

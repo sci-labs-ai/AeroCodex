@@ -43,6 +43,70 @@ const REQUIRED_SOURCE_REGISTRY_LIST_FIELDS: &[&str] = &[
     "limits",
 ];
 
+fn required_formula_vault_top_level_fields() -> &'static [&'static str] {
+    &[
+        "schema_version",
+        "record_status",
+        "slice",
+        "sources",
+        "formula_contract",
+        "validation_records",
+        "evidence_plan",
+        "promotion_gate",
+        "non_claims",
+    ]
+}
+
+fn required_formula_vault_slice_fields() -> &'static [&'static str] {
+    &[
+        "id",
+        "title",
+        "lifecycle_label",
+        "stage4_chunk",
+        "public_api_surface",
+    ]
+}
+
+fn required_formula_vault_sources_fields() -> &'static [&'static str] {
+    &["source_registry_seed_id", "validation_card_id"]
+}
+
+fn required_formula_vault_contract_list_fields() -> &'static [&'static str] {
+    &[
+        "formula_ids",
+        "variables",
+        "units",
+        "coordinate_frames",
+        "time_scales",
+        "sign_conventions",
+        "valid_domain",
+        "singularities",
+        "invalid_regions",
+        "branch_behavior",
+    ]
+}
+
+fn required_formula_vault_validation_fields() -> &'static [&'static str] {
+    &[
+        "required_source_registry_seed",
+        "required_validation_card",
+        "status",
+        "status_upgrade_policy",
+    ]
+}
+
+fn required_formula_vault_non_claims_true() -> &'static [&'static str] {
+    &[
+        "no_certification_evidence",
+        "no_flight_readiness",
+        "no_mission_readiness",
+        "no_operational_approval",
+        "no_regulated_use_approval",
+        "no_bulk_m07_import",
+        "no_external_parity_claim_without_evidence",
+    ]
+}
+
 const ALLOWED_STATUSES: &[&str] = &[
     "research_required",
     "equation_traceable",
@@ -190,6 +254,10 @@ fn main() {
             let root = repo_root();
             verify_status_vocabulary(&root)
         }
+        ["verify", "formula-vault"] => {
+            let root = repo_root();
+            verify_formula_vault(&root)
+        }
         ["dependency-policy"] => dependency_policy(),
         ["help"] | ["--help"] | ["-h"] => {
             print_usage();
@@ -209,7 +277,7 @@ fn main() {
 
 fn print_usage() {
     eprintln!(
-        "usage:\n  cargo run -p xtask -- verify --all\n  cargo run -p xtask -- verify cards\n  cargo run -p xtask -- verify source-registry\n  cargo run -p xtask -- verify data-registry\n  cargo run -p xtask -- verify status-vocabulary\n  cargo run -p xtask -- dependency-policy"
+        "usage:\n  cargo run -p xtask -- verify --all\n  cargo run -p xtask -- verify cards\n  cargo run -p xtask -- verify source-registry\n  cargo run -p xtask -- verify data-registry\n  cargo run -p xtask -- verify status-vocabulary\n  cargo run -p xtask -- verify formula-vault\n  cargo run -p xtask -- dependency-policy"
     );
 }
 
@@ -227,6 +295,7 @@ fn verify_all() -> Result<(), String> {
     verify_cards(&root, Some(&source_ids))?;
     verify_data_registry(&root)?;
     verify_status_vocabulary(&root)?;
+    verify_formula_vault(&root)?;
     Ok(())
 }
 
@@ -955,6 +1024,293 @@ fn relative_display(root: &Path, path: &Path) -> String {
         .replace('\\', "/")
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct FormulaVaultCandidateSummary {
+    slice_id: String,
+    formula_ids: BTreeSet<String>,
+}
+
+fn verify_formula_vault(root: &Path) -> Result<(), String> {
+    let vault_dir = root.join("formula-vault");
+    if !vault_dir.is_dir() {
+        return Err(format!(
+            "missing formula-vault metadata directory: {}",
+            vault_dir.display()
+        ));
+    }
+
+    let candidates_dir = vault_dir.join("candidates");
+    if !candidates_dir.is_dir() {
+        return Err(format!(
+            "missing formula-vault candidates directory: {}",
+            candidates_dir.display()
+        ));
+    }
+
+    let source_ids = collect_source_registry_ids(root)?;
+    let card_ids = collect_validation_card_ids(root)?;
+    let mut candidate_texts: Vec<(String, String)> = Vec::new();
+    visit_yaml(&candidates_dir, &mut |path| {
+        let text = fs::read_to_string(path).map_err(|e| format!("{}: {e}", path.display()))?;
+        candidate_texts.push((relative_display(root, path), text));
+        Ok(())
+    })?;
+
+    if candidate_texts.is_empty() {
+        return Err("no formula-vault candidate metadata records found".to_string());
+    }
+
+    let candidate_refs: Vec<(&str, &str)> = candidate_texts
+        .iter()
+        .map(|(path, text)| (path.as_str(), text.as_str()))
+        .collect();
+    let summaries = verify_formula_vault_candidate_texts(&candidate_refs, &source_ids, &card_ids)?;
+    println!(
+        "verified {} formula-vault candidate metadata records",
+        summaries.len()
+    );
+    Ok(())
+}
+
+fn verify_formula_vault_candidate_texts(
+    candidates: &[(&str, &str)],
+    source_ids: &BTreeSet<String>,
+    card_ids: &BTreeSet<String>,
+) -> Result<Vec<FormulaVaultCandidateSummary>, String> {
+    let mut summaries = Vec::new();
+    let mut slice_ids = BTreeSet::new();
+    let mut formula_ids = BTreeSet::new();
+
+    for (name, text) in candidates {
+        let path = Path::new(name);
+        let summary = verify_formula_vault_candidate_text(path, text, source_ids, card_ids)?;
+        if !slice_ids.insert(summary.slice_id.clone()) {
+            return Err(format!(
+                "duplicate formula-vault slice id `{}`",
+                summary.slice_id
+            ));
+        }
+        for formula_id in &summary.formula_ids {
+            if !formula_ids.insert(formula_id.clone()) {
+                return Err(format!(
+                    "duplicate formula-vault formula id `{formula_id}` across candidate records"
+                ));
+            }
+        }
+        summaries.push(summary);
+    }
+
+    Ok(summaries)
+}
+
+fn verify_formula_vault_candidate_text(
+    path: &Path,
+    text: &str,
+    source_ids: &BTreeSet<String>,
+    card_ids: &BTreeSet<String>,
+) -> Result<FormulaVaultCandidateSummary, String> {
+    verify_no_forbidden_readiness_markers(path, text)?;
+    verify_formula_vault_no_local_evidence_paths(path, text)?;
+    verify_required_top_level_fields(path, text, required_formula_vault_top_level_fields())?;
+
+    let schema_version = require_top_level_value(path, text, "schema_version")?;
+    if schema_version != "formula_vault_candidate_slice.v1" {
+        return Err(format!(
+            "{} has unsupported formula-vault schema_version `{schema_version}`",
+            path.display()
+        ));
+    }
+
+    let record_status = require_top_level_value(path, text, "record_status")?;
+    if record_status == "template_only" || !record_status.contains("research_required") {
+        return Err(format!(
+            "{} record_status `{record_status}` must remain a research_required candidate record",
+            path.display()
+        ));
+    }
+
+    for field in required_formula_vault_slice_fields() {
+        require_nested_value(path, text, "slice", field)?;
+    }
+    let slice_id = require_nested_value(path, text, "slice", "id")?;
+    if !slice_id.starts_with("formula_vault.") || !is_valid_dotted_id(slice_id) {
+        return Err(format!(
+            "{} has invalid formula-vault slice id `{slice_id}`",
+            path.display()
+        ));
+    }
+    let public_surface = require_nested_value(path, text, "slice", "public_api_surface")?;
+    if !public_surface.contains("blocked") {
+        return Err(format!(
+            "{} slice.public_api_surface must remain blocked",
+            path.display()
+        ));
+    }
+
+    for field in required_formula_vault_sources_fields() {
+        require_nested_value(path, text, "sources", field)?;
+    }
+    require_nested_list(path, text, "sources", "source_artifact_ids")?;
+
+    let source_id = require_nested_value(path, text, "sources", "source_registry_seed_id")?;
+    if !source_ids.contains(source_id) {
+        return Err(format!(
+            "{} references source-registry seed `{source_id}` without a matching validation/source_registry file",
+            path.display()
+        ));
+    }
+    let card_id = require_nested_value(path, text, "sources", "validation_card_id")?;
+    if !card_ids.contains(card_id) {
+        return Err(format!(
+            "{} references validation card `{card_id}` without a matching validation/cards file",
+            path.display()
+        ));
+    }
+
+    for field in required_formula_vault_contract_list_fields() {
+        require_nested_list(path, text, "formula_contract", field)?;
+    }
+    let formula_ids = require_nested_list(path, text, "formula_contract", "formula_ids")?;
+    let mut unique_formula_ids = BTreeSet::new();
+    for formula_id in formula_ids {
+        if !formula_id.starts_with("formula_vault.") || !is_valid_dotted_id(&formula_id) {
+            return Err(format!(
+                "{} has invalid formula-vault formula id `{formula_id}`",
+                path.display()
+            ));
+        }
+        if !unique_formula_ids.insert(formula_id.clone()) {
+            return Err(format!(
+                "{} duplicate formula-vault formula id `{formula_id}`",
+                path.display()
+            ));
+        }
+    }
+
+    for field in required_formula_vault_validation_fields() {
+        require_nested_value(path, text, "validation_records", field)?;
+    }
+    let required_source = require_nested_value(
+        path,
+        text,
+        "validation_records",
+        "required_source_registry_seed",
+    )?;
+    if required_source != source_id {
+        return Err(format!(
+            "{} validation_records.required_source_registry_seed `{required_source}` does not match sources.source_registry_seed_id `{source_id}`",
+            path.display()
+        ));
+    }
+    let required_card =
+        require_nested_value(path, text, "validation_records", "required_validation_card")?;
+    if required_card != card_id {
+        return Err(format!(
+            "{} validation_records.required_validation_card `{required_card}` does not match sources.validation_card_id `{card_id}`",
+            path.display()
+        ));
+    }
+    let status = require_nested_value(path, text, "validation_records", "status")?;
+    require_allowed(path, "validation_records.status", status, ALLOWED_STATUSES)?;
+
+    require_nested_value(path, text, "evidence_plan", "tolerance_rationale")?;
+    let default_state = require_nested_value(path, text, "promotion_gate", "default_state")?;
+    if default_state != "blocked" {
+        return Err(format!(
+            "{} promotion_gate.default_state must remain blocked",
+            path.display()
+        ));
+    }
+    require_nested_list(path, text, "promotion_gate", "required_before_promotion")?;
+
+    for field in required_formula_vault_non_claims_true() {
+        let value = require_nested_value(path, text, "non_claims", field)?;
+        if value != "true" {
+            return Err(format!(
+                "{} non_claims.{field} must be true",
+                path.display()
+            ));
+        }
+    }
+
+    Ok(FormulaVaultCandidateSummary {
+        slice_id: slice_id.to_string(),
+        formula_ids: unique_formula_ids,
+    })
+}
+
+fn verify_formula_vault_no_local_evidence_paths(path: &Path, text: &str) -> Result<(), String> {
+    let lowered = text.to_ascii_lowercase();
+    let forbidden = ["/mnt/", "c:\\users", "evidence/logs", "target/", "target\\"];
+    for marker in forbidden {
+        if lowered.contains(marker) {
+            return Err(format!(
+                "{} contains forbidden formula-vault local/evidence path marker `{marker}`",
+                path.display()
+            ));
+        }
+    }
+    Ok(())
+}
+
+fn require_nested_list(
+    path: &Path,
+    text: &str,
+    section: &str,
+    field: &str,
+) -> Result<Vec<String>, String> {
+    let items = nested_list_items(text, section, field);
+    if items.is_empty() {
+        Err(format!(
+            "{} nested list `{section}.{field}:` must contain at least one item",
+            path.display()
+        ))
+    } else {
+        Ok(items)
+    }
+}
+
+fn nested_list_items(text: &str, section: &str, field: &str) -> Vec<String> {
+    let section_prefix = format!("{section}:");
+    let field_prefix = format!("{field}:");
+    let mut in_section = false;
+    let mut in_field = false;
+    let mut items = Vec::new();
+
+    for line in text.lines() {
+        let trimmed_end = line.trim_end();
+        if is_top_level_line(trimmed_end) {
+            in_section = trimmed_end.starts_with(&section_prefix);
+            in_field = false;
+            continue;
+        }
+        if !in_section {
+            continue;
+        }
+
+        let nested = trimmed_end.trim_start();
+        let indent = trimmed_end.len().saturating_sub(nested.len());
+        if indent <= 2 && nested.starts_with(&field_prefix) {
+            in_field = true;
+            continue;
+        }
+        if indent <= 2 && !nested.starts_with("- ") && nested.contains(':') {
+            in_field = false;
+            continue;
+        }
+        if in_field {
+            if let Some(item) = nested.strip_prefix("- ") {
+                let item = clean_scalar(item);
+                if !item.is_empty() {
+                    items.push(item.to_string());
+                }
+            }
+        }
+    }
+
+    items
+}
+
 fn dependency_policy() -> Result<(), String> {
     let root = repo_root();
     let mut tomls = Vec::new();
@@ -1167,6 +1523,18 @@ fn collect_source_registry_ids(root: &Path) -> Result<BTreeSet<String>, String> 
     Ok(ids)
 }
 
+fn collect_validation_card_ids(root: &Path) -> Result<BTreeSet<String>, String> {
+    let cards_dir = root.join("validation/cards");
+    let mut ids = BTreeSet::new();
+    visit_yaml(&cards_dir, &mut |path| {
+        let text = fs::read_to_string(path).map_err(|e| format!("{}: {e}", path.display()))?;
+        let id = require_top_level_value(path, &text, "id")?;
+        ids.insert(id.to_string());
+        Ok(())
+    })?;
+    Ok(ids)
+}
+
 fn visit_yaml<F>(dir: &Path, f: &mut F) -> Result<(), String>
 where
     F: FnMut(&Path) -> Result<(), String>,
@@ -1327,6 +1695,85 @@ mod tests {
                 "    bundling_decision: import archive into public crates\n",
             );
         assert_data_registry_error_contains(&text, "unsafe external archive import decision");
+    }
+
+    fn minimal_formula_vault_candidate(slice_id: &str) -> String {
+        format!(
+            "schema_version: formula_vault_candidate_slice.v1\nrecord_status: metadata_only_research_required\nslice:\n  id: {slice_id}\n  title: Minimal formula-vault fixture\n  lifecycle_label: equation_contract_drafted\n  stage4_chunk: stage4_chunk7c_fixture\n  public_api_surface: blocked_no_public_application_programming_interface\n  implementation_surface: blocked_no_executable_formula_code\nsources:\n  source_artifact_ids:\n    - stage4.m07_rust_port_v14.2026_06_15\n  source_registry_seed_id: source.formula_vault.fixture.research_required\n  validation_card_id: validation.formula_vault.fixture\n  human_review_locators:\n    function_rows: []\n  source_boundary:\n    m07_archive_status: external_quarantine_reference_only\n    import_policy: no_bulk_import_no_generated_binary_no_raw_source_promotion\nformula_contract:\n  formula_ids:\n    - formula_vault.m00.angle.fixture\n  variables:\n    - angle\n  units:\n    - radian\n  coordinate_frames:\n    - not_frame_dependent\n  time_scales:\n    - not_time_scale_dependent\n  sign_conventions:\n    - positive convention pending source review\n  valid_domain:\n    - finite real scalar inputs only\n  singularities:\n    - none identified for metadata fixture\n  invalid_regions:\n    - non-finite inputs excluded\n  branch_behavior:\n    - single branch fixture\n  tolerance_policy:\n    absolute_tolerance: pending_future_equivalence_plan\n    relative_tolerance: pending_future_equivalence_plan\n    rationale: deferred until future evidence\nvalidation_records:\n  required_source_registry_seed: source.formula_vault.fixture.research_required\n  required_validation_card: validation.formula_vault.fixture\n  status: research_required\n  status_upgrade_policy: blocked_without_source_review_equivalence_and_reference_evidence\nevidence_plan:\n  rust_gates:\n    - future implementation-authorized tests only\n  scilab_equivalence_jobs: []\n  sgp4_reference_checks: []\n  analytical_identity_checks: []\n  reference_oracle_checks: []\n  fixture_hashes: []\n  tolerance_rationale: deferred_until_future_equivalence_evidence\npromotion_gate:\n  default_state: blocked\n  required_before_promotion:\n    - source_registry_seed_exists\n    - validation_card_exists\n    - no_raw_m07_source_or_generated_binary_promoted\n    - no_public_application_programming_interface_promoted_without_explicit_slice_authorization\nnon_claims:\n  no_formula_implementation: true\n  no_source_translation: true\n  no_scilab_execution_result: true\n  no_certification_evidence: true\n  no_flight_readiness: true\n  no_mission_readiness: true\n  no_operational_approval: true\n  no_regulated_use_approval: true\n  no_bulk_m07_import: true\n  no_external_parity_claim_without_evidence: true\n"
+        )
+    }
+
+    fn formula_vault_fixture_source_ids() -> BTreeSet<String> {
+        BTreeSet::from(["source.formula_vault.fixture.research_required".to_string()])
+    }
+
+    fn formula_vault_fixture_card_ids() -> BTreeSet<String> {
+        BTreeSet::from(["validation.formula_vault.fixture".to_string()])
+    }
+
+    fn assert_formula_vault_candidate_error_contains(text: &str, expected: &str) {
+        let err = verify_formula_vault_candidate_text(
+            Path::new("formula-vault/candidates/fixture.yaml"),
+            text,
+            &formula_vault_fixture_source_ids(),
+            &formula_vault_fixture_card_ids(),
+        )
+        .expect_err("formula-vault candidate fixture should fail");
+        assert!(
+            err.contains(expected),
+            "expected error containing `{expected}`, got `{err}`"
+        );
+    }
+
+    #[test]
+    fn valid_formula_vault_candidate_fixture_passes() {
+        let text = minimal_formula_vault_candidate("formula_vault.m00.angle.fixture_slice");
+        let summary = verify_formula_vault_candidate_text(
+            Path::new("formula-vault/candidates/fixture.yaml"),
+            &text,
+            &formula_vault_fixture_source_ids(),
+            &formula_vault_fixture_card_ids(),
+        )
+        .expect("minimal formula-vault candidate should pass");
+        assert_eq!(summary.slice_id, "formula_vault.m00.angle.fixture_slice");
+        assert_eq!(summary.formula_ids.len(), 1);
+    }
+
+    #[test]
+    fn missing_formula_vault_candidate_field_fails() {
+        let text = minimal_formula_vault_candidate("formula_vault.m00.angle.missing_title")
+            .replace("  title: Minimal formula-vault fixture\n", "");
+        assert_formula_vault_candidate_error_contains(&text, "missing nested value `slice.title`");
+    }
+
+    #[test]
+    fn duplicate_formula_vault_formula_id_fails() {
+        let text = minimal_formula_vault_candidate("formula_vault.m00.angle.duplicate_formula")
+            .replace(
+                "  formula_ids:\n    - formula_vault.m00.angle.fixture\n",
+                "  formula_ids:\n    - formula_vault.m00.angle.fixture\n    - formula_vault.m00.angle.fixture\n",
+            );
+        assert_formula_vault_candidate_error_contains(&text, "duplicate formula-vault formula id");
+    }
+
+    #[test]
+    fn duplicate_formula_vault_slice_id_fails() {
+        let first = minimal_formula_vault_candidate("formula_vault.m00.angle.duplicate_slice");
+        let second = minimal_formula_vault_candidate("formula_vault.m00.angle.duplicate_slice")
+            .replace(
+                "formula_vault.m00.angle.fixture",
+                "formula_vault.m00.angle.other_fixture",
+            );
+        let err = verify_formula_vault_candidate_texts(
+            &[
+                ("formula-vault/candidates/first.yaml", first.as_str()),
+                ("formula-vault/candidates/second.yaml", second.as_str()),
+            ],
+            &formula_vault_fixture_source_ids(),
+            &formula_vault_fixture_card_ids(),
+        )
+        .expect_err("duplicate slice ids should fail");
+        assert!(err.contains("duplicate formula-vault slice id"));
     }
 
     fn status_vocabulary_fixture() -> String {

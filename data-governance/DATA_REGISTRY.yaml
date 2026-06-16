@@ -8,7 +8,7 @@ artifacts:
     artifact_kind: repo_file_manifest
     origin: current_repo
     license: MIT OR Apache-2.0 with source-material attribution boundaries
-    sha256: 665b09569775f71b7c322570eb29b00337619d84b63a8ebab22d8313a0bde758
+    sha256: bc4a8b0c4357c0521acd51504300f576894160b5dd73c547ed4244b8973c7277
     hash_status: sha256_verified_current_repo_file
     allowed_use: in-repository provenance and thin-film source manifest tracking only
     bundling_decision: bundled repo-relative governance artifact; not an external-code import
@@ -50,7 +50,7 @@ artifacts:
     artifact_kind: repo_directory_validation_cards
     origin: current_repo
     license: MIT OR Apache-2.0
-    sha256: 2ae55b97e9919caa7799b3517c58ca5f5dcb721ffa7cd49c255071fcfb9f0184
+    sha256: 2d1486e9837b0d615deaf198325727be02feb5d618e5c70398c7cd4bef702dbb
     hash_status: aggregate_sha256_current_tracked_tree
     allowed_use: validation-card metadata and source-status tracking only
     bundling_decision: bundled repo-relative validation metadata; no external archive import
@@ -64,7 +64,7 @@ artifacts:
     artifact_kind: repo_directory_source_registry
     origin: current_repo
     license: MIT OR Apache-2.0 metadata with cited-source boundaries
-    sha256: 6e77db19650b69bf73303bbf0f6987248c8eb0d18a7aaf868a23cf9d734d0510
+    sha256: 7502ee26dac0db14abfb0a356a43f23c3ed506af53853733dfc095d16a78eed0
     hash_status: aggregate_sha256_current_tracked_tree
     allowed_use: source seed registry and validation-card linkage only
     bundling_decision: bundled repo-relative source metadata; not external source-code import
@@ -78,7 +78,7 @@ artifacts:
     artifact_kind: repo_directory_formula_vault_metadata
     origin: current_repo
     license: MIT OR Apache-2.0 metadata with source-boundary caveats
-    sha256: 5c095f3790d61560355793820ef8f0ff5dbbbf8c7e3a15babd307c7d4df75f48
+    sha256: 538278f5968c19bfcc212138f6181a16c1e2ad0d6c2c380ef14c635ab0fd7212
     hash_status: aggregate_sha256_current_tracked_tree
     allowed_use: quarantined formula-vault planning metadata and future per-slice gate templates only
     bundling_decision: bundled repo-relative metadata; no external M07 source-code import, generated binary, fixture, or public API promotion

@@ -1,0 +1,30 @@
+id: validation.formula_vault.candidate_verifier
+name: Formula-vault candidate metadata verifier
+category: validation
+status: research_required
+source:
+  id: source.validation.formula_vault_candidate_verifier.research_required
+  status: research_required
+assumptions:
+  - Formula-vault candidate metadata remains research and preliminary-design governance material.
+  - The verifier checks bounded YAML record shape and cross-links without importing external source bundles.
+  - Passing the verifier does not upgrade source validation, numerical validation, or readiness status.
+domain: Formula-vault candidate metadata records under formula-vault/candidates only.
+inputs:
+  - formula-vault candidate YAML records
+  - validation/source_registry seed identifiers
+  - validation/cards card identifiers
+outputs:
+  - dependency-free xtask verifier pass or actionable error
+  - duplicate/missing-field negative-case unit-test coverage
+  - continued blocked-by-default promotion state for formula-vault candidates
+tests:
+  - cargo test -p xtask formula_vault -- --nocapture
+  - cargo run -p xtask -- verify formula-vault
+  - cargo run -p xtask -- verify --all
+failure_modes:
+  - missing required formula-vault metadata fields
+  - duplicate slice or formula identifiers
+  - missing validation-card or source-registry cross-link
+  - accidental local evidence path or target-output path in candidate metadata
+notes: Stage 4 Chunk 7C verifier scaffold only; no formula implementation, no source translation, no generated Rust, no public application programming interface, no Scilab execution output, no fixture import, no certification evidence, no flight readiness, no mission readiness, no operational approval, and no regulated-use approval.

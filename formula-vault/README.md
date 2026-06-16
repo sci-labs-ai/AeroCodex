@@ -1,6 +1,6 @@
 # Formula vault
 
-This directory is a Stage 4 skeleton for future formula-vault metadata. It intentionally contains no imported M07 source code, no external archives, no generated binaries, and no public AeroCodex implementation APIs.
+This directory is a Stage 4 skeleton for future formula-vault metadata. It intentionally contains no imported M07 source code, no external archives, no generated binaries, and no public AeroCodex implementation application programming interfaces.
 
 AeroCodex remains research and preliminary-design software. This skeleton does not imply certification, flight readiness, mission readiness, habitat-safety approval, medical-use approval, operational approval, or regulated-use approval.
 
@@ -25,7 +25,16 @@ Stage 4 Chunk 7B adds the first bounded metadata-only candidate slice without im
 - validation card `validation.formula_vault.m00_angle_unit_conversions`
 - source seed `source.formula_vault.m00_angle_unit_conversions.research_required`
 
-The Chunk 7B slice is limited to three M00 release-gate rows: `app_deg2rad`, `app_rad2deg`, and `app_wrap2pi`. It does not promote exact expressions, wrap endpoint behavior, tolerances, executable code, or public APIs.
+The Chunk 7B slice is limited to three M00 release-gate rows: `app_deg2rad`, `app_rad2deg`, and `app_wrap2pi`. It does not promote exact expressions, wrap endpoint behavior, tolerances, executable code, or public application programming interfaces.
+
+Stage 4 Chunk 7C adds the first dependency-free candidate metadata verifier without implementing formulas:
+
+- command `cargo run -p xtask -- verify formula-vault`
+- assurance note `docs/assurance/formula_vault_candidate_verifier.md`
+- validation card `validation.formula_vault.candidate_verifier`
+- source seed `source.validation.formula_vault_candidate_verifier.research_required`
+
+The Chunk 7C verifier checks required metadata fields, cross-links, duplicate slice/formula identifiers, blocked promotion state, non-claim booleans, and absence of local evidence paths. It is included in `cargo run -p xtask -- verify --all`.
 
 The M07 source artifact remains registered externally as `stage4.m07_rust_port_v14.2026_06_15` in `data-governance/DATA_REGISTRY.yaml`.
 
@@ -41,4 +50,4 @@ Future chunks may add reviewed metadata such as:
 - tolerance and reference-oracle plans;
 - promotion-gate checklists.
 
-Future chunks must not add raw M07 source code or public API implementation files here unless the active prompt explicitly authorizes that bounded scope and the required gates pass.
+Future chunks must not add raw M07 source code or public application-programming-interface implementation files here unless the active prompt explicitly authorizes that bounded scope and the required gates pass.

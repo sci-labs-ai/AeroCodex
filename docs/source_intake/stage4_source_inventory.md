@@ -1,6 +1,6 @@
 # Stage 4 Source Inventory
 
-This inventory records Stage 4 local source materials inspected for planning. It does not import the archives into the repository and does not promote any external source into public API.
+This inventory records Stage 4 local source materials inspected for planning. It does not import the archives into the repository and does not promote any external source into a public application programming interface.
 
 AeroCodex remains research and preliminary-design software. It is not certified, flight-ready, mission-ready, habitat-safe, medical, operational, or regulated-use approved.
 
@@ -29,7 +29,7 @@ No source bundle, validation card, source-registry seed, or data-governance arti
 
 ## Chunk 3 formula-vault staging
 
-Chunk 3 defines the quarantined M07 formula-vault staging shape in `docs/assurance/formula_vault_staging.md`, records the M07 intake boundary in `docs/source_intake/m07_formula_vault_intake.md`, and adds the empty `formula-vault/` skeleton for future reviewed metadata. It does not import M07 source code, does not promote public APIs, and does not overwrite `crates/aero-codex-astrodynamics`.
+Chunk 3 defines the quarantined M07 formula-vault staging shape in `docs/assurance/formula_vault_staging.md`, records the M07 intake boundary in `docs/source_intake/m07_formula_vault_intake.md`, and adds the empty `formula-vault/` skeleton for future reviewed metadata. It does not import M07 source code, does not promote public application programming interfaces, and does not overwrite `crates/aero-codex-astrodynamics`.
 
 The M07 source artifact remains the registered external archive `stage4.m07_rust_port_v14.2026_06_15`; the formula-vault states are quarantine lifecycle labels only and do not upgrade validation or certification status.
 
@@ -41,7 +41,7 @@ The BioSim-RS source artifacts remain the registered external archives `stage4.b
 
 ## Chunk 5 Orekit reference-oracle mapping
 
-Chunk 5 defines the Orekit reference-oracle mapping in `docs/assurance/orekit_reference_oracle_mapping.md` and records the source boundary in `docs/source_intake/orekit_reference_oracle_boundary.md`. It does not import Orekit source code, does not run Orekit, does not create fixtures, does not add public APIs, and does not copy the Java class hierarchy.
+Chunk 5 defines the Orekit reference-oracle mapping in `docs/assurance/orekit_reference_oracle_mapping.md` and records the source boundary in `docs/source_intake/orekit_reference_oracle_boundary.md`. It does not import Orekit source code, does not run Orekit, does not create fixtures, does not add public application programming interfaces, and does not copy the Java class hierarchy.
 
 The Orekit source artifact remains the registered external archive `stage4.orekit_reference.2026_06_15`. Future Orekit-backed checks must create slice-specific oracle evidence records with source IDs, units, frames, epochs, valid domains, expected outputs, tolerances, fixture hashes where applicable, validation/status vocabulary values, and the research/preliminary-design caveat.
 
@@ -79,21 +79,27 @@ The slice does not import Java BioSim code, does not import the BioSim-RS scaffo
 
 Chunk 7A adds a metadata-only gate for future formula-vault implementation candidates: `docs/assurance/formula_vault_candidate_gate.md`, non-operative template `formula-vault/templates/implementation_candidate_slice.yaml`, validation card `validation.formula_vault.candidate_gate`, and source seed `source.validation.formula_vault_candidate_gate.research_required`.
 
-The gate requires future per-slice source locators, variable/unit/frame/time metadata, domain/singularity/branch/tolerance records, evidence plans, and blocked-by-default promotion status before any formula implementation is proposed. It does not import M07 code, does not add archives or fixtures, does not run Scilab or SGP4 checks, does not create public APIs, and does not make certification, readiness, operational, medical, or regulated-use claims. The validation status remains `research_required`.
+The gate requires future per-slice source locators, variable/unit/frame/time metadata, domain/singularity/branch/tolerance records, evidence plans, and blocked-by-default promotion status before any formula implementation is proposed. It does not import M07 code, does not add archives or fixtures, does not run Scilab or SGP4 checks, does not create public application programming interfaces, and does not make certification, readiness, operational, medical, or regulated-use claims. The validation status remains `research_required`.
 
 ## Chunk 7B formula-vault M00 angle/unit metadata slice
 
 Chunk 7B adds the first bounded formula-vault candidate metadata slice: `formula-vault/candidates/m00_angle_unit_conversions.yaml`, `docs/assurance/formula_vault_m00_angle_unit_candidate.md`, validation card `validation.formula_vault.m00_angle_unit_conversions`, and source seed `source.formula_vault.m00_angle_unit_conversions.research_required`.
 
-The slice is limited to M07 release-gate rows 3 through 5 for `app_deg2rad`, `app_rad2deg`, and `app_wrap2pi`, plus Scilab equivalence job locator `equivalence job 002`. It does not import M07 code, does not add archives or fixtures, does not execute Scilab, does not implement formulas, does not create public APIs, and does not make certification, readiness, operational, medical, or regulated-use claims. The validation status remains `research_required`.
+The slice is limited to M07 release-gate rows 3 through 5 for `app_deg2rad`, `app_rad2deg`, and `app_wrap2pi`, plus Scilab equivalence job locator `equivalence job 002`. It does not import M07 code, does not add archives or fixtures, does not execute Scilab, does not implement formulas, does not create public application programming interfaces, and does not make certification, readiness, operational, medical, or regulated-use claims. The validation status remains `research_required`.
 
-## M07 astrodynamics release-candidate observations
+## Chunk 7C formula-vault candidate verifier
+
+Chunk 7C adds a dependency-free verifier for formula-vault candidate metadata: `cargo run -p xtask -- verify formula-vault`, assurance note `docs/assurance/formula_vault_candidate_verifier.md`, validation card `validation.formula_vault.candidate_verifier`, and source seed `source.validation.formula_vault_candidate_verifier.research_required`.
+
+The verifier checks required candidate sections, existing validation/source cross-links, duplicate slice/formula identifiers, blocked promotion state, required non-claim booleans, and absence of local evidence paths. It does not import M07 code, does not add archives or fixtures, does not execute Scilab, does not implement formulas, does not create public application programming interfaces, and does not make certification, readiness, operational, medical, or regulated-use claims. The validation status remains `research_required`.
+
+## M07 observations
 
 - The M07 artifact manifest reports 1,350 represented function rows.
 - The generated final port summary reports 188 Scilab equivalence source jobs.
 - The M07 package state is release-candidate material pending AeroCodex Rust checks, Scilab equivalence execution, and SGP4 certification.
 - It must not overwrite the existing `crates/aero-codex-astrodynamics` crate.
-- It must not be bulk-merged into public APIs. Treat it as quarantined formula-vault candidate material until intake, correctness, and release gates pass.
+- It must not be bulk-merged into public application programming interfaces. Treat it as quarantined formula-vault candidate material until intake, correctness, and release gates pass.
 
 ## BioSim and BioSim-RS observations
 
