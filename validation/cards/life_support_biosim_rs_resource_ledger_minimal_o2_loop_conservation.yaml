@@ -1,0 +1,49 @@
+id: life_support.biosim_rs.resource_ledger_minimal_o2_loop_conservation
+name: BioSim-RS clean-room resource ledger and minimal oxygen-loop conservation
+category: life_support
+status: research_required
+source:
+  id: source.life_support.biosim_rs.resource_ledger_clean_room.research_required
+  status: research_required
+assumptions:
+  - ledger snapshots are caller-supplied clean-room resource stores over the Chunk 6A generic resource identities
+  - rows are grouped deterministically by resource kind and canonical unit
+  - residual is observed after-minus-before total minus caller-accounted source and sink terms
+  - the minimal oxygen loop is a bounded two-store transfer proof with a declared absolute tolerance
+  - persistence, BioSim scenario execution, biological dynamics, habitat-control behavior, and external BioSim parity are deferred to later chunks
+domain:
+  summary: "one-tick grouped resource-ledger residual checks plus a bounded two-store oxygen transfer conservation proof"
+  bounds:
+    - previous and next ticks must pass consecutive positive-duration tick validation
+    - before and after snapshots contain at least one unique nonnegative finite store each
+    - accounting terms contain finite source and sink amounts with at most one term per resource kind
+    - per-row pass/fail is residual absolute value less than or equal to the declared absolute tolerance
+    - minimal oxygen-loop proof uses positive transfer amount, positive tick duration, and at least one tick
+  excluded_cases:
+    - persistent ledger storage or append-only audit log
+    - BioSim scenario execution, CLI/API run commands, or external fixture replay
+    - biological dynamics, habitat-control behavior, crew safety, or medical suitability
+    - external Java BioSim or GPL-bound scaffold source validation
+inputs:
+  - previous validated BioSimTick
+  - next validated BioSimTick
+  - clean-room before and after BioSimResourceLedgerStore slices
+  - clean-room BioSimResourceLedgerAccounting slice
+  - absolute residual tolerance in the resource canonical unit
+outputs:
+  - BioSimResourceLedgerReport with ordered rows, residuals, pass/fail state, and worst-row metadata
+  - BioSimMinimalO2LoopConservationProof for the bounded two-store oxygen transfer helper
+  - research_required verification metadata for life_support.biosim_rs.resource_ledger_minimal_o2_loop_conservation
+tests:
+  - bounded minimal oxygen-loop ledger proof passes for multiple ticks
+  - broken oxygen ledger fails when the sink transfer is missing
+  - ledger rows are ordered deterministically by resource kind and canonical unit
+failure_modes:
+  - empty before or after store snapshots rejected as out of domain
+  - duplicate or empty store identifiers rejected as out of domain
+  - negative or nonfinite store amounts rejected
+  - duplicate accounting terms per resource kind rejected
+  - residuals above tolerance return OutsideDocumentedDomain with warnings
+  - insufficient source oxygen in the bounded loop is rejected before proof output is exposed
+  - status must not be interpreted as external validation, habitat safety, readiness, or certification evidence
+notes: "Stage 4 Chunk 6D validation card for clean-room resource-ledger accounting and minimal oxygen-loop conservation only. This card does not promote persistent ledgers, BioSim scenario execution, habitat-control, medical, operational, certification, or regulated-use behavior."

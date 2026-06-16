@@ -61,7 +61,7 @@ Chunk 6C does not add:
 - BioSim archive import;
 - GPL-compatible distribution decision beyond this clean-room primitive slice.
 
-Those remain future chunks. Chunk 6D is the next logical BioSim-RS step and should focus only on resource ledger and minimal O2-loop conservation if explicitly authorized.
+Those are outside Chunk 6C. Chunk 6D now records grouped resource-ledger residual checks and bounded minimal oxygen-loop conservation in `docs/assurance/biosim_rs_resource_ledger_validation.md`. Persistent ledger storage, scenario execution, and habitat-control behavior remain future chunks.
 
 ## Gate expectations
 

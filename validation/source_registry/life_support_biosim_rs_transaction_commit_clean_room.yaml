@@ -9,14 +9,15 @@ intended_use:
 requested_details:
   - Future reviewed clean-room specification package for broader BioSim transaction semantics.
   - Broader deterministic engine evidence before claims beyond the Chunk 6C one-tick digest proof are made.
-  - Resource ledger and conservation evidence before ledger or O2-loop behavior is promoted.
+  - Separate Chunk 6D resource-ledger evidence before persistent ledger storage or broader conservation behavior is promoted.
 implementation_notes:
   - Current implementation accepts a caller-supplied resource state, a validated consecutive tick boundary, and one finite delta per resource.
   - It exposes either a complete output snapshot or an error; it does not mutate caller state or persist a ledger.
   - Chunk 6C adds a separate deterministic ordering, digest, and one-tick replay-proof card/source seed.
+  - Chunk 6D adds a separate resource-ledger and bounded minimal oxygen-loop conservation card/source seed.
   - Status remains research_required pending source review and external validation evidence.
 limits:
   - Not a habitat controller or life-support simulator.
   - Not a persistent resource ledger, conservation model, or scenario executor.
   - Not evidence of operational, crew-safety, medical, or regulated-use suitability.
-notes: "Stage 4 Chunk 6B clean-room source seed. Separate Chunk 6C evidence covers deterministic ordering, digest, and one-tick replay proof only; later chunks must add separate cards before ledger persistence or conservation behavior is promoted."
+notes: "Stage 4 Chunk 6B clean-room source seed. Separate Chunk 6C evidence covers deterministic ordering, digest, and one-tick replay proof only; separate Chunk 6D evidence covers grouped resource-ledger residual checks and bounded minimal oxygen-loop conservation only. Later chunks must add separate cards before persistent ledger storage or scenario behavior is promoted."

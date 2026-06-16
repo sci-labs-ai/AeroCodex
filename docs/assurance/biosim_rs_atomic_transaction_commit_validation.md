@@ -50,13 +50,13 @@ Chunk 6B itself does not add:
 - replay proof;
 - persistent resource ledger entries;
 - conservation closure or minimal O2-loop accounting;
-- BioSim scenario execution;
+- no BioSim scenario execution;
 - CLI/API smoke tests;
 - external BioSim reference validation;
 - BioSim archive import;
 - GPL-compatible distribution decision beyond this clean-room primitive slice.
 
-Chunk 6C now records the follow-on deterministic ordering, digest, and one-tick replay proof slice in `docs/assurance/biosim_rs_deterministic_replay_validation.md`. Persistent ledgers, conservation behavior, and scenario execution remain future chunks.
+Chunk 6C now records the follow-on deterministic ordering, digest, and one-tick replay proof slice in `docs/assurance/biosim_rs_deterministic_replay_validation.md`. Chunk 6D records grouped resource-ledger residual checks and bounded minimal oxygen-loop conservation in `docs/assurance/biosim_rs_resource_ledger_validation.md`. Persistent ledger storage and scenario execution remain future chunks.
 
 ## Gate expectations
 

@@ -63,6 +63,12 @@ Chunk 6C adds clean-room deterministic ordering and digest helpers under `crates
 
 The slice does not import Java BioSim code, does not import the BioSim-RS scaffold crates, does not execute scenarios, does not add fixtures, and does not implement persistent resource ledgers, O2-loop conservation, biological dynamics, or habitat-control behavior. The validation status remains `research_required`.
 
+## Chunk 6D BioSim-RS resource ledger and minimal oxygen-loop conservation
+
+Chunk 6D adds clean-room grouped resource-ledger residual checks under `crates/aero-codex-life-support/src/biosim_resource_tick.rs`, plus validation card `life_support.biosim_rs.resource_ledger_minimal_o2_loop_conservation` and source seed `source.life_support.biosim_rs.resource_ledger_clean_room.research_required`. It groups caller-supplied before/after store totals by static resource kind and canonical unit, computes residuals against caller-accounted source/sink terms, and proves a bounded two-store oxygen transfer loop within a declared absolute tolerance.
+
+The slice does not import Java BioSim code, does not import the BioSim-RS scaffold crates, does not execute scenarios, does not add fixtures, and does not implement persistent ledger storage, biological dynamics, habitat-control behavior, or external BioSim parity. The validation status remains `research_required`.
+
 ## M07 astrodynamics release-candidate observations
 
 - The M07 artifact manifest reports 1,350 represented function rows.

@@ -28,6 +28,12 @@ pub fn biosim_deterministic_replay_codex_id() -> &'static str {
     "life_support.biosim_rs.deterministic_ordering_digest_replay"
 }
 
+/// Codex identifier for the clean-room BioSim-RS resource-ledger gate.
+#[must_use]
+pub fn biosim_resource_ledger_codex_id() -> &'static str {
+    "life_support.biosim_rs.resource_ledger_minimal_o2_loop_conservation"
+}
+
 /// Source-registry seed for the Chunk 6A clean-room resource/tick slice.
 #[must_use]
 pub fn biosim_resource_tick_clean_room_source_id() -> &'static str {
@@ -44,6 +50,12 @@ pub fn biosim_resource_transaction_clean_room_source_id() -> &'static str {
 #[must_use]
 pub fn biosim_resource_replay_clean_room_source_id() -> &'static str {
     "source.life_support.biosim_rs.deterministic_replay_clean_room.research_required"
+}
+
+/// Source-registry seed for the Chunk 6D clean-room resource-ledger slice.
+#[must_use]
+pub fn biosim_resource_ledger_clean_room_source_id() -> &'static str {
+    "source.life_support.biosim_rs.resource_ledger_clean_room.research_required"
 }
 
 fn biosim_resource_tick_sources() -> &'static [&'static str] {
@@ -65,10 +77,19 @@ fn biosim_deterministic_replay_sources() -> &'static [&'static str] {
     ]
 }
 
+fn biosim_resource_ledger_sources() -> &'static [&'static str] {
+    &[
+        "source.life_support.biosim_rs.resource_tick_clean_room.research_required",
+        "source.life_support.biosim_rs.transaction_commit_clean_room.research_required",
+        "source.life_support.biosim_rs.deterministic_replay_clean_room.research_required",
+        "source.life_support.biosim_rs.resource_ledger_clean_room.research_required",
+    ]
+}
+
 /// Minimal clean-room resource families for the first BioSim-RS validation slice.
 ///
 /// These are intentionally generic resource identities, not a translation of
-/// GPL BioSim Java classes or the GPL-bound BioSim-RS scaffold crates.
+/// GPL BioSim Java classes or any unresolved external scaffold crates.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum BioSimResourceKind {
     OxygenGas,
@@ -146,6 +167,67 @@ pub struct BioSimResourceReplayProof {
     pub after_digest: BioSimResourceDigest,
     pub delta_digest: BioSimResourceDigest,
     pub ordered_delta_count: usize,
+}
+
+/// Resource/unit grouping key used by the clean-room ledger rows.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct BioSimResourceUnitKey {
+    pub kind: BioSimResourceKind,
+    pub unit: &'static str,
+}
+
+/// One named compartment or store contributing to a resource ledger total.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct BioSimResourceLedgerStore {
+    pub store_id: &'static str,
+    pub kind: BioSimResourceKind,
+    pub amount: f64,
+}
+
+/// Accounted source/sink terms for one resource kind at one tick.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct BioSimResourceLedgerAccounting {
+    pub kind: BioSimResourceKind,
+    pub source_amount: f64,
+    pub sink_amount: f64,
+}
+
+/// Per-tick clean-room resource ledger row grouped by resource kind and unit.
+#[derive(Debug, Clone, PartialEq)]
+pub struct BioSimResourceLedgerRow {
+    pub tick: u64,
+    pub key: BioSimResourceUnitKey,
+    pub before_total: f64,
+    pub after_total: f64,
+    pub delta: f64,
+    pub accounted_source: f64,
+    pub accounted_sink: f64,
+    pub residual: f64,
+    pub tolerance_abs: f64,
+    pub passed: bool,
+}
+
+/// Validation report over one or more clean-room ledger rows.
+#[derive(Debug, Clone, PartialEq)]
+pub struct BioSimResourceLedgerReport {
+    pub passed: bool,
+    pub tolerance_abs: f64,
+    pub max_abs_residual: f64,
+    pub worst_tick: Option<u64>,
+    pub worst_key: Option<BioSimResourceUnitKey>,
+    pub row_count: usize,
+    pub rows: Vec<BioSimResourceLedgerRow>,
+    pub notes: Vec<String>,
+}
+
+/// Bounded proof for the minimal two-store oxygen transfer loop.
+#[derive(Debug, Clone, PartialEq)]
+pub struct BioSimMinimalO2LoopConservationProof {
+    pub report: BioSimResourceLedgerReport,
+    pub ticks_executed: u64,
+    pub transfer_kg_per_tick: f64,
+    pub final_source_kg: f64,
+    pub final_sink_kg: f64,
 }
 
 /// Conservative built-in resource catalog for future BioSim-RS slices.
@@ -236,6 +318,13 @@ pub fn biosim_resource_tick_verification_record(codex_id: &str) -> Option<Verifi
                 biosim_deterministic_replay_codex_id(),
                 biosim_deterministic_replay_sources(),
                 "Clean-room deterministic resource ordering plus fnv-1a before/after digest proof implemented for one caller-supplied transaction; no persistent ledger, scenario engine, conservation model, or external BioSim validation evidence is included.",
+            ),
+        ),
+        id if id == biosim_resource_ledger_codex_id() => Some(
+            VerificationRecord::research_required(
+                biosim_resource_ledger_codex_id(),
+                biosim_resource_ledger_sources(),
+                "Clean-room resource ledger and minimal oxygen-loop conservation check implemented for caller-supplied stores; no BioSim scenario engine, subsystem port, habitat-control behavior, or external BioSim parity evidence is included.",
             ),
         ),
         _ => None,
@@ -578,6 +667,365 @@ pub fn prove_biosim_resource_replay(
         "proof is not a persistent ledger, O2-loop conservation check, scenario execution, or habitat-control validation",
     )
     .with_validity(ValidityStatus::WithinDocumentedDomain))
+}
+
+#[derive(Debug, Default)]
+struct BioSimLedgerTotals {
+    before_total: f64,
+    after_total: f64,
+    accounted_source: f64,
+    accounted_sink: f64,
+}
+
+fn biosim_resource_unit_key(kind: BioSimResourceKind) -> BioSimResourceUnitKey {
+    BioSimResourceUnitKey {
+        kind,
+        unit: biosim_resource_identity(kind).canonical_unit,
+    }
+}
+
+fn validate_biosim_ledger_stores(
+    parameter: &'static str,
+    stores: &[BioSimResourceLedgerStore],
+) -> AeroResult<()> {
+    if stores.is_empty() {
+        return Err(out_of_domain(
+            parameter,
+            0.0,
+            "at least one resource store in the ledger snapshot",
+        ));
+    }
+
+    let mut seen_store_ids = BTreeMap::new();
+    for (index, store) in stores.iter().enumerate() {
+        if store.store_id.trim().is_empty() {
+            return Err(out_of_domain(
+                parameter,
+                index as f64,
+                "nonempty clean-room store identifier",
+            ));
+        }
+        validation::ensure_nonnegative(parameter, store.amount)?;
+        if seen_store_ids.insert(store.store_id, store.kind).is_some() {
+            return Err(out_of_domain(
+                parameter,
+                index as f64,
+                "unique store identifiers within one ledger snapshot",
+            ));
+        }
+    }
+    Ok(())
+}
+
+fn validate_biosim_ledger_accounting(
+    accounting: &[BioSimResourceLedgerAccounting],
+) -> AeroResult<()> {
+    let mut seen_kinds = BTreeMap::new();
+    for (index, term) in accounting.iter().enumerate() {
+        validation::ensure_finite("resource_ledger_accounted_source", term.source_amount)?;
+        validation::ensure_finite("resource_ledger_accounted_sink", term.sink_amount)?;
+        if seen_kinds.insert(term.kind, index).is_some() {
+            return Err(out_of_domain(
+                "resource_ledger_accounting",
+                index as f64,
+                "at most one source/sink accounting term per resource kind",
+            ));
+        }
+    }
+    Ok(())
+}
+
+fn summarize_biosim_resource_ledger_rows(
+    rows: Vec<BioSimResourceLedgerRow>,
+    tolerance_abs: f64,
+    notes: Vec<String>,
+) -> BioSimResourceLedgerReport {
+    let mut passed = true;
+    let mut max_abs_residual = 0.0_f64;
+    let mut worst_tick = None;
+    let mut worst_key = None;
+
+    for row in &rows {
+        let abs_residual = row.residual.abs();
+        if abs_residual > max_abs_residual {
+            max_abs_residual = abs_residual;
+            if !row.passed {
+                worst_tick = Some(row.tick);
+                worst_key = Some(row.key);
+            }
+        }
+        passed &= row.passed;
+    }
+
+    if passed {
+        worst_tick = None;
+        worst_key = None;
+    } else if worst_tick.is_none() {
+        if let Some(row) = rows.iter().find(|row| !row.passed) {
+            worst_tick = Some(row.tick);
+            worst_key = Some(row.key);
+        }
+    }
+
+    let row_count = rows.len();
+    BioSimResourceLedgerReport {
+        passed,
+        tolerance_abs,
+        max_abs_residual,
+        worst_tick,
+        worst_key,
+        row_count,
+        rows,
+        notes,
+    }
+}
+
+/// Validates one clean-room resource ledger tick grouped by resource kind and unit.
+///
+/// The residual convention is `(after_total - before_total) - (accounted_source +
+/// accounted_sink)`. Accounted source/sink terms are caller-supplied clean-room
+/// quantities in the resource's canonical unit. The helper is deterministic and
+/// does not persist a ledger, execute scenarios, import BioSim source, or prove
+/// Java BioSim mass-validation parity.
+pub fn validate_biosim_resource_ledger_tick(
+    previous: BioSimTick,
+    next: BioSimTick,
+    before: &[BioSimResourceLedgerStore],
+    after: &[BioSimResourceLedgerStore],
+    accounting: &[BioSimResourceLedgerAccounting],
+    tolerance_abs: f64,
+) -> AeroResult<EngineeringResult<BioSimResourceLedgerReport>> {
+    let tick = validate_biosim_tick_advance(previous, next)?.value;
+    validation::ensure_nonnegative("resource_ledger_tolerance_abs", tolerance_abs)?;
+    validate_biosim_ledger_stores("resource_ledger_before_store", before)?;
+    validate_biosim_ledger_stores("resource_ledger_after_store", after)?;
+    validate_biosim_ledger_accounting(accounting)?;
+
+    let mut totals = BTreeMap::<BioSimResourceUnitKey, BioSimLedgerTotals>::new();
+    for store in before {
+        let entry = totals
+            .entry(biosim_resource_unit_key(store.kind))
+            .or_default();
+        entry.before_total += store.amount;
+        validation::ensure_finite("resource_ledger_before_total", entry.before_total)?;
+    }
+    for store in after {
+        let entry = totals
+            .entry(biosim_resource_unit_key(store.kind))
+            .or_default();
+        entry.after_total += store.amount;
+        validation::ensure_finite("resource_ledger_after_total", entry.after_total)?;
+    }
+    for term in accounting {
+        let entry = totals
+            .entry(biosim_resource_unit_key(term.kind))
+            .or_default();
+        entry.accounted_source += term.source_amount;
+        entry.accounted_sink += term.sink_amount;
+        validation::ensure_finite("resource_ledger_accounted_source", entry.accounted_source)?;
+        validation::ensure_finite("resource_ledger_accounted_sink", entry.accounted_sink)?;
+    }
+
+    let mut rows = Vec::with_capacity(totals.len());
+    for (key, total) in totals {
+        let delta = total.after_total - total.before_total;
+        let accounted = total.accounted_source + total.accounted_sink;
+        let residual = delta - accounted;
+        validation::ensure_finite("resource_ledger_delta", delta)?;
+        validation::ensure_finite("resource_ledger_accounted_net", accounted)?;
+        validation::ensure_finite("resource_ledger_residual", residual)?;
+        rows.push(BioSimResourceLedgerRow {
+            tick: tick.next_index,
+            key,
+            before_total: total.before_total,
+            after_total: total.after_total,
+            delta,
+            accounted_source: total.accounted_source,
+            accounted_sink: total.accounted_sink,
+            residual,
+            tolerance_abs,
+            passed: residual.abs() <= tolerance_abs,
+        });
+    }
+
+    let report = summarize_biosim_resource_ledger_rows(
+        rows,
+        tolerance_abs,
+        vec![
+            "ledger rows are grouped by clean-room resource kind and canonical unit".to_string(),
+            "residual is the observed total delta minus caller-accounted source and sink terms"
+                .to_string(),
+        ],
+    );
+    let validity = if report.passed {
+        ValidityStatus::WithinDocumentedDomain
+    } else {
+        ValidityStatus::OutsideDocumentedDomain
+    };
+
+    let mut result = EngineeringResult::new(
+        report,
+        biosim_resource_ledger_codex_id(),
+        resource_tick_record(biosim_resource_ledger_codex_id()),
+    )
+    .with_assumption(
+        "biosim_rs.ledger_grouped_by_resource_unit",
+        "ledger rows group caller-supplied store totals by clean-room resource kind and canonical unit",
+    )
+    .with_assumption(
+        "biosim_rs.ledger_tolerance_abs",
+        "pass/fail is based on declared absolute residual tolerance in the resource canonical unit",
+    )
+    .with_validity(validity);
+
+    if !result.value.passed {
+        result = result.with_warning(
+            "biosim_rs.ledger_residual_exceeds_tolerance",
+            "at least one resource ledger residual exceeded the declared absolute tolerance",
+        );
+    }
+
+    Ok(result)
+}
+
+/// Builds a bounded minimal two-store oxygen-loop ledger proof over `tick_count` ticks.
+///
+/// This helper transfers a fixed positive amount from a source store to a sink
+/// store and validates that grouped oxygen mass is conserved within a declared
+/// absolute tolerance. It is a clean-room core accounting proof only; it does
+/// not add BioSim scenario execution, subsystem ports, biological dynamics,
+/// habitat controllers, medical suitability, operational approval, or certification claims.
+pub fn prove_biosim_minimal_o2_loop_conservation(
+    initial_source_kg: f64,
+    initial_sink_kg: f64,
+    transfer_kg_per_tick: f64,
+    tick_count: u64,
+    tick_duration_seconds: f64,
+    tolerance_abs: f64,
+) -> AeroResult<EngineeringResult<BioSimMinimalO2LoopConservationProof>> {
+    validation::ensure_nonnegative("initial_source_kg", initial_source_kg)?;
+    validation::ensure_nonnegative("initial_sink_kg", initial_sink_kg)?;
+    validation::ensure_positive("transfer_kg_per_tick", transfer_kg_per_tick)?;
+    validation::ensure_positive("tick_duration_seconds", tick_duration_seconds)?;
+    validation::ensure_nonnegative("resource_ledger_tolerance_abs", tolerance_abs)?;
+    if tick_count == 0 {
+        return Err(out_of_domain(
+            "tick_count",
+            0.0,
+            "at least one tick for minimal oxygen-loop ledger proof",
+        ));
+    }
+
+    let mut source_kg = initial_source_kg;
+    let mut sink_kg = initial_sink_kg;
+    let mut rows = Vec::new();
+
+    for tick_index in 0..tick_count {
+        let previous = validate_biosim_tick(tick_index, tick_duration_seconds)?.value;
+        let next = validate_biosim_tick(tick_index + 1, tick_duration_seconds)?.value;
+        let after_source_kg = source_kg - transfer_kg_per_tick;
+        validation::ensure_finite("source_oxygen_store_kg", after_source_kg)?;
+        if after_source_kg < 0.0 {
+            return Err(out_of_domain(
+                "source_oxygen_store_kg",
+                after_source_kg,
+                "nonnegative source oxygen store after transfer",
+            ));
+        }
+        let after_sink_kg = sink_kg + transfer_kg_per_tick;
+        validation::ensure_finite("sink_oxygen_store_kg", after_sink_kg)?;
+
+        let before = [
+            BioSimResourceLedgerStore {
+                store_id: "source_o2_store",
+                kind: BioSimResourceKind::OxygenGas,
+                amount: source_kg,
+            },
+            BioSimResourceLedgerStore {
+                store_id: "sink_o2_store",
+                kind: BioSimResourceKind::OxygenGas,
+                amount: sink_kg,
+            },
+        ];
+        let after = [
+            BioSimResourceLedgerStore {
+                store_id: "source_o2_store",
+                kind: BioSimResourceKind::OxygenGas,
+                amount: after_source_kg,
+            },
+            BioSimResourceLedgerStore {
+                store_id: "sink_o2_store",
+                kind: BioSimResourceKind::OxygenGas,
+                amount: after_sink_kg,
+            },
+        ];
+        let accounting = [BioSimResourceLedgerAccounting {
+            kind: BioSimResourceKind::OxygenGas,
+            source_amount: -transfer_kg_per_tick,
+            sink_amount: transfer_kg_per_tick,
+        }];
+
+        let tick_report = validate_biosim_resource_ledger_tick(
+            previous,
+            next,
+            &before,
+            &after,
+            &accounting,
+            tolerance_abs,
+        )?
+        .value;
+        rows.extend(tick_report.rows);
+        source_kg = after_source_kg;
+        sink_kg = after_sink_kg;
+    }
+
+    let report = summarize_biosim_resource_ledger_rows(
+        rows,
+        tolerance_abs,
+        vec![
+            "minimal oxygen loop uses one source store, one sink store, and a fixed internal transfer"
+                .to_string(),
+            "default validation test uses 1e-12 kg absolute tolerance for simple f64 transfers"
+                .to_string(),
+        ],
+    );
+    let passed = report.passed;
+    let proof = BioSimMinimalO2LoopConservationProof {
+        report,
+        ticks_executed: tick_count,
+        transfer_kg_per_tick,
+        final_source_kg: source_kg,
+        final_sink_kg: sink_kg,
+    };
+    let validity = if passed {
+        ValidityStatus::WithinDocumentedDomain
+    } else {
+        ValidityStatus::OutsideDocumentedDomain
+    };
+
+    let mut result = EngineeringResult::new(
+        proof,
+        biosim_resource_ledger_codex_id(),
+        resource_tick_record(biosim_resource_ledger_codex_id()),
+    )
+    .with_assumption(
+        "biosim_rs.minimal_o2_loop_only",
+        "proof covers only a bounded two-store oxygen transfer loop with caller-declared tolerance",
+    )
+    .with_assumption(
+        "biosim_rs.no_biosim_parity_claim",
+        "ledger proof does not claim Java BioSim mass-validation parity or habitat-control readiness",
+    )
+    .with_validity(validity);
+
+    if !result.value.report.passed {
+        result = result.with_warning(
+            "biosim_rs.minimal_o2_loop_residual_exceeds_tolerance",
+            "minimal oxygen-loop ledger residual exceeded the declared absolute tolerance",
+        );
+    }
+
+    Ok(result)
 }
 
 /// Applies all resource deltas at one validated tick boundary or rejects the whole commit.
@@ -1054,5 +1502,155 @@ mod tests {
         assert_eq!(before_digest.value, after_digest.value);
         assert_eq!(previous.index, 9);
         assert_eq!(state[0].amount, 1.0);
+    }
+
+    #[test]
+    fn minimal_o2_loop_ledger_passes_for_multiple_ticks() {
+        let result =
+            prove_biosim_minimal_o2_loop_conservation(10.0, 0.0, 1.0, 4, 60.0, 1.0e-12).unwrap();
+
+        assert_eq!(result.codex_id, biosim_resource_ledger_codex_id());
+        assert_eq!(
+            result.verification_status(),
+            VerificationStatus::ResearchRequired
+        );
+        assert!(result.value.report.passed);
+        assert_eq!(result.value.report.row_count, 4);
+        assert_eq!(result.value.report.rows.len(), 4);
+        assert_eq!(result.value.ticks_executed, 4);
+        assert_eq!(result.value.final_source_kg, 6.0);
+        assert_eq!(result.value.final_sink_kg, 4.0);
+        assert!(result.value.report.max_abs_residual <= 1.0e-12);
+        assert_eq!(result.value.report.worst_tick, None);
+        assert_eq!(result.value.report.worst_key, None);
+        assert!(result
+            .assumptions
+            .iter()
+            .any(|item| item.id == "biosim_rs.minimal_o2_loop_only"));
+    }
+
+    #[test]
+    fn broken_o2_ledger_fails_when_sink_transfer_is_missing() {
+        let previous = validate_biosim_tick(0, 60.0).unwrap().value;
+        let next = validate_biosim_tick(1, 60.0).unwrap().value;
+        let before = [
+            BioSimResourceLedgerStore {
+                store_id: "source_o2_store",
+                kind: BioSimResourceKind::OxygenGas,
+                amount: 10.0,
+            },
+            BioSimResourceLedgerStore {
+                store_id: "sink_o2_store",
+                kind: BioSimResourceKind::OxygenGas,
+                amount: 0.0,
+            },
+        ];
+        let after = [
+            BioSimResourceLedgerStore {
+                store_id: "source_o2_store",
+                kind: BioSimResourceKind::OxygenGas,
+                amount: 9.0,
+            },
+            BioSimResourceLedgerStore {
+                store_id: "sink_o2_store",
+                kind: BioSimResourceKind::OxygenGas,
+                amount: 0.0,
+            },
+        ];
+        let accounting = [BioSimResourceLedgerAccounting {
+            kind: BioSimResourceKind::OxygenGas,
+            source_amount: -1.0,
+            sink_amount: 1.0,
+        }];
+
+        let result = validate_biosim_resource_ledger_tick(
+            previous,
+            next,
+            &before,
+            &after,
+            &accounting,
+            1.0e-12,
+        )
+        .unwrap();
+
+        assert!(!result.value.passed);
+        assert_eq!(result.validity, ValidityStatus::OutsideDocumentedDomain);
+        assert_eq!(result.value.row_count, 1);
+        assert_eq!(result.value.worst_tick, Some(1));
+        assert_eq!(
+            result.value.worst_key,
+            Some(BioSimResourceUnitKey {
+                kind: BioSimResourceKind::OxygenGas,
+                unit: "kg"
+            })
+        );
+        assert_eq!(result.value.rows[0].delta, -1.0);
+        assert_eq!(result.value.rows[0].accounted_source, -1.0);
+        assert_eq!(result.value.rows[0].accounted_sink, 1.0);
+        assert_eq!(result.value.rows[0].residual, -1.0);
+        assert!(!result.value.rows[0].passed);
+        assert!(result.has_warnings());
+    }
+
+    #[test]
+    fn resource_ledger_row_ordering_is_stable_by_resource_unit_key() {
+        let previous = validate_biosim_tick(3, 60.0).unwrap().value;
+        let next = validate_biosim_tick(4, 60.0).unwrap().value;
+        let before = [
+            BioSimResourceLedgerStore {
+                store_id: "water",
+                kind: BioSimResourceKind::PotableWater,
+                amount: 4.0,
+            },
+            BioSimResourceLedgerStore {
+                store_id: "oxygen",
+                kind: BioSimResourceKind::OxygenGas,
+                amount: 2.0,
+            },
+        ];
+        let after = [
+            BioSimResourceLedgerStore {
+                store_id: "oxygen",
+                kind: BioSimResourceKind::OxygenGas,
+                amount: 2.0,
+            },
+            BioSimResourceLedgerStore {
+                store_id: "water",
+                kind: BioSimResourceKind::PotableWater,
+                amount: 4.0,
+            },
+        ];
+        let accounting = [
+            BioSimResourceLedgerAccounting {
+                kind: BioSimResourceKind::PotableWater,
+                source_amount: 0.0,
+                sink_amount: 0.0,
+            },
+            BioSimResourceLedgerAccounting {
+                kind: BioSimResourceKind::OxygenGas,
+                source_amount: 0.0,
+                sink_amount: 0.0,
+            },
+        ];
+
+        let result = validate_biosim_resource_ledger_tick(
+            previous,
+            next,
+            &before,
+            &after,
+            &accounting,
+            1.0e-12,
+        )
+        .unwrap();
+
+        assert!(result.value.passed);
+        assert_eq!(result.value.row_count, 2);
+        assert_eq!(result.value.rows[0].key.kind, BioSimResourceKind::OxygenGas);
+        assert_eq!(result.value.rows[0].key.unit, "kg");
+        assert_eq!(
+            result.value.rows[1].key.kind,
+            BioSimResourceKind::PotableWater
+        );
+        assert_eq!(result.value.rows[1].key.unit, "kg");
     }
 }

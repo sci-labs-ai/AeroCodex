@@ -15,6 +15,7 @@ Start with:
 - [BioSim-RS resource identity and tick validation](assurance/biosim_rs_resource_tick_validation.md)
 - [BioSim-RS atomic transaction commit validation](assurance/biosim_rs_atomic_transaction_commit_validation.md)
 - [BioSim-RS deterministic replay validation](assurance/biosim_rs_deterministic_replay_validation.md)
+- [BioSim-RS resource ledger validation](assurance/biosim_rs_resource_ledger_validation.md)
 - [BioSim-RS source boundary](source_intake/biosim_rs_source_boundary.md)
 - [BioSim-RS boundary placeholder](../biosim-rs/)
 - [Orekit reference-oracle mapping](assurance/orekit_reference_oracle_mapping.md)

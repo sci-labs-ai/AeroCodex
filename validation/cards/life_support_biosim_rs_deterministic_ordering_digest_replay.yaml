@@ -20,7 +20,7 @@ domain:
     - each delta references an existing resource balance and post-commit balances remain nonnegative
     - canonical ordering is by static clean-room resource ID, independent of caller slice order
   excluded_cases:
-    - persistent resource ledger entries
+    - persistent resource-ledger storage
     - O2-loop conservation, mass/energy closure validation, or biological dynamics
     - module scheduler execution, BioSim scenario execution, or CLI/API smoke tests
     - external BioSim reference validation or GPL source import

@@ -8,15 +8,16 @@ intended_use:
   - Boundary record showing that GPL Java BioSim source, GPL-bound BioSim-RS scaffold code, fixtures, and scenarios were not imported.
 requested_details:
   - Future reviewed clean-room specification package for broader BioSim deterministic engine semantics.
-  - Resource ledger and conservation evidence before ledger or O2-loop behavior is promoted.
+  - Separate Chunk 6D resource-ledger evidence before persistent ledger storage or broader conservation behavior is promoted.
   - CLI/API smoke evidence before user-facing BioSim run or replay commands are promoted.
 implementation_notes:
   - Current implementation canonicalizes caller-supplied resource states and deltas by static resource ID before digest generation.
   - It uses a documented dependency-free fnv-1a 64-bit digest for deterministic replay smoke comparison only.
   - It composes the existing clean-room consecutive tick validator and atomic commit helper to produce previous and next tick digests for one transaction.
+  - Chunk 6D adds a separate grouped resource-ledger and bounded minimal oxygen-loop conservation card/source seed.
   - Status remains research_required pending source review and external validation evidence.
 limits:
   - Not a habitat controller or life-support simulator.
-  - Not a persistent resource ledger, conservation model, module scheduler, scenario executor, or cryptographic integrity system.
+  - Not a persistent resource ledger storage layer, broader conservation model, module scheduler, scenario executor, or cryptographic integrity system.
   - Not evidence of operational, crew-safety, medical, certification, or regulated-use suitability.
-notes: "Stage 4 Chunk 6C clean-room source seed. Later chunks must add separate cards and evidence before persistent ledgers, conservation behavior, CLI/API scenario execution, or habitat-control behavior is promoted."
+notes: "Stage 4 Chunk 6C clean-room source seed. Separate Chunk 6D evidence covers grouped resource-ledger residual checks and bounded minimal oxygen-loop conservation only; later chunks must add separate cards and evidence before persistent ledger storage, CLI/API scenario execution, external BioSim parity, or habitat-control behavior is promoted."

@@ -58,7 +58,7 @@ Blocked before a licensing decision:
 - public APIs that imply validated habitat, medical, operational, or regulated-use capability;
 - distributing GPL-bound material under the dual `MIT OR Apache-2.0` core license.
 
-The placeholder `biosim-rs/` directory is a Stage 4 boundary marker only. It must remain README-only until a later chunk deliberately adds a BioSim-RS workspace. Chunk 6A and Chunk 6B clean-room primitives live in `crates/aero-codex-life-support` and do not import the external BioSim-RS scaffold crates.
+The placeholder `biosim-rs/` directory is a Stage 4 boundary marker only. It must remain README-only until a later chunk deliberately adds a BioSim-RS workspace. Chunk 6A, Chunk 6B, Chunk 6C, and Chunk 6D clean-room primitives live in `crates/aero-codex-life-support` and do not import the external BioSim-RS scaffold crates.
 
 ## Architecture boundary for future implementation slices
 
@@ -68,11 +68,11 @@ Future slices should be sequenced as:
 
 1. resource identity and tick validation — completed in Chunk 6A as clean-room generic identities, positive-duration tick validation, and consecutive transition checks;
 2. atomic transaction commit — completed in Chunk 6B as a clean-room caller-state/caller-delta helper that rejects invalid commits without exposing a committed output;
-3. deterministic ordering, digest, and replay proof;
-4. resource ledger and minimal O2-loop conservation;
+3. deterministic ordering, digest, and replay proof — completed in Chunk 6C as clean-room canonical ordering, fnv-1a digest evidence, and one-tick replay proof;
+4. resource ledger and minimal oxygen-loop conservation — completed in Chunk 6D as grouped residual checks plus a bounded two-store oxygen transfer proof;
 5. CLI/API smoke tests and friend-test report.
 
-Each slice must carry its own source IDs, license-path reference, validation status, unit/domain assumptions, mass/energy ledger expectations, deterministic replay evidence, and conservative research caveat. Chunk 6A intentionally carries no transaction, ledger, replay, or conservation evidence. Chunk 6B carries only atomic resource-delta commit evidence. Chunk 6C carries deterministic ordering, fnv-1a digest, and one-tick replay proof evidence only; persistent ledger and conservation expectations remain future work.
+Each slice must carry its own source IDs, license-path reference, validation status, unit/domain assumptions, mass/energy ledger expectations, deterministic replay evidence, and conservative research caveat. Chunk 6A intentionally carries no transaction, ledger, replay, or conservation evidence. Chunk 6B carries only atomic resource-delta commit evidence. Chunk 6C carries deterministic ordering, fnv-1a digest, and one-tick replay proof evidence only. Chunk 6D carries grouped ledger residual and bounded minimal oxygen-loop conservation evidence only; persistent ledger storage and scenario execution remain future work.
 
 ## Clean-room evidence package for future chunks
 

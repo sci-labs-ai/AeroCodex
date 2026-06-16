@@ -1,0 +1,23 @@
+id: source.life_support.biosim_rs.resource_ledger_clean_room.research_required
+title: BioSim-RS clean-room resource-ledger source seed
+category: life_support
+status: research_required
+intended_use:
+  - Clean-room source seed for grouped resource-ledger residual checks and bounded minimal oxygen-loop conservation proof evidence.
+  - Traceability anchor for Stage 4 Chunk 6D implementation in the existing life-support crate.
+  - Boundary record showing that GPL Java BioSim source, GPL-bound BioSim-RS scaffold code, fixtures, scenarios, and external runtime outputs were not imported.
+requested_details:
+  - Future reviewed clean-room specification package for broader BioSim resource-ledger semantics.
+  - Fixture license and hash records before any BioSim scenario or external golden-master evidence is used.
+  - CLI/API smoke evidence before user-facing BioSim ledger, run, or replay commands are promoted.
+  - External validation evidence before any habitat-control, biological-dynamics, crew-safety, operational, or certification claim is made.
+implementation_notes:
+  - Current implementation groups caller-supplied before and after store totals by static resource kind and canonical unit.
+  - Residual checks compare observed total change with caller-accounted source and sink terms under a declared absolute tolerance.
+  - The minimal oxygen-loop helper performs a bounded two-store internal transfer and checks aggregate oxygen conservation only.
+  - Status remains research_required pending source review and external validation evidence.
+limits:
+  - Not a habitat controller or life-support simulator.
+  - Not a persistent ledger, module scheduler, scenario executor, biological model, medical suitability claim, or cryptographic integrity system.
+  - Not evidence of operational, crew-safety, certification, flight-readiness, mission-readiness, or regulated-use suitability.
+notes: "Stage 4 Chunk 6D clean-room source seed. Later chunks must add separate cards and evidence before persistent ledger storage, CLI/API scenario execution, external BioSim parity, or habitat-control behavior is promoted."

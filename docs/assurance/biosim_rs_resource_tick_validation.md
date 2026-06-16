@@ -73,11 +73,11 @@ Chunk 6A does not add:
 - resource-ledger persistence;
 - minimal O2-loop conservation;
 - CLI/API smoke-test reports;
-- scenario execution;
+- no scenario execution;
 - BioSim archive import;
 - GPL-compatible distribution decision beyond this clean-room primitive slice.
 
-Those items were outside Chunk 6A. Chunk 6B records atomic transaction commit in `docs/assurance/biosim_rs_atomic_transaction_commit_validation.md`; Chunk 6C records deterministic ordering, digest, and one-tick replay proof in `docs/assurance/biosim_rs_deterministic_replay_validation.md`. Persistent ledgers and conservation behavior remain future chunks.
+Those items were outside Chunk 6A. Chunk 6B records atomic transaction commit in `docs/assurance/biosim_rs_atomic_transaction_commit_validation.md`; Chunk 6C records deterministic ordering, digest, and one-tick replay proof in `docs/assurance/biosim_rs_deterministic_replay_validation.md`; Chunk 6D records grouped resource-ledger residual checks and bounded minimal oxygen-loop conservation in `docs/assurance/biosim_rs_resource_ledger_validation.md`. Persistent ledger storage and scenario execution remain future chunks.
 
 ## Gate expectations
 
