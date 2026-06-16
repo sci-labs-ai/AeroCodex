@@ -13,6 +13,7 @@ Start with:
 - [Formula-vault candidate gate](assurance/formula_vault_candidate_gate.md)
 - [Formula-vault M00 angle/unit conversion metadata slice](assurance/formula_vault_m00_angle_unit_candidate.md)
 - [Formula-vault M00 per-candidate manifest/reference-link depth](assurance/formula_vault_m00_reference_manifest.md)
+- [Formula-vault M00 source-expression and test-vector contracts](assurance/formula_vault_m00_source_expression_test_vectors.md)
 - [Formula-vault candidate verifier](assurance/formula_vault_candidate_verifier.md)
 - [Equation inventory/readiness dashboard](assurance/equation_inventory_readiness_dashboard.md)
 - [M07 formula-vault intake](source_intake/m07_formula_vault_intake.md)

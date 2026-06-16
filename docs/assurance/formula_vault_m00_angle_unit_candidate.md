@@ -44,3 +44,8 @@ Chunk 7B does not authorize:
 - no flight-readiness, mission-readiness, operational-use, or regulated-use claims.
 
 Any later promotion must be limited to this bounded formula list and must satisfy the per-slice gate defined in `docs/assurance/formula_vault_candidate_gate.md`.
+
+
+## Chunk 7F contract cross-link
+
+Chunk 7F adds `formula-vault/contracts/m00_angle_unit_conversions_contract.yaml` as a metadata-only source-expression and test-vector contract for this same bounded candidate list. The contract records independent mathematical summaries and endpoint-sensitive `wrap2pi` expectations while keeping implementation, public API promotion, Scilab output import, and validation-status upgrade blocked.

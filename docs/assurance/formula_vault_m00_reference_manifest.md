@@ -49,3 +49,8 @@ cargo run -p xtask -- verify formula-vault
 ```
 
 Chunk 7D keeps the manifest as governance metadata and refreshes the formula-vault/data-registry aggregate fingerprints after adding it.
+
+
+## Chunk 7F contract cross-link
+
+The per-candidate manifest now links forward to `formula-vault/contracts/m00_angle_unit_conversions_contract.yaml`, which records the metadata-only source-expression and test-vector contract for the same three formula identifiers. The manifest and contract remain non-implementation records with `research_required` status.

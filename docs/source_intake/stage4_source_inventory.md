@@ -99,6 +99,13 @@ Chunk 7D adds metadata-only reference depth for the existing M00 candidate: `for
 
 The manifest links each selected formula identifier to its candidate function alias, source-function alias, release-gate row alias, equivalence-job alias, source-file locator, candidate/assurance/validation/source records, and pending review statuses. It does not import M07 code, does not copy source expressions, does not add archives or fixtures, does not execute Scilab, does not implement formulas, does not create public application programming interfaces, and does not make certification, readiness, operational, medical, or regulated-use claims. The validation status remains `research_required`.
 
+
+## Chunk 7F M00 source-expression and test-vector contract
+
+Chunk 7F adds the machine-readable contract `formula-vault/contracts/m00_angle_unit_conversions_contract.yaml`, assurance note `docs/assurance/formula_vault_m00_source_expression_test_vectors.md`, validation card `validation.formula_vault.m00_source_expression_test_vectors`, and source seed `source.formula_vault.m00_source_expression_test_vectors.research_required`.
+
+The contract covers only `formula_vault.m00.angle.deg2rad`, `formula_vault.m00.angle.rad2deg`, and `formula_vault.m00.angle.wrap2pi`. It records independently written mathematical summaries, finite-input domains, invalid non-finite inputs, tolerance metadata, reference-oracle metadata, and endpoint-sensitive `wrap2pi` behavior. It does not import M07 source code, does not copy source expressions into implementation code, does not add archives or fixtures, does not execute Scilab, does not implement formulas, does not create public application programming interfaces, and does not make certification, readiness, operational, medical, habitat-safety, or regulated-use claims. The validation status remains `research_required`.
+
 ## Chunk 7E equation inventory/readiness dashboard
 
 Chunk 7E adds the machine-readable inventory `validation/equation_inventory.tsv`, assurance note `docs/assurance/equation_inventory_readiness_dashboard.md`, validation card `validation.equation_inventory.readiness_dashboard`, source seed `source.validation.equation_inventory.readiness_dashboard.research_required`, and dependency-free verifier `cargo run -p xtask -- verify equation-inventory`.

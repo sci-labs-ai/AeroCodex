@@ -50,7 +50,7 @@ artifacts:
     artifact_kind: repo_directory_validation_cards
     origin: current_repo
     license: MIT OR Apache-2.0
-    sha256: 464d712de61a9988ce74556d7057bd8636f195db20c1b62af66c92a32e637afe
+    sha256: 30587749b5e3cacb543a6d2f86fa276eb484c8021d7e05df91cc39a20bc80053
     hash_status: aggregate_sha256_current_tracked_tree
     allowed_use: validation-card metadata and source-status tracking only
     bundling_decision: bundled repo-relative validation metadata; no external archive import
@@ -64,7 +64,7 @@ artifacts:
     artifact_kind: repo_directory_source_registry
     origin: current_repo
     license: MIT OR Apache-2.0 metadata with cited-source boundaries
-    sha256: 930caa66e7457610aa78900dbc03a8d6619993569f7d2ef00f29cffbefce9b59
+    sha256: ef79264c073223d744b22b6d6a0785e9a6b3b6ef5860e45c3d05b4b70ba653a0
     hash_status: aggregate_sha256_current_tracked_tree
     allowed_use: source seed registry and validation-card linkage only
     bundling_decision: bundled repo-relative source metadata; not external source-code import
@@ -78,7 +78,7 @@ artifacts:
     artifact_kind: repo_file_validation_inventory
     origin: current_repo
     license: MIT OR Apache-2.0 metadata
-    sha256: d08b8583d823f9451e0e79fc623c0ebe8bae63b21456db7b9ce0d324c8347678
+    sha256: 92fd9de8c66c5686894cb13cda04169df1b766f06d910a7378d5ff4866d4bfc2
     hash_status: sha256_verified_current_repo_file
     allowed_use: machine-readable equation inventory and readiness-dashboard counts only
     bundling_decision: bundled repo-relative validation metadata; no formula implementation, source archive import, generated code, fixture, or public application programming interface promotion
@@ -92,7 +92,7 @@ artifacts:
     artifact_kind: repo_directory_formula_vault_metadata
     origin: current_repo
     license: MIT OR Apache-2.0 metadata with source-boundary caveats
-    sha256: 2541bd1a04763f140b79f9f37d257796bae0edbb0cbe1d5022ab933cd5ecb779
+    sha256: f03497b8fd1834946ec468a55825d1dbeaae9b8b269123f8064395f3b4ea8ca6
     hash_status: aggregate_sha256_current_tracked_tree
     allowed_use: quarantined formula-vault planning metadata and future per-slice gate templates only
     bundling_decision: bundled repo-relative metadata; no external M07 source-code import, generated binary, fixture, or public application programming interface promotion

@@ -60,3 +60,13 @@ Future chunks may add reviewed metadata such as:
 - promotion-gate checklists.
 
 Future chunks must not add raw M07 source code or public application-programming-interface implementation files here unless the active prompt explicitly authorizes that bounded scope and the required gates pass.
+
+
+Stage 4 Chunk 7F adds a metadata-only source-expression and test-vector contract for the existing M00 angle/unit candidate:
+
+- `formula-vault/contracts/m00_angle_unit_conversions_contract.yaml`
+- `docs/assurance/formula_vault_m00_source_expression_test_vectors.md`
+- validation card `validation.formula_vault.m00_source_expression_test_vectors`
+- source seed `source.formula_vault.m00_source_expression_test_vectors.research_required`
+
+The contract records independent mathematical summaries, finite-input domains, tolerance metadata, and endpoint-sensitive `wrap2pi` expectations. It does not implement formulas, import M07 source, generate Rust, import Scilab outputs or fixtures, or promote any public application programming interface.

@@ -1,0 +1,23 @@
+id: source.formula_vault.m00_source_expression_test_vectors.research_required
+title: Formula-vault M00 source-expression and test-vector contract source seed
+category: validation
+status: research_required
+intended_use:
+  - Trace the Stage 4 Chunk 7F M00 source-expression and test-vector contract for deg2rad, rad2deg, and wrap2pi.
+  - Tie the contract to the registered M07 release-candidate artifact without importing raw source code, generated Rust, Scilab output, or external fixtures.
+  - Preserve the external quarantine/reference-only M07 source boundary until a later explicit implementation chunk is authorized.
+requested_details:
+  - M07 source artifact id stage4.m07_rust_port_v14.2026_06_15 with registered SHA256 15b1ca3a39267187167c43ea1228f28fd4736c4456f65d072dc42a32a7b19190.
+  - M07 source locators for app_deg2rad, app_rad2deg, and app_wrap2pi under the M00 constants conversion source file.
+  - Independent mathematical summaries for finite scalar unit conversions and the reviewed wrap interval convention.
+  - Test-vector metadata for degree/radian conversions and endpoint-sensitive two-pi wrapping.
+implementation_notes:
+  - Chunk 7F adds metadata/test contracts only.
+  - No M07 source code, generated binaries, raw archives, fixtures, public Rust APIs, crate changes, or replacement astrodynamics content are imported.
+  - deg2rad and rad2deg may be considered for a later tiny implementation chunk after this contract is verified.
+  - wrap2pi remains endpoint-sensitive and should be implemented only after explicit endpoint-test authorization.
+limits:
+  - No formula implementation, no source translation, no generated code import, and no public application programming interface.
+  - Not a Scilab execution result, no SGP4 certification claim, no external oracle fixture, and no M07 parity claim.
+  - No certification evidence, no flight readiness, no mission readiness, no operational use, no medical use, and no regulated-use suitability.
+notes: "Stage 4 Chunk 7F source seed for M00 source-expression and test-vector metadata. Later work must add implementation authorization, Rust tests, equivalence/reference evidence, and source-boundary scans before any status upgrade or application-interface proposal."

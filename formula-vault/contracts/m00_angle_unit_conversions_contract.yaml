@@ -1,0 +1,266 @@
+# Stage 4 Chunk 7F machine-readable source-expression and test-vector contract.
+#
+# Metadata/test-contract only: this file contains independent mathematical
+# summaries and expected-value metadata. It contains no Rust implementation
+# code, no generated code, no Scilab execution output, no certification
+# evidence, no flight-readiness claim, no mission-readiness claim, no
+# operational approval, no habitat-safety approval, no medical-use approval,
+# and no regulated-use approval.
+
+schema_version: formula_vault_source_expression_contract.v1
+record_status: metadata_test_contract_research_required
+stage4_chunk: stage4_chunk7f_m00_source_expression_test_vector_contract
+source_artifact_id: stage4.m07_rust_port_v14.2026_06_15
+source_archive_sha256: 15b1ca3a39267187167c43ea1228f28fd4736c4456f65d072dc42a32a7b19190
+source_boundary:
+  m07_archive_status: external_quarantine_reference_only
+  review_method: inspected_local_registered_archive_without_committing_raw_source
+  import_policy: no_bulk_import_no_raw_source_no_generated_code_no_external_fixture
+  public_api_surface: blocked_no_public_application_programming_interface
+  validation_status: research_required
+  m07_facts:
+    represented_function_rows: 1350
+    scilab_equivalence_jobs: 188
+    release_status: release_candidate_not_certified
+
+formulas:
+  - formula_id: formula_vault.m00.angle.deg2rad
+    rust_function_alias: app_deg2rad
+    scilab_function_alias: foa_app_ast_app_deg2rad
+    source_locator:
+      release_gate_table_alias: release-gate status csv row 3
+      source_file_alias: appendices_scilab_astrodynamics constants conversion source file
+      reviewed_line_span: lines 67 through 69 in the registered M07 source locator
+    source_expression_review_status: reviewed_without_source_copy
+    independent_mathematical_contract:
+      summary: finite real degree-valued scalar converted to radians
+      expression_summary: output_radians equals input_degrees multiplied by pi divided by 180
+    input_variable:
+      name: angle_degrees
+      units: degree
+      type: finite_real_scalar
+    output_variable:
+      name: angle_radians
+      units: radian
+      type: finite_real_scalar
+    coordinate_frame_dependence: none
+    time_scale_dependence: none
+    valid_domain: all finite real scalar degree inputs
+    invalid_inputs:
+      - NaN
+      - positive_infinity
+      - negative_infinity
+    singularities: none
+    branch_or_endpoint_behavior: single_branch_linear_conversion
+    tolerance_policy:
+      absolute_tolerance: 1.0e-15
+      relative_tolerance: 1.0e-15
+      rationale: finite f64 unit-conversion contract; future implementation tests should use strict near-equality against independent constants
+    reference_oracle:
+      type: independent_analytic_identity
+      identity: degrees_times_pi_over_180
+    implementation_status: blocked_no_formula_implementation_in_chunk7f
+    promotion_gate: blocked_until_future_explicit_implementation_chunk_with_rust_tests_and_equivalence_review
+    test_vectors:
+      - id: deg2rad.zero
+        input_degrees: 0.0
+        expected_radians_symbolic: '0'
+        expected_radians_decimal: 0.0
+      - id: deg2rad.ninety
+        input_degrees: 90.0
+        expected_radians_symbolic: 'pi/2'
+        expected_radians_decimal: 1.5707963267948966
+      - id: deg2rad.one_eighty
+        input_degrees: 180.0
+        expected_radians_symbolic: 'pi'
+        expected_radians_decimal: 3.141592653589793
+      - id: deg2rad.three_sixty
+        input_degrees: 360.0
+        expected_radians_symbolic: '2*pi'
+        expected_radians_decimal: 6.283185307179586
+      - id: deg2rad.negative_ninety
+        input_degrees: -90.0
+        expected_radians_symbolic: '-pi/2'
+        expected_radians_decimal: -1.5707963267948966
+      - id: deg2rad.forty_five
+        input_degrees: 45.0
+        expected_radians_symbolic: 'pi/4'
+        expected_radians_decimal: 0.7853981633974483
+    non_claim_caveats:
+      - no_certification_evidence
+      - no_flight_readiness
+      - no_mission_readiness
+      - no_operational_approval
+      - no_regulated_use_approval
+
+  - formula_id: formula_vault.m00.angle.rad2deg
+    rust_function_alias: app_rad2deg
+    scilab_function_alias: foa_app_ast_app_rad2deg
+    source_locator:
+      release_gate_table_alias: release-gate status csv row 4
+      source_file_alias: appendices_scilab_astrodynamics constants conversion source file
+      reviewed_line_span: lines 71 through 73 in the registered M07 source locator
+    source_expression_review_status: reviewed_without_source_copy
+    independent_mathematical_contract:
+      summary: finite real radian-valued scalar converted to degrees
+      expression_summary: output_degrees equals input_radians multiplied by 180 divided by pi
+    input_variable:
+      name: angle_radians
+      units: radian
+      type: finite_real_scalar
+    output_variable:
+      name: angle_degrees
+      units: degree
+      type: finite_real_scalar
+    coordinate_frame_dependence: none
+    time_scale_dependence: none
+    valid_domain: all finite real scalar radian inputs
+    invalid_inputs:
+      - NaN
+      - positive_infinity
+      - negative_infinity
+    singularities: none
+    branch_or_endpoint_behavior: single_branch_linear_conversion
+    tolerance_policy:
+      absolute_tolerance: 1.0e-12
+      relative_tolerance: 1.0e-15
+      rationale: finite f64 unit-conversion contract; degree outputs may be compared by absolute tolerance near zero and relative tolerance elsewhere
+    reference_oracle:
+      type: independent_analytic_identity
+      identity: radians_times_180_over_pi
+    implementation_status: blocked_no_formula_implementation_in_chunk7f
+    promotion_gate: blocked_until_future_explicit_implementation_chunk_with_rust_tests_and_equivalence_review
+    test_vectors:
+      - id: rad2deg.zero
+        input_radians_symbolic: '0'
+        input_radians_decimal: 0.0
+        expected_degrees: 0.0
+      - id: rad2deg.pi_over_two
+        input_radians_symbolic: 'pi/2'
+        input_radians_decimal: 1.5707963267948966
+        expected_degrees: 90.0
+      - id: rad2deg.pi
+        input_radians_symbolic: 'pi'
+        input_radians_decimal: 3.141592653589793
+        expected_degrees: 180.0
+      - id: rad2deg.two_pi
+        input_radians_symbolic: '2*pi'
+        input_radians_decimal: 6.283185307179586
+        expected_degrees: 360.0
+      - id: rad2deg.negative_pi
+        input_radians_symbolic: '-pi'
+        input_radians_decimal: -3.141592653589793
+        expected_degrees: -180.0
+      - id: rad2deg.pi_over_four
+        input_radians_symbolic: 'pi/4'
+        input_radians_decimal: 0.7853981633974483
+        expected_degrees: 45.0
+    non_claim_caveats:
+      - no_certification_evidence
+      - no_flight_readiness
+      - no_mission_readiness
+      - no_operational_approval
+      - no_regulated_use_approval
+
+  - formula_id: formula_vault.m00.angle.wrap2pi
+    rust_function_alias: app_wrap2pi
+    scilab_function_alias: foa_app_ast_app_wrap2pi
+    source_locator:
+      release_gate_table_alias: release-gate status csv row 5
+      source_file_alias: appendices_scilab_astrodynamics constants conversion source file
+      reviewed_line_span: lines 75 through 80 in the registered M07 source locator
+    source_expression_review_status: reviewed_without_source_copy
+    interval_review_state: reviewed_interval_0_to_2pi_exclusive_upper
+    independent_mathematical_contract:
+      summary: finite real radian-valued scalar normalized into the interval [0, 2*pi)
+      expression_summary: output is the nonnegative two-pi remainder of the input angle; negative finite remainders are shifted by one two-pi interval
+    input_variable:
+      name: angle_radians
+      units: radian
+      type: finite_real_scalar
+    output_variable:
+      name: wrapped_angle_radians
+      units: radian
+      type: finite_real_scalar
+    coordinate_frame_dependence: none
+    time_scale_dependence: none
+    valid_domain: all finite real scalar radian inputs
+    invalid_inputs:
+      - NaN
+      - positive_infinity
+      - negative_infinity
+    singularities: none
+    branch_or_endpoint_behavior:
+      interval: '[0, 2*pi)'
+      exact_zero: returns_zero
+      exact_positive_two_pi: returns_zero
+      exact_negative_two_pi: returns_zero
+      exact_positive_pi: returns_pi
+      exact_negative_pi: returns_pi
+      negative_small_angle: returns_two_pi_minus_epsilon_for_epsilon_in_open_interval_zero_to_two_pi
+      positive_small_angle: returns_epsilon
+      note: future Rust implementation must document f64 signed-zero and large-magnitude rounding behavior separately
+    tolerance_policy:
+      absolute_tolerance: 1.0e-15
+      relative_tolerance: 1.0e-15
+      rationale: endpoint-sensitive f64 periodic wrapping contract; exact multiples use endpoint tests and non-multiple values use near-equality
+    reference_oracle:
+      type: independent_interval_contract
+      identity: wrapped_angle_in_0_to_2pi_with_period_2pi
+    implementation_status: blocked_no_formula_implementation_in_chunk7f
+    promotion_gate: blocked_until_future_explicit_implementation_chunk_with_endpoint_tests_and_equivalence_review
+    test_vectors:
+      - id: wrap2pi.zero
+        input_radians_symbolic: '0'
+        expected_radians_symbolic: '0'
+        endpoint_class: lower_endpoint
+      - id: wrap2pi.two_pi
+        input_radians_symbolic: '2*pi'
+        expected_radians_symbolic: '0'
+        endpoint_class: upper_endpoint_wraps_to_lower
+      - id: wrap2pi.negative_two_pi
+        input_radians_symbolic: '-2*pi'
+        expected_radians_symbolic: '0'
+        endpoint_class: negative_period_wraps_to_lower
+      - id: wrap2pi.pi
+        input_radians_symbolic: 'pi'
+        expected_radians_symbolic: 'pi'
+        endpoint_class: interior
+      - id: wrap2pi.negative_pi
+        input_radians_symbolic: '-pi'
+        expected_radians_symbolic: 'pi'
+        endpoint_class: interior_after_wrap
+      - id: wrap2pi.three_pi
+        input_radians_symbolic: '3*pi'
+        expected_radians_symbolic: 'pi'
+        endpoint_class: interior_after_period_removal
+      - id: wrap2pi.negative_three_pi
+        input_radians_symbolic: '-3*pi'
+        expected_radians_symbolic: 'pi'
+        endpoint_class: interior_after_negative_period_removal
+      - id: wrap2pi.very_small_negative
+        input_radians_symbolic: '-epsilon'
+        expected_radians_symbolic: '2*pi - epsilon'
+        epsilon_constraint: 0 < epsilon < 2*pi
+        endpoint_class: just_below_lower_endpoint
+      - id: wrap2pi.very_small_positive
+        input_radians_symbolic: 'epsilon'
+        expected_radians_symbolic: 'epsilon'
+        epsilon_constraint: 0 < epsilon < 2*pi
+        endpoint_class: just_above_lower_endpoint
+    non_claim_caveats:
+      - no_certification_evidence
+      - no_flight_readiness
+      - no_mission_readiness
+      - no_operational_approval
+      - no_regulated_use_approval
+
+contract_level_non_claims:
+  no_formula_implementation: true
+  no_source_translation: true
+  no_raw_m07_source_committed: true
+  no_generated_formula_code: true
+  no_scilab_execution_result: true
+  no_external_fixture_import: true
+  no_public_api_promotion: true
+  no_status_upgrade_beyond_research_required: true

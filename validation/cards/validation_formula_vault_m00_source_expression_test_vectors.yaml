@@ -1,0 +1,49 @@
+id: validation.formula_vault.m00_source_expression_test_vectors
+name: Formula-vault M00 source-expression and test-vector contracts
+category: validation
+status: research_required
+source:
+  id: source.formula_vault.m00_source_expression_test_vectors.research_required
+  status: research_required
+assumptions:
+  - Stage 4 Chunk 7F is metadata/test-contract only and does not implement formulas.
+  - The contract applies only to formula_vault.m00.angle.deg2rad, formula_vault.m00.angle.rad2deg, and formula_vault.m00.angle.wrap2pi.
+  - M07 source material remains external and quarantine/reference-only.
+  - Raw source text, generated Rust, external fixtures, Scilab output, and public application programming interfaces are not promoted.
+domain:
+  summary: metadata-only source-expression and test-vector contract for three M00 angle/unit helper candidates
+  bounds:
+    - finite real scalar inputs only
+    - deg2rad and rad2deg are linear unit-conversion contracts
+    - wrap2pi records the reviewed interval convention and endpoint test-vector expectations
+    - validation status remains research_required until implementation, tests, and equivalence/reference evidence exist
+  excluded_cases:
+    - no formula implementation, no source translation, no generated code import, and no public Rust API creation
+    - no Scilab execution result, no SGP4 certification claim, no external oracle fixture import, and no source archive bundling
+    - no coverage claim for all M00 rows or all 1,350 M07 represented function rows
+    - no certification evidence, no flight-readiness claim, no mission-readiness claim, no operational approval, no medical approval, and no regulated-use approval
+inputs:
+  - formula-vault/contracts/m00_angle_unit_conversions_contract.yaml
+  - formula-vault/candidates/m00_angle_unit_conversions.yaml
+  - formula-vault/manifests/m00_angle_unit_conversions_manifest.yaml
+  - docs/assurance/formula_vault_m00_source_expression_test_vectors.md
+  - existing M07 data-governance artifact stage4.m07_rust_port_v14.2026_06_15
+outputs:
+  - independently written mathematical contract summaries for deg2rad, rad2deg, and wrap2pi
+  - finite-domain, invalid-input, tolerance-policy, and reference-oracle metadata
+  - endpoint-sensitive wrap2pi test-vector contract
+  - blocked-by-default future implementation gate
+  - research_required validation metadata for this contract
+tests:
+  - cargo run -p xtask -- verify formula-vault
+  - cargo run -p xtask -- verify equation-inventory
+  - cargo run -p xtask -- verify cards
+  - cargo run -p xtask -- verify source-registry
+  - cargo run -p xtask -- verify data-registry
+  - final source-boundary scan confirms no M07 code, archive, fixture, generated formula code, public API, crate change, or local absolute path was promoted
+failure_modes:
+  - future implementation treats this metadata as approval without Rust tests and equivalence/reference evidence
+  - future implementation collapses wrap2pi endpoint behavior into an unreviewed interval convention
+  - future candidate must not treat the M07 archive as bundled implementation source
+  - documentation is misread even though it provides no certification evidence, no readiness evidence, no operational approval, no medical approval, and no regulated-use approval
+notes: "Stage 4 Chunk 7F validation card for M00 source-expression and test-vector metadata only. This card does not implement formulas, import M07 code, run Scilab/SGP4 checks, create public application programming interfaces, or approve operational use."

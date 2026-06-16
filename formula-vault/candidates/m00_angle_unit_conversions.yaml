@@ -86,6 +86,19 @@ candidate_manifest:
       source_expression_status: pending_future_human_review_no_source_import
       implementation_status: blocked_no_formula_implementation
 
+
+source_expression_contract:
+  contract_id: formula_vault.contract.m00_angle_unit_conversions.v1
+  contract_path: formula-vault/contracts/m00_angle_unit_conversions_contract.yaml
+  contract_status: metadata_test_contract_research_required
+  stage4_chunk: stage4_chunk7f_m00_source_expression_test_vector_contract
+  covered_formula_ids:
+    - formula_vault.m00.angle.deg2rad
+    - formula_vault.m00.angle.rad2deg
+    - formula_vault.m00.angle.wrap2pi
+  implementation_status: blocked_no_formula_implementation
+  public_surface_status: blocked_no_public_application_programming_interface
+
 formula_contract:
   formula_ids:
     - formula_vault.m00.angle.deg2rad

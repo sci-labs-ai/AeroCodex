@@ -42,6 +42,7 @@ review_links:
     m07_intake_doc: docs/source_intake/m07_formula_vault_intake.md
     formula_vault_readme: formula-vault/README.md
     validation_readme: validation/README.md
+    source_expression_contract: formula-vault/contracts/m00_angle_unit_conversions_contract.yaml
 
 formula_reference_links:
   - formula_id: formula_vault.m00.angle.deg2rad
@@ -88,6 +89,10 @@ review_checklist:
     - each selected formula identifier has a row alias, source-function alias, source-file locator, and pending source-expression review status
     - candidate, assurance, validation-card, source-registry, verifier, and intake documents are cross-referenced
     - no external archive contents, source expressions, fixtures, generated outputs, or local absolute paths are bundled
+  completed_in_chunk7f:
+    - metadata-only source-expression and test-vector contract added for deg2rad, rad2deg, and wrap2pi
+    - wrap2pi interval convention recorded as reviewed interval [0, 2*pi) with endpoint-sensitive expected values
+    - no implementation, generated code, fixtures, Scilab outputs, raw source, or public application programming interface added
   blocked_until_future_explicit_authorization:
     - source expression transcription or translation
     - implementation code or generated Rust
