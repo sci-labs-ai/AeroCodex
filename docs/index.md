@@ -11,6 +11,7 @@ Start with:
 - [Status vocabulary registry](../validation/status_vocabulary.yaml)
 - [Formula-vault staging design](assurance/formula_vault_staging.md)
 - [Formula-vault candidate gate](assurance/formula_vault_candidate_gate.md)
+- [Formula-vault M00 angle/unit conversion metadata slice](assurance/formula_vault_m00_angle_unit_candidate.md)
 - [M07 formula-vault intake](source_intake/m07_formula_vault_intake.md)
 - [BioSim-RS license-bound architecture](assurance/biosim_rs_license_architecture.md)
 - [BioSim-RS resource identity and tick validation](assurance/biosim_rs_resource_tick_validation.md)

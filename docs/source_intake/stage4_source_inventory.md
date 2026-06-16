@@ -81,6 +81,12 @@ Chunk 7A adds a metadata-only gate for future formula-vault implementation candi
 
 The gate requires future per-slice source locators, variable/unit/frame/time metadata, domain/singularity/branch/tolerance records, evidence plans, and blocked-by-default promotion status before any formula implementation is proposed. It does not import M07 code, does not add archives or fixtures, does not run Scilab or SGP4 checks, does not create public APIs, and does not make certification, readiness, operational, medical, or regulated-use claims. The validation status remains `research_required`.
 
+## Chunk 7B formula-vault M00 angle/unit metadata slice
+
+Chunk 7B adds the first bounded formula-vault candidate metadata slice: `formula-vault/candidates/m00_angle_unit_conversions.yaml`, `docs/assurance/formula_vault_m00_angle_unit_candidate.md`, validation card `validation.formula_vault.m00_angle_unit_conversions`, and source seed `source.formula_vault.m00_angle_unit_conversions.research_required`.
+
+The slice is limited to M07 release-gate rows 3 through 5 for `app_deg2rad`, `app_rad2deg`, and `app_wrap2pi`, plus Scilab equivalence job locator `equivalence job 002`. It does not import M07 code, does not add archives or fixtures, does not execute Scilab, does not implement formulas, does not create public APIs, and does not make certification, readiness, operational, medical, or regulated-use claims. The validation status remains `research_required`.
+
 ## M07 astrodynamics release-candidate observations
 
 - The M07 artifact manifest reports 1,350 represented function rows.

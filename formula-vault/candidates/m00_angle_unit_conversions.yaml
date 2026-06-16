@@ -1,0 +1,152 @@
+# Stage 4 Chunk 7B formula-vault candidate metadata slice.
+#
+# Metadata only: this file has no formula implementation code, no generated
+# Rust, no Scilab execution output, no certification evidence, no flight
+# readiness, no mission readiness, no operational approval, and no regulated-use
+# approval.
+
+schema_version: formula_vault_candidate_slice.v1
+record_status: metadata_only_research_required
+
+slice:
+  id: formula_vault.m00_angle_unit_conversions.v1
+  title: M00 angle unit conversion and angle-wrap candidate metadata
+  lifecycle_label: equation_contract_drafted
+  stage4_chunk: stage4_chunk7b_formula_vault_first_metadata_slice
+  public_api_surface: blocked_no_public_application_programming_interface
+  implementation_surface: blocked_no_executable_formula_code
+  notes:
+    - First bounded formula-vault metadata slice after the Chunk 7A candidate gate.
+    - Selects three low-risk M00 unit/angle helper rows only.
+    - Does not import or translate the M07 implementation source.
+    - Does not cover the remaining M00 rows or any non-M00 astrodynamics formulas.
+
+sources:
+  source_artifact_ids:
+    - stage4.m07_rust_port_v14.2026_06_15
+  source_archive_sha256: 15b1ca3a39267187167c43ea1228f28fd4736c4456f65d072dc42a32a7b19190
+  docs_nested_zip_sha256: 5f228a2f885bbe67b2c280fb18d3bbd0c2386435f9758112e487ba6f9dc0142e
+  source_registry_seed_id: source.formula_vault.m00_angle_unit_conversions.research_required
+  validation_card_id: validation.formula_vault.m00_angle_unit_conversions
+  human_review_locators:
+    release_gate_csv: release-gate status csv; exact archive path captured in outside-run evidence
+    release_gate_rows:
+      - row_number_1_based_with_header: 3
+        milestone: M00
+        rust_function: app_deg2rad
+        scilab_function: foa_app_ast_app_deg2rad
+      - row_number_1_based_with_header: 4
+        milestone: M00
+        rust_function: app_rad2deg
+        scilab_function: foa_app_ast_app_rad2deg
+      - row_number_1_based_with_header: 5
+        milestone: M00
+        rust_function: app_wrap2pi
+        scilab_function: foa_app_ast_app_wrap2pi
+    source_files:
+      - Bate, Mueller, and White - Fundamentals of Astrodynamics/fundamentals_astrodynamics_scilab_cleaned_all/fundamentals_astrodynamics_scilab_cleaned_all/namespaced/appendices_scilab_astrodynamics/src/constants/ast_app_constants_conversions.sci
+    scilab_equivalence_jobs_csv: Scilab equivalence jobs csv; exact archive path captured in outside-run evidence
+    scilab_equivalence_job:
+      row_number_1_based_with_header: 3
+      job_id: equivalence job 002
+      source_basename: ast_app_constants_conversions.sci
+      local_source_path: source_scilab/m00_constants/ast_app_constants_conversions.sci
+      function_count_in_source_job: 12
+  source_boundary:
+    m07_archive_status: external_quarantine_reference_only
+    import_policy: no_bulk_import_no_generated_binary_no_raw_source_promotion
+    astrodynamics_crate_policy: no_replacement_and_no_public_api_without_explicit_future_gate
+
+formula_contract:
+  formula_ids:
+    - formula_vault.m00.angle.deg2rad
+    - formula_vault.m00.angle.rad2deg
+    - formula_vault.m00.angle.wrap2pi
+  selected_functions:
+    - rust_function: app_deg2rad
+      scilab_function: foa_app_ast_app_deg2rad
+      contract_intent: convert finite degree-valued angle metadata to radians; exact expression remains pending future source review before implementation.
+    - rust_function: app_rad2deg
+      scilab_function: foa_app_ast_app_rad2deg
+      contract_intent: convert finite radian-valued angle metadata to degrees; exact expression remains pending future source review before implementation.
+    - rust_function: app_wrap2pi
+      scilab_function: foa_app_ast_app_wrap2pi
+      contract_intent: normalize a finite radian angle into a two-pi interval; interval endpoint policy remains pending future source review before implementation.
+  variables:
+    - name: angle_degrees
+      applies_to: formula_vault.m00.angle.deg2rad
+      unit: degree
+      type: finite_real_scalar
+    - name: angle_radians
+      applies_to:
+        - formula_vault.m00.angle.rad2deg
+        - formula_vault.m00.angle.wrap2pi
+      unit: radian
+      type: finite_real_scalar
+  units:
+    - degree
+    - radian
+  coordinate_frames:
+    - not_frame_dependent
+  time_scales:
+    - not_time_scale_dependent
+  sign_conventions:
+    - positive angles follow the source-row convention; exact orientation is pending human source review before implementation.
+  valid_domain:
+    - finite real scalar inputs only
+  singularities:
+    - none identified for the metadata-only candidate; non-finite inputs remain excluded.
+  invalid_regions:
+    - NaN inputs are excluded.
+    - positive or negative infinity inputs are excluded.
+  branch_behavior:
+    - deg2rad and rad2deg are single-branch metadata candidates.
+    - wrap2pi interval endpoint behavior is not promoted until future source review and equivalence evidence exist.
+  tolerance_policy:
+    absolute_tolerance: pending_future_equivalence_plan
+    relative_tolerance: pending_future_equivalence_plan
+    rationale: No numerical tolerance is claimed in Chunk 7B because no executable implementation or reference fixture is promoted.
+
+validation_records:
+  required_source_registry_seed: source.formula_vault.m00_angle_unit_conversions.research_required
+  required_validation_card: validation.formula_vault.m00_angle_unit_conversions
+  status: research_required
+  status_upgrade_policy: blocked_without_source_review_equivalence_and_reference_evidence
+
+evidence_plan:
+  rust_gates:
+    - future bounded Rust unit tests only if a later chunk explicitly authorizes implementation
+  scilab_equivalence_jobs:
+    - equivalence job 002
+  sgp4_reference_checks: []
+  analytical_identity_checks:
+    - deg2rad and rad2deg inverse-consistency checks after future implementation authorization
+    - wrap2pi interval and periodicity checks after future implementation authorization
+  reference_oracle_checks:
+    - source-row inspection and independent unit-conversion oracle before status upgrade
+  fixture_hashes: []
+  tolerance_rationale: deferred_until_future_equivalence_evidence
+
+promotion_gate:
+  default_state: blocked
+  required_before_promotion:
+    - source locators rechecked against the registered M07 archive hash
+    - source expressions reviewed without bulk source import
+    - implementation chunk explicitly authorized
+    - Rust unit tests and equivalence/reference checks written for this bounded formula list only
+    - no raw M07 source, generated binary, fixture, local absolute path, or evidence log promoted
+    - no public application programming interface promoted without explicit future authorization
+    - research and preliminary-design caveat repeated
+
+non_claims:
+  no_formula_implementation: true
+  no_source_translation: true
+  no_scilab_execution_result: true
+  no_sgp4_certification_claim: true
+  no_certification_evidence: true
+  no_flight_readiness: true
+  no_mission_readiness: true
+  no_operational_approval: true
+  no_regulated_use_approval: true
+  no_bulk_m07_import: true
+  no_external_parity_claim_without_evidence: true

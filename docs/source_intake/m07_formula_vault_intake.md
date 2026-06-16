@@ -59,20 +59,20 @@ M07 material should move through these states in small, reviewable chunks:
 
 These are quarantine lifecycle labels. They do not replace the canonical validation/status vocabulary and should not be written as `data-governance` validation statuses unless a later verifier explicitly supports them.
 
-## First future metadata slice
+## First metadata slice
 
-A later formula-vault metadata slice should copy and complete `formula-vault/templates/implementation_candidate_slice.yaml` for a small, low-risk subset only. That slice should prefer a few representative astrodynamics formulas with clear source references, simple units, explicit domains, and independent reference values. It should not attempt to ingest all 1,350 represented rows at once.
+Stage 4 Chunk 7B adds the first formula-vault metadata slice by copying the candidate-gate shape into `formula-vault/candidates/m00_angle_unit_conversions.yaml` for a small, low-risk subset only. The slice covers three M00 angle/unit helper rows with clear M07 release-gate row locators and Scilab equivalence job locator `equivalence job 002`. It does not attempt to ingest all 1,350 represented rows at once.
 
-The first metadata slice should produce:
+The first metadata slice records:
 
-- a formula inventory file or directory approved by the repo;
+- a bounded formula-vault candidate metadata file approved by the repo;
 - unique `formula_id` values;
 - source artifact references back to `stage4.m07_rust_port_v14.2026_06_15`;
-- source equation/table/page/function-row locators;
+- source status-row/function locators;
 - variables and units;
 - coordinate/time assumptions;
-- valid domains and singularities/exclusions;
-- tolerance policy;
+- valid domains and invalid non-finite inputs;
+- deferred tolerance policy;
 - planned reference-oracle or Scilab equivalence checks;
 - a promotion-gate field that remains blocked until evidence exists.
 

@@ -1,0 +1,24 @@
+id: source.formula_vault.m00_angle_unit_conversions.research_required
+title: Formula-vault M00 angle unit conversion metadata slice source seed
+category: validation
+status: research_required
+intended_use:
+  - Trace the bounded Stage 4 Chunk 7B formula-vault candidate metadata slice for M00 angle/unit conversion helpers.
+  - Tie the candidate record to M07 release-gate CSV rows 3, 4, and 5 and Scilab equivalence job 002 without importing source code.
+  - Preserve the M07 source boundary as external quarantine/reference-only material until a later explicit implementation chunk is authorized.
+requested_details:
+  - M07 source artifact id stage4.m07_rust_port_v14.2026_06_15 with registered SHA256 15b1ca3a39267187167c43ea1228f28fd4736c4456f65d072dc42a32a7b19190.
+  - Validation-doc nested ZIP SHA256 5f228a2f885bbe67b2c280fb18d3bbd0c2386435f9758112e487ba6f9dc0142e observed during Chunk 7B inspection.
+  - release-gate status csv rows 3, 4, and 5 for app_deg2rad, app_rad2deg, and app_wrap2pi.
+  - Scilab equivalence jobs csv row 3, job_id equivalence job 002, source_basename ast_app_constants_conversions.sci, pending Scilab runner and Rust regression statuses.
+  - Source file locator appendices_scilab_astrodynamics/src/constants/ast_app_constants_conversions.sci for future human review.
+implementation_notes:
+  - Chunk 7B adds metadata only under formula-vault/candidates and assurance/validation/source records.
+  - No M07 source code, generated binaries, raw archives, fixtures, public Rust APIs, crate changes, or replacement astrodynamics content are imported.
+  - Exact formula expressions, wrap interval endpoint behavior, and numerical tolerances remain blocked until a later explicit implementation and equivalence chunk.
+  - The current validation status remains research_required.
+limits:
+  - No formula implementation, no source translation, no generated code import, and no public application programming interface.
+  - Not a Scilab execution result, no SGP4 certification claim, no external oracle fixture, and no M07 parity claim.
+  - No certification evidence, no flight readiness, no mission readiness, no operational use, no medical use, and no regulated-use suitability.
+notes: "Stage 4 Chunk 7B source seed for the first bounded formula-vault metadata slice. Later work must add implementation authorization, source-review evidence, Rust tests, and equivalence/reference evidence before any status upgrade; no public API promotion is considered without a later explicit gate."

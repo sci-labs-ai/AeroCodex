@@ -1,0 +1,44 @@
+id: validation.formula_vault.m00_angle_unit_conversions
+name: Formula-vault M00 angle unit conversion metadata slice
+category: validation
+status: research_required
+source:
+  id: source.formula_vault.m00_angle_unit_conversions.research_required
+  status: research_required
+assumptions:
+  - Stage 4 Chunk 7B is a metadata-only formula-vault candidate slice and does not implement formulas
+  - selected source rows are limited to M07 M00 app_deg2rad, app_rad2deg, and app_wrap2pi entries
+  - M07 source material remains external and quarantine/reference-only
+  - exact source expressions, wrap endpoint behavior, numerical tolerances, and public API shape remain blocked until a future explicitly authorized implementation chunk
+domain:
+  summary: "metadata-only candidate record for three M00 angle/unit conversion helper rows"
+  bounds:
+    - applies only to formula_vault.m00.angle.deg2rad, formula_vault.m00.angle.rad2deg, and formula_vault.m00.angle.wrap2pi
+    - source locators are release-gate CSV rows 3 through 5 and Scilab equivalence job 002
+    - records variables, units, finite-input domain, invalid non-finite inputs, and future evidence plan
+    - status remains research_required until source review, equivalence evidence, and Rust tests exist
+  excluded_cases:
+    - no formula implementation, no source translation, no generated code import, and no public Rust API creation
+    - no Scilab execution result, no SGP4 certification claim, no external oracle fixture import, and no source archive bundling
+    - no coverage claim for all M00 rows or all 1,350 M07 represented function rows
+    - no certification evidence, no flight-readiness claim, no mission-readiness claim, no operational approval, no medical approval, and no regulated-use approval
+inputs:
+  - formula-vault/candidates/m00_angle_unit_conversions.yaml
+  - docs/assurance/formula_vault_m00_angle_unit_candidate.md
+  - existing M07 data-governance artifact stage4.m07_rust_port_v14.2026_06_15
+outputs:
+  - bounded M00 angle/unit conversion candidate metadata record
+  - per-slice source-registry seed for M00 angle/unit conversion metadata
+  - blocked-by-default future evidence plan for equivalence job 002
+  - research_required validation metadata for this bounded slice
+tests:
+  - cargo run -p xtask -- verify cards
+  - cargo run -p xtask -- verify source-registry
+  - cargo run -p xtask -- verify data-registry
+  - final source-boundary scan confirms no M07 code, archive, fixture, public API, crate, or local absolute path was promoted
+failure_modes:
+  - future implementation uses this metadata as approval without source-review and equivalence evidence
+  - future candidate treats equivalence job 002 as completed Scilab evidence rather than a pending equivalence job
+  - future candidate must not treat the M07 archive as bundled implementation source
+  - documentation is misread even though it provides no certification evidence, no readiness evidence, no operational approval, no medical approval, and no regulated-use approval
+notes: "Stage 4 Chunk 7B validation card for the first formula-vault metadata-only candidate slice. This card does not implement formulas, import M07 code, run Scilab/SGP4 checks, create public APIs, or approve operational use."
