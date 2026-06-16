@@ -50,7 +50,7 @@ artifacts:
     artifact_kind: repo_directory_validation_cards
     origin: current_repo
     license: MIT OR Apache-2.0
-    sha256: ad22183bf715db4c9323158728ea3384edb368d7a3f7f3a98b66d5211bbc0545
+    sha256: cd008b5b7a5026c2da48c92a7891af5d02e7dd62f84a14b00c9d009692ab6f24
     hash_status: aggregate_sha256_current_tracked_tree
     allowed_use: validation-card metadata and source-status tracking only
     bundling_decision: bundled repo-relative validation metadata; no external archive import
@@ -64,7 +64,7 @@ artifacts:
     artifact_kind: repo_directory_source_registry
     origin: current_repo
     license: MIT OR Apache-2.0 metadata with cited-source boundaries
-    sha256: c22fbb4c45789964c31888b1fb6aa0167213029f56d644e1abce42f7a8a3af55
+    sha256: eef0f71ee7bca91c5ec8aae36bafbedf6c44d76a42898eb2f749a9ce065b04f2
     hash_status: aggregate_sha256_current_tracked_tree
     allowed_use: source seed registry and validation-card linkage only
     bundling_decision: bundled repo-relative source metadata; not external source-code import

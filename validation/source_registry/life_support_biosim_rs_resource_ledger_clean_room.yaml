@@ -9,7 +9,7 @@ intended_use:
 requested_details:
   - Future reviewed clean-room specification package for broader BioSim resource-ledger semantics.
   - Fixture license and hash records before any BioSim scenario or external golden-master evidence is used.
-  - CLI/API smoke evidence before user-facing BioSim ledger, run, or replay commands are promoted.
+  - Separate Chunk 6E CLI/API smoke evidence records static friend-test reporting; persistent BioSim run/replay command surfaces still need future evidence before promotion.
   - External validation evidence before any habitat-control, biological-dynamics, crew-safety, operational, or certification claim is made.
 implementation_notes:
   - Current implementation groups caller-supplied before and after store totals by static resource kind and canonical unit.

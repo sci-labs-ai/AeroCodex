@@ -1,0 +1,43 @@
+id: life_support.biosim_rs.cli_api_smoke_friend_test_report
+name: BioSim-RS clean-room CLI/API smoke and friend-test report
+category: life_support
+status: research_required
+source:
+  id: source.life_support.biosim_rs.cli_api_smoke_clean_room.research_required
+  status: research_required
+assumptions:
+  - smoke inputs are deterministic built-in clean-room examples composed from Chunk 6A through Chunk 6D primitives
+  - API smoke means the public Rust functions remain callable and return research_required verification metadata
+  - CLI smoke means the package example prints the static friend-test report without loading external fixtures or runtimes
+  - formatted report markers repeat the research boundary and non-readiness caveat for friend testing
+domain:
+  summary: "static public API plus example-output smoke report for the clean-room BioSim-RS kernel slices"
+  bounds:
+    - resource catalog validation succeeds for the built-in clean-room resource families
+    - deterministic replay proof uses a single in-memory caller-supplied transaction
+    - minimal oxygen-loop proof uses the bounded two-store transfer helper from Chunk 6D
+    - example output must include status, codex id, smoke pass/fail fields, digests, and explicit non-claim wording
+  excluded_cases:
+    - BioSim scenario execution, external fixture replay, or golden-master parity
+    - persistent ledger storage, module scheduling, or habitat-control behavior
+    - biological dynamics, medical suitability, crew safety, operational use, certification, or regulated-use approval
+    - imported Java BioSim implementation code or GPL-bound BioSim-RS scaffold crates
+inputs:
+  - built-in clean-room resource catalog
+  - deterministic in-memory resource state and deltas for one replay smoke proof
+  - deterministic minimal oxygen-loop transfer proof parameters
+  - formatted friend-test report string emitted by the package example
+outputs:
+  - BioSimCliApiSmokeReport with API smoke, CLI smoke, catalog count, replay digests, and minimal oxygen-loop fields
+  - formatted friend-test report text for `cargo run -p aero-codex-life-support --example biosim_friend_test_smoke`
+  - research_required verification metadata for life_support.biosim_rs.cli_api_smoke_friend_test_report
+tests:
+  - cli_api_smoke_report_is_stable_and_research_scoped
+  - friend_test_report_text_exposes_research_boundary_without_readiness_claims
+  - cargo run -p aero-codex-life-support --example biosim_friend_test_smoke
+failure_modes:
+  - missing public API wiring causes the static smoke report test to fail
+  - missing formatted report markers causes command_line_smoke_passed to be false and emits a warning
+  - failed replay or minimal oxygen-loop proof marks the smoke report outside the documented domain
+  - status must not be interpreted as external validation, habitat safety, readiness, certification, or operational evidence
+notes: "Stage 4 Chunk 6E validation card for clean-room static CLI/API smoke and friend-test reporting only. This card does not promote scenario execution, persistent ledgers, biological dynamics, habitat-control, medical, operational, certification, or regulated-use behavior."

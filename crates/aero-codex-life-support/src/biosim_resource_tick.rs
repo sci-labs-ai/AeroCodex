@@ -34,6 +34,12 @@ pub fn biosim_resource_ledger_codex_id() -> &'static str {
     "life_support.biosim_rs.resource_ledger_minimal_o2_loop_conservation"
 }
 
+/// Codex identifier for the clean-room BioSim-RS static smoke/friend-test report gate.
+#[must_use]
+pub fn biosim_cli_api_smoke_codex_id() -> &'static str {
+    "life_support.biosim_rs.cli_api_smoke_friend_test_report"
+}
+
 /// Source-registry seed for the Chunk 6A clean-room resource/tick slice.
 #[must_use]
 pub fn biosim_resource_tick_clean_room_source_id() -> &'static str {
@@ -56,6 +62,12 @@ pub fn biosim_resource_replay_clean_room_source_id() -> &'static str {
 #[must_use]
 pub fn biosim_resource_ledger_clean_room_source_id() -> &'static str {
     "source.life_support.biosim_rs.resource_ledger_clean_room.research_required"
+}
+
+/// Source-registry seed for the Chunk 6E clean-room static smoke/friend-test slice.
+#[must_use]
+pub fn biosim_cli_api_smoke_clean_room_source_id() -> &'static str {
+    "source.life_support.biosim_rs.cli_api_smoke_clean_room.research_required"
 }
 
 fn biosim_resource_tick_sources() -> &'static [&'static str] {
@@ -83,6 +95,16 @@ fn biosim_resource_ledger_sources() -> &'static [&'static str] {
         "source.life_support.biosim_rs.transaction_commit_clean_room.research_required",
         "source.life_support.biosim_rs.deterministic_replay_clean_room.research_required",
         "source.life_support.biosim_rs.resource_ledger_clean_room.research_required",
+    ]
+}
+
+fn biosim_cli_api_smoke_sources() -> &'static [&'static str] {
+    &[
+        "source.life_support.biosim_rs.resource_tick_clean_room.research_required",
+        "source.life_support.biosim_rs.transaction_commit_clean_room.research_required",
+        "source.life_support.biosim_rs.deterministic_replay_clean_room.research_required",
+        "source.life_support.biosim_rs.resource_ledger_clean_room.research_required",
+        "source.life_support.biosim_rs.cli_api_smoke_clean_room.research_required",
     ]
 }
 
@@ -230,6 +252,24 @@ pub struct BioSimMinimalO2LoopConservationProof {
     pub final_sink_kg: f64,
 }
 
+/// Static smoke report for the clean-room BioSim-RS public API and example output.
+///
+/// The report is deliberately generated from built-in deterministic inputs. It is
+/// a friend-test convenience artifact only; it is not a scenario runner, external
+/// BioSim parity check, habitat controller, or readiness claim.
+#[derive(Debug, Clone, PartialEq)]
+pub struct BioSimCliApiSmokeReport {
+    pub api_smoke_passed: bool,
+    pub command_line_smoke_passed: bool,
+    pub catalog_resource_count: usize,
+    pub minimal_o2_ticks_executed: u64,
+    pub minimal_o2_report_passed: bool,
+    pub replay_before_digest: String,
+    pub replay_after_digest: String,
+    pub replay_delta_digest: String,
+    pub friend_test_report_lines: usize,
+}
+
 /// Conservative built-in resource catalog for future BioSim-RS slices.
 #[must_use]
 pub fn biosim_resource_catalog() -> &'static [BioSimResourceKind] {
@@ -327,6 +367,11 @@ pub fn biosim_resource_tick_verification_record(codex_id: &str) -> Option<Verifi
                 "Clean-room resource ledger and minimal oxygen-loop conservation check implemented for caller-supplied stores; no BioSim scenario engine, subsystem port, habitat-control behavior, or external BioSim parity evidence is included.",
             ),
         ),
+        id if id == biosim_cli_api_smoke_codex_id() => Some(VerificationRecord::research_required(
+            biosim_cli_api_smoke_codex_id(),
+            biosim_cli_api_smoke_sources(),
+            "Clean-room static API and example-output smoke report implemented from built-in deterministic inputs; no BioSim scenario execution, external runtime, habitat-control behavior, or readiness evidence is included.",
+        )),
         _ => None,
     }
 }
@@ -1028,6 +1073,140 @@ pub fn prove_biosim_minimal_o2_loop_conservation(
     Ok(result)
 }
 
+/// Runs the conservative built-in BioSim-RS API/example-output smoke path.
+///
+/// The smoke path exercises only AeroCodex clean-room primitives from Chunks
+/// 6A through 6D with deterministic in-memory inputs. It is intended for
+/// friend-testing that the public API and the printable report remain wired. It
+/// does not execute BioSim scenarios, load external fixtures, invoke a BioSim
+/// runtime, validate external parity, or assert habitat/mission readiness.
+pub fn run_biosim_cli_api_smoke_report() -> AeroResult<EngineeringResult<BioSimCliApiSmokeReport>> {
+    let catalog = validate_biosim_resource_catalog(biosim_resource_catalog())?;
+    let previous = validate_biosim_tick(0, 60.0)?.value;
+    let next = validate_biosim_tick(1, 60.0)?.value;
+    let resource_state = [
+        BioSimResourceQuantity {
+            kind: BioSimResourceKind::OxygenGas,
+            amount: 10.0,
+        },
+        BioSimResourceQuantity {
+            kind: BioSimResourceKind::CarbonDioxideGas,
+            amount: 1.0,
+        },
+        BioSimResourceQuantity {
+            kind: BioSimResourceKind::PotableWater,
+            amount: 25.0,
+        },
+    ];
+    let resource_deltas = [
+        BioSimResourceDelta {
+            kind: BioSimResourceKind::OxygenGas,
+            delta_amount: -0.5,
+        },
+        BioSimResourceDelta {
+            kind: BioSimResourceKind::CarbonDioxideGas,
+            delta_amount: 0.5,
+        },
+    ];
+    let replay = prove_biosim_resource_replay(previous, next, &resource_state, &resource_deltas)?;
+    let minimal_o2 = prove_biosim_minimal_o2_loop_conservation(10.0, 1.0, 0.25, 2, 60.0, 1.0e-12)?;
+
+    let api_smoke_passed = catalog.value == biosim_resource_catalog().len()
+        && replay.validity == ValidityStatus::WithinDocumentedDomain
+        && minimal_o2.validity == ValidityStatus::WithinDocumentedDomain
+        && minimal_o2.value.report.passed;
+
+    let mut report = BioSimCliApiSmokeReport {
+        api_smoke_passed,
+        command_line_smoke_passed: false,
+        catalog_resource_count: catalog.value,
+        minimal_o2_ticks_executed: minimal_o2.value.ticks_executed,
+        minimal_o2_report_passed: minimal_o2.value.report.passed,
+        replay_before_digest: replay.value.before_digest.value.clone(),
+        replay_after_digest: replay.value.after_digest.value.clone(),
+        replay_delta_digest: replay.value.delta_digest.value.clone(),
+        friend_test_report_lines: 0,
+    };
+    let provisional_text = format_biosim_friend_test_report(&report);
+    report.command_line_smoke_passed =
+        biosim_friend_test_report_text_has_required_markers(&provisional_text);
+    report.friend_test_report_lines = format_biosim_friend_test_report(&report).lines().count();
+
+    let validity = if report.api_smoke_passed && report.command_line_smoke_passed {
+        ValidityStatus::WithinDocumentedDomain
+    } else {
+        ValidityStatus::OutsideDocumentedDomain
+    };
+
+    let mut result = EngineeringResult::new(
+        report,
+        biosim_cli_api_smoke_codex_id(),
+        resource_tick_record(biosim_cli_api_smoke_codex_id()),
+    )
+    .with_assumption(
+        "biosim_rs.friend_test_static_smoke_only",
+        "smoke report uses deterministic built-in examples and does not execute external BioSim scenarios",
+    )
+    .with_assumption(
+        "biosim_rs.no_external_runtime_or_fixtures",
+        "no Java BioSim runtime, BioSim-RS scaffold crate, external fixture, or golden-master output is loaded",
+    )
+    .with_validity(validity);
+
+    if !result.value.command_line_smoke_passed {
+        result = result.with_warning(
+            "biosim_rs.friend_test_report_missing_marker",
+            "formatted friend-test report did not contain every required research-boundary marker",
+        );
+    }
+
+    Ok(result)
+}
+
+/// Formats the built-in BioSim-RS friend-test smoke report for example/CLI output.
+#[must_use]
+pub fn format_biosim_friend_test_report(report: &BioSimCliApiSmokeReport) -> String {
+    format!(
+        "BioSim-RS clean-room friend-test smoke report\n\
+status: research_required\n\
+codex_id: {codex_id}\n\
+api_smoke_passed: {api_passed}\n\
+command_line_smoke_passed: {cli_passed}\n\
+catalog_resource_count: {catalog_count}\n\
+minimal_o2_ticks_executed: {o2_ticks}\n\
+minimal_o2_report_passed: {o2_passed}\n\
+replay_before_digest: {before_digest}\n\
+replay_after_digest: {after_digest}\n\
+replay_delta_digest: {delta_digest}\n\
+friend_test_report_lines: {line_count}\n\
+scope: static public API plus example-output smoke only; no BioSim scenario execution; no external fixtures; not certified; not flight-ready; not mission-ready; not habitat-safe; not operational; not medical; not regulated-use approved.\n",
+        codex_id = biosim_cli_api_smoke_codex_id(),
+        api_passed = report.api_smoke_passed,
+        cli_passed = report.command_line_smoke_passed,
+        catalog_count = report.catalog_resource_count,
+        o2_ticks = report.minimal_o2_ticks_executed,
+        o2_passed = report.minimal_o2_report_passed,
+        before_digest = report.replay_before_digest,
+        after_digest = report.replay_after_digest,
+        delta_digest = report.replay_delta_digest,
+        line_count = report.friend_test_report_lines,
+    )
+}
+
+fn biosim_friend_test_report_text_has_required_markers(text: &str) -> bool {
+    [
+        "BioSim-RS clean-room friend-test smoke report",
+        "status: research_required",
+        "api_smoke_passed:",
+        "command_line_smoke_passed:",
+        "no BioSim scenario execution",
+        "not certified",
+        "not flight-ready",
+    ]
+    .iter()
+    .all(|marker| text.contains(marker))
+}
+
 /// Applies all resource deltas at one validated tick boundary or rejects the whole commit.
 ///
 /// This helper is intentionally a pure, caller-state-in/caller-state-out atomic
@@ -1590,6 +1769,51 @@ mod tests {
         assert_eq!(result.value.rows[0].residual, -1.0);
         assert!(!result.value.rows[0].passed);
         assert!(result.has_warnings());
+    }
+
+    #[test]
+    fn cli_api_smoke_report_is_stable_and_research_scoped() {
+        let report = run_biosim_cli_api_smoke_report().unwrap();
+
+        assert_eq!(report.codex_id, biosim_cli_api_smoke_codex_id());
+        assert_eq!(
+            report.verification_status(),
+            VerificationStatus::ResearchRequired
+        );
+        assert!(report.value.api_smoke_passed);
+        assert!(report.value.command_line_smoke_passed);
+        assert_eq!(
+            report.value.catalog_resource_count,
+            biosim_resource_catalog().len()
+        );
+        assert_eq!(report.value.minimal_o2_ticks_executed, 2);
+        assert!(report.value.minimal_o2_report_passed);
+        assert_eq!(report.value.replay_before_digest.len(), 16);
+        assert_eq!(report.value.replay_after_digest.len(), 16);
+        assert_ne!(
+            report.value.replay_before_digest,
+            report.value.replay_after_digest
+        );
+        assert!(report
+            .assumptions
+            .iter()
+            .any(|item| item.id == "biosim_rs.friend_test_static_smoke_only"));
+    }
+
+    #[test]
+    fn friend_test_report_text_exposes_research_boundary_without_readiness_claims() {
+        let report = run_biosim_cli_api_smoke_report().unwrap();
+        let text = format_biosim_friend_test_report(&report.value);
+
+        assert!(text.contains("BioSim-RS clean-room friend-test smoke report"));
+        assert!(text.contains("status: research_required"));
+        assert!(text.contains("api_smoke_passed: true"));
+        assert!(text.contains("command_line_smoke_passed: true"));
+        assert!(text.contains("not certified"));
+        assert!(text.contains("not flight-ready"));
+        assert!(text.contains("no BioSim scenario execution"));
+        assert!(!text.contains("mission ready"));
+        assert!(!text.contains("habitat safe"));
     }
 
     #[test]

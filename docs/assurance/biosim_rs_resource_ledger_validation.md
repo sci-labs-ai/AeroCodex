@@ -46,7 +46,7 @@ Chunk 6D itself does not add:
 - persistent resource-ledger storage;
 - append-only audit logging;
 - no BioSim scenario execution;
-- CLI/API run or replay commands;
+- persistent BioSim run/replay command surfaces;
 - external BioSim reference validation;
 - no biological dynamics;
 - no habitat-control behavior;
@@ -71,4 +71,4 @@ A complete Chunk 6D closeout should keep evidence outside the repository and inc
 - thin-film artifact and nomenclature checks using the existing prompt-required Python shim if bare `python` is unavailable;
 - safety scans proving no GPL source, archives, fixtures, generated binaries, evidence logs, `target/`, or root `Cargo.lock` are staged.
 
-The next BioSim-RS implementation-oriented chunk is Chunk 6E for CLI/API smoke tests and a friend-test report. It must not begin without explicit authorization.
+Chunk 6E adds a separate static CLI/API smoke and friend-test report wrapper; it does not change the Chunk 6D scope or promote scenario execution.

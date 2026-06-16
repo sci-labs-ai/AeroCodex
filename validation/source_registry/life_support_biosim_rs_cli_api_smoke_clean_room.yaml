@@ -1,0 +1,22 @@
+id: source.life_support.biosim_rs.cli_api_smoke_clean_room.research_required
+title: BioSim-RS clean-room CLI/API smoke source seed
+category: life_support
+status: research_required
+intended_use:
+  - Clean-room source seed for a static public API and package-example smoke report over the existing BioSim-RS kernel slices.
+  - Traceability anchor for Stage 4 Chunk 6E implementation in the existing life-support crate.
+  - Boundary record showing that Java BioSim code, GPL-bound BioSim-RS scaffold crates, fixtures, scenarios, external runtimes, and golden-master outputs were not imported.
+requested_details:
+  - Future fixture license and hash records before any BioSim scenario or external golden-master evidence is used.
+  - Future command surface specification before any user-facing BioSim scenario run, replay, or ledger command is promoted.
+  - External validation evidence before any habitat-control, biological-dynamics, crew-safety, operational, certification, or regulated-use claim is made.
+implementation_notes:
+  - Current implementation composes existing clean-room resource catalog, tick, atomic commit, deterministic replay, and minimal oxygen-loop helpers.
+  - The package example prints a deterministic friend-test smoke report and does not parse operator inputs or load external files.
+  - Report digests use the existing dependency-free fnv-1a replay smoke evidence and remain non-cryptographic.
+  - Status remains research_required pending source review and external validation evidence.
+limits:
+  - Not a BioSim scenario runner, habitat controller, life-support simulator, or external parity check.
+  - Not a persistent ledger, module scheduler, fixture importer, biological model, medical suitability claim, or cryptographic integrity system.
+  - Not evidence of operational, crew-safety, certification, flight-readiness, mission-readiness, or regulated-use suitability.
+notes: "Stage 4 Chunk 6E clean-room source seed. Later chunks must add separate cards and evidence before scenario execution, external BioSim parity, persistent command surfaces, fixture replay, or habitat-control behavior is promoted."

@@ -21,7 +21,7 @@ domain:
     - minimal oxygen-loop proof uses positive transfer amount, positive tick duration, and at least one tick
   excluded_cases:
     - persistent ledger storage or append-only audit log
-    - BioSim scenario execution, CLI/API run commands, or external fixture replay
+    - BioSim scenario execution, persistent run/replay command surfaces, or external fixture replay
     - biological dynamics, habitat-control behavior, crew safety, or medical suitability
     - external Java BioSim or GPL-bound scaffold source validation
 inputs:

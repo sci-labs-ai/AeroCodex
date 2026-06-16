@@ -69,6 +69,12 @@ Chunk 6D adds clean-room grouped resource-ledger residual checks under `crates/a
 
 The slice does not import Java BioSim code, does not import the BioSim-RS scaffold crates, does not execute scenarios, does not add fixtures, and does not implement persistent ledger storage, biological dynamics, habitat-control behavior, or external BioSim parity. The validation status remains `research_required`.
 
+## Chunk 6E BioSim-RS CLI/API smoke and friend-test report
+
+Chunk 6E adds a static clean-room smoke/reporting slice under `crates/aero-codex-life-support/src/biosim_resource_tick.rs`, plus package example `crates/aero-codex-life-support/examples/biosim_friend_test_smoke.rs`, validation card `life_support.biosim_rs.cli_api_smoke_friend_test_report`, and source seed `source.life_support.biosim_rs.cli_api_smoke_clean_room.research_required`. It composes the Chunk 6A through Chunk 6D primitives with deterministic built-in inputs and prints a friend-test report that repeats the research boundary.
+
+The slice does not import Java BioSim code, does not import the BioSim-RS scaffold crates, does not execute scenarios, does not add external fixtures, and does not implement persistent command surfaces, biological dynamics, habitat-control behavior, or external BioSim parity. The validation status remains `research_required`.
+
 ## M07 astrodynamics release-candidate observations
 
 - The M07 artifact manifest reports 1,350 represented function rows.

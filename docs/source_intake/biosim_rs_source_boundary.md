@@ -1,6 +1,6 @@
 # BioSim-RS Source Boundary
 
-This source-intake note records the Stage 4 Chunk 4 boundary for BioSim-RS, the Chunk 6A clean-room resource/tick slice, the Chunk 6B clean-room atomic transaction commit slice, the Chunk 6C clean-room deterministic ordering/digest slice, and the Chunk 6D clean-room resource-ledger slice. It does not import any source archive, does not promote GPL-bound implementation code, and does not change AeroCodex's current dual `MIT OR Apache-2.0` core.
+This source-intake note records the Stage 4 Chunk 4 boundary for BioSim-RS, the Chunk 6A clean-room resource/tick slice, the Chunk 6B clean-room atomic transaction commit slice, the Chunk 6C clean-room deterministic ordering/digest slice, the Chunk 6D clean-room resource-ledger slice, and the Chunk 6E clean-room CLI/API smoke slice. It does not import any source archive, does not promote GPL-bound implementation code, and does not change AeroCodex's current dual `MIT OR Apache-2.0` core.
 
 AeroCodex remains research and preliminary-design software. It is not certified, flight-ready, mission-ready, habitat-safe, medical, operational, or regulated-use approved.
 
@@ -29,7 +29,7 @@ The following labels are source-intake lifecycle labels for BioSim-RS. They do n
 | `clean_room_implementation_lane` | Implementation role builds from approved specs without inspecting GPL-bound implementation code. | Bounded code only after independence evidence |
 | `rejected_or_superseded` | The artifact or lane is no longer used. | Retain provenance note and block promotion |
 
-## Allowed planning and Chunk 6A/6B/6C/6D use
+## Allowed planning and Chunk 6A/6B/6C/6D/6E use
 
 Chunk 4 use remains limited to:
 
@@ -47,6 +47,8 @@ Chunk 6C adds only clean-room deterministic resource ordering and fnv-1a before/
 
 Chunk 6D adds only clean-room grouped resource-ledger residual checks and bounded minimal oxygen-loop conservation proof evidence in `crates/aero-codex-life-support`, with source seed `source.life_support.biosim_rs.resource_ledger_clean_room.research_required` and validation card `life_support.biosim_rs.resource_ledger_minimal_o2_loop_conservation`. It uses no external BioSim archive contents, no GPL-bound scaffold crates, no fixtures, no scenarios, and no persistent ledger storage, biological dynamics, habitat-control behavior, or external BioSim parity claim.
 
+Chunk 6E adds only static clean-room API/example-output smoke reporting in `crates/aero-codex-life-support`, with source seed `source.life_support.biosim_rs.cli_api_smoke_clean_room.research_required` and validation card `life_support.biosim_rs.cli_api_smoke_friend_test_report`. It uses no external BioSim archive contents, no GPL-bound scaffold crates, no fixtures, no scenarios, and no persistent command surface, biological dynamics, habitat-control behavior, or external BioSim parity claim.
+
 ## Blocked use now
 
 The following remain blocked:
@@ -56,7 +58,7 @@ The following remain blocked:
 - importing the BioSim-RS bootstrap scaffold as workspace crates;
 - using GPL-bound fixtures without a fixture license and hash record;
 - claiming habitat safety, medical suitability, operational readiness, certification, or regulated-use approval;
-- adding persistent resource-ledger storage, broader conservation models, scenario-execution, or habitat-control behavior without new slice-specific evidence;
+- adding persistent resource-ledger storage, broader conservation models, scenario-execution, persistent command surfaces, or habitat-control behavior without new slice-specific evidence;
 - merging any GPL-derived BioSim-RS implementation into the dual AeroCodex core before the license path and validation gates are accepted.
 
 ## Future intake records
