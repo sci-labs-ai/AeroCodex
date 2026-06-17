@@ -8,7 +8,7 @@ artifacts:
     artifact_kind: repo_file_manifest
     origin: current_repo
     license: MIT OR Apache-2.0 with source-material attribution boundaries
-    sha256: bc4a8b0c4357c0521acd51504300f576894160b5dd73c547ed4244b8973c7277
+    sha256: 9f14c229898d6e36f0d0a6304aee1346e2e51bf80e1836629e05a00a77a6b61a
     hash_status: sha256_verified_current_repo_file
     allowed_use: in-repository provenance and thin-film source manifest tracking only
     bundling_decision: bundled repo-relative governance artifact; not an external-code import
