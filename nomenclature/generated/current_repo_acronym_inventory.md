@@ -7,141 +7,264 @@ This is an adoption snapshot for the nomenclature/acronym policy. It intentional
 ## Summary
 
 - `artifact_id_or_version_token`: 1
-- `chemical_formula_or_unit_symbol`: 74
-- `compound_registered_or_known`: 55
-- `needs_registry_or_waiver`: 223
-- `registered`: 43
-- `software_or_repo_infrastructure`: 11
+- `chemical_formula_or_unit_symbol`: 94
+- `compound_registered_or_known`: 61
+- `needs_registry_or_waiver`: 426
+- `registered`: 69
+- `software_or_repo_infrastructure`: 13
 - `uppercase_word_or_heading`: 160
 
 ## Top tokens
 
 | Token | Count | Files | Category | First location |
 |---|---:|---:|---|---|
-| `ID` | 831 | 36 | `software_or_repo_infrastructure` | `archive/prompts/Pasted markdown.md:182` |
-| `CODEX` | 489 | 14 | `uppercase_word_or_heading` | `archive/prompts/Pasted markdown.md:255` |
-| `SOURCES` | 150 | 11 | `uppercase_word_or_heading` | `crates/aero-codex-aerodynamics/src/lib.rs:40` |
-| `SOURCE` | 149 | 21 | `uppercase_word_or_heading` | `crates/aero-codex-aerodynamics/src/lib.rs:35` |
+| `STATUS` | 2099 | 6 | `uppercase_word_or_heading` | `crates/aero-codex-constants/src/lib.rs:14` |
+| `GATE` | 2083 | 4 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:2` |
+| `PORT` | 2083 | 4 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:2` |
+| `RELEASE` | 2083 | 4 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:2` |
+| `J2` | 1575 | 8 | `chemical_formula_or_unit_symbol` | `archive/prompts/Pasted markdown.md:1464` |
+| `ID` | 937 | 55 | `software_or_repo_infrastructure` | `archive/prompts/Pasted markdown.md:182` |
+| `M00` | 686 | 37 | `chemical_formula_or_unit_symbol` | `README.md:23` |
+| `CODEX` | 550 | 14 | `uppercase_word_or_heading` | `archive/prompts/Pasted markdown.md:255` |
+| `CR3BP` | 278 | 3 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:302` |
+| `M07` | 264 | 56 | `chemical_formula_or_unit_symbol` | `README.md:29` |
+| `SSO` | 256 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:5` |
+| `DCM` | 254 | 3 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:433` |
+| `ODE` | 239 | 3 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:6` |
+| `LVLH/CW` | 227 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:81` |
+| `LVLH` | 175 | 3 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:81` |
+| `M06` | 172 | 2 | `chemical_formula_or_unit_symbol` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:549` |
+| `SOURCES` | 168 | 11 | `uppercase_word_or_heading` | `crates/aero-codex-aerodynamics/src/lib.rs:40` |
+| `API` | 159 | 63 | `registered` | `README.md:114` |
+| `SOURCE` | 158 | 21 | `uppercase_word_or_heading` | `crates/aero-codex-aerodynamics/src/lib.rs:35` |
+| `TLE` | 156 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:549` |
+| `RS` | 142 | 35 | `chemical_formula_or_unit_symbol` | `README.md:50` |
+| `SGP4` | 141 | 22 | `registered` | `data-governance/DATA_REGISTRY.yaml:196` |
+| `CW` | 117 | 3 | `chemical_formula_or_unit_symbol` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:81` |
+| `P1` | 108 | 1 | `chemical_formula_or_unit_symbol` | `docs/source_intake/m07_formula_family_classifier/low_risk_candidate_shortlist.csv:8` |
 | `SHOCK` | 108 | 1 | `uppercase_word_or_heading` | `crates/aero-codex-gas-dynamics/src/lib.rs:32` |
+| `GPL` | 100 | 34 | `registered` | `README.md:117` |
 | `STANDARD` | 100 | 4 | `uppercase_word_or_heading` | `crates/aero-codex-atmosphere/src/lib.rs:16` |
-| `BLSS` | 92 | 35 | `registered` | `ARTIFACT_MANIFEST.md:18` |
+| `BLSS` | 96 | 36 | `registered` | `ARTIFACT_MANIFEST.md:18` |
+| `SGP4/TLE/TEME` | 94 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:549` |
+| `SGP4/TLE` | 90 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:549` |
 | `NASA` | 83 | 31 | `registered` | `archive/prompts/Pasted markdown.md:553` |
-| `AI` | 79 | 19 | `software_or_repo_infrastructure` | `ARTIFACT_MANIFEST.md:41` |
+| `SGP4/TEME` | 79 | 3 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:549` |
+| `AI` | 78 | 18 | `software_or_repo_infrastructure` | `ARTIFACT_MANIFEST.md:41` |
+| `TEME/ECEF/PEF` | 78 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:549` |
 | `MAX` | 75 | 11 | `uppercase_word_or_heading` | `crates/aero-codex-aerodynamics/src/lib.rs:316` |
 | `AC-P0` | 70 | 1 | `compound_registered_or_known` | `docs/phase_0_001/tracked_tasks.md:40` |
+| `README` | 66 | 20 | `software_or_repo_infrastructure` | `Cargo.toml:24` |
 | `RATIO` | 63 | 4 | `uppercase_word_or_heading` | `crates/aero-codex-gas-dynamics/src/lib.rs:21` |
+| `SEQ-118` | 63 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:148` |
+| `O2` | 61 | 19 | `chemical_formula_or_unit_symbol` | `crates/aero-codex-life-support/examples/thinfilm_demo.rs:33` |
+| `SHA256` | 61 | 21 | `software_or_repo_infrastructure` | `ARTIFACT_MANIFEST.md:6` |
 | `OBLIQUE` | 60 | 1 | `uppercase_word_or_heading` | `crates/aero-codex-gas-dynamics/src/lib.rs:55` |
-| `README` | 60 | 16 | `software_or_repo_infrastructure` | `Cargo.toml:24` |
+| `SEQ-058` | 60 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:214` |
 | `TRANSFER` | 60 | 5 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:31` |
 | `LEVEL` | 58 | 5 | `uppercase_word_or_heading` | `crates/aero-codex-atmosphere/src/lib.rs:17` |
+| `VECTOR` | 57 | 3 | `needs_registry_or_waiver` | `crates/aero-codex-astrodynamics/src/lib.rs:50` |
+| `CI` | 54 | 19 | `registered` | `README.md:23` |
 | `GAS` | 54 | 5 | `uppercase_word_or_heading` | `crates/aero-codex-atmosphere/src/lib.rs:16` |
+| `RATE` | 54 | 8 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:75` |
 | `NORMAL` | 53 | 1 | `uppercase_word_or_heading` | `crates/aero-codex-gas-dynamics/src/lib.rs:32` |
-| `API` | 51 | 29 | `registered` | `archive/prompts/Pasted markdown.md:363` |
-| `RATE` | 50 | 7 | `uppercase_word_or_heading` | `crates/aero-codex-atmosphere/src/lib.rs:38` |
-| `M3` | 48 | 5 | `chemical_formula_or_unit_symbol` | `crates/aero-codex-astrodynamics/src/lib.rs:553` |
+| `M3` | 48 | 5 | `chemical_formula_or_unit_symbol` | `crates/aero-codex-astrodynamics/src/lib.rs:1197` |
 | `SEA` | 48 | 4 | `uppercase_word_or_heading` | `crates/aero-codex-atmosphere/src/lib.rs:17` |
-| `EARTH` | 47 | 3 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:553` |
+| `EARTH` | 47 | 3 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:1197` |
 | `FLUX` | 46 | 6 | `uppercase_word_or_heading` | `crates/aero-codex-heat-transfer/src/lib.rs:20` |
-| `O2` | 46 | 6 | `chemical_formula_or_unit_symbol` | `crates/aero-codex-life-support/examples/thinfilm_demo.rs:33` |
-| `PARAMETER` | 46 | 7 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:553` |
+| `PARAMETER` | 46 | 7 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:1197` |
 | `PRESSURE` | 46 | 6 | `uppercase_word_or_heading` | `crates/aero-codex-aerodynamics/src/lib.rs:20` |
 | `CONSTANT` | 45 | 6 | `uppercase_word_or_heading` | `crates/aero-codex-atmosphere/src/lib.rs:16` |
 | `DELTA` | 45 | 2 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:31` |
-| `S2` | 45 | 5 | `chemical_formula_or_unit_symbol` | `crates/aero-codex-astrodynamics/src/lib.rs:553` |
+| `S2` | 45 | 5 | `chemical_formula_or_unit_symbol` | `crates/aero-codex-astrodynamics/src/lib.rs:1197` |
 | `HOHMANN` | 44 | 1 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:31` |
-| `C3` | 43 | 12 | `chemical_formula_or_unit_symbol` | `README.md:34` |
+| `MIT` | 44 | 23 | `software_or_repo_infrastructure` | `Cargo.toml:22` |
 | `PER` | 43 | 6 | `uppercase_word_or_heading` | `crates/aero-codex-atmosphere/src/lib.rs:16` |
+| `C3` | 42 | 11 | `chemical_formula_or_unit_symbol` | `crates/aero-codex-life-support/src/lib.rs:23` |
+| `PI` | 42 | 9 | `chemical_formula_or_unit_symbol` | `crates/aero-codex-aerodynamics/src/lib.rs:17` |
+| `ASTRODYNAMICS` | 40 | 2 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:121` |
+| `ZIP` | 40 | 11 | `software_or_repo_infrastructure` | `ARTIFACT_MANIFEST.md:5` |
 | `DOI` | 39 | 14 | `registered` | `data/thinfilm/source_verification.csv:2` |
 | `RCS` | 39 | 15 | `registered` | `docs/deployment/deploy_agent_prompt_nomenclature_policy_v0_002.md:58` |
 | `SI` | 39 | 22 | `registered` | `crates/aero-codex-aerodynamics/src/lib.rs:6` |
 | `BALANCE` | 38 | 3 | `uppercase_word_or_heading` | `crates/aero-codex-life-support/src/brlss_backbone.rs:164` |
 | `CEA` | 38 | 15 | `registered` | `archive/prompts/Pasted markdown.md:90` |
-| `GRAVITATIONAL` | 38 | 4 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:553` |
+| `GRAVITATIONAL` | 38 | 4 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:1197` |
 | `ISENTROPIC` | 38 | 3 | `uppercase_word_or_heading` | `crates/aero-codex-gas-dynamics/src/lib.rs:21` |
 | `NACA` | 38 | 14 | `registered` | `archive/prompts/Pasted markdown.md:552` |
-| `ASTRODYNAMICS` | 37 | 2 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:46` |
+| `P2` | 38 | 1 | `chemical_formula_or_unit_symbol` | `docs/source_intake/m07_formula_family_classifier/low_risk_candidate_shortlist.csv:17` |
+| `SEQ-040` | 38 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:87` |
+| `FROM` | 37 | 3 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:73` |
 | `MEL` | 37 | 2 | `registered` | `nomenclature/registry/waivers.yaml:22` |
 | `E014` | 36 | 7 | `chemical_formula_or_unit_symbol` | `nomenclature/README.md:87` |
 | `MASS` | 36 | 6 | `uppercase_word_or_heading` | `crates/aero-codex-gas-dynamics/src/lib.rs:29` |
 | `AIR` | 35 | 4 | `uppercase_word_or_heading` | `crates/aero-codex-atmosphere/src/lib.rs:16` |
 | `DENSITY` | 35 | 5 | `uppercase_word_or_heading` | `crates/aero-codex-atmosphere/src/lib.rs:17` |
 | `FAA` | 35 | 13 | `registered` | `docs/deployment/deploy_agent_prompt_nomenclature_policy_v0_002.md:35` |
+| `NAN` | 35 | 12 | `registered` | `crates/aero-codex-aerodynamics/src/lib.rs:249` |
+| `SEQ-175` | 35 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:518` |
+| `SEQ-159` | 34 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:433` |
 | `ECLSS` | 33 | 17 | `registered` | `archive/prompts/Pasted markdown.md:555` |
+| `REQUIRED` | 33 | 4 | `uppercase_word_or_heading` | `crates/aero-codex-constants/src/lib.rs:14` |
+| `SEQ-029` | 33 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:50` |
 | `CDR` | 32 | 14 | `registered` | `docs/deployment/deploy_agent_prompt_nomenclature_policy_v0_002.md:57` |
 | `KG` | 32 | 4 | `chemical_formula_or_unit_symbol` | `crates/aero-codex-atmosphere/src/lib.rs:16` |
 | `PBR` | 32 | 7 | `registered` | `crates/aero-codex-life-support/src/melissa_photobioreactor.rs:407` |
 | `RESIDUAL` | 32 | 4 | `uppercase_word_or_heading` | `crates/aero-codex-gas-dynamics/src/lib.rs:55` |
-| `ZIP` | 32 | 6 | `software_or_repo_infrastructure` | `ARTIFACT_MANIFEST.md:5` |
 | `MACH` | 31 | 1 | `uppercase_word_or_heading` | `crates/aero-codex-gas-dynamics/src/lib.rs:27` |
-| `REQUIRED` | 31 | 4 | `uppercase_word_or_heading` | `crates/aero-codex-constants/src/lib.rs:14` |
-| `SHA256` | 31 | 6 | `software_or_repo_infrastructure` | `ARTIFACT_MANIFEST.md:6` |
+| `SEQ-014` | 31 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:8` |
 | `TEMPERATURE` | 31 | 5 | `uppercase_word_or_heading` | `crates/aero-codex-atmosphere/src/lib.rs:18` |
-| `FROM` | 30 | 2 | `uppercase_word_or_heading` | `crates/aero-codex-propulsion/src/lib.rs:21` |
-| `NAN` | 30 | 12 | `registered` | `crates/aero-codex-aerodynamics/src/lib.rs:249` |
+| `ACX-NOM-WAIVER` | 30 | 2 | `needs_registry_or_waiver` | `nomenclature/docs/ACX-NOM-001.md:954` |
 | `ESM` | 29 | 11 | `registered` | `crates/aero-codex-life-support/examples/thinfilm_demo.rs:67` |
-| `PDE` | 29 | 13 | `registered` | `DATA_MANIFEST.toml:13` |
-| `PI` | 29 | 9 | `chemical_formula_or_unit_symbol` | `crates/aero-codex-aerodynamics/src/lib.rs:17` |
-| `RADIUS` | 28 | 4 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:553` |
+| `OR` | 29 | 14 | `chemical_formula_or_unit_symbol` | `Cargo.toml:22` |
+| `SEQ-041` | 29 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:100` |
+| `ACX-NOM-W008` | 28 | 3 | `compound_registered_or_known` | `nomenclature/ci/nom-rules.yaml:101` |
+| `I/O` | 28 | 2 | `compound_registered_or_known` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:128` |
+| `PDE` | 28 | 12 | `registered` | `DATA_MANIFEST.toml:13` |
+| `RADIUS` | 28 | 4 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:1197` |
+| `SEQ-026` | 28 | 1 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:191` |
+| `SEQ-057` | 28 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:266` |
+| `SEQ-061` | 28 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:252` |
+| `SEQ-130` | 28 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:386` |
+| `BASICS` | 27 | 8 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:127` |
+| `DATA` | 27 | 16 | `uppercase_word_or_heading` | `ARTIFACT_MANIFEST.md:22` |
 | `GAMMA` | 27 | 4 | `uppercase_word_or_heading` | `crates/aero-codex-atmosphere/src/lib.rs:17` |
+| `REGISTRY` | 27 | 12 | `needs_registry_or_waiver` | `data-governance/DATA_POLICY.md:9` |
 | `THINFILM` | 27 | 6 | `uppercase_word_or_heading` | `crates/aero-codex-life-support/src/brlss_backbone.rs:73` |
 | `AC` | 26 | 13 | `registered` | `docs/deployment/deploy_agent_prompt_nomenclature_policy_v0_002.md:59` |
 | `MEYER` | 26 | 1 | `uppercase_word_or_heading` | `crates/aero-codex-gas-dynamics/src/lib.rs:49` |
 | `PRANDTL` | 26 | 1 | `uppercase_word_or_heading` | `crates/aero-codex-gas-dynamics/src/lib.rs:49` |
 | `PROCEED` | 26 | 1 | `uppercase_word_or_heading` | `archive/prompts/Pasted markdown.md:1` |
+| `SEQ-025` | 26 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:35` |
+| `SEQ-027` | 26 | 2 | `needs_registry_or_waiver` | `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:58` |
 | `ALGAL` | 25 | 2 | `uppercase_word_or_heading` | `crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs:75` |
-| `BETA` | 25 | 1 | `uppercase_word_or_heading` | `crates/aero-codex-gas-dynamics/src/lib.rs:57` |
-| `SPECIFIC` | 25 | 4 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:29` |
-| `BASICS` | 24 | 8 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:52` |
-| `OXYGEN` | 24 | 4 | `uppercase_word_or_heading` | `crates/aero-codex-life-support/src/lib.rs:52` |
-| `SPEED` | 24 | 4 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:21` |
-| `TURN` | 24 | 1 | `uppercase_word_or_heading` | `crates/aero-codex-flight-dynamics/src/lib.rs:21` |
-| `DYNAMICS` | 23 | 2 | `uppercase_word_or_heading` | `crates/aero-codex-flight-dynamics/src/lib.rs:33` |
-| `REPORT` | 23 | 7 | `uppercase_word_or_heading` | `crates/aero-codex-constants/src/lib.rs:23` |
-| `DAILY` | 22 | 1 | `uppercase_word_or_heading` | `crates/aero-codex-life-support/src/lib.rs:47` |
-| `COEFFICIENT` | 21 | 1 | `uppercase_word_or_heading` | `crates/aero-codex-aerodynamics/src/lib.rs:26` |
-| `HEAT` | 21 | 2 | `uppercase_word_or_heading` | `crates/aero-codex-heat-transfer/src/lib.rs:25` |
-| `ROM` | 21 | 10 | `registered` | `crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs:440` |
-| `TROPOSPHERE` | 21 | 1 | `uppercase_word_or_heading` | `crates/aero-codex-atmosphere/src/lib.rs:25` |
-| `CO2` | 20 | 6 | `chemical_formula_or_unit_symbol` | `crates/aero-codex-life-support/examples/thinfilm_demo.rs:27` |
-| `DRAG` | 20 | 1 | `uppercase_word_or_heading` | `crates/aero-codex-aerodynamics/src/lib.rs:24` |
-| `LIFE` | 20 | 1 | `uppercase_word_or_heading` | `crates/aero-codex-life-support/src/lib.rs:65` |
-| `MEAN` | 20 | 3 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:553` |
-| `SUPPORT` | 20 | 1 | `uppercase_word_or_heading` | `crates/aero-codex-life-support/src/lib.rs:65` |
-| `CI` | 19 | 10 | `registered` | `docs/deployment/deploy_agent_prompt_nomenclature_policy_v0_002.md:13` |
-| `TWO` | 19 | 3 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:52` |
-| `BIOFILM` | 18 | 3 | `uppercase_word_or_heading` | `crates/aero-codex-life-support/src/nitrifying_biofilm.rs:177` |
-| `BVAD/ECLSS` | 17 | 11 | `compound_registered_or_known` | `crates/aero-codex-constants/src/lib.rs:30` |
-| `RESEARCH` | 17 | 3 | `uppercase_word_or_heading` | `README.md:4` |
-| `ACX-NOM-001` | 16 | 12 | `compound_registered_or_known` | `ARTIFACT_MANIFEST.md:43` |
-| `FLOW` | 16 | 3 | `uppercase_word_or_heading` | `crates/aero-codex-gas-dynamics/src/lib.rs:29` |
-| `INVERSE` | 16 | 1 | `uppercase_word_or_heading` | `crates/aero-codex-gas-dynamics/src/lib.rs:53` |
-| `OF` | 16 | 3 | `chemical_formula_or_unit_symbol` | `crates/aero-codex-astrodynamics/src/lib.rs:43` |
-| `STATUS` | 16 | 2 | `uppercase_word_or_heading` | `crates/aero-codex-constants/src/lib.rs:14` |
-| `TIME` | 16 | 2 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:41` |
-| `YAML` | 16 | 9 | `registered` | `docs/phase_0_001/final_microtasks_001_020_report.md:113` |
-| `ATMOSPHERE` | 15 | 2 | `uppercase_word_or_heading` | `crates/aero-codex-atmosphere/src/lib.rs:16` |
-| `CIRCULAR` | 15 | 1 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:21` |
-| `DRY` | 15 | 4 | `uppercase_word_or_heading` | `crates/aero-codex-atmosphere/src/lib.rs:17` |
-| `ECSS` | 15 | 9 | `registered` | `docs/deployment/deploy_agent_prompt_nomenclature_policy_v0_002.md:35` |
-| `IDEAL` | 15 | 2 | `uppercase_word_or_heading` | `crates/aero-codex-propulsion/src/lib.rs:23` |
-| `ISS` | 15 | 5 | `registered` | `citations/blss_thinfilm_refs.bib:3` |
-| `MIN` | 15 | 7 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:576` |
-| `NASA/JPL` | 15 | 12 | `compound_registered_or_known` | `archive/prompts/Pasted markdown.md:554` |
-| `NH4` | 15 | 3 | `chemical_formula_or_unit_symbol` | `crates/aero-codex-life-support/src/nitrifying_biofilm.rs:57` |
-| `ORBITAL` | 15 | 1 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:23` |
-| `PA` | 15 | 4 | `chemical_formula_or_unit_symbol` | `crates/aero-codex-atmosphere/src/lib.rs:18` |
-| `PDR` | 15 | 8 | `registered` | `nomenclature/docs/ACX-NOM-001.md:716` |
-| `PR` | 15 | 9 | `software_or_repo_infrastructure` | `archive/prompts/Pasted markdown.md:1428` |
-| `TIC` | 15 | 8 | `registered` | `crates/aero-codex-life-support/src/melissa_photobioreactor.rs:262` |
-| `TOTAL` | 15 | 2 | `uppercase_word_or_heading` | `crates/aero-codex-astrodynamics/src/lib.rs:39` |
-| `BASIC` | 14 | 6 | `uppercase_word_or_heading` | `crates/aero-codex-aerodynamics/src/lib.rs:38` |
-| `BOLTZMANN` | 14 | 3 | `uppercase_word_or_heading` | `crates/aero-codex-constants/src/lib.rs:89` |
-| `BUCKLING` | 14 | 2 | `uppercase_word_or_heading` | `crates/aero-codex-structures/src/lib.rs:30` |
-| `BVAD` | 14 | 7 | `registered` | `archive/prompts/Pasted markdown.md:555` |
 
 ## Tokens needing registry or waiver review
 
-- `ACX-NOM-WAIVER` (6 occurrences, 2 files), first seen at `nomenclature/docs/ACX-NOM-001.md:954`
+- `GATE` (2083 occurrences, 4 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:2`
+- `PORT` (2083 occurrences, 4 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:2`
+- `RELEASE` (2083 occurrences, 4 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:2`
+- `CR3BP` (278 occurrences, 3 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:302`
+- `SSO` (256 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:5`
+- `DCM` (254 occurrences, 3 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:433`
+- `ODE` (239 occurrences, 3 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:6`
+- `LVLH/CW` (227 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:81`
+- `LVLH` (175 occurrences, 3 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:81`
+- `TLE` (156 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:549`
+- `SGP4/TLE/TEME` (94 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:549`
+- `SGP4/TLE` (90 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:549`
+- `SGP4/TEME` (79 occurrences, 3 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:549`
+- `TEME/ECEF/PEF` (78 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:549`
+- `SEQ-118` (63 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:148`
+- `SEQ-058` (60 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:214`
+- `VECTOR` (57 occurrences, 3 files), first seen at `crates/aero-codex-astrodynamics/src/lib.rs:50`
+- `SEQ-040` (38 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:87`
+- `SEQ-175` (35 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:518`
+- `SEQ-159` (34 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:433`
+- `SEQ-029` (33 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:50`
+- `SEQ-014` (31 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:8`
+- `ACX-NOM-WAIVER` (30 occurrences, 2 files), first seen at `nomenclature/docs/ACX-NOM-001.md:954`
+- `SEQ-041` (29 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:100`
+- `SEQ-026` (28 occurrences, 1 files), first seen at `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:191`
+- `SEQ-057` (28 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:266`
+- `SEQ-061` (28 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:252`
+- `SEQ-130` (28 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:386`
+- `REGISTRY` (27 occurrences, 12 files), first seen at `data-governance/DATA_POLICY.md:9`
+- `SEQ-025` (26 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:35`
+- `SEQ-027` (26 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:58`
+- `SEQ-001` (24 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:459`
+- `SEQ-032` (24 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:67`
+- `SEQ-135` (24 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:422`
+- `SEQ-022` (23 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:29`
+- `SEQ-031` (22 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:59`
+- `SEQ-052` (22 occurrences, 1 files), first seen at `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:722`
+- `SEQ-062` (22 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:280`
+- `SEQ-063` (22 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:291`
+- `SEQ-180` (22 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:573`
+- `SEQ-045` (21 occurrences, 1 files), first seen at `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:643`
+- `SEQ-056` (21 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:200`
+- `SEQ-015` (20 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:7`
+- `SEQ-048` (20 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:185`
+- `SEQ-124` (20 occurrences, 1 files), first seen at `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:623`
+- `SEQ-125` (20 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:472`
+- `SEQ-134` (20 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:412`
+- `SEQ-008` (19 occurrences, 1 files), first seen at `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:55`
+- `SEQ-042` (19 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:104`
+- `SEQ-053` (19 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:211`
+- `SEQ-160` (19 occurrences, 1 files), first seen at `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:1054`
+- `SEQ-163` (18 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:453`
+- `SEQ-174` (18 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:509`
+- `SEQ-185` (18 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:373`
+- `SEQ-024` (17 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:40`
+- `SEQ-114` (17 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:340`
+- `SEQ-119` (17 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:172`
+- `SEQ-121` (17 occurrences, 1 files), first seen at `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:584`
+- `SEQ-004` (16 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:116`
+- `SEQ-019` (16 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:21`
+- `SEQ-047` (16 occurrences, 1 files), first seen at `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:706`
+- `SEQ-176` (16 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:535`
+- `SEQ-188` (16 occurrences, 1 files), first seen at `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:1200`
+- `SEQ-162` (15 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:450`
+- `SEQ-164` (15 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:456`
+- `SEQ-177` (15 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:543`
+- `SEQ-013` (14 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:4`
+- `SEQ-020` (14 occurrences, 1 files), first seen at `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:131`
+- `SEQ-054` (14 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:205`
+- `SEQ-117` (14 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:465`
+- `SEQ-123` (14 occurrences, 1 files), first seen at `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:609`
+- `SEQ-132` (14 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:403`
+- `SEQ-136` (14 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:356`
+- `SEQ-137` (14 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:363`
+- `SEQ-179` (14 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:566`
+- `SEQ-011` (13 occurrences, 1 files), first seen at `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:74`
+- `SEQ-012` (13 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:5`
+- `SEQ-034` (13 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:70`
+- `SEQ-039` (13 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:83`
+- `SEQ-165` (13 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:458`
+- `SEQ-172` (13 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:501`
+- `SEQ-184` (13 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:485`
+- `SEQ-009` (12 occurrences, 1 files), first seen at `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:25`
+- `SEQ-023` (12 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:32`
+- `SEQ-028` (12 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:46`
+- `SEQ-049` (12 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:196`
+- `SEQ-060` (12 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:246`
+- `SEQ-183` (12 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:588`
+- `SEQ-018` (11 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:17`
+- `SEQ-030` (11 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:53`
+- `SEQ-173` (11 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:507`
+- `SEQ-187` (11 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:382`
+- `PASS` (10 occurrences, 2 files), first seen at `docs/phase_0_001/version_lock_audit.md:28`
+- `SEQ-002` (10 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:2`
+- `SEQ-046` (10 occurrences, 1 files), first seen at `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:664`
+- `SEQ-059` (10 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:241`
+- `SEQ-081` (10 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:335`
+- `SEQ-083` (10 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:549`
+- `SEQ-115` (10 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:347`
+- `SEQ-169` (10 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:489`
+- `SEQ-120` (9 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:180`
+- `SEQ-122` (9 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:184`
+- `SEQ-146` (9 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:481`
+- `SEQ-168` (9 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:370`
+- `STATUSES` (9 occurrences, 1 files), first seen at `xtask/src/main.rs:110`
+- `DUE` (8 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/low_risk_candidate_shortlist.csv:2`
+- `SEQ-005` (8 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:119`
+- `SEQ-006` (8 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:123`
+- `SEQ-016` (8 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:14`
+- `SEQ-037` (8 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:76`
+- `SEQ-044` (8 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:112`
+- `SEQ-051` (8 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:198`
+- `SEQ-128` (8 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:352`
+- `SEQ-131` (8 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:400`
+- `SEQ-155` (8 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:557`
+- `SEQ-156` (8 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:561`
+- `SEQ-161` (8 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:446`
+- `SEQ-170` (8 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:494`
+- `SEQ-182` (8 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:584`
+- `SEQ-010` (7 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:6`
+- `SEQ-035` (7 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:80`
+- `SEQ-043` (7 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:115`
+- `SEQ-050` (7 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:194`
+- `SEQ-127` (7 occurrences, 1 files), first seen at `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:1176`
 - `AIM` (6 occurrences, 3 files), first seen at `nomenclature/REFERENCES.md:23`
 - `ELEMENT` (6 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/brlss_backbone.rs:164`
 - `ENERGY` (6 occurrences, 1 files), first seen at `crates/aero-codex-astrodynamics/src/lib.rs:29`
@@ -150,35 +273,42 @@ This is an adoption snapshot for the nomenclature/acronym policy. It intentional
 - `NITRATE` (6 occurrences, 3 files), first seen at `crates/aero-codex-life-support/src/melissa_photobioreactor.rs:650`
 - `NOZZLE` (6 occurrences, 2 files), first seen at `crates/aero-codex-propulsion/src/lib.rs:36`
 - `ORBIT` (6 occurrences, 1 files), first seen at `crates/aero-codex-astrodynamics/src/lib.rs:21`
+- `PROJECTION` (6 occurrences, 2 files), first seen at `crates/aero-codex-astrodynamics/src/lib.rs:60`
 - `R/` (6 occurrences, 2 files), first seen at `crates/aero-codex-thermo/src/lib.rs:25`
 - `RAD` (6 occurrences, 1 files), first seen at `crates/aero-codex-gas-dynamics/src/lib.rs:303`
-- `RECOVERY` (6 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/lib.rs:61`
+- `RECOVERY` (6 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/lib.rs:63`
 - `ROCKET` (6 occurrences, 2 files), first seen at `crates/aero-codex-propulsion/src/lib.rs:36`
 - `SAMPLE` (6 occurrences, 4 files), first seen at `nomenclature/README.md:141`
+- `SEQ-033` (6 occurrences, 1 files), first seen at `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:364`
+- `SEQ-082` (6 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:462`
+- `SEQ-126` (6 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:554`
+- `SEQ-129` (6 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:383`
+- `SEQ-171` (6 occurrences, 2 files), first seen at `docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv:498`
 - `TANK` (6 occurrences, 3 files), first seen at `crates/aero-codex-life-support/src/melissa_photobioreactor.rs:422`
 - `THICKNESS` (6 occurrences, 3 files), first seen at `crates/aero-codex-life-support/src/nitrifying_biofilm.rs:220`
 - `TOLERANCE` (6 occurrences, 1 files), first seen at `crates/aero-codex-gas-dynamics/src/lib.rs:310`
-- `WATER` (6 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/lib.rs:61`
+- `WATER` (6 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/lib.rs:63`
 - `ZERO` (6 occurrences, 4 files), first seen at `crates/aero-codex-core/src/units.rs:13`
 - `AOB` (5 occurrences, 3 files), first seen at `crates/aero-codex-life-support/src/nitrifying_biofilm.rs:65`
 - `AXIAL` (5 occurrences, 1 files), first seen at `crates/aero-codex-structures/src/lib.rs:21`
-- `CATEGORIES` (5 occurrences, 1 files), first seen at `xtask/src/main.rs:54`
+- `CATEGORIES` (5 occurrences, 1 files), first seen at `xtask/src/main.rs:118`
 - `COEFFICIENTS` (5 occurrences, 1 files), first seen at `crates/aero-codex-aerodynamics/src/lib.rs:35`
 - `COMPARTMENT` (5 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/brlss_backbone.rs:93`
-- `CREW` (5 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/lib.rs:47`
+- `CREW` (5 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/lib.rs:49`
 - `CYLINDRICAL` (5 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/melissa_photobioreactor.rs:70`
 - `FACTOR` (5 occurrences, 1 files), first seen at `crates/aero-codex-flight-dynamics/src/lib.rs:21`
 - `GENERIC` (5 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/brlss_backbone.rs:93`
 - `III` (5 occurrences, 3 files), first seen at `citations/blss_thinfilm_refs.bib:103`
 - `MECHANICS` (5 occurrences, 2 files), first seen at `crates/aero-codex-structures/src/lib.rs:36`
 - `MOLAR` (5 occurrences, 1 files), first seen at `crates/aero-codex-thermo/src/lib.rs:32`
-- `NET` (5 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/lib.rs:50`
+- `NET` (5 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/lib.rs:52`
 - `NITRIFICATION` (5 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/nitrifying_biofilm.rs:65`
 - `PERFORMANCE` (5 occurrences, 1 files), first seen at `crates/aero-codex-flight-dynamics/src/lib.rs:33`
 - `PHYSICAL` (5 occurrences, 2 files), first seen at `crates/aero-codex-constants/src/lib.rs:20`
-- `REQUIREMENT` (5 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/lib.rs:47`
-- `RESIDENCE` (5 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/lib.rs:44`
-- `STATUSES` (5 occurrences, 1 files), first seen at `xtask/src/main.rs:46`
+- `REQUIREMENT` (5 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/lib.rs:49`
+- `RESIDENCE` (5 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/lib.rs:46`
+- `SEQ-055` (5 occurrences, 1 files), first seen at `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:784`
+- `SEQ-079` (5 occurrences, 1 files), first seen at `docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv:1150`
 - `STOICHIOMETRY` (5 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/nitrifying_biofilm.rs:65`
 - `THERMAL` (5 occurrences, 1 files), first seen at `crates/aero-codex-heat-transfer/src/lib.rs:29`
 - `TODO` (5 occurrences, 1 files), first seen at `nomenclature/templates/EQUATION_SYMBOL_TABLE.yaml:16`
@@ -187,7 +317,7 @@ This is an adoption snapshot for the nomenclature/acronym policy. It intentional
 - `ACRONYM` (4 occurrences, 4 files), first seen at `nomenclature/ADOPTION_PLAN.md:51`
 - `ALLOWANCE` (4 occurrences, 1 files), first seen at `crates/aero-codex-gas-dynamics/src/lib.rs:260`
 - `AQUASIM` (4 occurrences, 2 files), first seen at `source_material/new_thinfilm/blss_thinfilm_report.tex:253`
-- `BIOREGENERATIVE` (4 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/lib.rs:70`
+- `BIOREGENERATIVE` (4 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/lib.rs:72`
 - `BLAS/LAPACK` (4 occurrences, 4 files), first seen at `README.md:19`
 - `CARBONATE` (4 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/melissa_photobioreactor.rs:344`
 - `CASE` (4 occurrences, 2 files), first seen at `nomenclature/docs/ACX-NOM-001.md:291`
@@ -196,7 +326,7 @@ This is an adoption snapshot for the nomenclature/acronym policy. It intentional
 - `DIFFUSION` (4 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/nitrifying_biofilm.rs:94`
 - `END` (4 occurrences, 1 files), first seen at `crates/aero-codex-structures/src/lib.rs:25`
 - `FNA` (4 occurrences, 1 files), first seen at `source_material/new_thinfilm/blss_thinfilm_report.tex:291`
-- `FORBIDDEN` (4 occurrences, 1 files), first seen at `xtask/src/main.rs:104`
+- `FORBIDDEN` (4 occurrences, 1 files), first seen at `xtask/src/main.rs:168`
 - `GARCIA` (4 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/thinfilm_provenance.rs:16`
 - `GLENN` (4 occurrences, 2 files), first seen at `crates/aero-codex-constants/src/lib.rs:26`
 - `GOOD` (4 occurrences, 1 files), first seen at `nomenclature/examples/rust/good_bad_examples.rs:11`
@@ -206,138 +336,8 @@ This is an adoption snapshot for the nomenclature/acronym policy. It intentional
 - `ITERATIONS` (4 occurrences, 1 files), first seen at `crates/aero-codex-gas-dynamics/src/lib.rs:304`
 - `LICENSE` (4 occurrences, 3 files), first seen at `archive/prompts/Pasted markdown.md:124`
 - `LIST` (4 occurrences, 1 files), first seen at `xtask/src/main.rs:24`
-- `MARKERS` (4 occurrences, 1 files), first seen at `xtask/src/main.rs:86`
+- `MARKERS` (4 occurrences, 1 files), first seen at `xtask/src/main.rs:150`
 - `N123AB` (4 occurrences, 2 files), first seen at `nomenclature/docs/ACX-NOM-001.md:826`
 - `NED` (4 occurrences, 3 files), first seen at `nomenclature/README.md:140`
 - `NITRIFIER` (4 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/nitrifying_biofilm.rs:304`
 - `NO2-` (4 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/nitrifying_biofilm.rs:57`
-- `NOB` (4 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/thinfilm_provenance.rs:69`
-- `NOTICE` (4 occurrences, 4 files), first seen at `archive/prompts/Pasted markdown.md:127`
-- `ONLY` (4 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/thinfilm_provenance.rs:142`
-- `PDF` (4 occurrences, 4 files), first seen at `archive/prompts/Pasted markdown.md:115`
-- `PLOS` (4 occurrences, 4 files), first seen at `citations/blss_thinfilm_refs.bib:43`
-- `PRIMITIVES` (4 occurrences, 2 files), first seen at `crates/aero-codex-heat-transfer/src/lib.rs:37`
-- `RATES` (4 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/nitrifying_biofilm.rs:304`
-- `REGISTRY` (4 occurrences, 1 files), first seen at `xtask/src/main.rs:27`
-- `ROUNDING` (4 occurrences, 1 files), first seen at `crates/aero-codex-gas-dynamics/src/lib.rs:260`
-- `SCREAMING` (4 occurrences, 2 files), first seen at `nomenclature/docs/ACX-NOM-001.md:291`
-- `SNAKE` (4 occurrences, 2 files), first seen at `nomenclature/docs/ACX-NOM-001.md:291`
-- `SPHERICAL` (4 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/nitrifying_biofilm.rs:94`
-- `TIP` (4 occurrences, 1 files), first seen at `crates/aero-codex-structures/src/lib.rs:25`
-- `AREAL` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs:155`
-- `ARTIFACT` (3 occurrences, 3 files), first seen at `DATA_MANIFEST.toml:18`
-- `BAD` (3 occurrences, 1 files), first seen at `nomenclature/examples/rust/good_bad_examples.rs:4`
-- `BIOMASS` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/melissa_photobioreactor.rs:228`
-- `BOUNDS` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/brlss_backbone.rs:218`
-- `BRACKET` (3 occurrences, 1 files), first seen at `crates/aero-codex-gas-dynamics/src/lib.rs:305`
-- `BREAKEVEN` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/brlss_backbone.rs:355`
-- `BRLSS` (3 occurrences, 1 files), first seen at `source_material/new_thinfilm/blss_thinfilm_report.tex:34`
-- `CHECKLIST` (3 occurrences, 3 files), first seen at `nomenclature/ADOPTION_PLAN.md:40`
-- `COMPONENT` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs:223`
-- `CONNECTED` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/melissa_photobioreactor.rs:562`
-- `CORRECTION` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/melissa_photobioreactor.rs:210`
-- `COUPLED` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs:484`
-- `DETRELL` (3 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/thinfilm_provenance.rs:28`
-- `DILUTION` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/melissa_photobioreactor.rs:650`
-- `DISCONNECTED` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/melissa_photobioreactor.rs:526`
-- `DISSOLVED` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs:277`
-- `DOMAIN` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs:563`
-- `FEASIBLE` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/melissa_photobioreactor.rs:480`
-- `FICK` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/nitrifying_biofilm.rs:177`
-- `FLAT` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/melissa_photobioreactor.rs:118`
-- `GEOMETRIC` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/melissa_photobioreactor.rs:210`
-- `GROWTH` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs:75`
-- `HABITAT` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs:484`
-- `HARVEST` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs:204`
-- `IDS` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/lib.rs:31`
-- `INTERVALS` (3 occurrences, 1 files), first seen at `crates/aero-codex-gas-dynamics/src/lib.rs:308`
-- `INVENTORY` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/brlss_backbone.rs:259`
-- `L/` (3 occurrences, 2 files), first seen at `crates/aero-codex-aerodynamics/src/lib.rs:25`
-- `LAPSE` (3 occurrences, 1 files), first seen at `crates/aero-codex-atmosphere/src/lib.rs:38`
-- `LICENSE-APACHE` (3 occurrences, 3 files), first seen at `archive/prompts/Pasted markdown.md:126`
-- `LICENSE-MIT` (3 occurrences, 3 files), first seen at `archive/prompts/Pasted markdown.md:125`
-- `LINEAR` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs:440`
-- `LOOP` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/brlss_backbone.rs:187`
-- `METRIC` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/brlss_backbone.rs:282`
-- `MONTRAS` (3 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/thinfilm_provenance.rs:20`
-- `PACK` (3 occurrences, 3 files), first seen at `nomenclature/CHANGELOG.md:15`
-- `PEREZ` (3 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/thinfilm_provenance.rs:18`
-- `POLIZZI` (3 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/thinfilm_provenance.rs:22`
-- `POUGHON` (3 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/thinfilm_provenance.rs:14`
-- `PRODUCTIVITY` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs:155`
-- `PROFILE` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs:97`
-- `REGION` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/melissa_photobioreactor.rs:480`
-- `RESET` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs:204`
-- `SCAN` (3 occurrences, 1 files), first seen at `crates/aero-codex-gas-dynamics/src/lib.rs:308`
-- `SERIES` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/melissa_photobioreactor.rs:422`
-- `SOLIDS` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/nitrifying_biofilm.rs:197`
-- `SYMBOL` (3 occurrences, 2 files), first seen at `nomenclature/README.md:63`
-- `TERMINOLOGY` (3 occurrences, 3 files), first seen at `nomenclature/CHANGELOG.md:15`
-- `THETA` (3 occurrences, 1 files), first seen at `crates/aero-codex-gas-dynamics/src/lib.rs:57`
-- `VALIDATED` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs:563`
-- `VECTOR` (3 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs:410`
-- `VERMEULEN` (3 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/thinfilm_provenance.rs:30`
-- `W/` (3 occurrences, 2 files), first seen at `crates/aero-codex-constants/src/lib.rs:88`
-- `ADOPTION` (2 occurrences, 2 files), first seen at `nomenclature/INTEGRATION_SUMMARY.md:20`
-- `BISECTION` (2 occurrences, 1 files), first seen at `crates/aero-codex-gas-dynamics/src/lib.rs:309`
-- `C3-` (2 occurrences, 1 files), first seen at `source_material/new_thinfilm/blss_thinfilm_report.tex:136`
-- `CEN` (2 occurrences, 2 files), first seen at `data/thinfilm/source_verification.csv:2`
-- `CHANGELOG` (2 occurrences, 2 files), first seen at `nomenclature/INTEGRATION_SUMMARY.md:20`
-- `COS` (2 occurrences, 1 files), first seen at `crates/aero-codex-flight-dynamics/src/lib.rs:42`
-- `D/` (2 occurrences, 1 files), first seen at `crates/aero-codex-aerodynamics/src/lib.rs:27`
-- `DEPENDENCY` (2 occurrences, 1 files), first seen at `xtask/src/main.rs:104`
-- `ESA` (2 occurrences, 2 files), first seen at `data/thinfilm/source_verification.csv:12`
-- `FRAC` (2 occurrences, 1 files), first seen at `crates/aero-codex-flight-dynamics/src/lib.rs:18`
-- `H2O` (2 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/nitrifying_biofilm.rs:57`
-- `NO3-` (2 occurrences, 2 files), first seen at `crates/aero-codex-life-support/src/nitrifying_biofilm.rs:58`
-- `O2/` (2 occurrences, 1 files), first seen at `source_material/new_thinfilm/blss_thinfilm_report.tex:501`
-- `ODE/DAE` (2 occurrences, 2 files), first seen at `docs/phase_0_001/thinfilm_implementation_plan.md:12`
-- `PASS` (2 occurrences, 1 files), first seen at `docs/phase_0_001/version_lock_audit.md:28`
-- `PLAN` (2 occurrences, 2 files), first seen at `nomenclature/INTEGRATION_SUMMARY.md:20`
-- `PROJECTION` (2 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/thinfilm_provenance.rs:113`
-- `PULL` (2 occurrences, 2 files), first seen at `ARTIFACT_MANIFEST.md:56`
-- `READINESS` (2 occurrences, 1 files), first seen at `xtask/src/main.rs:120`
-- `REFPROP` (2 occurrences, 2 files), first seen at `archive/prompts/Pasted markdown.md:91`
-- `REQUEST` (2 occurrences, 2 files), first seen at `ARTIFACT_MANIFEST.md:56`
-- `SCHEMA` (2 occurrences, 1 files), first seen at `xtask/src/main.rs:86`
-- `SCK` (2 occurrences, 2 files), first seen at `data/thinfilm/source_verification.csv:2`
-- `SOI` (2 occurrences, 2 files), first seen at `archive/prompts/Pasted markdown.md:1196`
-- `SPICE` (2 occurrences, 2 files), first seen at `validation/source_registry/astrodynamics_transfer_celestial_basics.yaml:22`
-- `TAN` (2 occurrences, 1 files), first seen at `crates/aero-codex-flight-dynamics/src/lib.rs:43`
-- `TEMPLATE` (2 occurrences, 2 files), first seen at `ARTIFACT_MANIFEST.md:56`
-- `TOKENS` (2 occurrences, 1 files), first seen at `xtask/src/main.rs:104`
-- `VERIFIED` (2 occurrences, 1 files), first seen at `crates/aero-codex-constants/src/lib.rs:101`
-- `WARN` (2 occurrences, 1 files), first seen at `nomenclature/docs/ACX-NOM-001.md:880`
-- `YYYY-MM-DD` (2 occurrences, 1 files), first seen at `nomenclature/templates/ACRONYM_PROPOSAL.md:24`
-- `ACX-NOM-WAIVER-` (1 occurrences, 1 files), first seen at `nomenclature/schemas/waiver.schema.json:34`
-- `ASCII` (1 occurrences, 1 files), first seen at `nomenclature/docs/ACX-NOM-001.md:298`
-- `ATC` (1 occurrences, 1 files), first seen at `nomenclature/registry/terminology_sources.yaml:93`
-- `BRIDGE` (1 occurrences, 1 files), first seen at `nomenclature/README.md:66`
-- `BVAD/ECLSS/ALS` (1 occurrences, 1 files), first seen at `docs/phase_0_001/microtask_log.md:1175`
-- `CARGO` (1 occurrences, 1 files), first seen at `xtask/src/main.rs:172`
-- `CEA/REFPROP` (1 occurrences, 1 files), first seen at `README.md:19`
-- `CO3--` (1 occurrences, 1 files), first seen at `crates/aero-codex-life-support/src/melissa_photobioreactor.rs:332`
-- `DIC` (1 occurrences, 1 files), first seen at `nomenclature/registry/acronyms.yaml:1498`
-- `DIR` (1 occurrences, 1 files), first seen at `xtask/src/main.rs:172`
-- `DOF` (1 occurrences, 1 files), first seen at `validation/source_registry/flight_dynamics_basic_performance.yaml:19`
-- `EXPANSIONS` (1 occurrences, 1 files), first seen at `crates/aero-codex-gas-dynamics/src/lib.rs:74`
-- `GNSS` (1 occurrences, 1 files), first seen at `nomenclature/registry/acronyms.yaml:132`
-- `HCO3` (1 occurrences, 1 files), first seen at `crates/aero-codex-life-support/examples/thinfilm_demo.rs:27`
-- `HELPERS` (1 occurrences, 1 files), first seen at `crates/aero-codex-astrodynamics/src/lib.rs:60`
-- `ICAO` (1 occurrences, 1 files), first seen at `nomenclature/registry/concepts.yaml:16`
-- `IDE` (1 occurrences, 1 files), first seen at `nomenclature/ADOPTION_PLAN.md:106`
-- `INV-001` (1 occurrences, 1 files), first seen at `nomenclature/docs/ACX-NOM-001.md:131`
-- `INV-002` (1 occurrences, 1 files), first seen at `nomenclature/docs/ACX-NOM-001.md:147`
-- `INV-003` (1 occurrences, 1 files), first seen at `nomenclature/docs/ACX-NOM-001.md:157`
-- `INV-004` (1 occurrences, 1 files), first seen at `nomenclature/docs/ACX-NOM-001.md:161`
-- `INV-005` (1 occurrences, 1 files), first seen at `nomenclature/docs/ACX-NOM-001.md:176`
-- `INV-006` (1 occurrences, 1 files), first seen at `nomenclature/docs/ACX-NOM-001.md:195`
-- `INV-007` (1 occurrences, 1 files), first seen at `nomenclature/docs/ACX-NOM-001.md:218`
-- `INV-008` (1 occurrences, 1 files), first seen at `nomenclature/docs/ACX-NOM-001.md:229`
-- `INV-009` (1 occurrences, 1 files), first seen at `nomenclature/docs/ACX-NOM-001.md:242`
-- `INV-010` (1 occurrences, 1 files), first seen at `nomenclature/docs/ACX-NOM-001.md:258`
-- `LSR` (1 occurrences, 1 files), first seen at `source_material/new_thinfilm/blss_thinfilm_report.tex:138`
-- `LTIP` (1 occurrences, 1 files), first seen at `data/thinfilm/parameter_cards/poughon_c4a_symbolic.toml:8`
-- `MATH` (1 occurrences, 1 files), first seen at `nomenclature/README.md:66`
-- `MEMORY` (1 occurrences, 1 files), first seen at `README.md:4`
-- `MPC` (1 occurrences, 1 files), first seen at `docs/phase_0_001/thinfilm_implementation_plan.md:27`
