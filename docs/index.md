@@ -8,6 +8,7 @@ Start with:
 - [Stage 5 master plan](roadmap/stage5_master_plan.md)
 - [Stage 5 deployment queue](roadmap/stage5_deployment_queue.md)
 - [Stage 5 handoff inventory](source_intake/stage5_handoff_inventory.md)
+- [Stage 5 BioSim/Orekit v3 serial plan](roadmap/stage5_bio_ore_v3_serial_plan.md)
 - [Stage 5 agent operating rules](deployment/stage5_agent_operating_rules.md)
 - [Stage 4 data/source governance](../data-governance/)
 - [Stage 4 data/source registry](../data-governance/DATA_REGISTRY.yaml)

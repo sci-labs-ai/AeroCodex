@@ -33,6 +33,18 @@ These rules govern Stage 5 deployment-agent work after the Chunk 0 baseline free
 - Orekit is a reference oracle and architecture guide only. Do not copy Java source, class files, or class-hierarchy structure.
 - BioSim/Orekit work uses `deferred_pending_deep_handoff` until explicit user authorization selects a bounded deep handoff or safe carve-out.
 
+
+## Final deep BioSim/Orekit handoff arrival rule
+
+When final deep BioSim/Orekit handoffs arrive:
+
+- Pause the deployment queue after the active chunk closes.
+- Inventory and hash the new bundles outside the repository.
+- Compare them against Session E/F and legacy BioSim/Orekit drafts before changing queue order.
+- Classify superseded material only with explicit evidence.
+- Deploy BioSim/Orekit through serial subpatches only.
+- Never deploy old B1a/O1a merely because they are smaller than the final v3 material.
+
 ## Governed-count and validation rules
 
 - Never hardcode governed counts to satisfy a verifier.
