@@ -1,0 +1,23 @@
+id: source.life_support.biosim_plus.clean_room_scenario_schema.research_required
+title: BioSim-plus clean-room scenario schema source seed
+category: life_support
+status: research_required
+intended_use:
+  - Clean-room source seed for Stage 5 prep BioSim-plus scenario schema, deterministic replay policy, ledger invariants, and friend-test report v2 contracts.
+  - Traceability anchor for docs/contracts-only planning that builds beyond existing clean-room BioSim-RS resource/tick, transaction, replay, ledger, and smoke-report primitives.
+  - Boundary record showing that GPL Java BioSim source, GPL-bound BioSim-RS scaffold crates, fixtures, scenarios, external runtimes, and golden-master outputs were not imported.
+requested_details:
+  - Future reviewed clean-room implementation specification before any parser, scenario executor, replay runner, persistent ledger, CLI, or public API is added.
+  - Fixture license and hash records before any external scenario file, BioSim fixture, or golden-master output is used.
+  - Independent source review before any schema token such as food_stored is promoted to a Rust resource identity.
+  - Separate validation evidence before any biological-dynamics, habitat-control, medical, crew-safety, operational, certification, or regulated-use claim is considered.
+implementation_notes:
+  - This source seed supports documentation and contract files only.
+  - The proposed scenario schema covers O2, CO2, H2O, biomass, food, and power as resource-accounting concepts.
+  - Deterministic replay and ledger invariants are specified as future implementation requirements, not as current runtime behavior.
+  - Status remains research_required pending clean-room source review, implementation tests, reference evidence, and validation evidence.
+limits:
+  - Not a BioSim scenario runner, biological simulator, habitat controller, medical model, fixture importer, or external parity check.
+  - Not a persistent ledger, command surface, parser crate, scheduler, crop model, crew model, or power-system model.
+  - Not evidence of operational, crew-safety, habitat-safety, certification, flight-readiness, mission-readiness, medical-use, or regulated-use suitability.
+notes: "Stage 5 prep clean-room source seed. Later chunks must add separate source-boundary reviews, implementation tests, fixtures manifests, and validation cards before scenario execution, persistent ledgers, external BioSim parity, or habitat-control behavior is promoted."

@@ -1,0 +1,55 @@
+id: life_support.biosim_plus.clean_room_scenario_schema
+name: BioSim-plus clean-room scenario schema, replay, and ledger contracts
+category: life_support
+status: research_required
+source:
+  id: source.life_support.biosim_plus.clean_room_scenario_schema.research_required
+  status: research_required
+assumptions:
+  - this Stage 5 prep slice is docs/contracts-only and adds no public runtime surface
+  - scenario contracts use finite deterministic tick grids and clean-room resource keys
+  - O2, CO2, H2O, biomass, food, and power are resource-accounting concepts, not safety or biological validation claims
+  - future replay, ledger, and friend-test report behavior must be implemented from clean-room specs only
+  - GPL Java BioSim source, GPL-bound BioSim-RS scaffold crates, fixtures, generated outputs, and external runtimes remain excluded from the dual core
+  - validation status remains research_required until separate source review and independent validation evidence are supplied
+domain:
+  summary: "docs/contracts-only clean-room scenario schema subset for deterministic multi-tick resource-accounting replay and friend-test report v2 planning"
+  bounds:
+    - recognized schema version biosim_plus.scenario_contract.v0_1
+    - finite positive tick duration and positive tick count
+    - unique scenario resource keys with canonical units
+    - finite nonnegative initial stores and finite module-stub deltas
+    - deterministic module ordering, ledger row ordering, and replay-report ordering
+    - resource ledger residuals compared against declared absolute tolerances
+    - uncertainty and sensitivity hooks declared but disabled by default
+  excluded_cases:
+    - runtime parser, scenario executor, persistent ledger storage, public CLI, or public API
+    - external BioSim fixture loading, golden-master parity, or external runtime comparison
+    - biological dynamics, crop growth, crew physiology, medical suitability, or habitat-control behavior
+    - operational readiness, habitat-safety approval, flight readiness, mission readiness, certification, or regulated-use approval
+inputs:
+  - current AeroCodex clean-room BioSim-RS resource/tick, transaction, replay, ledger, and friend-test smoke documentation
+  - independent Stage 5 prep requirements for scenario schema, multi-tick replay, resource ledger invariants, minimal examples, and sensitivity hooks
+  - docs/architecture/biosim_plus_clean_room_scenario_schema.md
+  - docs/assurance/biosim_plus_ledger_invariants.md
+  - docs/assurance/biosim_plus_replay_policy.md
+  - biosim_plus_minimal_habitat_scenario_contract.yaml
+  - biosim_plus_friend_test_report_v2.md
+outputs:
+  - docs-only clean-room BioSim-plus scenario schema subset
+  - resource-ledger invariant policy for O2, CO2, H2O, biomass, food, and power concepts
+  - deterministic multi-tick replay policy for future implementation chunks
+  - minimal habitat scenario contract draft with explicit non-claims
+  - friend-test report v2 contract with required non-claim wording
+tests:
+  - deployment agent reviews docs and contract files for research_required status and non-claim wording
+  - deployment agent verifies validation card/source-registry fields with cargo run -p xtask -- verify cards and source-registry
+  - deployment agent verifies equation inventory count deltas if validation/equation_inventory.tsv is updated
+  - future implementation chunk must add parser, replay, ledger, report, negative-case, and source-boundary tests before any runtime surface is promoted
+failure_modes:
+  - any copied Java BioSim code, comments, class names, method structure, control flow, fixtures, or generated outputs blocks deployment
+  - any GPL-bound BioSim-RS scaffold import into the dual MIT/Apache core blocks deployment
+  - any status promotion above research_required blocks deployment
+  - any medical, habitat-control, operational, certification, or regulated-use claim blocks deployment
+  - missing non-claim wording in user-facing docs or future report text blocks deployment
+notes: "Stage 5 prep validation card for BioSim-plus clean-room scenario schema, replay, and ledger contracts only. No implementation code, public CLI/API, external BioSim parity, biological dynamics, medical claim, habitat-safety claim, operational claim, certification claim, or regulated-use claim is added."

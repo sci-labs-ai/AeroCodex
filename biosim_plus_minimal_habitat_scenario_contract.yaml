@@ -1,0 +1,175 @@
+schema_version: biosim_plus.scenario_contract.v0_1
+contract_status: research_required
+contract_id: biosim_plus.minimal_habitat_scenario.clean_room_contract.v0_1
+name: BioSim-plus minimal habitat scenario contract
+scope: docs_contract_only_no_runtime_surface
+clean_room_boundary:
+  inspected_inputs:
+    - current_aerocodex_clean_room_docs
+    - current_aerocodex_clean_room_resource_tick_public_metadata
+    - independent_requirements_from_stage5_prep_prompt
+  excluded_inputs:
+    - gpl_java_biosim_source_code
+    - gpl_biosim_rs_bootstrap_scaffold_code
+    - external_biosim_scenario_fixtures
+    - external_golden_master_runtime_outputs
+  import_policy: no_code_no_comments_no_control_flow_no_fixtures_no_generated_outputs
+status_policy:
+  allowed_status: research_required
+  forbidden_promotions:
+    - equation_traceable_without_source_review
+    - implementation_verified_without_tests_and_review
+    - reference_validated_without_reference_evidence
+    - experiment_validated_without_experiment_evidence
+scenario_subset:
+  required_top_level_fields:
+    - schema_version
+    - scenario_id
+    - status
+    - time
+    - resources
+    - modules
+    - ledger
+    - replay
+    - uncertainty
+    - non_claims
+  status_value: research_required
+  time:
+    tick_count:
+      type: positive_integer
+      minimum: 1
+    tick_duration_seconds:
+      type: finite_positive_float
+      unit: s
+  resources:
+    - key: o2_gas
+      concept: O2
+      canonical_unit: kg
+      implementation_mapping: existing_clean_room_oxygen_gas_identity
+      initial_amount_rule: finite_nonnegative
+    - key: co2_gas
+      concept: CO2
+      canonical_unit: kg
+      implementation_mapping: existing_clean_room_carbon_dioxide_gas_identity
+      initial_amount_rule: finite_nonnegative
+    - key: h2o_potable
+      concept: H2O_potable
+      canonical_unit: kg
+      implementation_mapping: existing_clean_room_potable_water_identity
+      initial_amount_rule: finite_nonnegative
+    - key: h2o_waste
+      concept: H2O_waste
+      canonical_unit: kg
+      implementation_mapping: existing_clean_room_waste_water_identity
+      initial_amount_rule: finite_nonnegative
+    - key: biomass_edible
+      concept: biomass
+      canonical_unit: kg
+      implementation_mapping: existing_clean_room_edible_biomass_identity
+      initial_amount_rule: finite_nonnegative
+    - key: food_stored
+      concept: food
+      canonical_unit: kg
+      implementation_mapping: contract_only_pending_clean_room_identity_review
+      initial_amount_rule: finite_nonnegative
+    - key: power_electrical
+      concept: power
+      canonical_unit: kWh
+      implementation_mapping: existing_clean_room_electrical_energy_identity
+      initial_amount_rule: finite_nonnegative
+  module_stub_types:
+    - fixed_load_stub
+    - fixed_producer_stub
+    - storage_transfer_stub
+    - report_only_stub
+  blocked_module_behavior:
+    - biological_growth_dynamics
+    - physiological_or_medical_models
+    - habitat_control_logic
+    - external_biosim_runtime_parity
+    - hidden_randomness
+ledger:
+  invariant_version: biosim_plus.ledger_invariants.v0_1
+  tolerance_policy:
+    tolerance_abs_required: true
+    tolerance_abs_type: finite_nonnegative_float
+    tolerance_unit: canonical_resource_unit
+  residual_definition: observed_delta_minus_accounted_sources_plus_accounted_sinks
+  pass_rule: abs_residual_less_than_or_equal_tolerance_abs
+  default_failure_policy: stop_at_first_invalid_tick_and_emit_failed_research_report
+replay:
+  replay_policy_version: biosim_plus.replay_policy.v0_1
+  canonical_order:
+    - scenario_metadata_by_field_name
+    - resource_keys_by_lowercase_key
+    - stores_by_resource_key_then_store_id
+    - modules_by_explicit_module_order_then_module_id
+    - tick_records_by_tick_index
+    - deltas_by_module_order_resource_key_store_id
+    - ledger_rows_by_tick_resource_key_unit_store_id
+  deterministic_digest:
+    required_if_runtime_is_added: true
+    role: smoke_test_replay_evidence_only
+    cryptographic_claim: false
+uncertainty:
+  default_state: declared_but_disabled
+  allowed_hooks:
+    - named_scalar_parameter
+    - deterministic_bounded_sweep
+    - seeded_case_selection
+  blocked_hooks:
+    - unseeded_randomness
+    - clock_dependent_randomness
+    - network_dependent_inputs
+    - automatic_status_promotion
+minimal_examples:
+  - scenario_id: biosim_plus.example.fixed_resource_box.v0_1
+    description: synthetic multi-tick resource-accounting box with fixed loads and no biological claims
+    tick_count: 3
+    tick_duration_seconds: 3600.0
+    required_resource_keys:
+      - o2_gas
+      - co2_gas
+      - h2o_potable
+      - h2o_waste
+      - biomass_edible
+      - food_stored
+      - power_electrical
+    expected_report_status: research_required
+  - scenario_id: biosim_plus.example.storage_transfer.v0_1
+    description: synthetic same-resource transfer between stores to exercise ledger residual checks
+    tick_count: 2
+    tick_duration_seconds: 600.0
+    required_resource_keys:
+      - o2_gas
+      - h2o_potable
+      - power_electrical
+    expected_report_status: research_required
+non_claims:
+  no_biological_dynamics_claim: true
+  no_external_biosim_parity_claim: true
+  no_fixture_import: true
+  no_gpl_source_import: true
+  no_habitat_control_claim: true
+  no_habitat_safety_claim: true
+  no_medical_claim: true
+  no_operational_claim: true
+  no_certification_claim: true
+  no_regulated_use_claim: true
+  no_public_runtime_surface_in_this_chunk: true
+promotion_gate:
+  default_state: docs_contract_only
+  required_before_runtime:
+    - clean_room_implementation_design
+    - fixture_license_and_hash_manifest_if_fixtures_are_used
+    - schema_parser_tests
+    - deterministic_replay_tests
+    - resource_ledger_invariant_tests
+    - friend_test_report_v2_tests
+    - source_boundary_review
+    - no_gpl_archive_or_scaffold_import_scan
+notes: >-
+  Stage 5 prep contract for a clean-room BioSim-plus scenario layer. This file is
+  a draft contract and does not authorize runtime implementation, external BioSim
+  parity checks, operational use, medical use, habitat-safety use, certification,
+  or regulated use.
