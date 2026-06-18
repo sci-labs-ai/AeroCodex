@@ -1,0 +1,23 @@
+id: source.orekit_reference_oracle.mapping.research_required
+title: Orekit reference-oracle mapping source seed
+category: validation
+status: research_required
+intended_use:
+  - Register the Stage 6 Orekit reference-oracle map as validation-planning metadata only.
+  - Tie future astrodynamics oracle comparisons to AeroCodex-native evidence records with units, frames, time scale, tolerances, source IDs, and fixture hashes.
+  - Preserve the boundary that Orekit may inform reference outputs and family-level planning without source translation or architecture cloning.
+requested_details:
+  - Family-level oracle matrix for time scale policies, frame graph policies, TLE parsing, SGP4/TEME, two-body propagation, Hohmann transfer, J2 later, event checks later, and coordinate transforms later.
+  - Per-family input units, output units, time-scale requirements, frame requirements, tolerance strategy, fixture/hash requirements, blocked prerequisites, and non-copying boundary.
+  - External source artifact identity for Orekit archive reference planning, including SHA256 and non-bundling status.
+  - Deployment-agent confirmation that no Java source, comments, class hierarchy, method structure, control flow, generated logs, raw archive, or unreviewed fixture enters the repository.
+implementation_notes:
+  - Allowed repository effect is docs, validation card, source seed, and equation-inventory bookkeeping only.
+  - No Java, Rust bindings, foreign-function interface, subprocess execution, source fixture, generated expected-value table, or public astrodynamics API is added by this seed.
+  - Any future oracle outputs must live behind a separate fixture manifest, hash record, license review, and validation card update.
+limits:
+  - Not validation of any AeroCodex astrodynamics implementation.
+  - Not certification, operational approval, mission readiness, flight readiness, habitat-safety approval, medical-use approval, or regulated-use approval.
+  - Not permission to clone Orekit architecture, package layout, Java class hierarchy, comments, tests, control flow, or generated outputs.
+  - Not a substitute for time-scale, frame, TLE, TEME, perturbation, solver, or coordinate-transform policy review.
+notes: Research-required source seed for Stage 6 planning. The deployment agent must keep the external archive outside the repo and run all normal validation checks before merge.

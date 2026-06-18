@@ -1,0 +1,49 @@
+id: validation.orekit_reference_oracle.mapping
+name: Orekit reference-oracle mapping plan
+category: validation
+status: research_required
+source:
+  id: source.orekit_reference_oracle.mapping.research_required
+  status: research_required
+assumptions:
+  - Orekit is used only as an external reference oracle and architecture context source.
+  - Future comparison outputs must be generated outside the repo and recorded with AeroCodex-native evidence records before use.
+  - No Java source, comments, test bodies, class hierarchy, control flow, generated logs, archives, binaries, or unreviewed fixtures are imported into AeroCodex.
+  - The plan is docs and validation metadata only; it does not add Rust APIs, Java bindings, fixtures, or operational capability.
+domain:
+  summary: Reference-oracle planning for astrodynamics validation families.
+  bounds:
+    - time scale policies
+    - frame graph policies
+    - TLE parsing
+    - SGP4/TEME
+    - two-body propagation
+    - Hohmann transfer
+    - J2 later
+    - event checks later
+    - coordinate transforms later
+  excluded_cases:
+    - direct source translation
+    - class hierarchy cloning
+    - external fixture import without manifest and hash
+    - validation status promotion beyond research_required
+inputs:
+  - AeroCodex-native oracle family names, units, frames, time-scale requirements, blocked prerequisites, and future fixture/hash requirements.
+  - Registered external Orekit source artifact metadata for reference-oracle planning only.
+outputs:
+  - Family-level oracle map and future evidence requirements.
+  - Stage 6 astrodynamics chunk recommendations that keep time, frame, TLE, SGP4/TEME, J2, event, and coordinate-transform risks blocked until policies exist.
+tests:
+  - cargo fmt --all -- --check
+  - cargo clippy --workspace --all-targets --all-features -- -D warnings
+  - cargo test --workspace --all-features
+  - cargo run -p xtask -- verify cards
+  - cargo run -p xtask -- verify source-registry
+  - cargo run -p xtask -- verify equation-inventory
+  - cargo run -p xtask -- verify --all
+failure_modes:
+  - Orekit source text, comments, test bodies, generated output, or class hierarchy structure is copied into AeroCodex.
+  - A future oracle output lacks input units, output units, time-scale requirements, frame requirements, tolerance policy, fixture hash, or source-boundary record.
+  - Time, frame, TLE, SGP4, and TEME comparisons are attempted before their prerequisite policies exist.
+  - The card is used to imply certification, operational approval, mission readiness, flight readiness, habitat-safety approval, medical-use approval, or regulated-use approval.
+notes: Research-required validation-planning card only; no implementation, no fixtures, no Orekit execution evidence, no external parity claim, no certification, no operational approval, no mission readiness, no flight readiness, no habitat-safety approval, no medical-use approval, and no regulated-use approval is claimed.
