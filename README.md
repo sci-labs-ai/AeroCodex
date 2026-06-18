@@ -20,7 +20,7 @@ The core repository is intentionally pure Rust. It does not include C/C++/Fortra
 
 ## Current governed state
 
-This README reflects current `main` after the bounded Stage 5 Orekit v3 O2b classical-elements/Kepler deployment. The live governed counters are verifier-derived; O2b intentionally adds 13 executable research-equation rows and 6 helper-algorithm rows while leaving the other governed counters unchanged:
+This README reflects current `main` after the bounded Stage 5 Orekit v3 O2c oracle-record/tolerance-comparison deployment. The live governed counters are verifier-derived; O2c intentionally adds 15 helper-algorithm rows while leaving executable research-equation and the other five governed counters unchanged:
 
 | Inventory class | Count | Meaning |
 |---|---:|---|
@@ -30,11 +30,11 @@ This README reflects current `main` after the bounded Stage 5 Orekit v3 O2b clas
 | Validation cards | 44 | Conservative validation/governance records. They are not certification evidence. |
 | Source-registry seeds | 42 | Source/governance traceability seeds. |
 | Validation-card-only records | 44 | Metadata records, not formula implementations. |
-| Helper algorithms | 144 | Support routines not counted as executable research equations. |
+| Helper algorithms | 159 | Support routines not counted as executable research equations. |
 
-Stage 5 has deployed several bounded, adapted slices: Chunk 0 intake/queue baseline, Session D policy/templates and taxonomy remediation, Session C1 documentation/policy adaptation, Session C2 classifier planning metadata, Session B canonical-unit scalar expansion, Orekit v3 O2a time/frame/state foundation, Orekit v3 O2b classical-elements/Kepler research foundation, adapted Session E BioSim-plus docs/contracts, Session G friend-test material, Session A wrap2pi endpoint contract/test metadata, professional hardening slices, and adapted Session F Orekit reference-oracle planning metadata.
+Stage 5 has deployed several bounded, adapted slices: Chunk 0 intake/queue baseline, Session D policy/templates and taxonomy remediation, Session C1 documentation/policy adaptation, Session C2 classifier planning metadata, Session B canonical-unit scalar expansion, Orekit v3 O2a time/frame/state foundation, Orekit v3 O2b classical-elements/Kepler research foundation, Orekit v3 O2c oracle-record/tolerance-comparison helpers, adapted Session E BioSim-plus docs/contracts, Session G friend-test material, Session A wrap2pi endpoint contract/test metadata, professional hardening slices, and adapted Session F Orekit reference-oracle planning metadata.
 
-These deployments do **not** complete deep Orekit or deep BioSim work. Orekit O2b now provides bounded research/preliminary-only classical-elements, elliptic-Kepler, and deterministic smoke-example support; Orekit O2c/O2d remain unfinished, with O2c the next bounded implementation candidate. BioSim B2a/B2b/B2c remain unfinished, with corrected B2a still requiring review. `wrap2pi` has deployed contract/test metadata only; executable/public runtime promotion remains blocked pending a separate endpoint-behavior decision. `app_resolve_coplanar` remains blocked for a separate least-squares/rank/tolerance policy. The M07 source artifact remains quarantined source material: it reports 1,350 represented function rows, 1,333 C2 classifier rows, and 188 source-file-level equivalence jobs as metadata, but it is not bulk-merged into public APIs.
+These deployments do **not** complete deep Orekit or deep BioSim work. Orekit O2b provides bounded research/preliminary-only classical-elements, elliptic-Kepler, and deterministic smoke-example support. Orekit O2c now provides validated oracle-record construction and local deterministic tolerance-comparison helpers only; it does not execute Orekit, verify evidence hashes, import external fixtures, parse TLEs, run SGP4, perform TEME transforms, propagate orbits, or claim parity. Orekit O2d remains unfinished and is the next bounded Orekit candidate after O2c CI closure. BioSim B2a/B2b/B2c remain unfinished, with corrected B2a still requiring review. `wrap2pi` has deployed contract/test metadata only; executable/public runtime promotion remains blocked pending a separate endpoint-behavior decision. `app_resolve_coplanar` remains blocked for a separate least-squares/rank/tolerance policy. The M07 source artifact remains quarantined source material: it reports 1,350 represented function rows, 1,333 C2 classifier rows, and 188 source-file-level equivalence jobs as metadata, but it is not bulk-merged into public APIs.
 
 ## What AeroCodex can do now
 
@@ -65,7 +65,7 @@ AeroCodex does **not** currently provide certified flight software, a complete B
 | `aero-codex-heat-transfer` | Stefan-Boltzmann radiation, Newton-law convection, and one-dimensional conduction helpers. |
 | `aero-codex-structures` | Axial stress, bending stress, cantilever end-load deflection, and Euler column buckling helpers. |
 | `aero-codex-flight-dynamics` | Level-turn, stall-speed, turn-rate/radius, and specific-excess-power helpers. |
-| `aero-codex-astrodynamics` | Two-body orbital helpers, Hohmann transfer helpers, sphere of influence, bounded classical-elements and elliptic-Kepler research helpers, and staged formula-vault candidates. |
+| `aero-codex-astrodynamics` | Two-body orbital helpers, Hohmann transfer helpers, sphere of influence, bounded classical-elements and elliptic-Kepler research helpers, O2c oracle-record/tolerance-comparison metadata helpers, and staged formula-vault candidates. |
 | `aero-codex-life-support` | BLSS mass-balance helpers, thin-film/MELiSSA research kernels, and clean-room BioSim-style resource/tick primitives. |
 | `xtask` | Dependency-free local governance, validation, data-registry, formula-vault, and inventory checks. |
 

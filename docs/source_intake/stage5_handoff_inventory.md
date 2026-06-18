@@ -22,14 +22,15 @@ Deployment completion is tracked as status, progress, or explanatory context, no
 | Session C C1 | M07 formula-family docs/policy adaptation | deployed/completed | ready_for_live_intake | `3925dd6bb0639180a2311d10cd8060e4700d61ed` | None. |
 | Session C C2 | M07 classifier CSV dataset and checksum refresh | deployed/completed; data-registry coverage closed by this reconciliation | needs_review | initial dataset `617996193aba0322d8591bb8e1b7755bbe4e1baf`; refresh `989ba7b33b4c6ee83c213387e5bbbb34bd65348b` | Planning metadata only; no source implementation import and no external M07 backlog reduction. |
 | Session B | M00 canonical-unit scalar expansion | deployed/completed | needs_review | `fe45e11a6b457e0c2cc146e25f270d04e7141ce4` | None for Session B. |
-| Orekit v3 O2a | Time/frame/state foundation | deployed/completed | needs_review | `2f1e64ea7638b2f54071eca488c26252256235ca` | O2b now deployed; O2c/O2d remain unfinished. |
-| Orekit v3 O2b | Classical-elements, elliptic-Kepler, and deterministic smoke-example foundation | deployed/completed | needs_review | this bounded O2b deployment commit | O2c/O2d remain unfinished; no operational Orekit parity claim. |
+| Orekit v3 O2a | Time/frame/state foundation | deployed/completed | needs_review | `2f1e64ea7638b2f54071eca488c26252256235ca` | O2b and O2c now deployed; O2d remains unfinished. |
+| Orekit v3 O2b | Classical-elements, elliptic-Kepler, and deterministic smoke-example foundation | deployed/completed | needs_review | `9ce001940bb3e423bf97e499a079e27eb0502f5a` | O2c now deployed separately; O2d remains unfinished; no operational Orekit parity claim. |
+| Orekit v3 O2c | Oracle-record and tolerance-comparison helpers | deployed/completed | needs_review | this bounded O2c deployment commit | Local deterministic record/tolerance comparison only; no external oracle execution, evidence verification, TLE, SGP4, TEME transform, propagation, or parity claim. |
 | Session E raw BioSim-plus | Adapted clean-room docs/contracts slice | deployed/completed | superseded | `9dcc303336d12e401c4a866b3bc2410c937014dd` | Does not complete BioSim v3 B2a/B2b/B2c. |
 | Session G | Public friend-test package | deployed/completed | needs_review | `286dab75fef46a9d729fbff3650636162dc4c8e4` | Public counts must track current main. |
 | Session A | wrap2pi endpoint contract/test metadata | deployed/completed | needs_review | `28e3a7697c9d17559d22414abbdca9284646d629`; `e20754cb3d2856a1b28c6808c96d7ed5d1871bdf` | Executable/public `wrap2pi` remains blocked. |
 | Flight-dynamics hardening | Professional test hardening | completed | needs_review | `2412dfb25f1cb369d4bcb60c76b32c3cd8b2bf0f` | No Stage 5 runtime lane opened. |
 | Aerodynamics/local-gate hardening | Professional gate and count-display hardening | completed | needs_review | `59bbac1081457b1772019fc6851d7a2e07484141` | No Stage 5 runtime lane opened. |
-| Session F raw Orekit oracle | Adapted reference-oracle planning metadata | deployed/completed | superseded | `68dc10fc9215df2be9bc64e0f2a94121250c361a` | Planning metadata only; O2b is deployed separately and O2c/O2d remain unfinished. |
+| Session F raw Orekit oracle | Adapted reference-oracle planning metadata | deployed/completed | superseded | `68dc10fc9215df2be9bc64e0f2a94121250c361a` | Planning metadata only; O2b and O2c are deployed separately and O2d remains unfinished. |
 
 ## Raw A-G handoff inventory
 
@@ -62,15 +63,15 @@ Deployment completion is tracked as status, progress, or explanatory context, no
 | Orekit v3 bundle | Orekit v3 astrodynamics foundation handoff bundle | `f1c2f4b224b6b9701b99753b9ad33aca590a38234596bc19d749e8b25cd34b21` | 340382 | needs_review | Final deep intake material; not bulk-deployed. |
 | Orekit v3 O2a | `Orekit v3 O2a time/frame/state patch` | `b0d1d783124cfd39b2dba03e268f86dca08f0e57a3cea16ffa78bb5c0379dc0f` | 55321 | needs_review | Adapted O2a deployed; current status completed for O2a only. |
 | Orekit v3 O2b | `Orekit v3 O2b elements/Kepler patch` | `40eac48edd55f5ca0f0d70bce0b73bd5480ce99cafc00c0efe15d525d9c44273` | 100645 | needs_review | Adapted bounded O2b deployed; current status completed for O2b only. |
-| Orekit v3 O2c | `Orekit v3 O2c oracle-records patch` | `658b0380a3c2573ada548a827668349c535c231fadad8e771f424cf9d24d4aaa` | 55530 | needs_review | Next bounded candidate; not started. |
-| Orekit v3 O2d | `Orekit v3 O2d two-line-element contract/source-policy patch` | `da937d5870cc092dd75683db2a04b8ba226c00ded9c13f26c7ef85a8d2ca0621` | 56638 | blocked | Blocked by O2c. |
+| Orekit v3 O2c | `Orekit v3 O2c oracle-records patch` | `658b0380a3c2573ada548a827668349c535c231fadad8e771f424cf9d24d4aaa` | 55530 | needs_review | Adapted bounded O2c deployed as local record/tolerance-comparison helpers only. |
+| Orekit v3 O2d | `Orekit v3 O2d two-line-element contract/source-policy patch` | `da937d5870cc092dd75683db2a04b8ba226c00ded9c13f26c7ef85a8d2ca0621` | 56638 | needs_review | Next bounded Orekit candidate after O2c; contract/source policy only, not parser/propagator implementation. |
 
 ## Legacy and aggregate material
 
 | Artifact | Role | SHA256 | Classification | Current disposition |
 |---|---|---|---|---|
 | legacy BioSim B1a materials | older domain/validation draft and notes | `54a215961f5147bcc28217a10e2df514cf1b9f221fb17eb9b315a1182157ac33` for patch | superseded | Reference-only; corrected B2a controls future BioSim intake. |
-| legacy Orekit O1a materials | older time/frame/state draft and notes | `45d32eb5eafd9eedd56d5fece06c4908370e9cb14b2a480f7c41136a12a592c4` for patch | superseded | Reference-only; O2a/O2b are deployed and O2c/O2d control future Orekit intake. |
+| legacy Orekit O1a materials | older time/frame/state draft and notes | `45d32eb5eafd9eedd56d5fece06c4908370e9cb14b2a480f7c41136a12a592c4` for patch | superseded | Reference-only; O2a/O2b/O2c are deployed and O2d controls future Orekit intake. |
 | older BioSim v1/v2 and Orekit v1/v2 materials | older deep handoffs/audits | recorded in prior inventory revisions | superseded | Audit/history only where v3 comparison identifies successors. |
 | `BioSim and Orekit v.zip`, `Orekit and Bio new v.zip`, `stage 5.zip`, `files-aerocodex.zip` | aggregate or source archive wrappers | recorded in prior inventory revisions | blocked | Not deployment patches; do not bulk deploy. |
 | `AeroCodex_stage5_deep_parallel_recovery_protocol.zip` | process material | `071fd8b34f55bee873a89f8c87dbb0dbddf469f99021dd765d3cfc0a8d31100d` | blocked | Process material is not repository payload. |
@@ -78,6 +79,6 @@ Deployment completion is tracked as status, progress, or explanatory context, no
 ## Operating notes
 
 - Raw Stage 5 handoffs remain non-bulk-deployable unless a future prompt explicitly carves out a bounded adapted slice.
-- No Orekit O2c/O2d or BioSim B2a/B2b/B2c work is started by the O2b deployment.
+- No Orekit O2d or BioSim B2a/B2b/B2c work is started by the O2c deployment.
 - C2 classifier data remains research/planning metadata tied to `stage4.m07_rust_port_v14.2026_06_15`; classification does not promote source or reduce `external_m07_backlog_rows`.
 - The only authorized handoff classification values are `ready_for_live_intake`, `needs_review`, `blocked`, and `superseded`.

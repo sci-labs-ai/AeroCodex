@@ -17,6 +17,7 @@
 pub mod elements;
 pub mod frames;
 pub mod kepler;
+pub mod oracle;
 pub mod state;
 pub mod time;
 

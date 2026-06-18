@@ -25,7 +25,7 @@ The current main counts below are verifier-derived and include Session G plus la
 | Validation cards | 44 | Conservative validation/governance records. They are not certification evidence. |
 | Source-registry seeds | 42 | Source/governance traceability seeds. |
 | Validation-card-only records | 44 | Metadata records, not formula implementations. |
-| Helper algorithms | 144 | Support routines not counted as executable research equations. |
+| Helper algorithms | 159 | Support routines not counted as executable research equations. |
 
 ## Public alpha lanes
 
@@ -43,7 +43,7 @@ The current main counts below are verifier-derived and include Session G plus la
 
 - `wrap2pi` contract/test metadata exists, but executable/public runtime implementation remains blocked pending a separate endpoint-behavior decision.
 - `app_resolve_coplanar` remains blocked for least-squares, rank, singularity, and tolerance policy.
-- Orekit v3 O2a and O2b exist as research/preliminary-only foundations; O2c and O2d remain incomplete.
+- Orekit v3 O2a and O2b exist as research/preliminary-only foundations; O2c exists as local deterministic oracle-record/tolerance-comparison infrastructure only; O2d remains incomplete.
 - BioSim docs/contracts and clean-room primitives remain research-only and incomplete as a full engine.
 - Session F provides Orekit reference-oracle planning metadata only and does not provide certified Orekit parity.
 - M07 material remains quarantined source material and is not bulk-imported.
