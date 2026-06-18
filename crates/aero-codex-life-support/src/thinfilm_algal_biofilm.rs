@@ -2,7 +2,7 @@
 //!
 //! This module covers attached microalgal film growth, light attenuation,
 //! areal productivity, mixture/PDE local residuals, boundary conditions, and the
-//! reduced-order service vector used by a mission-level BLSS controller.
+//! reduced-order service vector used by a BLSS controller model.
 
 use aero_codex_core::{validation, AeroError, AeroResult, EngineeringResult, ValidityStatus};
 
@@ -369,7 +369,7 @@ pub fn nitrate_boundary_residual(
     result(residual, ID, validity)
 }
 
-/// Service vector required by a mission-level thin-film BLSS controller.
+/// Service vector for a thin-film BLSS controller model.
 ///
 /// The signs follow thin-film report Eq. (49): oxygen production is positive;
 /// carbon dioxide and nitrate uptake are represented as positive service rates;

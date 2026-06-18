@@ -47,6 +47,6 @@ equation,codex_id,rust_function,bib_keys,report_locator,notes
 46,life_support.thinfilm.algal_biofilm.nitrate_boundary_residual,thinfilm_algal_biofilm::nitrate_boundary_residual,polizzi2022,section 9.2,Dirichlet wetted-boundary residual.
 47,life_support.thinfilm.rom.service_projection,thinfilm_algal_biofilm::linear_rom_service,"polizzi2022,poughon2021,garcia2021",section 9.3,Reduced-order service projection.
 48,life_support.thinfilm.rom.habitat_coupled_derivative,thinfilm_algal_biofilm::habitat_coupled_derivative,"garcia2021,vermeulen2023",section 9.3,"Habitat derivative from crew forcing, service vector, and losses."
-49,life_support.thinfilm.rom.service_vector,thinfilm_algal_biofilm::thinfilm_service_vector,polizzi2022,appendix B,Operational service-vector constructor.
+49,life_support.thinfilm.rom.service_vector,thinfilm_algal_biofilm::thinfilm_service_vector,polizzi2022,appendix B,Research-only service-vector constructor.
 50,life_support.thinfilm.rom.linear_service,thinfilm_algal_biofilm::linear_rom_service,polizzi2022,appendix B,Linear basis ROM y = W Phi + epsilon.
 51,life_support.thinfilm.rom.validated_domain_check,thinfilm_algal_biofilm::validated_domain_contains,"poughon2021,polizzi2022,garcia2021",appendix B,Validated-domain membership predicate.

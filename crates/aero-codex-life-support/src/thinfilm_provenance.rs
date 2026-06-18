@@ -650,7 +650,7 @@ pub const EQUATION_REFERENCES: &[EquationReference] = &[
         source_ids: ALGAL_SOURCES,
         verification_status: VerificationStatus::ImplementationVerified,
         report_locator: "appendix B",
-        notes: "Operational service-vector constructor.",
+        notes: "Research-only service-vector constructor.",
     },
     EquationReference {
         equation: "50",

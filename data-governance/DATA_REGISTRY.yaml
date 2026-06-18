@@ -8,7 +8,7 @@ artifacts:
     artifact_kind: repo_file_manifest
     origin: current_repo
     license: MIT OR Apache-2.0 with source-material attribution boundaries
-    sha256: 9f14c229898d6e36f0d0a6304aee1346e2e51bf80e1836629e05a00a77a6b61a
+    sha256: fb1c27142913955531e107d9741e222e4644e32fca123dba09164335e8a46194
     hash_status: sha256_verified_current_repo_file
     allowed_use: in-repository provenance and thin-film source manifest tracking only
     bundling_decision: bundled repo-relative governance artifact; not an external-code import
@@ -36,7 +36,7 @@ artifacts:
     artifact_kind: repo_directory_data
     origin: current_repo
     license: MIT OR Apache-2.0 with cited-source attribution boundaries
-    sha256: 35bd385aef29827a24eb42332051e4f18a028f66aa4351de3e52bfd1d9c54146
+    sha256: 9ca811af28b7ba602f259afad289bc8778936de37595e99d7e128555c6181aef
     hash_status: aggregate_sha256_current_tracked_tree
     allowed_use: research data cards and source-verification support for thin-film BLSS kernels only
     bundling_decision: bundled repo-relative data material; not certification evidence by itself
@@ -50,7 +50,7 @@ artifacts:
     artifact_kind: repo_directory_validation_cards
     origin: current_repo
     license: MIT OR Apache-2.0
-    sha256: dbfdcb70291b1a4704f71a031ffc86c96f733f91f7c8dd1bff642702ee03b966
+    sha256: 858842243b591d198aca16e7bdb535de011731dae4f88bb714f8f425ea99b194
     hash_status: aggregate_sha256_current_tracked_tree
     allowed_use: validation-card metadata and source-status tracking only
     bundling_decision: bundled repo-relative validation metadata; no external archive import
@@ -64,7 +64,7 @@ artifacts:
     artifact_kind: repo_directory_source_registry
     origin: current_repo
     license: MIT OR Apache-2.0 metadata with cited-source boundaries
-    sha256: 10796e50d7e0981d95c4b8671c21e1ba07524573b3e20353599ef9147967b1ed
+    sha256: 0e45fe9e3d0aa2cf99aa64b102817d1e7bb807d2717283e271ba2141fa49ce83
     hash_status: aggregate_sha256_current_tracked_tree
     allowed_use: source seed registry and validation-card linkage only
     bundling_decision: bundled repo-relative source metadata; not external source-code import
@@ -78,7 +78,7 @@ artifacts:
     artifact_kind: repo_file_validation_inventory
     origin: current_repo
     license: MIT OR Apache-2.0 metadata
-    sha256: 1e5610bee7fe21ed6ce97535bb05dde2d32884d6ed64484fda62240442b1bbf3
+    sha256: 4c9339f084eebf4a54db5cafa39936361b7124e84e306f2b7e8d0cad1b84c301
     hash_status: sha256_verified_current_repo_file
     allowed_use: machine-readable equation inventory and readiness-dashboard counts only
     bundling_decision: bundled repo-relative validation metadata; no formula implementation, source archive import, generated code, fixture, or public application programming interface promotion
@@ -92,7 +92,7 @@ artifacts:
     artifact_kind: repo_directory_formula_vault_metadata
     origin: current_repo
     license: MIT OR Apache-2.0 metadata with source-boundary caveats
-    sha256: 173e7b6a1b58a2590384d6916e3ad08e593bec3f2fa1e27f547369d999cd963b
+    sha256: 5244b67e314b75c5ee3eeb0b277161f18428d6dd3bf8d41875fd312468b11ae2
     hash_status: aggregate_sha256_current_tracked_tree
     allowed_use: quarantined formula-vault planning metadata and future per-slice gate templates only
     bundling_decision: bundled repo-relative metadata; no external M07 source-code import, generated binary, fixture, or public application programming interface promotion

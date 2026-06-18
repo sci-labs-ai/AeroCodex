@@ -217,3 +217,11 @@ records:
   approved_by: nomenclature_owner
   expires: never
   status: approved
+- waiver_id: ACX-NOM-WAIVER-0125
+  rule: ACX-NOM-W008
+  surface_form: RUSTDOCFLAGS
+  context: .github/workflows/ci.yml rustdoc warning-deny gate
+  reason: Standard Rust toolchain environment variable used to make rustdoc warnings fail CI; not an AeroCodex domain acronym.
+  approved_by: nomenclature_owner
+  expires: never
+  status: approved

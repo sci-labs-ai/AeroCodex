@@ -27,7 +27,7 @@ sha256 = "bb1eb060ce633a7ead9420cf742f3971dbadb4425cb5fce5cc98c3074ad30268"
 [[files]]
 path = "checksums/SHA256SUMS"
 bytes = 6583
-sha256 = "95cbc147e85d91f68a6f55baec58862f9e97c5c2a250a38799d68bd3d9a930d5"
+sha256 = "7a0f3b2b6562ae388dbb09a989df64d5fbf6b8c3d2cf7336e37416c93ea55f5e"
 
 [[files]]
 path = "citations/blss_thinfilm_refs.bib"
@@ -61,18 +61,18 @@ sha256 = "cc36434bb25c3d5688b24a75ccc01c04a0a6c54c4abef45e6d8c627625c4cde3"
 
 [[files]]
 path = "crates/aero-codex-life-support/src/thinfilm_algal_biofilm.rs"
-bytes = 24066
-sha256 = "0eea4678f878cf86b02645d9a9dba524cca811cdab76478054daa323da42965e"
+bytes = 24042
+sha256 = "a58eb619fd15d046bf50fe650d9412d548cbcdb6f243876c546c499358080f83"
 
 [[files]]
 path = "crates/aero-codex-life-support/src/thinfilm_provenance.rs"
-bytes = 32018
-sha256 = "3328ed715546584bafba60a78e12a764fbe1faf9fd2d63c9ebf5d0fd6ce667e0"
+bytes = 32020
+sha256 = "6f12d3f31e2708d6b7bc03d54d66dea008861c29aa60c6c57175cade4c673ae7"
 
 [[files]]
 path = "data/thinfilm/equation_manifest.csv"
-bytes = 8669
-sha256 = "833e3e16f7e469f17cc9e0a5c99e3803ce101bf70aee13708078e75894512c42"
+bytes = 8671
+sha256 = "0b1c2e4803aadb250c14b430bc3374b1a84a2a563a25e2f59d15b8115e5f8d52"
 
 [[files]]
 path = "data/thinfilm/parameter_cards/montras_c3_nitrifier_28c_ph8.toml"

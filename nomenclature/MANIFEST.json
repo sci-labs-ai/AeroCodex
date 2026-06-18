@@ -116,13 +116,13 @@
     },
     {
       "path": "generated/terminology/index.jsonl",
-      "bytes": 39204,
-      "sha256": "512c2b53bf6ea1318f26e8eb9706818f3542bc300628b6606f3b8d7de9deb448"
+      "bytes": 40070,
+      "sha256": "c50684b91347600393f81b1d3c74af7a3f6cc92ee239f1c8571e16df068bce70"
     },
     {
       "path": "registry/acronyms.yaml",
-      "bytes": 42955,
-      "sha256": "533b693a12e806612b1cf99491a281a902c5e3b45374840bb1c6628b4b79b470"
+      "bytes": 44816,
+      "sha256": "ba95d17ac22d9f60d8df232f48ba31bbf4df07792d926ed01a7420ccbc90320d"
     },
     {
       "path": "registry/aliases.yaml",
@@ -161,8 +161,8 @@
     },
     {
       "path": "registry/waivers.yaml",
-      "bytes": 1189,
-      "sha256": "075ea87bfb298828ebd03e2099b52e3cb587bc948c8bb009132b126293a5bfc1"
+      "bytes": 9076,
+      "sha256": "82d7889cf4687d6d4a1926f5af753d5d6fcf5be261a4b13993508aec50962d34"
     },
     {
       "path": "schemas/acronym.schema.json",
