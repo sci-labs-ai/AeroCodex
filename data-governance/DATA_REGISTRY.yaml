@@ -92,7 +92,7 @@ artifacts:
     artifact_kind: repo_directory_formula_vault_metadata
     origin: current_repo
     license: MIT OR Apache-2.0 metadata with source-boundary caveats
-    sha256: 390f1e0ae30d303fafe5ea35577cdab395ad33237c90a22c8bfda23bf3a11463
+    sha256: 4da83c4cb16330fb8066673cdbb0a82b265dce6867412f6fad3401b6c80b3660
     hash_status: aggregate_sha256_current_tracked_tree
     allowed_use: quarantined formula-vault planning metadata and future per-slice gate templates only
     bundling_decision: bundled repo-relative metadata; no external M07 source-code import, generated binary, fixture, or public application programming interface promotion

@@ -8,14 +8,14 @@
 
 schema_version: formula_vault_endpoint_contract.v1
 record_status: metadata_test_contract_research_required
-stage4_chunk: stage4_chunk8b_wrap2pi_endpoint_behavior_contract
+deployment_session: stage5_session_a_wrap2pi_endpoint_behavior_contract
 formula:
   formula_id: formula_vault.m00.angle.wrap2pi
   existing_candidate_slice_id: formula_vault.m00_angle_unit_conversions.v1
   rust_function_alias: app_wrap2pi
   scilab_function_alias: foa_app_ast_app_wrap2pi
   likely_future_aerocodex_function: m00_wrap2pi
-  implementation_status: blocked_no_formula_implementation_in_chunk8b
+  implementation_status: blocked_no_formula_implementation_in_stage5_session_a
   public_surface_status: blocked_no_public_application_programming_interface
 
 source_locator_review:
