@@ -5,6 +5,10 @@ AeroCodex Phase 0.001 establishes a pure-Rust workspace for source-traceable aer
 Start with:
 
 - [Stage 4 master plan](roadmap/stage4_master_plan.md)
+- [Stage 5 master plan](roadmap/stage5_master_plan.md)
+- [Stage 5 deployment queue](roadmap/stage5_deployment_queue.md)
+- [Stage 5 handoff inventory](source_intake/stage5_handoff_inventory.md)
+- [Stage 5 agent operating rules](deployment/stage5_agent_operating_rules.md)
 - [Stage 4 data/source governance](../data-governance/)
 - [Stage 4 data/source registry](../data-governance/DATA_REGISTRY.yaml)
 - [Status vocabulary](../validation/status_vocabulary.md)
