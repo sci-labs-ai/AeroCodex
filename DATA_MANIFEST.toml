@@ -27,7 +27,7 @@ sha256 = "bb1eb060ce633a7ead9420cf742f3971dbadb4425cb5fce5cc98c3074ad30268"
 [[files]]
 path = "checksums/SHA256SUMS"
 bytes = 6583
-sha256 = "7a0f3b2b6562ae388dbb09a989df64d5fbf6b8c3d2cf7336e37416c93ea55f5e"
+sha256 = "1ab2eaf8799bfc8f772da049e3b309e630b4e6479fdd4cc450f2370efecfa3c2"
 
 [[files]]
 path = "citations/blss_thinfilm_refs.bib"

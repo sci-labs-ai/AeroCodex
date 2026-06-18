@@ -96,23 +96,23 @@
     },
     {
       "path": "generated/current_repo_acronym_baseline.json",
-      "bytes": 7620,
-      "sha256": "af399faf1d89ff550c20f739eae8893472b4af1a0d8b8d42b690c6949335aea9"
+      "bytes": 10926,
+      "sha256": "81ada0e17932e902a12f11d362d531e2e1edea88d5e4b1713defe611ee4baa56"
     },
     {
       "path": "generated/current_repo_acronym_inventory.csv",
-      "bytes": 96975,
-      "sha256": "61ec4986e423a8160ab0b2abb8b74f65c13a5102dd845003b2af560df82e7ed0"
+      "bytes": 186645,
+      "sha256": "9b4ea695dd0db1e87a1f3382b397f141564eefa3f218b2da84a12fe8181538f1"
     },
     {
       "path": "generated/current_repo_acronym_inventory.json",
-      "bytes": 666536,
-      "sha256": "8997d5da898357c695ae04a6427594702f81c676c5438bd30ba617f0abe890c6"
+      "bytes": 1208880,
+      "sha256": "0e8497c792c66b07d46c0b9b91c059ef6fe5a39f705464ce3fb88b2fb8777633"
     },
     {
       "path": "generated/current_repo_acronym_inventory.md",
-      "bytes": 32504,
-      "sha256": "e26839a2225c5b16c1f7ca336d0c069a0b310d82248cd44311b6294a9a38a714"
+      "bytes": 37802,
+      "sha256": "3140317c58837354f4a204c52eaed716a77c2a72624917c0d7c287492074d5aa"
     },
     {
       "path": "generated/terminology/index.jsonl",
