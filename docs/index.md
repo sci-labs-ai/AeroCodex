@@ -24,6 +24,8 @@ Start with:
 - [Equation inventory/readiness dashboard](assurance/equation_inventory_readiness_dashboard.md)
 - [Validation-card generation policy](assurance/validation_card_generation_policy.md)
 - [Source-seed generation policy](assurance/source_seed_generation_policy.md)
+- [M07 formula-family validation-card strategy](assurance/validation_family_card_strategy.md)
+- [Stage 5 M07 formula-family wave plan](roadmap/stage5_m07_formula_family_wave_plan.md)
 - [M07 formula-vault intake](source_intake/m07_formula_vault_intake.md)
 - [BioSim-RS license-bound architecture](assurance/biosim_rs_license_architecture.md)
 - [BioSim-RS resource identity and tick validation](assurance/biosim_rs_resource_tick_validation.md)
