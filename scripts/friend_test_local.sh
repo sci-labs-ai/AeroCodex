@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 cd "${REPO_ROOT}"
 
-TOTAL_STEPS=8
+TOTAL_STEPS=15
 CURRENT_STEP=0
 
 info() {
@@ -20,6 +20,14 @@ run_step() {
   "$@"
 }
 
+run_shell_step() {
+  CURRENT_STEP=$((CURRENT_STEP + 1))
+  local label="$1"
+  local command_text="$2"
+  info "step ${CURRENT_STEP}/${TOTAL_STEPS}: ${label}"
+  bash -lc "${command_text}"
+}
+
 info "AeroCodex local friend-test package"
 info "repository root: ${REPO_ROOT}"
 
@@ -29,33 +37,69 @@ if ! command -v cargo >/dev/null 2>&1; then
   exit 127
 fi
 
+if ! command -v git >/dev/null 2>&1; then
+  info "ERROR: git was not found on the command search path"
+  exit 127
+fi
+
+if ! command -v sha256sum >/dev/null 2>&1; then
+  info "ERROR: sha256sum was not found on the command search path"
+  info "Install GNU coreutils or use the PowerShell friend-test script on Windows."
+  exit 127
+fi
+
+if command -v python >/dev/null 2>&1; then
+  PYTHON_CMD=python
+elif command -v python3 >/dev/null 2>&1; then
+  PYTHON_CMD=python3
+  info "python: using python3 fallback because bare python was not found"
+else
+  info "ERROR: neither python nor python3 was found on the command search path"
+  exit 127
+fi
+
 if command -v rustc >/dev/null 2>&1; then
   info "rustc: $(rustc --version)"
 else
   info "rustc: not found on the command search path"
 fi
 info "cargo: $(cargo --version)"
+info "python command: ${PYTHON_CMD} ($(${PYTHON_CMD} --version 2>&1))"
 
-if command -v git >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   info "git commit: $(git log -1 --format=%h)"
 fi
 
+run_step "git status --short" \
+  git status --short
+run_step "git diff --check" \
+  git diff --check
+run_step "sha256sum -c checksums/SHA256SUMS" \
+  sha256sum -c checksums/SHA256SUMS
 run_step "cargo fmt --all -- --check" \
   cargo fmt --all -- --check
+run_step "cargo check --workspace --all-targets --all-features" \
+  cargo check --workspace --all-targets --all-features
 run_step "cargo clippy --workspace --all-targets --all-features -- -D warnings" \
   cargo clippy --workspace --all-targets --all-features -- -D warnings
-run_step "cargo test --workspace --all-features" \
-  cargo test --workspace --all-features
+run_step "cargo test --workspace --all-targets --all-features" \
+  cargo test --workspace --all-targets --all-features
 run_step "cargo run -p xtask -- verify --all" \
   cargo run -p xtask -- verify --all
-run_step "cargo run -p xtask -- verify equation-inventory" \
-  cargo run -p xtask -- verify equation-inventory
-run_step "cargo run -p xtask -- verify formula-vault" \
-  cargo run -p xtask -- verify formula-vault
 run_step "cargo run -p xtask -- dependency-policy" \
   cargo run -p xtask -- dependency-policy
-run_step "cargo doc --workspace --all-features --no-deps" \
-  cargo doc --workspace --all-features --no-deps
+run_step "${PYTHON_CMD} scripts/verify_thinfilm_artifact.py" \
+  "${PYTHON_CMD}" scripts/verify_thinfilm_artifact.py
+run_step "${PYTHON_CMD} nomenclature/tooling/aerocodex_nom_lint.py --root nomenclature" \
+  "${PYTHON_CMD}" nomenclature/tooling/aerocodex_nom_lint.py --root nomenclature
+run_step "${PYTHON_CMD} nomenclature/tooling/aerocodex_acronym_inventory.py --repo-root . --nomenclature-root nomenclature --check-new --baseline nomenclature/generated/current_repo_acronym_baseline.json" \
+  "${PYTHON_CMD}" nomenclature/tooling/aerocodex_acronym_inventory.py --repo-root . --nomenclature-root nomenclature --check-new --baseline nomenclature/generated/current_repo_acronym_baseline.json
+run_step "${PYTHON_CMD} nomenclature/tooling/aerocodex_terminology.py --root nomenclature export-jsonl --output nomenclature/generated/terminology/index.jsonl" \
+  "${PYTHON_CMD}" nomenclature/tooling/aerocodex_terminology.py --root nomenclature export-jsonl --output nomenclature/generated/terminology/index.jsonl
+run_step "git diff --exit-code nomenclature/generated/terminology/index.jsonl" \
+  git diff --exit-code nomenclature/generated/terminology/index.jsonl
+run_shell_step "RUSTDOCFLAGS=\"-D warnings\" cargo doc --workspace --all-features --no-deps" \
+  'RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps'
 
 if [[ -f Cargo.lock ]]; then
   info "NOTE: a root Cargo.lock exists after the run. Do not submit it unless project policy changes."

@@ -312,6 +312,101 @@ mod tests {
     }
 
     #[test]
+    fn dynamic_pressure_scales_linearly_with_density_and_quadratically_with_speed() {
+        let rho = 1.225;
+        let speed = 80.0;
+        let baseline = dynamic_pressure(rho, speed).unwrap();
+
+        assert_close(
+            dynamic_pressure(2.0 * rho, speed).unwrap(),
+            2.0 * baseline,
+            1.0e-9,
+        );
+        assert_close(
+            dynamic_pressure(rho, 2.0 * speed).unwrap(),
+            4.0 * baseline,
+            1.0e-9,
+        );
+        assert_close(
+            dynamic_pressure(rho, 0.5 * speed).unwrap(),
+            0.25 * baseline,
+            1.0e-9,
+        );
+    }
+
+    #[test]
+    fn lift_and_drag_scale_linearly_with_reference_terms() {
+        let q = 720.0;
+        let area = 14.0;
+        let cl = -0.35;
+        let cd = 0.08;
+        let lift_baseline = lift(q, area, cl).unwrap();
+        let drag_baseline = drag(q, area, cd).unwrap();
+
+        assert_close(
+            lift(2.0 * q, area, cl).unwrap(),
+            2.0 * lift_baseline,
+            1.0e-9,
+        );
+        assert_close(
+            lift(q, 2.0 * area, cl).unwrap(),
+            2.0 * lift_baseline,
+            1.0e-9,
+        );
+        assert_close(
+            lift(q, area, 2.0 * cl).unwrap(),
+            2.0 * lift_baseline,
+            1.0e-9,
+        );
+        assert_close(
+            drag(2.0 * q, area, cd).unwrap(),
+            2.0 * drag_baseline,
+            1.0e-9,
+        );
+        assert_close(
+            drag(q, 2.0 * area, cd).unwrap(),
+            2.0 * drag_baseline,
+            1.0e-9,
+        );
+        assert_close(
+            drag(q, area, 2.0 * cd).unwrap(),
+            2.0 * drag_baseline,
+            1.0e-9,
+        );
+        assert!(lift_baseline.is_sign_negative());
+        assert!(drag_baseline.is_sign_positive());
+    }
+
+    #[test]
+    fn induced_drag_coefficient_is_even_and_quadratic_in_lift_coefficient() {
+        let cl = 0.62;
+        let aspect_ratio = 9.0;
+        let oswald_efficiency = 0.41;
+        let baseline = induced_drag_coefficient(cl, aspect_ratio, oswald_efficiency).unwrap();
+
+        assert_close(
+            induced_drag_coefficient(-cl, aspect_ratio, oswald_efficiency).unwrap(),
+            baseline,
+            1.0e-15,
+        );
+        assert_close(
+            induced_drag_coefficient(2.0 * cl, aspect_ratio, oswald_efficiency).unwrap(),
+            4.0 * baseline,
+            1.0e-15,
+        );
+        assert_close(
+            induced_drag_coefficient(cl, 2.0 * aspect_ratio, oswald_efficiency).unwrap(),
+            0.5 * baseline,
+            1.0e-15,
+        );
+        assert_close(
+            induced_drag_coefficient(cl, aspect_ratio, 2.0 * oswald_efficiency).unwrap(),
+            0.5 * baseline,
+            1.0e-15,
+        );
+    }
+
+    #[test]
     fn nonfinite_derived_outputs_return_numerical_failure() {
         assert_numerical_failure(dynamic_pressure(f64::MAX, f64::MAX));
         assert_numerical_failure(lift(f64::MAX, f64::MAX, 1.0));

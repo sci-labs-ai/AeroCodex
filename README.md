@@ -20,19 +20,19 @@ The core repository is intentionally pure Rust. It does not include C/C++/Fortra
 
 ## Current governed state
 
-This README reflects the governed state after **Stage 4 Chunk 8A — M00 vector equation expansion** is merged, pushed, branch-clean, and CI-green.
+This README reflects the governed state after **Stage 5 professional hardening — local-gate parity and dynamics-test coverage** on current `main`. This is test/governance hardening only; no Stage 5 source-material handoff or Chunk 0 deployment is implied.
 
 | Inventory class | Count | Meaning |
 |---|---:|---|
-| Executable research equations | 128 | Public Rust research/preliminary-design equation kernels inventoried by `validation/equation_inventory.tsv`. |
-| Metadata-only formula-vault candidates | 17 | M00 angle/unit and vector-algebra candidates selected into the formula-vault metadata layer. |
-| External M07 backlog rows | 1,333 | Registered external M07 represented rows not yet selected as formula-vault candidates. |
-| Validation cards | 38 | Conservative validation/governance records. They are not certification evidence. |
-| Source-registry seeds | 36 | Source/governance traceability seeds. |
-| Validation-card-only records | 38 | Metadata records, not formula implementations. |
-| Helper algorithms | 89 | Support routines not counted as executable research equations. |
+| Executable research equations | 138 | Public Rust research/preliminary-design equation kernels inventoried by `validation/equation_inventory.tsv`. |
+| Metadata-only formula-vault candidates | 27 | M00 angle/unit and vector-algebra candidates selected into the formula-vault metadata layer. |
+| External M07 backlog rows | 1,323 | Registered external M07 represented rows not yet selected as formula-vault candidates. |
+| Validation cards | 43 | Conservative validation/governance records. They are not certification evidence. |
+| Source-registry seeds | 41 | Source/governance traceability seeds. |
+| Validation-card-only records | 43 | Metadata records, not formula implementations. |
+| Helper algorithms | 138 | Support routines not counted as executable research equations. |
 
-Chunk 8A adds a bounded M00 vector/angle expansion to `aero-codex-astrodynamics`: `m00_degrees_to_radians`, `m00_radians_to_degrees`, `m00_vector_dot`, `m00_vector_norm`, `m00_vector_cross`, `m00_unit_vector`, `m00_vector_angle`, `m00_vector_projection`, `m00_scalar_triple_product`, `m00_vector_triple_product`, `m00_vector_triple_bac_cab`, `m00_vectors_collinear`, `m00_vectors_coplanar`, `m00_tangent_from_dr_ds`, `m00_velocity_from_arc_rate`, and `m00_vector_distance`.
+Stage 4 Chunk 8A added a bounded M00 vector/angle expansion to `aero-codex-astrodynamics`: `m00_degrees_to_radians`, `m00_radians_to_degrees`, `m00_vector_dot`, `m00_vector_norm`, `m00_vector_cross`, `m00_unit_vector`, `m00_vector_angle`, `m00_vector_projection`, `m00_scalar_triple_product`, `m00_vector_triple_product`, `m00_vector_triple_bac_cab`, `m00_vectors_collinear`, `m00_vectors_coplanar`, `m00_tangent_from_dr_ds`, `m00_velocity_from_arc_rate`, and `m00_vector_distance`.
 
 `wrap2pi` remains blocked for a dedicated endpoint-behavior chunk. `app_resolve_coplanar` remains blocked for a separate least-squares/rank/tolerance policy. The M07 source artifact remains quarantined source material: it reports 1,350 represented function rows and 188 Scilab equivalence jobs, but it is still release-candidate / not certified and is not bulk-merged into public APIs.
 
@@ -125,22 +125,19 @@ Run these before merging user-visible changes:
 ```bash
 git status --short
 git diff --check
+sha256sum -c checksums/SHA256SUMS
 cargo fmt --all -- --check
+cargo check --workspace --all-targets --all-features
 cargo clippy --workspace --all-targets --all-features -- -D warnings
-cargo test --workspace --all-features
+cargo test --workspace --all-targets --all-features
 cargo run -p xtask -- verify --all
-cargo run -p xtask -- verify cards
-cargo run -p xtask -- verify source-registry
-cargo run -p xtask -- verify data-registry
-cargo run -p xtask -- verify status-vocabulary
-cargo run -p xtask -- verify formula-vault
-cargo run -p xtask -- verify equation-inventory
 cargo run -p xtask -- dependency-policy
+python scripts/verify_thinfilm_artifact.py
 python nomenclature/tooling/aerocodex_nom_lint.py --root nomenclature
 python nomenclature/tooling/aerocodex_acronym_inventory.py --repo-root . --nomenclature-root nomenclature --check-new --baseline nomenclature/generated/current_repo_acronym_baseline.json
 python nomenclature/tooling/aerocodex_terminology.py --root nomenclature export-jsonl --output nomenclature/generated/terminology/index.jsonl
 git diff --exit-code nomenclature/generated/terminology/index.jsonl
-cargo doc --workspace --all-features --no-deps
+RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps
 ```
 
 The root `Cargo.lock` is intentionally not committed in the current workspace flow. Remove generated root lockfiles before staging unless the project deliberately changes that policy.

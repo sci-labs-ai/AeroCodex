@@ -1,6 +1,6 @@
 # Friend-test quickstart
 
-This guide is for outside testers who want to clone AeroCodex, run the standard local checks, and report whether the research workspace builds cleanly on their machine.
+This guide is for outside testers who want to clone AeroCodex, run the CI-equivalent local checks, and report whether the research workspace builds cleanly on their machine.
 
 AeroCodex is research/preliminary-design software. It is not certified, not operational, not flight-ready, not habitat-safe, not medical-use software, and not approved for regulated use. Passing these checks only means the repository’s local software gates completed on your machine; it does not prove physical validity, safety, certification, or mission readiness.
 
@@ -8,15 +8,18 @@ AeroCodex is research/preliminary-design software. It is not certified, not oper
 
 The friend-test package covers repository hygiene and governance checks:
 
-- Rust formatting, linting, tests, and documentation generation;
-- validation-card, source-registry, equation-inventory, formula-vault, data-registry, and dependency-policy gates exposed through `xtask`;
+- Git status, whitespace, checksum, and generated-file cleanliness;
+- Rust formatting, checking, linting, all-target tests, and warning-deny documentation generation;
+- validation-card, source-registry, equation-inventory, formula-vault, data-registry, status-vocabulary, and dependency-policy gates exposed through `xtask`;
+- thin-film provenance artifact verification;
+- nomenclature, acronym, and generated terminology checks;
 - a clear distinction between executable research equations, formula-vault metadata candidates, validation-card-only records, helper algorithms, and blocked items.
 
 It does not validate flight behavior, mission behavior, habitat safety, medical behavior, regulated use, or formula physical correctness beyond the repository checks that already exist.
 
 ## Prerequisites
 
-Install the Rust toolchain with `cargo`, `rustc`, `rustfmt`, and `clippy` available on your command search path. The scripts assume the repository has already been cloned and that commands are run from the repository root or through the provided scripts.
+Install the Rust toolchain with `cargo`, `rustc`, `rustfmt`, and `clippy` available on your command search path. The scripts also require `git` and either `python` or `python3`. The Bash script requires `sha256sum`; the PowerShell script can use either `sha256sum` or its built-in `Get-FileHash` fallback. The nomenclature tooling imports the Python `yaml` package; if that import is missing, install `pyyaml` in your chosen Python environment.
 
 Useful environment details to include in reports:
 
@@ -24,9 +27,10 @@ Useful environment details to include in reports:
 rustc --version
 cargo --version
 rustup show
+python --version || python3 --version
 ```
 
-On Windows, PowerShell users can run the `.ps1` script. On Linux, macOS, Git Bash, or Windows Subsystem for Linux, use the `.sh` script.
+On Windows, PowerShell users can run the `.ps1` script. On Linux, Git Bash, or Windows Subsystem for Linux, use the `.sh` script. On macOS, install a package that provides `sha256sum` or run the commands manually with an equivalent checksum manifest checker.
 
 ## One-command local run
 
@@ -50,17 +54,24 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/friend_test_local.ps
 
 ## Manual command sequence
 
-The scripts run this sequence in order:
+The scripts run this CI-equivalent sequence in order. If bare `python` is unavailable locally, use `python3` for the Python commands and report that fallback.
 
 ```bash
+git status --short
+git diff --check
+sha256sum -c checksums/SHA256SUMS
 cargo fmt --all -- --check
+cargo check --workspace --all-targets --all-features
 cargo clippy --workspace --all-targets --all-features -- -D warnings
-cargo test --workspace --all-features
+cargo test --workspace --all-targets --all-features
 cargo run -p xtask -- verify --all
-cargo run -p xtask -- verify equation-inventory
-cargo run -p xtask -- verify formula-vault
 cargo run -p xtask -- dependency-policy
-cargo doc --workspace --all-features --no-deps
+python scripts/verify_thinfilm_artifact.py
+python nomenclature/tooling/aerocodex_nom_lint.py --root nomenclature
+python nomenclature/tooling/aerocodex_acronym_inventory.py --repo-root . --nomenclature-root nomenclature --check-new --baseline nomenclature/generated/current_repo_acronym_baseline.json
+python nomenclature/tooling/aerocodex_terminology.py --root nomenclature export-jsonl --output nomenclature/generated/terminology/index.jsonl
+git diff --exit-code nomenclature/generated/terminology/index.jsonl
+RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps
 ```
 
 A failure in any one command is a useful test result. Do not continue by hiding errors; report the first failing command, the operating system, Rust version, and enough terminal output to reproduce the issue.
@@ -71,6 +82,7 @@ A good friend-test report contains:
 
 - operating system and shell;
 - `rustc --version` and `cargo --version`;
+- `python --version` or `python3 --version`, including any fallback used by the script;
 - repository commit hash, if available from `git log -1 --format=%h`;
 - whether you used the Bash script, PowerShell script, or manual commands;
 - the first failing command and the surrounding terminal output, or a note that all commands completed;
