@@ -1,0 +1,53 @@
+id: life_support.biosim_plus.clean_room_scenario_engine
+name: BioSim-plus clean-room scenario replay-integrity ledger and report slice
+category: life_support
+status: research_required
+source:
+  id: source.life_support.biosim_plus.clean_room_scenario_engine.research_required
+  status: research_required
+assumptions:
+  - B2c consumes only successful B2b-2 BioSimScenarioReplay records produced inside this crate
+  - committed replay-event amounts are authoritative for ledger source and sink totals
+  - requested-but-uncommitted clamp amounts are reported separately and not folded into committed totals
+  - deterministic friend-test report text is evidence formatting only and is not persistent storage
+  - fixed synthetic package example data is visibly synthetic and not an external fixture or biological scenario
+  - validation status remains research_required until separate source review and independent validation evidence are supplied
+domain:
+  summary: "bounded clean-room replay-integrity, per-compartment resource ledger, deterministic report, and fixed synthetic example for BioSim-plus B2c"
+  bounds:
+    - successful B2b-2 replay object with finite nonnegative cell amounts
+    - deterministic tick summaries and replay events already produced by deployed B2b-2 runtime
+    - resource units limited to scenario-layer canonical unit labels
+    - ledger equation final = initial + committed sources - committed sinks
+    - explicit nonnegative clamp accounting from B2b-2 replay events
+  excluded_cases:
+    - external scenario parsing, external BioSim parity, generated fixture comparison, or golden-master import
+    - flat-resource adapter, biosim_resource_tick bridge, aggregate flat-resource proof, or older resource catalog mapping
+    - persistent ledger, CLI service, network service, environment loading, wall-clock timestamps, random IDs, or file-backed storage
+    - biological dynamics, crew physiology, medical suitability, habitat-control behavior, safety evidence, certification, operational use, or regulated-use approval
+inputs:
+  - crates/aero-codex-life-support/src/biosim_process.rs
+  - crates/aero-codex-life-support/src/biosim_scenario.rs
+  - crates/aero-codex-life-support/src/biosim_scenario_report.rs
+  - docs/architecture/biosim_plus_clean_room_runtime_boundary.md
+  - docs/assurance/biosim_plus_clean_room_scenario_engine.md
+outputs:
+  - fail-closed replay-integrity report for successful B2b-2 replay records
+  - deterministic per-compartment resource ledger rows based on committed event amounts
+  - explicit clamp accounting fields
+  - deterministic path-safe friend-test report text
+  - fixed synthetic package example output
+tests:
+  - cargo test -p aero-codex-life-support biosim_scenario_report -- --nocapture
+  - cargo test -p aero-codex-life-support b2c_replay_integrity -- --nocapture
+  - cargo run -p aero-codex-life-support --example biosim_synthetic_resource_scenario
+  - cargo run -p xtask -- verify equation-inventory
+  - cargo run -p xtask -- verify cards
+  - cargo run -p xtask -- verify source-registry
+failure_modes:
+  - any copied Java BioSim source, comments, class names, method structure, control flow, fixture, archive, or generated output blocks deployment
+  - any GPL-bound BioSim-RS scaffold import into the dual MIT/Apache core blocks deployment
+  - any status promotion above research_required blocks deployment
+  - any flat-resource adapter, external parser, persistent service, or local path emission blocks deployment
+  - missing fail-closed replay-integrity or ledger self-consistency checks blocks deployment
+notes: "Stage 5 BioSim v3 B2c clean-room implementation metadata. No external source import, external BioSim parity, biological-dynamics claim, safety claim, medical claim, operational claim, certification claim, or regulated-use claim is made."

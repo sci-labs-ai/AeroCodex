@@ -1,0 +1,23 @@
+id: source.life_support.biosim_plus.clean_room_scenario_engine.research_required
+title: BioSim-plus clean-room scenario replay-ledger report source seed
+category: life_support
+status: research_required
+intended_use:
+  - Traceability anchor for Stage 5 BioSim v3 B2c replay-integrity, ledger, deterministic report, and fixed synthetic example implementation.
+  - Clean-room source seed for code that consumes B2b-2 replay records directly and keeps committed event amounts authoritative.
+  - Boundary record showing that GPL Java BioSim source, GPL-bound BioSim-RS scaffold crates, external fixtures, generated outputs, external runtimes, archives, and golden-master outputs were not imported.
+requested_details:
+  - Independent source review before any external BioSim scenario or fixture is considered.
+  - Separate validation evidence before any biological-dynamics, habitat-control, medical, safety, operational, certification, or regulated-use claim is considered.
+  - Separate authorization before parser, persistence, service, CLI, file-backed loading, network, or external reference-oracle behavior is added.
+implementation_notes:
+  - B2c is in-memory Rust code in the existing life-support crate.
+  - Ledger rows are deterministic per compartment/resource cell and use B2b-2 committed replay-event amounts.
+  - Clamp accounting remains explicit as requested-but-uncommitted event amount.
+  - The synthetic package example is fixed, small, and visibly synthetic.
+  - No biosim_resource_tick adapter, aggregate flat-resource proof, or external scenario mapping is introduced.
+limits:
+  - Not a BioSim Java port, external BioSim parity result, biological simulator, habitat controller, medical model, fixture importer, or external reference comparison.
+  - Not a persistent ledger, command surface, parser crate, scheduler, crop model, crew model, or power-system model.
+  - Not evidence of safety, certification, operational suitability, medical use, or regulated-use suitability.
+notes: "Stage 5 BioSim v3 B2c clean-room source seed. Status remains research_required pending separate source-boundary review and independent validation evidence."

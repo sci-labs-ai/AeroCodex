@@ -64,10 +64,10 @@ These current-main counts come from the governed equation-inventory verifier and
 | Executable research equations | 151 | Public Rust research/preliminary-design equation kernels inventoried by `validation/equation_inventory.tsv`. |
 | Metadata-only formula-vault candidates | 27 | Formula-vault candidate metadata records; not implementations by themselves. |
 | External M07 backlog rows | 1,323 | Registered external M07 represented rows not yet selected as formula-vault candidates. C2 classification does not remove rows from this backlog. |
-| Validation cards | 45 | Conservative validation/governance records. They are not certification evidence. |
-| Source-registry seeds | 43 | Source/governance traceability seeds. |
-| Validation-card-only records | 45 | Metadata records, not formula implementations. |
-| Helper algorithms | 238 | Support routines not counted as executable research equations. |
+| Validation cards | 46 | Conservative validation/governance records. They are not certification evidence. |
+| Source-registry seeds | 44 | Source/governance traceability seeds. |
+| Validation-card-only records | 46 | Metadata records, not formula implementations. |
+| Helper algorithms | 262 | Support routines not counted as executable research equations. |
 
 The historical Session G deltas were `+0` executable research equations, `+0` formula-vault candidates, `+0` external M07 backlog rows, `+1` validation card, `+1` source-registry seed, `+1` validation-card-only record, and `+0` helper algorithms. The absolute values above are no longer the old Session G branch-local counts.
 
@@ -78,7 +78,7 @@ A clean friend-test run still leaves blocked and research-only items blocked. In
 - `wrap2pi` has contract/test metadata but executable/public runtime implementation remains blocked pending endpoint-behavior policy;
 - `app_resolve_coplanar` remains blocked pending least-squares, rank, and tolerance policy;
 - Orekit O2a/O2b/O2c/O2d exist as bounded research/preliminary-only foundations and metadata helpers; O2d is contract/source-policy only and does not parse two-line-element records, implement checksums, decode fields, run SGP4, perform TEME transforms, propagate orbits, track objects operationally, or claim parity;
-- BioSim B2a exists only as a clean-room scenario-domain and deterministic structural-validation foundation; B2b-1 exists only as process/validated-constructor/one-tick-intent-planner helpers; B2b-2 exists only as bounded compartment replay, compact noncryptographic digest, and immutable atomic replay-event helpers; no flat-resource adapter, ledger, report, example, full engine, controller, or safety/operational claim exists; B2b-3 remains optional/not started and B2c remains blocked;
+- BioSim B2a exists only as a clean-room scenario-domain and deterministic structural-validation foundation; B2b-1 exists only as process/validated-constructor/one-tick-intent-planner helpers; B2b-2 exists only as bounded compartment replay, compact noncryptographic digest, and immutable atomic replay-event helpers; B2c exists only as fail-closed replay-integrity validation, deterministic committed-event ledger accounting, clamp accounting, path-safe report formatting, one synthetic example, and governance; no flat-resource adapter, full engine, controller, biological-fidelity, habitat-safety, medical, operational, parity, certification, or regulated-use claim exists; B2b-3 is skipped/not required for the deployed B2c consumer path;
 - formula-vault candidates remain metadata-only unless a later chunk explicitly implements and validates them;
 - validation cards remain conservative records and do not prove implementation or validation by themselves.
 

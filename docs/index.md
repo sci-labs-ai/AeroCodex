@@ -35,6 +35,9 @@ Start with:
 - [BioSim-RS resource ledger validation](assurance/biosim_rs_resource_ledger_validation.md)
 - [BioSim-RS CLI/API smoke and friend-test report](assurance/biosim_rs_cli_api_smoke_friend_test_report.md)
 - [BioSim-RS source boundary](source_intake/biosim_rs_source_boundary.md)
+
+- [BioSim-plus clean-room runtime boundary](architecture/biosim_plus_clean_room_runtime_boundary.md)
+- [BioSim-plus B2c replay-ledger report assurance](assurance/biosim_plus_clean_room_scenario_engine.md)
 - [BioSim-RS boundary placeholder](../biosim-rs/)
 - [Orekit reference-oracle mapping](assurance/orekit_reference_oracle_mapping.md)
 - [Astrodynamics time/frame/state, elliptic-helper, oracle, and TLE-contract foundation](assurance/astrodynamics_time_frame_tle_foundation.md)

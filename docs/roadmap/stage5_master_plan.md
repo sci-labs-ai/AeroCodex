@@ -1,12 +1,12 @@
 # Stage 5 Master Plan
 
-Stage 5 turns the completed Stage 4 governance surface into a controlled handoff-intake and deployment sequence. This plan records the live status after the bounded BioSim v3 B2b-2 compartment replay, compact digest, and atomic event-model deployment. It does not certify AeroCodex, promote external source trees, or approve the next implementation chunk.
+Stage 5 turns the completed Stage 4 governance surface into a controlled handoff-intake and deployment sequence. This plan records the live status after the bounded BioSim v3 B2c replay-integrity, deterministic ledger/report, synthetic example, and governance deployment. It does not certify AeroCodex, promote external source trees, or approve the next implementation chunk.
 
 AeroCodex remains research, education, verification-oriented development, and preliminary-design software. It is not certified, flight-ready, mission-ready, habitat-safe, medical, operational, or regulated-use approved. Stage 5 keeps the conservative validation posture; validation material remains `research_required` unless a later bounded review proves a stronger status.
 
 ## Verified live state
 
-- Current live main at B2b-1 deployment start: `13bcc241da6791189109d698690cb5c7cabdec66`.
+- Current live main before B2c deployment start: `69250935eb2480eabd8efd37b6d6cf62a6157664`.
 - Root `Cargo.lock` policy: absent from the repository root.
 - Exact-current-main CI requirement: Rust GitHub Actions must be completed successfully for the exact head before a modifying chunk starts or closes.
 
@@ -15,12 +15,12 @@ AeroCodex remains research, education, verification-oriented development, and pr
 | Executable research equations | 151 | Public Rust research/preliminary-design equation kernels inventoried by `validation/equation_inventory.tsv`. |
 | Metadata-only formula-vault candidates | 27 | Formula-vault candidate metadata records; not implementations by themselves. |
 | External M07 backlog rows | 1,323 | Registered external M07 represented rows not yet selected as formula-vault candidates. C2 classification does not remove rows from this backlog. |
-| Validation cards | 45 | Conservative validation/governance records. They are not certification evidence. |
-| Source-registry seeds | 43 | Source/governance traceability seeds. |
-| Validation-card-only records | 45 | Metadata records, not formula implementations. |
-| Helper algorithms | 238 | Support routines not counted as executable research equations. |
+| Validation cards | 46 | Conservative validation/governance records. They are not certification evidence. |
+| Source-registry seeds | 44 | Source/governance traceability seeds. |
+| Validation-card-only records | 46 | Metadata records, not formula implementations. |
+| Helper algorithms | 262 | Support routines not counted as executable research equations. |
 
-The B2b-2 deployment intentionally updates governed equation-inventory totals by +34 helper algorithms; executable research equations, metadata-only candidates, external M07 backlog rows, validation cards, source-registry seeds, and validation-card-only records remain unchanged from B2b-1.
+The B2c deployment intentionally updates governed equation-inventory totals by +1 validation card, +1 source-registry seed, +1 validation-card-only record, and +24 helper algorithms; executable research equations, metadata-only candidates, and external M07 backlog rows remain unchanged from B2b-2.
 
 ## Completed Stage 5 lanes
 
@@ -48,10 +48,10 @@ The B2b-2 deployment intentionally updates governed equation-inventory totals by
 
 ## Remaining lanes
 
-1. Optional BioSim B2b-3 flat-resource adapter proof remains not started and requires a separate necessity decision before any deployment.
+1. Optional BioSim B2b-3 flat-resource adapter proof is skipped/not required for the deployed B2c consumer path; it remains closed unless a future separate adapter-proof prompt reopens it.
 2. Orekit O2c is deployed as local deterministic record/tolerance-comparison infrastructure only; it does not execute Orekit or verify evidence.
 3. Orekit O2d is deployed as contract/source-policy metadata only; it does not parse two-line-element records, implement checksums, run SGP4, perform TEME transforms, propagate orbits, or claim parity.
-4. BioSim B2b-3 remains optional/not started; B2c remains blocked pending the final B2b contract.
+4. BioSim B2c is deployed as a bounded replay-integrity/ledger/report/governance slice only; no complete BioSim engine, external parity, or operational/safety claim is made.
 5. Runtime/public `wrap2pi` remains blocked pending a separate endpoint-behavior runtime decision.
 6. `app_resolve_coplanar` remains blocked pending rank, tolerance, and solver policy.
 
@@ -73,4 +73,4 @@ The reconciled registry coverage is explicit, not aggregate-only: the core class
 
 Stage 5 is complete only when all approved chunks are deployed from current `main`, each exact commit CI run is green, governed counts are intentionally updated and documented, forbidden-material scans are clean, temporary branches are removed, and every source/license boundary remains intact.
 
-Exactly one coherent modifying chunk is authorized at a time. The next recommended bounded decision is whether to deploy optional BioSim v3 B2b-3 exact-mapping adapter proof or skip/supersede it and proceed to B2c; this plan does not authorize either chunk.
+Exactly one coherent modifying chunk is authorized at a time. The next recommended bounded decision is final Stage 5 closeout/status consolidation after deployed Orekit O2a-O2d and BioSim B2a/B2b-1/B2b-2/B2c slices; this plan does not authorize that chunk.

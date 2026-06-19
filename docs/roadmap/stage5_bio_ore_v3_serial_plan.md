@@ -1,6 +1,6 @@
 # Stage 5 BioSim/Orekit v3 Serial Plan
 
-This document records the current BioSim and Orekit v3 serial plan after deployed O2a, deployed O2b, deployed O2c, deployed O2d, corrected BioSim B2a, deployed BioSim B2b-1, deployed BioSim B2b-2, adapted Session E, and adapted Session F slices. It is documentation/status control only. It does not authorize additional Orekit runtime/code, approve source-locator normalization, import external source, or change governed inventories outside a bounded deployment chunk.
+This document records the current BioSim and Orekit v3 serial plan after deployed O2a, deployed O2b, deployed O2c, deployed O2d, corrected BioSim B2a, deployed BioSim B2b-1, deployed BioSim B2b-2, deployed BioSim B2c, adapted Session E, and adapted Session F slices. It is documentation/status control only. It does not authorize additional Orekit runtime/code, approve source-locator normalization, import external source, or change governed inventories outside a bounded deployment chunk.
 
 ## Summary
 
@@ -10,7 +10,7 @@ This document records the current BioSim and Orekit v3 serial plan after deploye
 - Orekit O2d two-line-element contract/source-policy review is deployed/completed as contract-only metadata and fail-closed prerequisite evaluation; it remains historically classified `needs_review` and is not a parser, checksum, decoder, SGP4, TEME, propagation, or operational-tracking implementation.
 - Adapted Session F reference-oracle planning metadata is deployed at `68dc10fc9215df2be9bc64e0f2a94121250c361a`, but it is not a replacement for O2c or O2d; O2c and O2d are separately deployed bounded slices.
 - Adapted Session E BioSim-plus docs/contracts are deployed at `9dcc303336d12e401c4a866b3bc2410c937014dd`, but they are not a replacement for BioSim B2a, B2b, or B2c.
-- Corrected BioSim B2a, bounded BioSim B2b-1, and bounded BioSim B2b-2 are deployed/completed at research-required scope; optional B2b-3 remains not started pending a necessity decision, and B2c remains `blocked` pending the final B2b contract.
+- Corrected BioSim B2a, bounded BioSim B2b-1, bounded BioSim B2b-2, and bounded BioSim B2c are deployed/completed at research-required scope; optional B2b-3 is skipped/not required for the B2c consumer path unless a future separate adapter-proof prompt reopens it.
 - Legacy Session E/F, old v1/v2, B1a, O1a, and aggregate wrappers are audit/history references, not direct deployment targets.
 
 ## Orekit v3 serial order
@@ -29,8 +29,8 @@ This document records the current BioSim and Orekit v3 serial plan after deploye
 | 1 | Corrected B2a domain and structural validation | deployed/completed | needs_review | Bounded B2a deployment. | Scenario-domain and structural validation only; no process flows, replay, adapter, ledger, report, example, complete engine, controller, biological-fidelity, habitat-safety, medical, operational, parity, or certification claim. |
 | 2 | B2b-1 process/planner re-cut | deployed/completed | needs_review | Depends on accepted corrected B2a. | Process identifiers, validated constructors, and deterministic one-tick intent planner only; no replay, adapter, ledger, report, example, digest, full engine, or operational claim. |
 | 3 | B2b-2 bounded replay/digest/event model | deployed/completed | needs_review | Depends on accepted B2b-1. | Bounded deterministic compartment replay, immutable events/summaries/final cells, explicit requested/committed/clamp semantics, atomic per-tick commit, and compact noncryptographic state digests only; no adapter, ledger, report, example, complete engine, or operational claim. |
-| 4 | B2b-3 optional flat-resource adapter proof | optional/not started | needs_review | Depends on accepted B2b-2 and separate necessity decision. | Optional and non-authoritative exact-mapping proof only; may be skipped/superseded if no supported consumer requires it. |
-| 5 | B2c replay-integrity/ledger/report/governance | blocked_until_predecessor | blocked | Depends on final accepted B2b contract and B2b-3 necessity decision. | Requires replay-integrity, ledger/report-governance review, and exact scope authorization. |
+| 4 | B2b-3 optional flat-resource adapter proof | skipped/not required for B2c | needs_review | B2b-2 accepted; B2c consumes B2b-2 replay records directly. | Optional and non-authoritative exact-mapping proof only; not deployed by B2c and closed unless a future supported consumer requires it. |
+| 5 | B2c replay-integrity/ledger/report/governance | deployed/completed | needs_review | Depends on accepted B2b-2; B2b-3 skipped/not required for this consumer path. | Fail-closed replay-integrity validation, deterministic committed-event ledger accounting, clamp accounting, self-consistency validation, path-safe report formatting, one synthetic example, and governance only; no complete engine, external parity, safety, medical, operational, certification, or regulated-use claim. |
 
 ## Relationship to deployed adapted slices
 
@@ -54,6 +54,6 @@ This document records the current BioSim and Orekit v3 serial plan after deploye
 
 ## Known blockers
 
-- BioSim B2b-3 optional adapter-proof necessity decision.
-- BioSim B2c predecessor gates.
-- BioSim B2c example execution and report-integrity evidence.
+- No BioSim B2b-3 adapter is required by the deployed B2c consumer path; reopening it requires a separate future prompt and supported consumer.
+- Final Stage 5 closeout/status consolidation remains a separate bounded decision.
+- No complete BioSim engine, external parity, safety, medical, operational, certification, or regulated-use claim exists.

@@ -22,10 +22,10 @@ The current main counts below are verifier-derived and include Session G plus la
 | Executable research equations | 151 | Public Rust research/preliminary-design equation kernels inventoried by `validation/equation_inventory.tsv`. |
 | Metadata-only formula-vault candidates | 27 | Formula-vault candidate metadata records; not implementations by themselves. |
 | External M07 backlog rows | 1,323 | Registered external M07 represented rows not yet selected as formula-vault candidates. C2 classification does not remove rows from this backlog. |
-| Validation cards | 45 | Conservative validation/governance records. They are not certification evidence. |
-| Source-registry seeds | 43 | Source/governance traceability seeds. |
-| Validation-card-only records | 45 | Metadata records, not formula implementations. |
-| Helper algorithms | 238 | Support routines not counted as executable research equations. |
+| Validation cards | 46 | Conservative validation/governance records. They are not certification evidence. |
+| Source-registry seeds | 44 | Source/governance traceability seeds. |
+| Validation-card-only records | 46 | Metadata records, not formula implementations. |
+| Helper algorithms | 262 | Support routines not counted as executable research equations. |
 
 ## Public alpha lanes
 
@@ -44,7 +44,7 @@ The current main counts below are verifier-derived and include Session G plus la
 - `wrap2pi` contract/test metadata exists, but executable/public runtime implementation remains blocked pending a separate endpoint-behavior decision.
 - `app_resolve_coplanar` remains blocked for least-squares, rank, singularity, and tolerance policy.
 - Orekit v3 O2a/O2b/O2c/O2d exist as bounded research/preliminary-only foundations and metadata helpers; O2d is contract/source-policy only and does not provide two-line-element parsing, checksums, field decoding, SGP4, TEME transforms, propagation, operational tracking, or parity.
-- BioSim docs/contracts, flat resource/tick primitives, corrected B2a scenario-domain structural validation, B2b-1 process/intent-planner helpers, and B2b-2 bounded replay/digest/event helpers remain research-only and incomplete as a full scenario engine or controller; no flat-resource adapter, ledger, report, or example exists from B2b-2, B2b-3 remains optional/not started, and B2c remains blocked.
+- BioSim docs/contracts, flat resource/tick primitives, corrected B2a scenario-domain structural validation, B2b-1 process/intent-planner helpers, B2b-2 bounded replay/digest/event helpers, and B2c replay-integrity/ledger/report/example helpers remain research-only and incomplete as a full scenario engine or controller; no flat-resource adapter exists in B2c, B2b-3 is skipped/not required for the deployed B2c consumer path, and no biological-fidelity, habitat-safety, medical, operational, parity, certification, or regulated-use claim is made.
 - Session F provides Orekit reference-oracle planning metadata only and does not provide certified Orekit parity.
 - M07 material remains quarantined source material and is not bulk-imported.
 

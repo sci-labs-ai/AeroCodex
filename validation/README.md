@@ -29,6 +29,9 @@ Current non-example cards include atmosphere troposphere planning, thermodynamic
 
 ## Local scaffold checks
 
+- Stage 5 BioSim v3 B2c records `life_support.biosim_plus.clean_room_scenario_engine` as research_required metadata for clean-room replay-integrity, committed-event ledger accounting, deterministic friend-test reporting, and a fixed synthetic example.
+
+
 Run these from the repository root in a Rust-enabled environment:
 
 ```bash

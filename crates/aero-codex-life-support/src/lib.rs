@@ -530,3 +530,6 @@ mod tests {
         assert!(verification_record("life_support.unknown").is_none());
     }
 }
+
+/// Clean-room BioSim-plus replay-ledger report and fixed synthetic friend-test example support.
+pub mod biosim_scenario_report;

@@ -2937,6 +2937,43 @@ mod tests {
     }
 
     #[test]
+    fn b2c_replay_integrity_accepts_authoritative_b2b2_replay() {
+        let scenario = basic_replay_scenario(3);
+        let replay = run_biosim_scenario(&scenario, &[supported_transfer_process()])
+            .expect("authoritative replay");
+        let report = validate_biosim_scenario_replay_integrity(&replay).expect("integrity report");
+        assert_eq!(report.tick_count(), 3);
+        assert_eq!(report.tick_summary_count(), 3);
+        assert_eq!(report.event_count(), 6);
+        assert_eq!(report.total_clamp_amount(), 0.0);
+        assert!(report.total_committed_amount() > 0.0);
+    }
+
+    #[test]
+    fn b2c_replay_integrity_fails_closed_on_bad_tick_count() {
+        let scenario = basic_replay_scenario(2);
+        let mut replay = run_biosim_scenario(&scenario, &[supported_transfer_process()])
+            .expect("authoritative replay");
+        replay.tick_count = 3;
+        assert!(matches!(
+            validate_biosim_scenario_replay_integrity(&replay),
+            Err(BioSimScenarioReplayIntegrityError::TickSummaryCountMismatch { .. })
+        ));
+    }
+
+    #[test]
+    fn b2c_replay_integrity_fails_closed_on_event_arithmetic_drift() {
+        let scenario = basic_replay_scenario(1);
+        let mut replay = run_biosim_scenario(&scenario, &[supported_transfer_process()])
+            .expect("authoritative replay");
+        replay.replay_events[0].after_amount += 1.0;
+        assert!(matches!(
+            validate_biosim_scenario_replay_integrity(&replay),
+            Err(BioSimScenarioReplayIntegrityError::EventArithmeticMismatch { .. })
+        ));
+    }
+
+    #[test]
     fn planning_order_is_independent_of_process_compartment_and_transform_input_order() {
         let ordered = vec![
             source_process(),
@@ -3076,4 +3113,419 @@ mod tests {
             Err(BioSimProcessValidationError::IntentAllocationFailed { .. })
         ));
     }
+}
+
+/// B2c fail-closed integrity summary for a successful B2b-2 replay.
+///
+/// The report is derived only from committed replay records. It is not a
+/// persistent ledger, external parity proof, biological model, command surface,
+/// source import, or regulated-use claim.
+#[derive(Debug, Clone, PartialEq)]
+pub struct BioSimScenarioReplayIntegrityReport {
+    tick_count: u64,
+    tick_summary_count: usize,
+    event_count: usize,
+    final_cell_count: usize,
+    total_committed_amount: f64,
+    total_clamp_amount: f64,
+}
+
+impl BioSimScenarioReplayIntegrityReport {
+    /// Returns the committed replay tick count.
+    #[must_use]
+    pub const fn tick_count(&self) -> u64 {
+        self.tick_count
+    }
+
+    /// Returns the number of tick summaries inspected.
+    #[must_use]
+    pub const fn tick_summary_count(&self) -> usize {
+        self.tick_summary_count
+    }
+
+    /// Returns the number of committed replay events inspected.
+    #[must_use]
+    pub const fn event_count(&self) -> usize {
+        self.event_count
+    }
+
+    /// Returns the number of final state cells inspected.
+    #[must_use]
+    pub const fn final_cell_count(&self) -> usize {
+        self.final_cell_count
+    }
+
+    /// Returns the unsigned sum of committed replay-event amounts.
+    #[must_use]
+    pub const fn total_committed_amount(&self) -> f64 {
+        self.total_committed_amount
+    }
+
+    /// Returns the unsigned sum of explicitly clamped requested amounts.
+    #[must_use]
+    pub const fn total_clamp_amount(&self) -> f64 {
+        self.total_clamp_amount
+    }
+}
+
+/// B2c fail-closed replay-integrity validation errors.
+#[derive(Debug, Clone, PartialEq)]
+pub enum BioSimScenarioReplayIntegrityError {
+    TickSummaryCountMismatch {
+        tick_count: u64,
+        summary_count: usize,
+    },
+    TickSummaryIndexMismatch {
+        expected_tick_index: u64,
+        actual_tick_index: u64,
+    },
+    InitialDigestMismatch,
+    DigestChainMismatch {
+        tick_index: u64,
+    },
+    FinalDigestMismatch,
+    EventTickOutOfRange {
+        tick_index: u64,
+        tick_count: u64,
+    },
+    EventSequenceMismatch {
+        tick_index: u64,
+        expected_sequence_index: usize,
+        actual_sequence_index: usize,
+    },
+    TickEventCountMismatch {
+        tick_index: u64,
+        expected_event_count: usize,
+        actual_event_count: usize,
+    },
+    EventAmountInvalid {
+        tick_index: u64,
+        sequence_index: usize,
+        field: &'static str,
+        value: f64,
+    },
+    EventUnitMismatch {
+        tick_index: u64,
+        sequence_index: usize,
+        expected_unit: &'static str,
+        actual_unit: &'static str,
+    },
+    EventArithmeticMismatch {
+        tick_index: u64,
+        sequence_index: usize,
+    },
+    EventCellContinuityMismatch {
+        tick_index: u64,
+        sequence_index: usize,
+        compartment_id: String,
+        resource_kind: BioSimScenarioResourceKind,
+        expected_before_amount: f64,
+        actual_before_amount: f64,
+    },
+    DuplicateFinalCell {
+        compartment_id: String,
+        resource_kind: BioSimScenarioResourceKind,
+    },
+    FinalCellAmountInvalid {
+        compartment_id: String,
+        resource_kind: BioSimScenarioResourceKind,
+        amount: f64,
+    },
+    FinalCellUnitMismatch {
+        compartment_id: String,
+        resource_kind: BioSimScenarioResourceKind,
+        expected_unit: &'static str,
+        actual_unit: &'static str,
+    },
+    MissingFinalCellForEvent {
+        compartment_id: String,
+        resource_kind: BioSimScenarioResourceKind,
+    },
+    FinalCellMismatch {
+        compartment_id: String,
+        resource_kind: BioSimScenarioResourceKind,
+        expected_amount: f64,
+        actual_amount: f64,
+    },
+}
+
+/// Validates that a B2b-2 replay is internally self-consistent before B2c reporting.
+///
+/// The check consumes immutable replay records, never rebuilds state from external
+/// input, and fails closed on digest-chain, event-order, event-arithmetic,
+/// clamp-accounting, unit, continuity, or final-state inconsistencies.
+pub fn validate_biosim_scenario_replay_integrity(
+    replay: &BioSimScenarioReplay,
+) -> Result<BioSimScenarioReplayIntegrityReport, BioSimScenarioReplayIntegrityError> {
+    let tick_count = replay.tick_count();
+    let tick_summaries = replay.tick_summaries();
+    if u64::try_from(tick_summaries.len()).unwrap_or(u64::MAX) != tick_count {
+        return Err(
+            BioSimScenarioReplayIntegrityError::TickSummaryCountMismatch {
+                tick_count,
+                summary_count: tick_summaries.len(),
+            },
+        );
+    }
+
+    for (index, summary) in tick_summaries.iter().enumerate() {
+        let expected_tick_index = u64::try_from(index).unwrap_or(u64::MAX);
+        if summary.tick_index() != expected_tick_index {
+            return Err(
+                BioSimScenarioReplayIntegrityError::TickSummaryIndexMismatch {
+                    expected_tick_index,
+                    actual_tick_index: summary.tick_index(),
+                },
+            );
+        }
+        if index == 0 && summary.before_cell_state_digest() != replay.initial_cell_state_digest() {
+            return Err(BioSimScenarioReplayIntegrityError::InitialDigestMismatch);
+        }
+        if index > 0 {
+            let previous = &tick_summaries[index - 1];
+            if summary.before_cell_state_digest() != previous.after_cell_state_digest() {
+                return Err(BioSimScenarioReplayIntegrityError::DigestChainMismatch {
+                    tick_index: summary.tick_index(),
+                });
+            }
+        }
+        if index + 1 == tick_summaries.len()
+            && summary.after_cell_state_digest() != replay.final_cell_state_digest()
+        {
+            return Err(BioSimScenarioReplayIntegrityError::FinalDigestMismatch);
+        }
+    }
+
+    let mut event_counts = vec![0usize; tick_summaries.len()];
+    let mut next_sequence_indexes = vec![0usize; tick_summaries.len()];
+    let mut last_amounts = BTreeMap::<ScenarioCellKey, f64>::new();
+    let mut total_committed_amount = 0.0;
+    let mut total_clamp_amount = 0.0;
+
+    for event in replay.replay_events() {
+        if event.tick_index() >= tick_count {
+            return Err(BioSimScenarioReplayIntegrityError::EventTickOutOfRange {
+                tick_index: event.tick_index(),
+                tick_count,
+            });
+        }
+        let tick_index = usize::try_from(event.tick_index()).map_err(|_| {
+            BioSimScenarioReplayIntegrityError::EventTickOutOfRange {
+                tick_index: event.tick_index(),
+                tick_count,
+            }
+        })?;
+        let expected_sequence_index = next_sequence_indexes[tick_index];
+        if event.sequence_index() != expected_sequence_index {
+            return Err(BioSimScenarioReplayIntegrityError::EventSequenceMismatch {
+                tick_index: event.tick_index(),
+                expected_sequence_index,
+                actual_sequence_index: event.sequence_index(),
+            });
+        }
+        next_sequence_indexes[tick_index] = expected_sequence_index.checked_add(1).ok_or(
+            BioSimScenarioReplayIntegrityError::EventSequenceMismatch {
+                tick_index: event.tick_index(),
+                expected_sequence_index,
+                actual_sequence_index: event.sequence_index(),
+            },
+        )?;
+        event_counts[tick_index] = event_counts[tick_index].checked_add(1).ok_or(
+            BioSimScenarioReplayIntegrityError::TickEventCountMismatch {
+                tick_index: event.tick_index(),
+                expected_event_count: tick_summaries[tick_index].event_count(),
+                actual_event_count: event_counts[tick_index],
+            },
+        )?;
+
+        validate_integrity_event_amount(
+            event.tick_index(),
+            event.sequence_index(),
+            "requested_amount",
+            event.requested_amount(),
+            true,
+        )?;
+        validate_integrity_event_amount(
+            event.tick_index(),
+            event.sequence_index(),
+            "committed_amount",
+            event.committed_amount(),
+            false,
+        )?;
+        validate_integrity_event_amount(
+            event.tick_index(),
+            event.sequence_index(),
+            "clamp_amount",
+            event.clamp_amount(),
+            false,
+        )?;
+        validate_integrity_event_amount(
+            event.tick_index(),
+            event.sequence_index(),
+            "before_amount",
+            event.before_amount(),
+            false,
+        )?;
+        validate_integrity_event_amount(
+            event.tick_index(),
+            event.sequence_index(),
+            "after_amount",
+            event.after_amount(),
+            false,
+        )?;
+
+        let expected_unit = biosim_scenario_resource_kind_unit(event.resource_kind());
+        if event.unit() != expected_unit {
+            return Err(BioSimScenarioReplayIntegrityError::EventUnitMismatch {
+                tick_index: event.tick_index(),
+                sequence_index: event.sequence_index(),
+                expected_unit,
+                actual_unit: event.unit(),
+            });
+        }
+
+        let key = ScenarioCellKey {
+            compartment_id: event.compartment_id().as_str().to_owned(),
+            resource_kind: event.resource_kind(),
+        };
+        if let Some(expected_before_amount) = last_amounts.get(&key) {
+            if !biosim_integrity_amounts_match(*expected_before_amount, event.before_amount()) {
+                return Err(
+                    BioSimScenarioReplayIntegrityError::EventCellContinuityMismatch {
+                        tick_index: event.tick_index(),
+                        sequence_index: event.sequence_index(),
+                        compartment_id: key.compartment_id.clone(),
+                        resource_kind: key.resource_kind,
+                        expected_before_amount: *expected_before_amount,
+                        actual_before_amount: event.before_amount(),
+                    },
+                );
+            }
+        }
+
+        let arithmetic_ok = match event.intent_kind() {
+            BioSimTickIntentKind::Produce | BioSimTickIntentKind::Source => {
+                biosim_integrity_amounts_match(event.committed_amount(), event.requested_amount())
+                    && biosim_integrity_amounts_match(event.clamp_amount(), 0.0)
+                    && biosim_integrity_amounts_match(
+                        event.after_amount(),
+                        event.before_amount() + event.committed_amount(),
+                    )
+            }
+            BioSimTickIntentKind::Consume | BioSimTickIntentKind::Sink => {
+                biosim_integrity_amounts_match(
+                    event.requested_amount(),
+                    event.committed_amount() + event.clamp_amount(),
+                ) && biosim_integrity_amounts_match(
+                    event.after_amount(),
+                    event.before_amount() - event.committed_amount(),
+                )
+            }
+        };
+        if !arithmetic_ok {
+            return Err(
+                BioSimScenarioReplayIntegrityError::EventArithmeticMismatch {
+                    tick_index: event.tick_index(),
+                    sequence_index: event.sequence_index(),
+                },
+            );
+        }
+
+        total_committed_amount += event.committed_amount();
+        total_clamp_amount += event.clamp_amount();
+        last_amounts.insert(key, event.after_amount());
+    }
+
+    for (index, summary) in tick_summaries.iter().enumerate() {
+        let actual_event_count = event_counts[index];
+        if summary.event_count() != actual_event_count {
+            return Err(BioSimScenarioReplayIntegrityError::TickEventCountMismatch {
+                tick_index: summary.tick_index(),
+                expected_event_count: summary.event_count(),
+                actual_event_count,
+            });
+        }
+    }
+
+    let mut final_amounts = BTreeMap::<ScenarioCellKey, f64>::new();
+    for cell in replay.final_cells() {
+        if !cell.amount().is_finite() || cell.amount() < 0.0 {
+            return Err(BioSimScenarioReplayIntegrityError::FinalCellAmountInvalid {
+                compartment_id: cell.compartment_id().as_str().to_owned(),
+                resource_kind: cell.resource_kind(),
+                amount: cell.amount(),
+            });
+        }
+        let expected_unit = biosim_scenario_resource_kind_unit(cell.resource_kind());
+        if cell.unit() != expected_unit {
+            return Err(BioSimScenarioReplayIntegrityError::FinalCellUnitMismatch {
+                compartment_id: cell.compartment_id().as_str().to_owned(),
+                resource_kind: cell.resource_kind(),
+                expected_unit,
+                actual_unit: cell.unit(),
+            });
+        }
+        let key = ScenarioCellKey {
+            compartment_id: cell.compartment_id().as_str().to_owned(),
+            resource_kind: cell.resource_kind(),
+        };
+        if final_amounts.insert(key.clone(), cell.amount()).is_some() {
+            return Err(BioSimScenarioReplayIntegrityError::DuplicateFinalCell {
+                compartment_id: key.compartment_id,
+                resource_kind: key.resource_kind,
+            });
+        }
+    }
+
+    for (key, expected_amount) in last_amounts {
+        let Some(actual_amount) = final_amounts.get(&key) else {
+            return Err(
+                BioSimScenarioReplayIntegrityError::MissingFinalCellForEvent {
+                    compartment_id: key.compartment_id,
+                    resource_kind: key.resource_kind,
+                },
+            );
+        };
+        if !biosim_integrity_amounts_match(expected_amount, *actual_amount) {
+            return Err(BioSimScenarioReplayIntegrityError::FinalCellMismatch {
+                compartment_id: key.compartment_id,
+                resource_kind: key.resource_kind,
+                expected_amount,
+                actual_amount: *actual_amount,
+            });
+        }
+    }
+
+    Ok(BioSimScenarioReplayIntegrityReport {
+        tick_count,
+        tick_summary_count: tick_summaries.len(),
+        event_count: replay.replay_events().len(),
+        final_cell_count: replay.final_cells().len(),
+        total_committed_amount,
+        total_clamp_amount,
+    })
+}
+
+fn validate_integrity_event_amount(
+    tick_index: u64,
+    sequence_index: usize,
+    field: &'static str,
+    value: f64,
+    require_positive: bool,
+) -> Result<(), BioSimScenarioReplayIntegrityError> {
+    if !value.is_finite() || value < 0.0 || (require_positive && value <= 0.0) {
+        Err(BioSimScenarioReplayIntegrityError::EventAmountInvalid {
+            tick_index,
+            sequence_index,
+            field,
+            value,
+        })
+    } else {
+        Ok(())
+    }
+}
+
+fn biosim_integrity_amounts_match(left: f64, right: f64) -> bool {
+    let scale = left.abs().max(right.abs()).max(1.0);
+    (left - right).abs() <= 1.0e-9 * scale
 }
