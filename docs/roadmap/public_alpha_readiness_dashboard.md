@@ -15,7 +15,7 @@ The public alpha friend-test package is intended to answer four narrow questions
 
 ## Current main governed counts
 
-The current main counts below are verifier-derived and include Session G plus later Stage 5 work. Session G itself historically added `+1` validation card, `+1` source-registry seed, `+1` validation-card-only record, and `+0` to the other four governed counters; the absolute values here are the current-main values, not the old Session G branch-local snapshot.
+The current main counts below are verifier-derived and include Session G plus later Stage 5 work through BioSim B2c and the final Stage 5 closeout/status consolidation. Session G itself historically added `+1` validation card, `+1` source-registry seed, `+1` validation-card-only record, and `+0` to the other four governed counters; the absolute values here are the current-main values, not the old Session G branch-local snapshot. The final closeout/status consolidation has zero governed-count delta.
 
 | Inventory class | Current main count | Meaning |
 |---|---:|---|

@@ -1,12 +1,12 @@
 # Stage 5 Master Plan
 
-Stage 5 turns the completed Stage 4 governance surface into a controlled handoff-intake and deployment sequence. This plan records the live status after the bounded BioSim v3 B2c replay-integrity, deterministic ledger/report, synthetic example, and governance deployment. It does not certify AeroCodex, promote external source trees, or approve the next implementation chunk.
+Stage 5 turns the completed Stage 4 governance surface into a controlled handoff-intake and deployment sequence. This plan records the live status for the final Stage 5 closeout/status consolidation after deployed Orekit O2a-O2d and BioSim B2a/B2b-1/B2b-2/B2c slices. It does not certify AeroCodex, promote external source trees, or approve a new implementation chunk.
 
 AeroCodex remains research, education, verification-oriented development, and preliminary-design software. It is not certified, flight-ready, mission-ready, habitat-safe, medical, operational, or regulated-use approved. Stage 5 keeps the conservative validation posture; validation material remains `research_required` unless a later bounded review proves a stronger status.
 
 ## Verified live state
 
-- Current live main before B2c deployment start: `69250935eb2480eabd8efd37b6d6cf62a6157664`.
+- Current live main before final closeout/status consolidation: `a75866cb70c91547800c1fef0fbef50fc9713e07`.
 - Root `Cargo.lock` policy: absent from the repository root.
 - Exact-current-main CI requirement: Rust GitHub Actions must be completed successfully for the exact head before a modifying chunk starts or closes.
 
@@ -20,7 +20,7 @@ AeroCodex remains research, education, verification-oriented development, and pr
 | Validation-card-only records | 46 | Metadata records, not formula implementations. |
 | Helper algorithms | 262 | Support routines not counted as executable research equations. |
 
-The B2c deployment intentionally updates governed equation-inventory totals by +1 validation card, +1 source-registry seed, +1 validation-card-only record, and +24 helper algorithms; executable research equations, metadata-only candidates, and external M07 backlog rows remain unchanged from B2b-2.
+The B2c deployment is the most recent count-changing Stage 5 slice and intentionally updates governed equation-inventory totals by +1 validation card, +1 source-registry seed, +1 validation-card-only record, and +24 helper algorithms; executable research equations, metadata-only candidates, and external M07 backlog rows remain unchanged from B2b-2. This final closeout/status consolidation has expected delta 0 across all seven governed counts.
 
 ## Completed Stage 5 lanes
 
@@ -39,21 +39,23 @@ The B2c deployment intentionally updates governed equation-inventory totals by +
 | Orekit v3 O2d two-line-element contract/source-policy metadata | deployed/completed | `9b2a8e24e2ee55c9840371868ca0ab8343cdeb07` | Contract-only source policy and fail-closed prerequisite evaluation; no parser, checksum algorithm, epoch/orbital-field decoder, SGP4, TEME transform, propagation, operational tracking, or parity claim. |
 | BioSim v3 corrected B2a scenario-domain and structural validation | deployed/completed | `13bcc241da6791189109d698690cb5c7cabdec66` | Clean-room synthetic scenario resource kinds, metadata/compartment/store/clock records, and deterministic structural validation only; no process flows, replay, adapter, ledger, report, example, complete engine, controller, biological-fidelity, habitat-safety, medical, operational, parity, or certification claim. |
 | BioSim v3 B2b-1 process-types/validated-constructor/intent-planner foundation | deployed/completed | `803927e1cf3e35f9c6179e8e8dc98606d2686a3f` | Clean-room synthetic process identifiers, source/sink/transfer/transform records, validated constructors, deterministic one-tick intent planning, and planner guards only. |
-| BioSim v3 B2b-2 bounded replay/digest/event foundation | deployed/completed | deployed by this bounded B2b-2 change | Bounded deterministic compartment replay, immutable replay events/tick summaries/final cells, explicit requested/committed/clamp event semantics, fail-closed initialization, atomic per-tick commit, and compact noncryptographic Fowler-Noll-Vo 1a state digests only; no flat-resource adapter, ledger, report, example, complete engine, controller, biological-fidelity, habitat-safety, medical, operational, parity, certification, or regulated-use claim. |
-| Adapted Session E BioSim-plus docs/contracts | deployed/completed | `9dcc303336d12e401c4a866b3bc2410c937014dd` | Does not complete deep BioSim v3 B2b/B2c; B2a now provides only the bounded scenario-domain/structural-validation foundation. |
+| BioSim v3 B2b-2 bounded replay/digest/event foundation | deployed/completed | `69250935eb2480eabd8efd37b6d6cf62a6157664` | Bounded deterministic compartment replay, immutable replay events/tick summaries/final cells, explicit requested/committed/clamp event semantics, fail-closed initialization, atomic per-tick commit, and compact noncryptographic Fowler-Noll-Vo 1a state digests only; no flat-resource adapter, ledger, report, example, complete engine, controller, biological-fidelity, habitat-safety, medical, operational, parity, certification, or regulated-use claim. |
+| BioSim v3 B2c replay-integrity/ledger/report/governance | deployed/completed | `a75866cb70c91547800c1fef0fbef50fc9713e07` | Bounded fail-closed replay-integrity validation, committed-event ledger accounting, clamp accounting, path-safe report formatting, one synthetic example, and governance only; B2b-3 is skipped/not required for this consumer path and no complete engine, parity, safety, medical, operational, certification, or regulated-use claim is made. |
+| Adapted Session E BioSim-plus docs/contracts | deployed/completed | `9dcc303336d12e401c4a866b3bc2410c937014dd` | Does not provide a complete BioSim engine; B2a, B2b-1, B2b-2, and B2c are tracked as separate bounded v3 slices. |
 | Session G public friend-test package | deployed/completed | `286dab75fef46a9d729fbff3650636162dc4c8e4` | Public counts must track current main. |
 | Session A wrap2pi endpoint contract/test metadata | deployed/completed | `28e3a7697c9d17559d22414abbdca9284646d629`; label fix `e20754cb3d2856a1b28c6808c96d7ed5d1871bdf` | Executable/public `wrap2pi` remains blocked. |
 | Professional hardening | completed | flight dynamics `2412dfb25f1cb369d4bcb60c76b32c3cd8b2bf0f`; aerodynamics/local gates `59bbac1081457b1772019fc6851d7a2e07484141` | No new runtime scope. |
 | Adapted Session F reference-oracle metadata | deployed/completed | `68dc10fc9215df2be9bc64e0f2a94121250c361a` | Planning metadata only; O2b, O2c, and O2d are deployed separately as bounded research/preliminary-only slices. |
 
-## Remaining lanes
+## Post-closeout blockers and deferred decisions
 
-1. Optional BioSim B2b-3 flat-resource adapter proof is skipped/not required for the deployed B2c consumer path; it remains closed unless a future separate adapter-proof prompt reopens it.
-2. Orekit O2c is deployed as local deterministic record/tolerance-comparison infrastructure only; it does not execute Orekit or verify evidence.
-3. Orekit O2d is deployed as contract/source-policy metadata only; it does not parse two-line-element records, implement checksums, run SGP4, perform TEME transforms, propagate orbits, or claim parity.
-4. BioSim B2c is deployed as a bounded replay-integrity/ledger/report/governance slice only; no complete BioSim engine, external parity, or operational/safety claim is made.
-5. Runtime/public `wrap2pi` remains blocked pending a separate endpoint-behavior runtime decision.
-6. `app_resolve_coplanar` remains blocked pending rank, tolerance, and solver policy.
+1. No approved Orekit or BioSim Stage 5 serial implementation slice remains open after the deployed O2a-O2d and B2a/B2b-1/B2b-2/B2c sequence.
+2. Optional BioSim B2b-3 flat-resource adapter proof is skipped/not required for the deployed B2c consumer path; it remains closed unless a future separate adapter-proof prompt reopens it.
+3. Orekit O2c is deployed as local deterministic record/tolerance-comparison infrastructure only; it does not execute Orekit or verify evidence.
+4. Orekit O2d is deployed as contract/source-policy metadata only; it does not parse two-line-element records, implement checksums, run SGP4, perform TEME transforms, propagate orbits, or claim parity.
+5. BioSim B2c is deployed as a bounded replay-integrity/ledger/report/governance slice only; no complete BioSim engine, external parity, or operational/safety claim is made.
+6. Runtime/public `wrap2pi` remains blocked pending a separate endpoint-behavior runtime decision.
+7. `app_resolve_coplanar` remains blocked pending rank, tolerance, and solver policy.
 
 ## C2 data-governance closure rule
 
@@ -73,4 +75,4 @@ The reconciled registry coverage is explicit, not aggregate-only: the core class
 
 Stage 5 is complete only when all approved chunks are deployed from current `main`, each exact commit CI run is green, governed counts are intentionally updated and documented, forbidden-material scans are clean, temporary branches are removed, and every source/license boundary remains intact.
 
-Exactly one coherent modifying chunk is authorized at a time. The next recommended bounded decision is final Stage 5 closeout/status consolidation after deployed Orekit O2a-O2d and BioSim B2a/B2b-1/B2b-2/B2c slices; this plan does not authorize that chunk.
+Exactly one coherent modifying chunk remains authorized at a time. This final closeout/status consolidation is documentation/governance only and does not authorize post-Stage 5 runtime work; any future `wrap2pi`, `app_resolve_coplanar`, optional B2b-3 adapter, Orekit, or BioSim engine work requires a separate bounded prompt.

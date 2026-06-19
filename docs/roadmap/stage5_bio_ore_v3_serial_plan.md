@@ -36,7 +36,7 @@ This document records the current BioSim and Orekit v3 serial plan after deploye
 
 | Material | Current relationship | Classification |
 |---|---|---|
-| Adapted Session E BioSim-plus clean-room docs/contracts | Deployed as docs/contracts only; deep BioSim v3 runtime lanes remain open. | superseded |
+| Adapted Session E BioSim-plus clean-room docs/contracts | Deployed as docs/contracts only; bounded B2a/B2b-1/B2b-2/B2c slices are tracked separately and no complete BioSim engine is claimed. | superseded |
 | Adapted Session F Orekit reference-oracle planning metadata | Deployed as planning metadata only; O2b, O2c, and O2d were deployed separately as bounded research/preliminary-only slices. | superseded |
 | Session E original BioSim-plus handoff | Older direct lane replaced by BioSim v3 serial intake or adapted bounded docs/contracts where explicitly deployed. | superseded |
 | Session F original Orekit handoff | Older direct lane replaced by Orekit v3 serial intake or adapted bounded reference-oracle metadata where explicitly deployed. | superseded |
@@ -55,5 +55,5 @@ This document records the current BioSim and Orekit v3 serial plan after deploye
 ## Known blockers
 
 - No BioSim B2b-3 adapter is required by the deployed B2c consumer path; reopening it requires a separate future prompt and supported consumer.
-- Final Stage 5 closeout/status consolidation remains a separate bounded decision.
+- Final Stage 5 closeout/status consolidation is documentation/governance-only and does not open another Orekit or BioSim serial slice.
 - No complete BioSim engine, external parity, safety, medical, operational, certification, or regulated-use claim exists.
