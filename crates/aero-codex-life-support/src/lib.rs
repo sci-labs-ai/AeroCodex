@@ -14,6 +14,8 @@
 //! equation-traceable implementations whose biological parameters, operating
 //! domains, and validation tolerances must be calibrated for the target system.
 
+/// Clean-room BioSim-plus synthetic process definitions and deterministic intent planning.
+pub mod biosim_process;
 /// Clean-room BioSim-RS resource-identity and tick-validation primitives.
 pub mod biosim_resource_tick;
 /// Clean-room BioSim-plus synthetic scenario domain and structural validation.

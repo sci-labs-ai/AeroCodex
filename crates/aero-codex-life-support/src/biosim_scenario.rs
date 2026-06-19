@@ -43,6 +43,32 @@ impl BioSimCompartmentId {
     }
 }
 
+/// Stable validated identifier for a synthetic process definition.
+///
+/// B2b-1 introduces process identifiers for deterministic intent planning only.
+/// These identifiers do not authorize replay, state mutation, adapter mapping,
+/// external BioSim compatibility, or operational control behavior.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct BioSimProcessId(String);
+
+impl BioSimProcessId {
+    /// Parses a process identifier using the same lower-snake policy as compartments.
+    ///
+    /// Accepted identifiers are ASCII lower-snake identifiers: first character
+    /// `a..z`, then `a..z`, `0..9`, or `_`, with at most 64 bytes.
+    pub fn new(value: impl Into<String>) -> Result<Self, BioSimScenarioValidationError> {
+        let value = value.into();
+        validate_biosim_scenario_identifier("process_id", &value)?;
+        Ok(Self(value))
+    }
+
+    /// Returns the validated process identifier text.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
 /// Metadata carried by a clean-room synthetic scenario.
 ///
 /// Public fields are untrusted assembly data for B2a review and tests.
@@ -432,7 +458,7 @@ pub const fn biosim_scenario_resource_kind_unit(kind: BioSimScenarioResourceKind
     }
 }
 
-fn validate_biosim_scenario_identifier(
+pub(crate) fn validate_biosim_scenario_identifier(
     field: &'static str,
     value: &str,
 ) -> Result<(), BioSimScenarioValidationError> {
@@ -566,6 +592,40 @@ mod tests {
                 Err(BioSimScenarioValidationError::InvalidIdentifier { .. })
             ));
         }
+    }
+
+    #[test]
+    fn process_id_validation_matches_compartment_identifier_policy() {
+        let one = BioSimProcessId::new("p").expect("one-character process ID");
+        assert_eq!(one.as_str(), "p");
+
+        let max_len = "a".repeat(64);
+        let max_id = BioSimProcessId::new(max_len.clone()).expect("64-byte process ID");
+        assert_eq!(max_id.as_str(), max_len);
+
+        for raw in [
+            "",
+            "ProcessOne",
+            "process-one",
+            "process one",
+            "process!one",
+            "1process",
+            "_process",
+            "process_é",
+            &"a".repeat(65),
+        ] {
+            assert!(matches!(
+                BioSimProcessId::new(raw),
+                Err(BioSimScenarioValidationError::InvalidIdentifier { .. })
+            ));
+        }
+
+        assert_eq!(
+            BioSimProcessId::new("process__one_")
+                .expect("matching repeated/trailing underscore policy")
+                .as_str(),
+            "process__one_"
+        );
     }
 
     #[test]

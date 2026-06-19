@@ -8,7 +8,7 @@ artifacts:
     artifact_kind: repo_file_manifest
     origin: current_repo
     license: MIT OR Apache-2.0 with source-material attribution boundaries
-    sha256: 28bc84a978ecdccc2e85130df58cbeb2dd8a0ffd87b789359c69e377f6cd311c
+    sha256: a5ce4d78772ad78c3229fac0c515928bbc7b92643f657df437bdd43899ed792f
     hash_status: sha256_verified_current_repo_file
     allowed_use: in-repository provenance and thin-film source manifest tracking only
     bundling_decision: bundled repo-relative governance artifact; not an external-code import
@@ -78,7 +78,7 @@ artifacts:
     artifact_kind: repo_file_validation_inventory
     origin: current_repo
     license: MIT OR Apache-2.0 metadata
-    sha256: c7dfc5b965ddb4fd94b3f7032f89e0786b26c18666cb83bf173bdcae97177ffe
+    sha256: f8d39a44032572e6ff40f05e1829ad3603292cdee100c622390038bf32d3c201
     hash_status: sha256_verified_current_repo_file
     allowed_use: machine-readable equation inventory and readiness-dashboard counts only
     bundling_decision: bundled repo-relative validation metadata; no formula implementation, source archive import, generated code, fixture, or public application programming interface promotion

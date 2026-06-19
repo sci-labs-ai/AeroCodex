@@ -25,7 +25,7 @@ The current main counts below are verifier-derived and include Session G plus la
 | Validation cards | 45 | Conservative validation/governance records. They are not certification evidence. |
 | Source-registry seeds | 43 | Source/governance traceability seeds. |
 | Validation-card-only records | 45 | Metadata records, not formula implementations. |
-| Helper algorithms | 176 | Support routines not counted as executable research equations. |
+| Helper algorithms | 204 | Support routines not counted as executable research equations. |
 
 ## Public alpha lanes
 
@@ -44,7 +44,7 @@ The current main counts below are verifier-derived and include Session G plus la
 - `wrap2pi` contract/test metadata exists, but executable/public runtime implementation remains blocked pending a separate endpoint-behavior decision.
 - `app_resolve_coplanar` remains blocked for least-squares, rank, singularity, and tolerance policy.
 - Orekit v3 O2a/O2b/O2c/O2d exist as bounded research/preliminary-only foundations and metadata helpers; O2d is contract/source-policy only and does not provide two-line-element parsing, checksums, field decoding, SGP4, TEME transforms, propagation, operational tracking, or parity.
-- BioSim docs/contracts, flat resource/tick primitives, and corrected B2a scenario-domain structural validation remain research-only and incomplete as a full scenario engine or controller.
+- BioSim docs/contracts, flat resource/tick primitives, corrected B2a scenario-domain structural validation, and B2b-1 process/intent-planner helpers remain research-only and incomplete as a full scenario engine or controller; B2b-2/B2b-3/B2c remain incomplete.
 - Session F provides Orekit reference-oracle planning metadata only and does not provide certified Orekit parity.
 - M07 material remains quarantined source material and is not bulk-imported.
 

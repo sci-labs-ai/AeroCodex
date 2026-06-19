@@ -21,13 +21,13 @@ sha256 = "cbca8994de4ffe26e4ba28d9b004f6745195b3172f7839b3510f0be27c3be37d"
 
 [[files]]
 path = "README.md"
-bytes = 12737
-sha256 = "bc2f08fc7602cc2dcc94a3e9610a786a1c7bb3008bfe476227e7e5e1f51b30b0"
+bytes = 13187
+sha256 = "68a9e11254026118936c6af590892ece1f42d8d589999e92bf4c87fac631bbe0"
 
 [[files]]
 path = "checksums/SHA256SUMS"
 bytes = 6583
-sha256 = "5a73aaa6a2d85238138ae964a018f95338fd175967813e1d38b08a2f254fe3ff"
+sha256 = "793b2f569aadbcc5a836b2cfe13950003e5375640211f220d4b42658d23c113e"
 
 [[files]]
 path = "citations/blss_thinfilm_refs.bib"
@@ -46,8 +46,8 @@ sha256 = "a484c41759df5dcf91cf417f45a3107e7482645b897a8de9ffe8af49935edca3"
 
 [[files]]
 path = "crates/aero-codex-life-support/src/lib.rs"
-bytes = 22255
-sha256 = "836cb931f7f0e70d26b3274d02ae115af489bb2590e3477d93ac6ed00e7de0b3"
+bytes = 22371
+sha256 = "63eca5215041964423fd89628776a7cb4d73fd913c0d5f72aad5866a7fd82f62"
 
 [[files]]
 path = "crates/aero-codex-life-support/src/melissa_photobioreactor.rs"
