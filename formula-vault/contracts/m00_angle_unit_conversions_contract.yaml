@@ -16,8 +16,18 @@ source_boundary:
   m07_archive_status: external_quarantine_reference_only
   review_method: inspected_local_registered_archive_without_committing_raw_source
   import_policy: no_bulk_import_no_raw_source_no_generated_code_no_external_fixture
-  public_api_surface: bounded_m00_wrap2pi_public_api_only_no_aliases
+  public_api_surface: bounded_m00_angle_public_api_no_aliases
   validation_status: research_required
+  deployed_public_m00_functions:
+    - m00_degrees_to_radians
+    - m00_radians_to_degrees
+    - m00_wrap2pi
+  legacy_app_public_rust_aliases: []
+  legacy_foa_public_rust_aliases: []
+  public_api_surface_non_claims:
+    parity_claim: false
+    certification_claim: false
+    operational_readiness_claim: false
   m07_facts:
     represented_function_rows: 1350
     scilab_equivalence_jobs: 188
@@ -25,13 +35,41 @@ source_boundary:
 
 formulas:
   - formula_id: formula_vault.m00.angle.deg2rad
-    rust_function_alias: app_deg2rad
+    public_function: m00_degrees_to_radians
+    legacy_release_gate_alias: app_deg2rad
     scilab_function_alias: foa_app_ast_app_deg2rad
+    public_rust_alias_policy:
+      legacy_app_public_rust_alias: absent
+      legacy_foa_public_rust_alias: absent
+    primary_validation_link:
+      path: validation/cards/validation_formula_vault_m00_angle_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing angle-family validation card covers deg2rad/rad2deg; one card per formula is not required
+    primary_source_link:
+      path: validation/source_registry/source_formula_vault_m00_angle_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing angle-family source seed covers deg2rad/rad2deg; one seed per formula is not required
+    new_validation_card_required: false
+    new_source_seed_required: false
     source_locator:
       release_gate_table_alias: release-gate status csv row 3
       source_file_alias: appendices_scilab_astrodynamics constants conversion source file
       reviewed_line_span: lines 67 through 69 in the registered M07 source locator
     source_expression_review_status: reviewed_without_source_copy
+    runtime_decision:
+      codex_id: formula_vault.m00.angle.deg2rad
+      public_function: m00_degrees_to_radians
+      output_variable: angle_radians
+      finite_input_policy: non-finite inputs are rejected by validation::ensure_finite
+      finite_output_policy: non-finite computed outputs are rejected by ensure_finite_formula_result returning numerical_failure
+      failure_policy: non-finite inputs are rejected by validation::ensure_finite; non-finite computed outputs are rejected by ensure_finite_formula_result returning numerical_failure
+      range_or_endpoint_policy: not_applicable_to_unit_conversion_except_no_wrapping_or_range_change
+      clamping_policy: no_clamping
+      numerical_sensitivity_policy: finite f64 PI-based unit conversion with contract/test tolerances and research_required/no-readiness posture
+      validation_status: research_required
+      parity_claim: false
+      certification_claim: false
+      operational_readiness_claim: false
     independent_mathematical_contract:
       summary: finite real degree-valued scalar converted to radians
       expression_summary: output_radians equals input_degrees multiplied by pi divided by 180
@@ -94,13 +132,41 @@ formulas:
       - no_regulated_use_approval
 
   - formula_id: formula_vault.m00.angle.rad2deg
-    rust_function_alias: app_rad2deg
+    public_function: m00_radians_to_degrees
+    legacy_release_gate_alias: app_rad2deg
     scilab_function_alias: foa_app_ast_app_rad2deg
+    public_rust_alias_policy:
+      legacy_app_public_rust_alias: absent
+      legacy_foa_public_rust_alias: absent
+    primary_validation_link:
+      path: validation/cards/validation_formula_vault_m00_angle_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing angle-family validation card covers deg2rad/rad2deg; one card per formula is not required
+    primary_source_link:
+      path: validation/source_registry/source_formula_vault_m00_angle_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing angle-family source seed covers deg2rad/rad2deg; one seed per formula is not required
+    new_validation_card_required: false
+    new_source_seed_required: false
     source_locator:
       release_gate_table_alias: release-gate status csv row 4
       source_file_alias: appendices_scilab_astrodynamics constants conversion source file
       reviewed_line_span: lines 71 through 73 in the registered M07 source locator
     source_expression_review_status: reviewed_without_source_copy
+    runtime_decision:
+      codex_id: formula_vault.m00.angle.rad2deg
+      public_function: m00_radians_to_degrees
+      output_variable: angle_degrees
+      finite_input_policy: non-finite inputs are rejected by validation::ensure_finite
+      finite_output_policy: non-finite computed outputs are rejected by ensure_finite_formula_result returning numerical_failure
+      failure_policy: non-finite inputs are rejected by validation::ensure_finite; non-finite computed outputs are rejected by ensure_finite_formula_result returning numerical_failure
+      range_or_endpoint_policy: not_applicable_to_unit_conversion_except_no_wrapping_or_range_change
+      clamping_policy: no_clamping
+      numerical_sensitivity_policy: finite f64 PI-based unit conversion with contract/test tolerances and research_required/no-readiness posture
+      validation_status: research_required
+      parity_claim: false
+      certification_claim: false
+      operational_readiness_claim: false
     independent_mathematical_contract:
       summary: finite real radian-valued scalar converted to degrees
       expression_summary: output_degrees equals input_radians multiplied by 180 divided by pi
@@ -163,14 +229,42 @@ formulas:
       - no_regulated_use_approval
 
   - formula_id: formula_vault.m00.angle.wrap2pi
-    rust_function_alias: app_wrap2pi
+    public_function: m00_wrap2pi
+    legacy_release_gate_alias: app_wrap2pi
     scilab_function_alias: foa_app_ast_app_wrap2pi
+    public_rust_alias_policy:
+      legacy_app_public_rust_alias: absent
+      legacy_foa_public_rust_alias: absent
+    primary_validation_link:
+      path: validation/cards/validation_formula_vault_m00_wrap2pi_endpoint_policy.yaml
+      resolved: true
+      governance_semantics: existing dedicated wrap2pi endpoint validation card covers wrap2pi
+    primary_source_link:
+      path: validation/source_registry/source_formula_vault_m00_wrap2pi_endpoint_policy.yaml
+      resolved: true
+      governance_semantics: existing dedicated wrap2pi endpoint source seed covers wrap2pi
+    new_validation_card_required: false
+    new_source_seed_required: false
     source_locator:
       release_gate_table_alias: release-gate status csv row 5
       source_file_alias: appendices_scilab_astrodynamics constants conversion source file
       reviewed_line_span: lines 75 through 80 in the registered M07 source locator
     source_expression_review_status: reviewed_without_source_copy
     interval_review_state: reviewed_interval_0_to_2pi_exclusive_upper
+    runtime_decision:
+      codex_id: formula_vault.m00.angle.wrap2pi
+      public_function: m00_wrap2pi
+      output_variable: wrapped_angle_radians
+      finite_input_policy: non-finite inputs are rejected by validation::ensure_finite
+      finite_output_policy: non-finite computed outputs are rejected by ensure_finite_formula_result returning numerical_failure
+      failure_policy: non-finite inputs are rejected by validation::ensure_finite; non-finite computed outputs are rejected by ensure_finite_formula_result returning numerical_failure
+      range_or_endpoint_policy: '[0, TAU) half-open range; positive-zero canonicalization; exact TAU remainder repair to predecessor below TAU; non-finite inputs reject'
+      clamping_policy: no_epsilon_or_ordinary_value_clamping
+      numerical_sensitivity_policy: finite f64 TAU/rem_euclid endpoint policy with positive-zero canonicalization, exact-TAU-neighbor repair, no epsilon clamping, and research_required/no-readiness posture
+      validation_status: research_required
+      parity_claim: false
+      certification_claim: false
+      operational_readiness_claim: false
     independent_mathematical_contract:
       summary: finite real radian-valued scalar normalized into the interval [0, 2*pi)
       expression_summary: output is the nonnegative two-pi remainder of the input angle; negative finite remainders are shifted by one two-pi interval
@@ -256,7 +350,12 @@ formulas:
       - no_regulated_use_approval
 
 contract_level_non_claims:
-  no_additional_formula_implementation_beyond_bounded_m00_wrap2pi_runtime: true
+  no_additional_formula_implementation_beyond_bounded_m00_angle_runtime_functions: true
+  bounded_deployed_m00_angle_runtime_functions:
+    - m00_degrees_to_radians
+    - m00_radians_to_degrees
+    - m00_wrap2pi
+  no_additional_legacy_app_or_foa_public_rust_aliases: true
   no_source_translation: true
   no_raw_m07_source_committed: true
   no_generated_formula_code: true

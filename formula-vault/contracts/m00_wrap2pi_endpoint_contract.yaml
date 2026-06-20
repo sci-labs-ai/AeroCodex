@@ -12,11 +12,14 @@ deployment_session: post_stage5_m00_wrap2pi_runtime_deployment
 formula:
   formula_id: formula_vault.m00.angle.wrap2pi
   existing_candidate_slice_id: formula_vault.m00_angle_unit_conversions.v1
-  rust_function_alias: app_wrap2pi
+  public_function: m00_wrap2pi
+  legacy_release_gate_alias: app_wrap2pi
   scilab_function_alias: foa_app_ast_app_wrap2pi
-  likely_future_aerocodex_function: m00_wrap2pi
+  public_rust_alias_policy:
+    legacy_app_public_rust_alias: absent
+    legacy_foa_public_rust_alias: absent
   implementation_status: bounded_rust_runtime_deployed_research_required
-  public_surface_status: public_api_m00_wrap2pi_only_blocked_from_readiness_or_certification_promotion
+  public_surface_status: bounded_m00_angle_public_api_no_aliases_research_required
 
 source_locator_review:
   status: reviewed_without_source_copy
