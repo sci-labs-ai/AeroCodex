@@ -341,3 +341,124 @@ formulas:
       - no_certification_evidence
       - no_external_scilab_equivalence_claim
       - no_operational_approval
+
+post_stage5_runtime_backfill:
+  schema_version: formula_vault_runtime_backfill.v1
+  source_commit: f9b177b140a4f9dfeefaf376fe38b298bae145d5
+  equation_batch_manifest: equation-batches/m00-angle-vector.tsv
+  validation_status: research_required
+  runtime_kernel_files_changed: 0
+  historical_formula_records_preserved: true
+  cli_exposure_changed: false
+  disposition: existing_runtime_selected_for_compiler_verified_equation_batch
+  primary_validation_card: validation/cards/validation_formula_vault_m00_vector_algebra.yaml
+  primary_source_seed: validation/source_registry/source_formula_vault_m00_vector_algebra.yaml
+  formula_rows:
+    - formula_id: formula_vault.m00.vector.dot
+      runtime_symbol: m00_vector_dot
+      output_variable: dot_product
+      test_strategy: exact
+      inventory_category: executable_research_equation
+      new_validation_card_required: false
+      new_source_seed_required: false
+    - formula_id: formula_vault.m00.vector.norm
+      runtime_symbol: m00_vector_norm
+      output_variable: norm
+      test_strategy: exact
+      inventory_category: executable_research_equation
+      new_validation_card_required: false
+      new_source_seed_required: false
+    - formula_id: formula_vault.m00.vector.cross
+      runtime_symbol: m00_vector_cross
+      output_variable: cross_product
+      test_strategy: exact
+      inventory_category: executable_research_equation
+      new_validation_card_required: false
+      new_source_seed_required: false
+    - formula_id: formula_vault.m00.vector.unit
+      runtime_symbol: m00_unit_vector
+      output_variable: unit_vector
+      test_strategy: tolerance
+      inventory_category: executable_research_equation
+      new_validation_card_required: false
+      new_source_seed_required: false
+    - formula_id: formula_vault.m00.vector.angle
+      runtime_symbol: m00_vector_angle
+      output_variable: angle_radians
+      test_strategy: tolerance
+      inventory_category: executable_research_equation
+      new_validation_card_required: false
+      new_source_seed_required: false
+    - formula_id: formula_vault.m00.vector.projection
+      runtime_symbol: m00_vector_projection
+      output_variable: projected_vector
+      test_strategy: exact
+      inventory_category: executable_research_equation
+      new_validation_card_required: false
+      new_source_seed_required: false
+    - formula_id: formula_vault.m00.vector.scalar_triple
+      runtime_symbol: m00_scalar_triple_product
+      output_variable: scalar_triple_product
+      test_strategy: exact
+      inventory_category: executable_research_equation
+      new_validation_card_required: false
+      new_source_seed_required: false
+    - formula_id: formula_vault.m00.vector.vector_triple
+      runtime_symbol: m00_vector_triple_product
+      output_variable: vector_triple_product
+      test_strategy: exact
+      inventory_category: executable_research_equation
+      new_validation_card_required: false
+      new_source_seed_required: false
+    - formula_id: formula_vault.m00.vector.vector_triple_bac_cab
+      runtime_symbol: m00_vector_triple_bac_cab
+      output_variable: vector_triple_product
+      test_strategy: exact
+      inventory_category: executable_research_equation
+      new_validation_card_required: false
+      new_source_seed_required: false
+    - formula_id: formula_vault.m00.vector.is_collinear
+      runtime_symbol: m00_vectors_collinear
+      output_variable: is_collinear
+      test_strategy: exact
+      inventory_category: executable_research_equation
+      new_validation_card_required: false
+      new_source_seed_required: false
+    - formula_id: formula_vault.m00.vector.is_coplanar
+      runtime_symbol: m00_vectors_coplanar
+      output_variable: is_coplanar
+      test_strategy: exact
+      inventory_category: executable_research_equation
+      new_validation_card_required: false
+      new_source_seed_required: false
+    - formula_id: formula_vault.m00.vector.tangent_from_dr_ds
+      runtime_symbol: m00_tangent_from_dr_ds
+      output_variable: tangent_unit
+      test_strategy: tolerance
+      inventory_category: executable_research_equation
+      new_validation_card_required: false
+      new_source_seed_required: false
+    - formula_id: formula_vault.m00.vector.velocity_from_arc_rate
+      runtime_symbol: m00_velocity_from_arc_rate
+      output_variable: velocity
+      test_strategy: tolerance
+      inventory_category: executable_research_equation
+      new_validation_card_required: false
+      new_source_seed_required: false
+    - formula_id: formula_vault.m00.vector.distance
+      runtime_symbol: m00_vector_distance
+      output_variable: distance
+      test_strategy: exact
+      inventory_category: executable_research_equation
+      new_validation_card_required: false
+      new_source_seed_required: false
+  excluded_scope:
+    - app_resolve_coplanar
+  excluded_scope_reason: solver_rank_and_singularity_policy_requires_separate_review
+  scope_limits:
+    no_runtime_implementation_change: true
+    no_legacy_alias_promotion: true
+    no_external_scilab_parity_claim: true
+    no_certification_claim: true
+    no_operational_readiness_claim: true
+    full_equation_inventory_complete: false

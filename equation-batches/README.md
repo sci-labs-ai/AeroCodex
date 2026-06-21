@@ -10,8 +10,12 @@ From the repository root:
 
 ```text
 cargo run -p xtask -- equation-batch plan --manifest equation-batches/m00-canonical-units.tsv
-cargo run -p xtask -- equation-batch generate --manifest equation-batches/m00-canonical-units.tsv --output-dir <directory-outside-the-repository>
-cargo run -p xtask -- equation-batch verify --manifest equation-batches/m00-canonical-units.tsv --output-dir <directory-outside-the-repository>
+cargo run -p xtask -- equation-batch generate --manifest equation-batches/m00-canonical-units.tsv --output-dir <canonical-directory-outside-the-repository>
+cargo run -p xtask -- equation-batch verify --manifest equation-batches/m00-canonical-units.tsv --output-dir <canonical-directory-outside-the-repository>
+
+cargo run -p xtask -- equation-batch plan --manifest equation-batches/m00-angle-vector.tsv
+cargo run -p xtask -- equation-batch generate --manifest equation-batches/m00-angle-vector.tsv --output-dir <angle-vector-directory-outside-the-repository>
+cargo run -p xtask -- equation-batch verify --manifest equation-batches/m00-angle-vector.tsv --output-dir <angle-vector-directory-outside-the-repository>
 ```
 
 `plan` validates the manifest and prints a stable json plan. `generate` writes a deterministic probe crate and artifact hashes outside the repository. `verify` regenerates the expected artifacts, checks their hashes, and runs the probe crate with Cargo in offline mode.
@@ -36,4 +40,9 @@ Rules:
 - Generated output must be outside the Git repository and may not overwrite an existing directory.
 - Missing symbols, invalid expressions, stale governance links, compilation failures, and failed contract probes stop the batch.
 
-The canonical-unit manifest is the first reference batch. It proves the pipeline against ten already governed equations; it does not claim that the full equation inventory is complete or operationally ready.
+## Governed reference batches
+
+- `m00-canonical-units.tsv` covers 10 canonical-unit equations.
+- `m00-angle-vector.tsv` covers 17 existing angle, wrapping, and vector-algebra runtime equations.
+
+The two manifests are disjoint and provide compiler-verified coverage for 27 M00 equations. They do not change runtime kernels, expand the Beta 1 command-line surface, claim external Scilab parity, or imply that the full equation inventory is complete or operationally ready.

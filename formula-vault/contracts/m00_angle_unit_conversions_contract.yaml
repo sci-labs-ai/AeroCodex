@@ -363,3 +363,48 @@ contract_level_non_claims:
   no_external_fixture_import: true
   no_alternate_public_api_promotion: true
   no_status_upgrade_beyond_research_required: true
+
+post_stage5_runtime_backfill:
+  schema_version: formula_vault_runtime_backfill.v1
+  source_commit: f9b177b140a4f9dfeefaf376fe38b298bae145d5
+  equation_batch_manifest: equation-batches/m00-angle-vector.tsv
+  validation_status: research_required
+  runtime_kernel_files_changed: 0
+  historical_formula_records_preserved: true
+  cli_exposure_changed: false
+  disposition: existing_runtime_selected_for_compiler_verified_equation_batch
+  formula_rows:
+    - formula_id: formula_vault.m00.angle.deg2rad
+      runtime_symbol: m00_degrees_to_radians
+      output_variable: angle_radians
+      test_strategy: tolerance
+      inventory_category: executable_research_equation
+      primary_validation_card: validation/cards/validation_formula_vault_m00_angle_unit_conversions.yaml
+      primary_source_seed: validation/source_registry/source_formula_vault_m00_angle_unit_conversions.yaml
+      new_validation_card_required: false
+      new_source_seed_required: false
+    - formula_id: formula_vault.m00.angle.rad2deg
+      runtime_symbol: m00_radians_to_degrees
+      output_variable: angle_degrees
+      test_strategy: tolerance
+      inventory_category: executable_research_equation
+      primary_validation_card: validation/cards/validation_formula_vault_m00_angle_unit_conversions.yaml
+      primary_source_seed: validation/source_registry/source_formula_vault_m00_angle_unit_conversions.yaml
+      new_validation_card_required: false
+      new_source_seed_required: false
+    - formula_id: formula_vault.m00.angle.wrap2pi
+      runtime_symbol: m00_wrap2pi
+      output_variable: wrapped_angle_radians
+      test_strategy: invariant
+      inventory_category: executable_research_equation
+      primary_validation_card: validation/cards/validation_formula_vault_m00_wrap2pi_endpoint_policy.yaml
+      primary_source_seed: validation/source_registry/source_formula_vault_m00_wrap2pi_endpoint_policy.yaml
+      new_validation_card_required: false
+      new_source_seed_required: false
+  scope_limits:
+    no_runtime_implementation_change: true
+    no_legacy_alias_promotion: true
+    no_external_scilab_parity_claim: true
+    no_certification_claim: true
+    no_operational_readiness_claim: true
+    full_equation_inventory_complete: false
