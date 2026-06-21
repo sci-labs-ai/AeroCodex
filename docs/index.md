@@ -22,6 +22,7 @@ Start with:
 - [Formula-vault M00 vector-equation expansion](assurance/formula_vault_m00_vector_equation_expansion.md)
 - [Formula-vault candidate verifier](assurance/formula_vault_candidate_verifier.md)
 - [Equation inventory/readiness dashboard](assurance/equation_inventory_readiness_dashboard.md)
+- [Equation batch compiler](../equation-batches/README.md)
 - [Validation-card generation policy](assurance/validation_card_generation_policy.md)
 - [Source-seed generation policy](assurance/source_seed_generation_policy.md)
 - [M07 formula-family validation-card strategy](assurance/validation_family_card_strategy.md)

@@ -287,6 +287,18 @@ fn main() {
             let root = repo_root();
             run_beta1_automated_gate(&root, remaining)
         }
+        ["equation-batch", "plan", remaining @ ..] => {
+            let root = repo_root();
+            run_equation_batch(&root, "plan", remaining)
+        }
+        ["equation-batch", "generate", remaining @ ..] => {
+            let root = repo_root();
+            run_equation_batch(&root, "generate", remaining)
+        }
+        ["equation-batch", "verify", remaining @ ..] => {
+            let root = repo_root();
+            run_equation_batch(&root, "verify", remaining)
+        }
         ["dependency-policy"] => dependency_policy(),
         ["help"] | ["--help"] | ["-h"] => {
             print_usage();
@@ -306,7 +318,7 @@ fn main() {
 
 fn print_usage() {
     eprintln!(
-        "usage:\n  cargo run -p xtask -- verify --all\n  cargo run -p xtask -- verify cards\n  cargo run -p xtask -- verify source-registry\n  cargo run -p xtask -- verify data-registry\n  cargo run -p xtask -- verify status-vocabulary\n  cargo run -p xtask -- verify formula-vault\n  cargo run -p xtask -- verify equation-inventory\n  cargo run -p xtask -- verify beta1\n  cargo run -p xtask -- verify beta1-automated [--output-dir <output-directory>] [--timeout-seconds <seconds>]\n  cargo run -p xtask -- dependency-policy"
+        "usage:\n  cargo run -p xtask -- verify --all\n  cargo run -p xtask -- verify cards\n  cargo run -p xtask -- verify source-registry\n  cargo run -p xtask -- verify data-registry\n  cargo run -p xtask -- verify status-vocabulary\n  cargo run -p xtask -- verify formula-vault\n  cargo run -p xtask -- verify equation-inventory\n  cargo run -p xtask -- verify beta1\n  cargo run -p xtask -- verify beta1-automated [--output-dir <output-directory>] [--timeout-seconds <seconds>]\n  cargo run -p xtask -- equation-batch plan --manifest <repo-relative-manifest>\n  cargo run -p xtask -- equation-batch generate --manifest <repo-relative-manifest> --output-dir <outside-repository-directory>\n  cargo run -p xtask -- equation-batch verify --manifest <repo-relative-manifest> --output-dir <outside-repository-directory> [--timeout-seconds <seconds>]\n  cargo run -p xtask -- dependency-policy"
     );
 }
 
@@ -346,6 +358,115 @@ fn run_beta1_automated_gate(root: &Path, remaining: &[&str]) -> Result<(), Strin
     } else {
         Err(format!("Beta 1 automated gate failed with status {status}"))
     }
+}
+
+fn run_equation_batch(root: &Path, action: &str, remaining: &[&str]) -> Result<(), String> {
+    let script = root.join("scripts/equation_batch.py");
+    if !script.is_file() {
+        return Err(format!(
+            "missing equation-batch compiler: {}",
+            script.display()
+        ));
+    }
+
+    let candidates = ["python", "python3"];
+    let python = candidates
+        .into_iter()
+        .find(|candidate| {
+            Command::new(*candidate)
+                .arg("--version")
+                .output()
+                .map(|output| output.status.success())
+                .unwrap_or(false)
+        })
+        .ok_or_else(|| {
+            "no usable Python interpreter found for equation-batch compiler".to_string()
+        })?;
+
+    let status = Command::new(python)
+        .arg(&script)
+        .arg(action)
+        .arg("--repo")
+        .arg(root)
+        .args(remaining.iter().copied())
+        .status()
+        .map_err(|error| {
+            format!("failed to start equation-batch compiler with {python}: {error}")
+        })?;
+    if status.success() {
+        Ok(())
+    } else {
+        Err(format!(
+            "equation-batch {action} failed with status {status}"
+        ))
+    }
+}
+
+fn verify_equation_batch_scaffold(root: &Path) -> Result<(), String> {
+    let required_files = [
+        "scripts/equation_batch.py",
+        "equation-batches/README.md",
+        "equation-batches/m00-canonical-units.tsv",
+    ];
+    for relative in required_files {
+        let path = root.join(relative);
+        if !path.is_file() {
+            return Err(format!("missing equation-batch scaffold file: {relative}"));
+        }
+    }
+
+    let script = fs::read_to_string(root.join("scripts/equation_batch.py"))
+        .map_err(|error| format!("equation-batch compiler: {error}"))?;
+    for marker in [
+        "aerocodex.equation_batch.v1",
+        "maximum_rows",
+        "no_rust_source_scraping",
+        "runtime_symbols_compiler_verified",
+        "--offline",
+    ] {
+        if !script.contains(marker) {
+            return Err(format!(
+                "scripts/equation_batch.py missing required marker `{marker}`"
+            ));
+        }
+    }
+
+    let manifest = fs::read_to_string(root.join("equation-batches/m00-canonical-units.tsv"))
+        .map_err(|error| format!("equation-batch example manifest: {error}"))?;
+    let mut lines = manifest.lines();
+    let header = lines
+        .next()
+        .ok_or_else(|| "equation-batch example manifest is empty".to_string())?;
+    let expected_header = "schema_version\tbatch_id\tformula_id\tpackage\tcrate_name\truntime_symbol\toutput_variable\tcontract_path\tvalidation_card_path\tsource_seed_path\tvalidation_status\ttest_strategy\ttest_expression";
+    if header != expected_header {
+        return Err("equation-batch example manifest header mismatch".to_string());
+    }
+    let rows: Vec<&str> = lines.filter(|line| !line.trim().is_empty()).collect();
+    if rows.len() != 10 {
+        return Err(format!(
+            "equation-batch canonical example must contain 10 rows, got {}",
+            rows.len()
+        ));
+    }
+    for (index, row) in rows.iter().enumerate() {
+        if row.split('\t').count() != 13 {
+            return Err(format!(
+                "equation-batch example row {} does not have 13 fields",
+                index + 2
+            ));
+        }
+        if !row.contains("\tresearch_required\t") {
+            return Err(format!(
+                "equation-batch example row {} does not retain research_required",
+                index + 2
+            ));
+        }
+    }
+
+    println!(
+        "verified equation-batch compiler scaffold: schema=aerocodex.equation_batch.v1; example_rows=10; maximum_rows=40"
+    );
+    Ok(())
 }
 
 fn verify_beta1(root: &Path) -> Result<(), String> {
@@ -557,6 +678,7 @@ fn verify_all() -> Result<(), String> {
     verify_status_vocabulary(&root)?;
     verify_formula_vault(&root)?;
     verify_equation_inventory(&root)?;
+    verify_equation_batch_scaffold(&root)?;
     verify_beta1(&root)?;
     Ok(())
 }

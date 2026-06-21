@@ -23,6 +23,12 @@ jobs:
         with:
           python-version: "3.11"
       - run: python -m pip install --upgrade pip pyyaml
+      - name: Run equation batch compiler self-test
+        run: python scripts/equation_batch.py self-test
+      - name: Compile canonical equation batch example
+        run: |
+          cargo run -p xtask -- equation-batch generate --manifest equation-batches/m00-canonical-units.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch"
+          cargo run -p xtask -- equation-batch verify --manifest equation-batches/m00-canonical-units.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch" --timeout-seconds 600
       - name: Run native automated qualification and packaging
         run: cargo run -p xtask -- verify beta1-automated --output-dir "${{ runner.temp }}/aerocodex-beta1-automated"
       - name: Upload native candidate and reports
