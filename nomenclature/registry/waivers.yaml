@@ -225,3 +225,59 @@ records:
   approved_by: nomenclature_owner
   expires: never
   status: approved
+- waiver_id: ACX-NOM-WAIVER-0126
+  rule: ACX-NOM-W008
+  surface_form: AEROCODEX
+  context: Beta 1 build-provenance environment variable names
+  reason: Uppercase product-name component in build-system environment variables; not a new acronym expansion.
+  approved_by: nomenclature_owner
+  expires: never
+  status: approved
+- waiver_id: ACX-NOM-WAIVER-0127
+  rule: ACX-NOM-W008
+  surface_form: BUILD
+  context: Beta 1 build-provenance environment variable names
+  reason: Uppercase descriptive component in build-system environment variables; not a standalone acronym.
+  approved_by: nomenclature_owner
+  expires: never
+  status: approved
+- waiver_id: ACX-NOM-WAIVER-0128
+  rule: ACX-NOM-W008
+  surface_form: COMMIT
+  context: Beta 1 build-provenance environment variable names and release metadata
+  reason: Uppercase descriptive component in build-system provenance identifiers; not a standalone acronym.
+  approved_by: nomenclature_owner
+  expires: never
+  status: approved
+- waiver_id: ACX-NOM-WAIVER-0129
+  rule: ACX-NOM-W008
+  surface_form: SHA-256
+  context: Beta 1 release documentation and checksum artifact descriptions
+  reason: Standard cryptographic digest algorithm name used literally in release documentation.
+  approved_by: nomenclature_owner
+  expires: never
+  status: approved
+- waiver_id: ACX-NOM-WAIVER-0130
+  rule: ACX-NOM-W008
+  surface_form: TARGET
+  context: Beta 1 Rust build-target environment variable names
+  reason: Uppercase standard Rust build-system variable name; not a new AeroCodex acronym.
+  approved_by: nomenclature_owner
+  expires: never
+  status: approved
+- waiver_id: ACX-NOM-WAIVER-0131
+  rule: ACX-NOM-W008
+  surface_form: PKG
+  context: Cargo package-version environment variable name used by the Beta 1 CLI
+  reason: Standard Cargo environment-variable abbreviation preserved exactly for build metadata access.
+  approved_by: nomenclature_owner
+  expires: never
+  status: approved
+- waiver_id: ACX-NOM-WAIVER-0132
+  rule: ACX-NOM-W008
+  surface_form: VERSION
+  context: Cargo package-version environment variable name used by the Beta 1 CLI
+  reason: Uppercase descriptive component in a standard Cargo environment variable; not a standalone acronym.
+  approved_by: nomenclature_owner
+  expires: never
+  status: approved

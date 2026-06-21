@@ -62,3 +62,8 @@ Every Stage 4 chunk closeout must include:
 - source-boundary decisions;
 - intentional deferrals and blockers;
 - next recommended chunk.
+## Beta 1 candidate artifact gate
+
+A Beta 1 concept archive may be produced only from a clean committed source snapshot. The candidate packager must run Cargo offline, prove the current dependency graph is repository-local and path-only, embed the source commit and target in the binary, emit SHA-256 checksums and a release manifest, and execute the packaged binary smoke contract after archive extraction.
+
+Candidate packaging does not authorize a Git tag, GitHub release, signing event, publication, operational-readiness claim, certification claim, or validation-status upgrade. Those actions require a separate explicit release decision.

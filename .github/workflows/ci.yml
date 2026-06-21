@@ -15,6 +15,7 @@ jobs:
         with:
           python-version: "3.x"
       - run: python -m pip install --upgrade pip pyyaml
+      - run: python scripts/verify_beta1_release.py --self-test
       - run: git diff --check
       - run: sha256sum -c checksums/SHA256SUMS
       - run: cargo fmt --all -- --check

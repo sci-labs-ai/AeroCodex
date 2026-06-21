@@ -72,3 +72,18 @@ cargo run -p xtask -- verify beta1
 ```
 
 The complete repository gate remains `cargo run -p xtask -- verify --all` plus the other CI commands documented in the friend-test quickstart.
+## Build a testable release archive
+
+From a clean committed checkout:
+
+```bash
+python scripts/package_beta1_release.py --repo . --output-dir dist/beta1
+```
+
+Verify the resulting ZIP and execute its packaged binary smoke contract:
+
+```bash
+python scripts/verify_beta1_release.py --archive dist/beta1/aerocodex-0.0.1-beta1-concept-<target>-<commit12>.zip --run-binary
+```
+
+The archive records the exact Git commit and target. This remains a `research_required` Beta 1 concept artifact, not a certified or operational release. See [`release_testing.md`](release_testing.md).

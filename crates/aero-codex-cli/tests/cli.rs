@@ -40,7 +40,11 @@ fn version_json_exposes_bounded_release_identity() {
     let output = run(&["version", "--json"]);
     assert!(output.status.success(), "{}", stderr(&output));
     let text = stdout(&output);
+    assert!(text.contains("\"package_version\":\"0.0.1\""));
     assert!(text.contains("\"release_channel\":\"beta1-concept\""));
+    assert!(text.contains("\"build_commit\":"));
+    assert!(text.contains("\"build_target\":"));
+    assert!(text.contains("\"build_profile\":"));
     assert!(text.contains("\"supported_formula_count\":10"));
     assert!(text.contains("\"validation_status\":\"research_required\""));
     assert!(text.contains("\"safety_notice\":"));

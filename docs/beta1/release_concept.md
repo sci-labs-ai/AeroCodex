@@ -64,3 +64,8 @@ Beta 1 does not claim:
 ## Next scaling step
 
 After the ten-formula CLI and release gate are deployed, the next production-engineering task is a generated formula registry. It should consume governed contract/inventory rows, emit deterministic dispatcher metadata and tests, and produce an exception report for blocked rows. That is the mechanism intended to scale from this pilot to the larger equation inventory without repeating manual four-to-ten-formula review ceremonies.
+## Release-candidate packaging layer
+
+The Beta 1 concept now has a deterministic candidate-packaging gate. It builds only a clean committed source snapshot, proves Cargo dependencies are workspace-local and path-only, runs Cargo offline, embeds the source commit and target in the binary version output, emits a manifest and SHA-256 checksums, and re-runs the bounded smoke contract from the extracted archive.
+
+The packaging layer does not tag, publish, sign, or certify a release. Cargo version remains `0.0.1`, validation remains `research_required`, and the release channel remains `beta1-concept`. See [`release_testing.md`](release_testing.md).

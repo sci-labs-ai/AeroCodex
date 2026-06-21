@@ -312,6 +312,10 @@ fn verify_beta1(root: &Path) -> Result<(), String> {
         "crates/aero-codex-cli/tests/cli.rs",
         "docs/beta1/release_concept.md",
         "docs/beta1/cli_quickstart.md",
+        "docs/beta1/release_testing.md",
+        "scripts/package_beta1_release.py",
+        "scripts/verify_beta1_release.py",
+        ".github/workflows/beta1-package.yml",
     ];
     for relative in required_files {
         let path = root.join(relative);
@@ -351,6 +355,10 @@ fn verify_beta1(root: &Path) -> Result<(), String> {
         .map_err(|error| format!("aero-codex-cli main.rs: {error}"))?;
     for marker in [
         "fn release_channel() -> &'static str",
+        "env!(\"CARGO_PKG_VERSION\")",
+        "fn build_commit() -> &'static str",
+        "fn build_target() -> &'static str",
+        "fn build_profile() -> &'static str",
         "fn validation_status() -> &'static str",
         "fn supported_formula_count() -> usize",
         "formula_vault.m00.canonical.time_unit_from_mu_du",
@@ -382,6 +390,72 @@ fn verify_beta1(root: &Path) -> Result<(), String> {
         }
     }
 
+    let release_testing = fs::read_to_string(root.join("docs/beta1/release_testing.md"))
+        .map_err(|error| format!("Beta 1 release testing: {error}"))?;
+    for marker in [
+        "Build a candidate archive",
+        "--run-binary",
+        "workspace-local and path-only",
+        "not an aerospace assurance or certification gate",
+    ] {
+        if !release_testing.contains(marker) {
+            return Err(format!(
+                "docs/beta1/release_testing.md missing marker `{marker}`"
+            ));
+        }
+    }
+
+    let packager = fs::read_to_string(root.join("scripts/package_beta1_release.py"))
+        .map_err(|error| format!("Beta 1 packager: {error}"))?;
+    for marker in [
+        "cargo",
+        "--offline",
+        "--release",
+        "AEROCODEX_BUILD_COMMIT",
+        "release-manifest.json",
+        "SHA256SUMS",
+        "verify_beta1_release.py",
+    ] {
+        if !packager.contains(marker) {
+            return Err(format!(
+                "scripts/package_beta1_release.py missing marker `{marker}`"
+            ));
+        }
+    }
+
+    let release_verifier = fs::read_to_string(root.join("scripts/verify_beta1_release.py"))
+        .map_err(|error| format!("Beta 1 release verifier: {error}"))?;
+    for marker in [
+        "--self-test",
+        "--run-binary",
+        "tampered_fixture_rejected",
+        "non_positive_input",
+        "unknown_formula",
+    ] {
+        if !release_verifier.contains(marker) {
+            return Err(format!(
+                "scripts/verify_beta1_release.py missing marker `{marker}`"
+            ));
+        }
+    }
+
+    let package_workflow = fs::read_to_string(root.join(".github/workflows/beta1-package.yml"))
+        .map_err(|error| format!("Beta 1 package workflow: {error}"))?;
+    for marker in [
+        "workflow_dispatch",
+        "ubuntu-latest",
+        "windows-latest",
+        "macos-latest",
+        "package_beta1_release.py",
+        "actions/upload-artifact@v4",
+    ] {
+        if !package_workflow.contains(marker) {
+            return Err(format!(
+                ".github/workflows/beta1-package.yml missing marker `{marker}`"
+            ));
+        }
+    }
+
     let workflow = fs::read_to_string(root.join(".github/workflows/ci.yml"))
         .map_err(|error| format!("CI workflow: {error}"))?;
     let bash_friend_test = fs::read_to_string(root.join("scripts/friend_test_local.sh"))
@@ -400,7 +474,7 @@ fn verify_beta1(root: &Path) -> Result<(), String> {
     }
 
     println!(
-        "verified Beta 1 concept: channel=beta1-concept; cargo_version=0.0.1; supported_formulas=10; validation_status=research_required"
+        "verified Beta 1 concept: channel=beta1-concept; cargo_version=0.0.1; supported_formulas=10; validation_status=research_required; release_packaging=present"
     );
     Ok(())
 }

@@ -52,6 +52,7 @@ Start with:
 - [Versioning](roadmap/versioning.md)
 - [Beta 1 concept](beta1/release_concept.md)
 - [Beta 1 CLI quickstart](beta1/cli_quickstart.md)
+- [Beta 1 release-candidate testing](beta1/release_testing.md)
 - [Milestones](roadmap/milestones.md)
 - [Post-1.0 expansion concepts](roadmap/post_1_0_expansion.md)
 - [Phase 0.001 working inventory](phase_0_001/working_inventory.md)

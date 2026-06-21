@@ -161,8 +161,8 @@
     },
     {
       "path": "registry/waivers.yaml",
-      "bytes": 9076,
-      "sha256": "82d7889cf4687d6d4a1926f5af753d5d6fcf5be261a4b13993508aec50962d34"
+      "bytes": 11342,
+      "sha256": "88f09ed65204e509504e0eaba5100dd6be92f43a6a84242b62a3009a8ac7f35b"
     },
     {
       "path": "schemas/acronym.schema.json",

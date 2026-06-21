@@ -24,7 +24,23 @@ fn release_channel() -> &'static str {
 }
 
 fn package_version() -> &'static str {
-    "0.0.1"
+    env!("CARGO_PKG_VERSION")
+}
+
+fn build_commit() -> &'static str {
+    option_env!("AEROCODEX_BUILD_COMMIT").unwrap_or("unknown")
+}
+
+fn build_target() -> &'static str {
+    option_env!("AEROCODEX_BUILD_TARGET").unwrap_or("unknown")
+}
+
+fn build_profile() -> &'static str {
+    if cfg!(debug_assertions) {
+        "debug"
+    } else {
+        "release"
+    }
 }
 
 fn validation_status() -> &'static str {
@@ -425,6 +441,12 @@ fn output_version(json: bool) {
         push_json_string(&mut output, package_version());
         output.push_str(",\"release_channel\":");
         push_json_string(&mut output, release_channel());
+        output.push_str(",\"build_commit\":");
+        push_json_string(&mut output, build_commit());
+        output.push_str(",\"build_target\":");
+        push_json_string(&mut output, build_target());
+        output.push_str(",\"build_profile\":");
+        push_json_string(&mut output, build_profile());
         write!(
             output,
             ",\"supported_formula_count\":{},\"validation_status\":",
@@ -439,6 +461,9 @@ fn output_version(json: bool) {
     } else {
         println!("AeroCodex {}", package_version());
         println!("release_channel={}", release_channel());
+        println!("build_commit={}", build_commit());
+        println!("build_target={}", build_target());
+        println!("build_profile={}", build_profile());
         println!("supported_formula_count={}", supported_formula_count());
         println!("validation_status={}", validation_status());
         println!("safety_notice={}", safety_notice());
@@ -910,6 +935,14 @@ fn main() -> ExitCode {
 mod tests {
     use super::*;
     use std::collections::BTreeSet;
+
+    #[test]
+    fn release_identity_uses_cargo_metadata_and_safe_defaults() {
+        assert_eq!(package_version(), env!("CARGO_PKG_VERSION"));
+        assert!(!build_commit().is_empty());
+        assert!(!build_target().is_empty());
+        assert!(matches!(build_profile(), "debug" | "release"));
+    }
 
     #[test]
     fn registry_is_unique_and_complete() {
