@@ -19,122 +19,866 @@ source_boundary:
     scilab_equivalence_jobs: 188
     release_status: release_candidate_not_certified
 
+  public_api_surface: bounded_m00_canonical_unit_conversion_public_api_no_aliases
+  deployed_public_m00_functions:
+    - m00_canonical_time_unit_from_mu_du
+    - m00_canonical_speed_unit_from_du_tu
+    - m00_canonical_speed_unit_from_mu_du
+    - m00_canonical_mu_from_units
+    - m00_distance_to_canonical
+    - m00_distance_from_canonical
+    - m00_time_to_canonical
+    - m00_time_from_canonical
+    - m00_speed_to_canonical
+    - m00_speed_from_canonical
+  legacy_app_public_rust_aliases: []
+  legacy_foa_public_rust_aliases: []
+  public_api_surface_non_claims:
+    parity_claim: false
+    certification_claim: false
+    operational_readiness_claim: false
 formulas:
   - formula_id: formula_vault.m00.canonical.time_unit_from_mu_du
+    public_function: m00_canonical_time_unit_from_mu_du
     rust_function_alias: m00_canonical_time_unit_from_mu_du
     m07_locator_aliases:
       - app_canonical_units_from_mu_du release-gate row 12
+    primary_validation_link:
+      path: validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family validation card covers all ten formulas; one card per formula is not required
+    primary_source_link:
+      path: validation/source_registry/source_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family source seed covers all ten formulas; one seed per formula is not required
+    new_validation_card_required: false
+    new_source_seed_required: false
+    source_expression_review_status: reviewed_without_source_copy
+    runtime_decision:
+      codex_id: formula_vault.m00.canonical.time_unit_from_mu_du
+      public_function: m00_canonical_time_unit_from_mu_du
+      output_variable: time_unit
+      finite_input_policy: all scalar inputs must be finite; non-finite inputs are rejected
+      scale_policy: every unit scale is finite and strictly positive; zero or negative scales are rejected
+      signed_quantity_policy: positive-scale formula; every input and the computed scale are finite and strictly positive
+      finite_output_policy: the computed result must be finite; overflow or any non-finite output is rejected as numerical failure
+      failure_policy: reject non-finite inputs, reject nonpositive scales, reject overflow or non-finite output, and provide no silent clamp, fallback, or absolute-value substitution
+      range_or_endpoint_policy: not_applicable_to_scalar_unit_conversion
+      clamping_policy: no_clamping_no_fallback_no_absolute_value_substitution
+      rounding_policy: IEEE-754 f64 rounding applies
+      determinism_policy: deterministic for the same build and platform
+      test_strategy: tolerance-based retained contract vectors plus bounded algebraic identity tests
+      operation_ordering_policy: evaluate distance_unit cubed, divide by mu, then take the positive square root; this ordering is not an exact associativity claim
+      numerical_sensitivity_policy: IEEE-754 f64 product, ratio, and square-root rounding applies; execution is deterministic for the same build and platform; bounded exact or tolerance-based tests apply without arbitrary-magnitude exactness claims
+      validation_status: research_required
+      parity_claim: false
+      certification_claim: false
+      operational_readiness_claim: false
     independent_mathematical_contract:
       expression_summary: TU equals square root of distance_unit cubed divided by gravitational parameter
       domain_summary: mu and distance_unit are finite strictly positive scalars in compatible units
+    input_variables:
+      - name: mu
+        units: caller_supplied_distance_cubed_per_time_squared
+        type: finite_strictly_positive_real_scalar
+      - name: distance_unit
+        units: caller_supplied_distance_unit
+        type: finite_strictly_positive_real_scalar
+    output_variable:
+      name: time_unit
+      units: caller_supplied_time_unit
+      type: finite_strictly_positive_real_scalar
     output_units: caller_supplied_time_unit
-    branch_or_endpoint_behavior: single branch positive square root
+    coordinate_frame_dependence: none
+    time_scale_dependence: none
+    valid_domain: mu and distance_unit are finite strictly positive scalars in compatible units
     invalid_inputs:
       - nonfinite mu
       - nonfinite distance_unit
       - nonpositive mu
       - nonpositive distance_unit
+      - overflow or nonfinite computed output
+    singularities: none within the valid domain
+    branch_or_endpoint_behavior: single branch positive square root
     tolerance_policy:
-      absolute_tolerance: 1.0e-12 for normalized tests
-      relative_tolerance: 1.0e-12 for nonzero values
-
+      comparison_strategy: tolerance
+      absolute_tolerance: 1e-12
+      relative_tolerance: 1e-12
+      bounded_round_trip_or_algebraic_tests: true
+      rationale: retained explicit exact or tolerance-based contract tests over bounded finite f64 inputs; no arbitrary-magnitude exactness claim
+    reference_oracle:
+      type: independent_analytic_identity
+      identity: sqrt_distance_unit_cubed_divided_by_mu
+    implementation_status: bounded_runtime_deployed_research_required
+    promotion_gate: deployed_metadata_complete_no_status_upgrade_without_future_equivalence_review
+    non_claim_caveats:
+      - no_certification_evidence
+      - no_flight_readiness
+      - no_mission_readiness
+      - no_operational_approval
+      - no_m07_or_scilab_parity_claim
+      - no_arbitrary_magnitude_exactness_claim
+      - no_exact_associativity_claim
+      - no_broader_m00_completion_claim
+      - no_m00_c3_readiness_claim
   - formula_id: formula_vault.m00.canonical.speed_unit_from_du_tu
+    public_function: m00_canonical_speed_unit_from_du_tu
     rust_function_alias: m00_canonical_speed_unit_from_du_tu
     m07_locator_aliases:
       - app_canonical_units_from_mu_du release-gate row 12
       - app_to_due_velocity release-gate row 8
       - app_from_due_velocity release-gate row 9
+    primary_validation_link:
+      path: validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family validation card covers all ten formulas; one card per formula is not required
+    primary_source_link:
+      path: validation/source_registry/source_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family source seed covers all ten formulas; one seed per formula is not required
+    new_validation_card_required: false
+    new_source_seed_required: false
+    source_expression_review_status: reviewed_without_source_copy
+    runtime_decision:
+      codex_id: formula_vault.m00.canonical.speed_unit_from_du_tu
+      public_function: m00_canonical_speed_unit_from_du_tu
+      output_variable: speed_unit
+      finite_input_policy: all scalar inputs must be finite; non-finite inputs are rejected
+      scale_policy: every unit scale is finite and strictly positive; zero or negative scales are rejected
+      signed_quantity_policy: positive-scale formula; every input and the computed scale are finite and strictly positive
+      finite_output_policy: the computed result must be finite; overflow or any non-finite output is rejected as numerical failure
+      failure_policy: reject non-finite inputs, reject nonpositive scales, reject overflow or non-finite output, and provide no silent clamp, fallback, or absolute-value substitution
+      range_or_endpoint_policy: not_applicable_to_scalar_unit_conversion
+      clamping_policy: no_clamping_no_fallback_no_absolute_value_substitution
+      rounding_policy: IEEE-754 f64 rounding applies
+      determinism_policy: deterministic for the same build and platform
+      test_strategy: tolerance-based retained contract vectors plus bounded algebraic identity tests
+      operation_ordering_policy: evaluate distance_unit divided by time_unit in the implemented order; this ordering is not an exact associativity claim
+      numerical_sensitivity_policy: IEEE-754 f64 ratio rounding applies; execution is deterministic for the same build and platform; bounded exact or tolerance-based tests apply without arbitrary-magnitude exactness claims
+      validation_status: research_required
+      parity_claim: false
+      certification_claim: false
+      operational_readiness_claim: false
     independent_mathematical_contract:
       expression_summary: speed_unit equals distance_unit divided by time_unit
       domain_summary: distance_unit and time_unit are finite strictly positive scalars
+    input_variables:
+      - name: distance_unit
+        units: caller_supplied_distance_unit
+        type: finite_strictly_positive_real_scalar
+      - name: time_unit
+        units: caller_supplied_time_unit
+        type: finite_strictly_positive_real_scalar
+    output_variable:
+      name: speed_unit
+      units: caller_supplied_distance_per_time_unit
+      type: finite_strictly_positive_real_scalar
     output_units: distance_per_time
-    branch_or_endpoint_behavior: single branch positive ratio
+    coordinate_frame_dependence: none
+    time_scale_dependence: none
+    valid_domain: distance_unit and time_unit are finite strictly positive scalars
     invalid_inputs:
       - nonfinite distance_unit
       - nonfinite time_unit
       - nonpositive distance_unit
       - nonpositive time_unit
-
+      - overflow or nonfinite computed output
+    singularities: none within the valid domain
+    branch_or_endpoint_behavior: single branch positive ratio
+    tolerance_policy:
+      comparison_strategy: tolerance
+      absolute_tolerance: 1e-12
+      relative_tolerance: 1e-12
+      bounded_round_trip_or_algebraic_tests: true
+      rationale: retained explicit exact or tolerance-based contract tests over bounded finite f64 inputs; no arbitrary-magnitude exactness claim
+    reference_oracle:
+      type: independent_analytic_identity
+      identity: distance_unit_divided_by_time_unit
+    implementation_status: bounded_runtime_deployed_research_required
+    promotion_gate: deployed_metadata_complete_no_status_upgrade_without_future_equivalence_review
+    non_claim_caveats:
+      - no_certification_evidence
+      - no_flight_readiness
+      - no_mission_readiness
+      - no_operational_approval
+      - no_m07_or_scilab_parity_claim
+      - no_arbitrary_magnitude_exactness_claim
+      - no_exact_associativity_claim
+      - no_broader_m00_completion_claim
+      - no_m00_c3_readiness_claim
   - formula_id: formula_vault.m00.canonical.speed_unit_from_mu_du
+    public_function: m00_canonical_speed_unit_from_mu_du
     rust_function_alias: m00_canonical_speed_unit_from_mu_du
     m07_locator_aliases:
       - app_canonical_units_from_mu_du release-gate row 12
+    primary_validation_link:
+      path: validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family validation card covers all ten formulas; one card per formula is not required
+    primary_source_link:
+      path: validation/source_registry/source_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family source seed covers all ten formulas; one seed per formula is not required
+    new_validation_card_required: false
+    new_source_seed_required: false
+    source_expression_review_status: reviewed_without_source_copy
+    runtime_decision:
+      codex_id: formula_vault.m00.canonical.speed_unit_from_mu_du
+      public_function: m00_canonical_speed_unit_from_mu_du
+      output_variable: speed_unit
+      finite_input_policy: all scalar inputs must be finite; non-finite inputs are rejected
+      scale_policy: every unit scale is finite and strictly positive; zero or negative scales are rejected
+      signed_quantity_policy: positive-scale formula; every input and the computed scale are finite and strictly positive
+      finite_output_policy: the computed result must be finite; overflow or any non-finite output is rejected as numerical failure
+      failure_policy: reject non-finite inputs, reject nonpositive scales, reject overflow or non-finite output, and provide no silent clamp, fallback, or absolute-value substitution
+      range_or_endpoint_policy: not_applicable_to_scalar_unit_conversion
+      clamping_policy: no_clamping_no_fallback_no_absolute_value_substitution
+      rounding_policy: IEEE-754 f64 rounding applies
+      determinism_policy: deterministic for the same build and platform
+      test_strategy: tolerance-based retained contract vectors plus bounded algebraic identity tests
+      operation_ordering_policy: evaluate mu divided by distance_unit, then take the positive square root; this ordering is not an exact associativity claim
+      numerical_sensitivity_policy: IEEE-754 f64 ratio and square-root rounding applies; execution is deterministic for the same build and platform; bounded exact or tolerance-based tests apply without arbitrary-magnitude exactness claims
+      validation_status: research_required
+      parity_claim: false
+      certification_claim: false
+      operational_readiness_claim: false
     independent_mathematical_contract:
       expression_summary: speed_unit equals square root of mu divided by distance_unit
       domain_summary: mu and distance_unit are finite strictly positive scalars in compatible units
+    input_variables:
+      - name: mu
+        units: caller_supplied_distance_cubed_per_time_squared
+        type: finite_strictly_positive_real_scalar
+      - name: distance_unit
+        units: caller_supplied_distance_unit
+        type: finite_strictly_positive_real_scalar
+    output_variable:
+      name: speed_unit
+      units: caller_supplied_distance_per_time_unit
+      type: finite_strictly_positive_real_scalar
     output_units: distance_per_time
+    coordinate_frame_dependence: none
+    time_scale_dependence: none
+    valid_domain: mu and distance_unit are finite strictly positive scalars in compatible units
+    invalid_inputs:
+      - nonfinite mu
+      - nonfinite distance_unit
+      - nonpositive mu
+      - nonpositive distance_unit
+      - overflow or nonfinite computed output
+    singularities: none within the valid domain
     branch_or_endpoint_behavior: single branch positive square root
-
+    tolerance_policy:
+      comparison_strategy: tolerance
+      absolute_tolerance: 1e-12
+      relative_tolerance: 1e-12
+      bounded_round_trip_or_algebraic_tests: true
+      rationale: retained explicit exact or tolerance-based contract tests over bounded finite f64 inputs; no arbitrary-magnitude exactness claim
+    reference_oracle:
+      type: independent_analytic_identity
+      identity: sqrt_mu_divided_by_distance_unit
+    implementation_status: bounded_runtime_deployed_research_required
+    promotion_gate: deployed_metadata_complete_no_status_upgrade_without_future_equivalence_review
+    non_claim_caveats:
+      - no_certification_evidence
+      - no_flight_readiness
+      - no_mission_readiness
+      - no_operational_approval
+      - no_m07_or_scilab_parity_claim
+      - no_arbitrary_magnitude_exactness_claim
+      - no_exact_associativity_claim
+      - no_broader_m00_completion_claim
+      - no_m00_c3_readiness_claim
   - formula_id: formula_vault.m00.canonical.mu_from_units
+    public_function: m00_canonical_mu_from_units
     rust_function_alias: m00_canonical_mu_from_units
     m07_locator_aliases:
       - app_canonical_units_from_mu_du release-gate row 12
+    primary_validation_link:
+      path: validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family validation card covers all ten formulas; one card per formula is not required
+    primary_source_link:
+      path: validation/source_registry/source_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family source seed covers all ten formulas; one seed per formula is not required
+    new_validation_card_required: false
+    new_source_seed_required: false
+    source_expression_review_status: reviewed_without_source_copy
+    runtime_decision:
+      codex_id: formula_vault.m00.canonical.mu_from_units
+      public_function: m00_canonical_mu_from_units
+      output_variable: canonical_mu
+      finite_input_policy: all scalar inputs must be finite; non-finite inputs are rejected
+      scale_policy: every unit scale is finite and strictly positive; zero or negative scales are rejected
+      signed_quantity_policy: positive-scale formula; every input and the computed canonical parameter are finite and strictly positive
+      finite_output_policy: the computed result must be finite; overflow or any non-finite output is rejected as numerical failure
+      failure_policy: reject non-finite inputs, reject nonpositive scales, reject overflow or non-finite output, and provide no silent clamp, fallback, or absolute-value substitution
+      range_or_endpoint_policy: not_applicable_to_scalar_unit_conversion
+      clamping_policy: no_clamping_no_fallback_no_absolute_value_substitution
+      rounding_policy: IEEE-754 f64 rounding applies
+      determinism_policy: deterministic for the same build and platform
+      test_strategy: tolerance-based retained contract vectors plus bounded algebraic identity tests
+      operation_ordering_policy: evaluate mu multiplied by time_unit squared, then divide by distance_unit cubed; this ordering is not an exact associativity claim
+      numerical_sensitivity_policy: IEEE-754 f64 product and ratio rounding applies; execution is deterministic for the same build and platform; bounded exact or tolerance-based tests apply without arbitrary-magnitude exactness claims
+      validation_status: research_required
+      parity_claim: false
+      certification_claim: false
+      operational_readiness_claim: false
     independent_mathematical_contract:
       expression_summary: canonical_mu equals mu multiplied by time_unit squared divided by distance_unit cubed
       domain_summary: mu, distance_unit, and time_unit are finite strictly positive scalars in compatible units
+    input_variables:
+      - name: mu
+        units: caller_supplied_distance_cubed_per_time_squared
+        type: finite_strictly_positive_real_scalar
+      - name: distance_unit
+        units: caller_supplied_distance_unit
+        type: finite_strictly_positive_real_scalar
+      - name: time_unit
+        units: caller_supplied_time_unit
+        type: finite_strictly_positive_real_scalar
+    output_variable:
+      name: canonical_mu
+      units: dimensionless_canonical_gravitational_parameter
+      type: finite_strictly_positive_real_scalar
     output_units: dimensionless_canonical_gravitational_parameter
+    coordinate_frame_dependence: none
+    time_scale_dependence: none
+    valid_domain: mu, distance_unit, and time_unit are finite strictly positive scalars in compatible units
+    invalid_inputs:
+      - nonfinite mu
+      - nonfinite distance_unit
+      - nonfinite time_unit
+      - nonpositive mu
+      - nonpositive distance_unit
+      - nonpositive time_unit
+      - overflow or nonfinite computed output
+    singularities: none within the valid domain
     branch_or_endpoint_behavior: single branch positive scalar ratio
-
+    tolerance_policy:
+      comparison_strategy: tolerance
+      absolute_tolerance: 1e-12
+      relative_tolerance: 1e-12
+      bounded_round_trip_or_algebraic_tests: true
+      rationale: retained explicit exact or tolerance-based contract tests over bounded finite f64 inputs; no arbitrary-magnitude exactness claim
+    reference_oracle:
+      type: independent_analytic_identity
+      identity: mu_times_time_unit_squared_divided_by_distance_unit_cubed
+    implementation_status: bounded_runtime_deployed_research_required
+    promotion_gate: deployed_metadata_complete_no_status_upgrade_without_future_equivalence_review
+    non_claim_caveats:
+      - no_certification_evidence
+      - no_flight_readiness
+      - no_mission_readiness
+      - no_operational_approval
+      - no_m07_or_scilab_parity_claim
+      - no_arbitrary_magnitude_exactness_claim
+      - no_exact_associativity_claim
+      - no_broader_m00_completion_claim
+      - no_m00_c3_readiness_claim
   - formula_id: formula_vault.m00.canonical.distance_to_canonical
+    public_function: m00_distance_to_canonical
     rust_function_alias: m00_distance_to_canonical
     m07_locator_aliases:
       - app_to_due_distance release-gate row 6
+    primary_validation_link:
+      path: validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family validation card covers all ten formulas; one card per formula is not required
+    primary_source_link:
+      path: validation/source_registry/source_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family source seed covers all ten formulas; one seed per formula is not required
+    new_validation_card_required: false
+    new_source_seed_required: false
+    source_expression_review_status: reviewed_without_source_copy
+    runtime_decision:
+      codex_id: formula_vault.m00.canonical.distance_to_canonical
+      public_function: m00_distance_to_canonical
+      output_variable: canonical_distance
+      finite_input_policy: all scalar inputs must be finite; non-finite inputs are rejected
+      scale_policy: every unit scale is finite and strictly positive; zero or negative scales are rejected
+      signed_quantity_policy: negative, zero, and positive finite distances are allowed; the unit scale is finite and strictly positive
+      finite_output_policy: the computed result must be finite; overflow or any non-finite output is rejected as numerical failure
+      failure_policy: reject non-finite inputs, reject nonpositive scales, reject overflow or non-finite output, and provide no silent clamp, fallback, or absolute-value substitution
+      range_or_endpoint_policy: not_applicable_to_scalar_unit_conversion
+      clamping_policy: no_clamping_no_fallback_no_absolute_value_substitution
+      rounding_policy: IEEE-754 f64 rounding applies
+      determinism_policy: deterministic for the same build and platform
+      test_strategy: exact retained contract vectors plus bounded tolerance-based round-trip tests
+      operation_ordering_policy: evaluate distance divided by distance_unit; this ordering is not an exact associativity claim
+      numerical_sensitivity_policy: IEEE-754 f64 ratio rounding applies; execution is deterministic for the same build and platform; bounded exact or tolerance-based tests apply without arbitrary-magnitude exactness claims
+      validation_status: research_required
+      parity_claim: false
+      certification_claim: false
+      operational_readiness_claim: false
     independent_mathematical_contract:
       expression_summary: canonical_distance equals distance divided by positive distance_unit
       domain_summary: distance is finite signed scalar; distance_unit is finite and strictly positive
+    input_variables:
+      - name: distance
+        units: caller_supplied_distance_unit
+        type: finite_signed_real_scalar
+      - name: distance_unit
+        units: caller_supplied_distance_unit
+        type: finite_strictly_positive_real_scalar
+    output_variable:
+      name: canonical_distance
+      units: canonical_distance_unit
+      type: finite_signed_real_scalar
     output_units: canonical_distance_unit
+    coordinate_frame_dependence: none
+    time_scale_dependence: none
+    valid_domain: distance is a finite signed scalar, including negative, zero, and positive values; distance_unit is finite and strictly positive
+    invalid_inputs:
+      - nonfinite distance
+      - nonfinite distance_unit
+      - nonpositive distance_unit
+      - overflow or nonfinite computed output
+    singularities: none within the valid domain
     branch_or_endpoint_behavior: single branch finite scalar ratio
-
+    tolerance_policy:
+      comparison_strategy: exact
+      absolute_tolerance: 1e-12
+      relative_tolerance: 1e-12
+      bounded_round_trip_or_algebraic_tests: true
+      rationale: retained explicit exact or tolerance-based contract tests over bounded finite f64 inputs; no arbitrary-magnitude exactness claim
+    reference_oracle:
+      type: independent_analytic_identity
+      identity: distance_divided_by_distance_unit
+    implementation_status: bounded_runtime_deployed_research_required
+    promotion_gate: deployed_metadata_complete_no_status_upgrade_without_future_equivalence_review
+    non_claim_caveats:
+      - no_certification_evidence
+      - no_flight_readiness
+      - no_mission_readiness
+      - no_operational_approval
+      - no_m07_or_scilab_parity_claim
+      - no_arbitrary_magnitude_exactness_claim
+      - no_exact_associativity_claim
+      - no_broader_m00_completion_claim
+      - no_m00_c3_readiness_claim
   - formula_id: formula_vault.m00.canonical.distance_from_canonical
+    public_function: m00_distance_from_canonical
     rust_function_alias: m00_distance_from_canonical
     m07_locator_aliases:
       - app_from_due_distance release-gate row 7
+    primary_validation_link:
+      path: validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family validation card covers all ten formulas; one card per formula is not required
+    primary_source_link:
+      path: validation/source_registry/source_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family source seed covers all ten formulas; one seed per formula is not required
+    new_validation_card_required: false
+    new_source_seed_required: false
+    source_expression_review_status: reviewed_without_source_copy
+    runtime_decision:
+      codex_id: formula_vault.m00.canonical.distance_from_canonical
+      public_function: m00_distance_from_canonical
+      output_variable: distance
+      finite_input_policy: all scalar inputs must be finite; non-finite inputs are rejected
+      scale_policy: every unit scale is finite and strictly positive; zero or negative scales are rejected
+      signed_quantity_policy: negative, zero, and positive finite canonical distances are allowed; the unit scale is finite and strictly positive
+      finite_output_policy: the computed result must be finite; overflow or any non-finite output is rejected as numerical failure
+      failure_policy: reject non-finite inputs, reject nonpositive scales, reject overflow or non-finite output, and provide no silent clamp, fallback, or absolute-value substitution
+      range_or_endpoint_policy: not_applicable_to_scalar_unit_conversion
+      clamping_policy: no_clamping_no_fallback_no_absolute_value_substitution
+      rounding_policy: IEEE-754 f64 rounding applies
+      determinism_policy: deterministic for the same build and platform
+      test_strategy: exact retained contract vectors plus bounded tolerance-based round-trip tests
+      operation_ordering_policy: evaluate canonical_distance multiplied by distance_unit; this ordering is not an exact associativity claim
+      numerical_sensitivity_policy: IEEE-754 f64 product rounding applies; execution is deterministic for the same build and platform; bounded exact or tolerance-based tests apply without arbitrary-magnitude exactness claims
+      validation_status: research_required
+      parity_claim: false
+      certification_claim: false
+      operational_readiness_claim: false
     independent_mathematical_contract:
       expression_summary: distance equals canonical_distance multiplied by positive distance_unit
       domain_summary: canonical_distance is finite signed scalar; distance_unit is finite and strictly positive
+    input_variables:
+      - name: canonical_distance
+        units: canonical_distance_unit
+        type: finite_signed_real_scalar
+      - name: distance_unit
+        units: caller_supplied_distance_unit
+        type: finite_strictly_positive_real_scalar
+    output_variable:
+      name: distance
+      units: caller_supplied_distance_unit
+      type: finite_signed_real_scalar
     output_units: caller_supplied_distance_unit
+    coordinate_frame_dependence: none
+    time_scale_dependence: none
+    valid_domain: canonical_distance is a finite signed scalar, including negative, zero, and positive values; distance_unit is finite and strictly positive
+    invalid_inputs:
+      - nonfinite canonical_distance
+      - nonfinite distance_unit
+      - nonpositive distance_unit
+      - overflow or nonfinite computed output
+    singularities: none within the valid domain
     branch_or_endpoint_behavior: single branch finite scalar product
-
+    tolerance_policy:
+      comparison_strategy: exact
+      absolute_tolerance: 1e-12
+      relative_tolerance: 1e-12
+      bounded_round_trip_or_algebraic_tests: true
+      rationale: retained explicit exact or tolerance-based contract tests over bounded finite f64 inputs; no arbitrary-magnitude exactness claim
+    reference_oracle:
+      type: independent_analytic_identity
+      identity: canonical_distance_multiplied_by_distance_unit
+    implementation_status: bounded_runtime_deployed_research_required
+    promotion_gate: deployed_metadata_complete_no_status_upgrade_without_future_equivalence_review
+    non_claim_caveats:
+      - no_certification_evidence
+      - no_flight_readiness
+      - no_mission_readiness
+      - no_operational_approval
+      - no_m07_or_scilab_parity_claim
+      - no_arbitrary_magnitude_exactness_claim
+      - no_exact_associativity_claim
+      - no_broader_m00_completion_claim
+      - no_m00_c3_readiness_claim
   - formula_id: formula_vault.m00.canonical.time_to_canonical
+    public_function: m00_time_to_canonical
     rust_function_alias: m00_time_to_canonical
     m07_locator_aliases:
       - app_to_tue_time release-gate row 10
+    primary_validation_link:
+      path: validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family validation card covers all ten formulas; one card per formula is not required
+    primary_source_link:
+      path: validation/source_registry/source_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family source seed covers all ten formulas; one seed per formula is not required
+    new_validation_card_required: false
+    new_source_seed_required: false
+    source_expression_review_status: reviewed_without_source_copy
+    runtime_decision:
+      codex_id: formula_vault.m00.canonical.time_to_canonical
+      public_function: m00_time_to_canonical
+      output_variable: canonical_time
+      finite_input_policy: all scalar inputs must be finite; non-finite inputs are rejected
+      scale_policy: every unit scale is finite and strictly positive; zero or negative scales are rejected
+      signed_quantity_policy: negative, zero, and positive finite times are allowed; the unit scale is finite and strictly positive
+      finite_output_policy: the computed result must be finite; overflow or any non-finite output is rejected as numerical failure
+      failure_policy: reject non-finite inputs, reject nonpositive scales, reject overflow or non-finite output, and provide no silent clamp, fallback, or absolute-value substitution
+      range_or_endpoint_policy: not_applicable_to_scalar_unit_conversion
+      clamping_policy: no_clamping_no_fallback_no_absolute_value_substitution
+      rounding_policy: IEEE-754 f64 rounding applies
+      determinism_policy: deterministic for the same build and platform
+      test_strategy: exact retained contract vectors plus bounded tolerance-based round-trip tests
+      operation_ordering_policy: evaluate time divided by time_unit; this ordering is not an exact associativity claim
+      numerical_sensitivity_policy: IEEE-754 f64 ratio rounding applies; execution is deterministic for the same build and platform; bounded exact or tolerance-based tests apply without arbitrary-magnitude exactness claims
+      validation_status: research_required
+      parity_claim: false
+      certification_claim: false
+      operational_readiness_claim: false
     independent_mathematical_contract:
       expression_summary: canonical_time equals time divided by positive time_unit
       domain_summary: time is finite signed scalar; time_unit is finite and strictly positive
+    input_variables:
+      - name: time
+        units: caller_supplied_time_unit
+        type: finite_signed_real_scalar
+      - name: time_unit
+        units: caller_supplied_time_unit
+        type: finite_strictly_positive_real_scalar
+    output_variable:
+      name: canonical_time
+      units: canonical_time_unit
+      type: finite_signed_real_scalar
     output_units: canonical_time_unit
+    coordinate_frame_dependence: none
+    time_scale_dependence: none
+    valid_domain: time is a finite signed scalar, including negative, zero, and positive values; time_unit is finite and strictly positive
+    invalid_inputs:
+      - nonfinite time
+      - nonfinite time_unit
+      - nonpositive time_unit
+      - overflow or nonfinite computed output
+    singularities: none within the valid domain
     branch_or_endpoint_behavior: single branch finite scalar ratio
-
+    tolerance_policy:
+      comparison_strategy: exact
+      absolute_tolerance: 1e-12
+      relative_tolerance: 1e-12
+      bounded_round_trip_or_algebraic_tests: true
+      rationale: retained explicit exact or tolerance-based contract tests over bounded finite f64 inputs; no arbitrary-magnitude exactness claim
+    reference_oracle:
+      type: independent_analytic_identity
+      identity: time_divided_by_time_unit
+    implementation_status: bounded_runtime_deployed_research_required
+    promotion_gate: deployed_metadata_complete_no_status_upgrade_without_future_equivalence_review
+    non_claim_caveats:
+      - no_certification_evidence
+      - no_flight_readiness
+      - no_mission_readiness
+      - no_operational_approval
+      - no_m07_or_scilab_parity_claim
+      - no_arbitrary_magnitude_exactness_claim
+      - no_exact_associativity_claim
+      - no_broader_m00_completion_claim
+      - no_m00_c3_readiness_claim
   - formula_id: formula_vault.m00.canonical.time_from_canonical
+    public_function: m00_time_from_canonical
     rust_function_alias: m00_time_from_canonical
     m07_locator_aliases:
       - app_from_tue_time release-gate row 11
+    primary_validation_link:
+      path: validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family validation card covers all ten formulas; one card per formula is not required
+    primary_source_link:
+      path: validation/source_registry/source_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family source seed covers all ten formulas; one seed per formula is not required
+    new_validation_card_required: false
+    new_source_seed_required: false
+    source_expression_review_status: reviewed_without_source_copy
+    runtime_decision:
+      codex_id: formula_vault.m00.canonical.time_from_canonical
+      public_function: m00_time_from_canonical
+      output_variable: time
+      finite_input_policy: all scalar inputs must be finite; non-finite inputs are rejected
+      scale_policy: every unit scale is finite and strictly positive; zero or negative scales are rejected
+      signed_quantity_policy: negative, zero, and positive finite canonical times are allowed; the unit scale is finite and strictly positive
+      finite_output_policy: the computed result must be finite; overflow or any non-finite output is rejected as numerical failure
+      failure_policy: reject non-finite inputs, reject nonpositive scales, reject overflow or non-finite output, and provide no silent clamp, fallback, or absolute-value substitution
+      range_or_endpoint_policy: not_applicable_to_scalar_unit_conversion
+      clamping_policy: no_clamping_no_fallback_no_absolute_value_substitution
+      rounding_policy: IEEE-754 f64 rounding applies
+      determinism_policy: deterministic for the same build and platform
+      test_strategy: exact retained contract vectors plus bounded tolerance-based round-trip tests
+      operation_ordering_policy: evaluate canonical_time multiplied by time_unit; this ordering is not an exact associativity claim
+      numerical_sensitivity_policy: IEEE-754 f64 product rounding applies; execution is deterministic for the same build and platform; bounded exact or tolerance-based tests apply without arbitrary-magnitude exactness claims
+      validation_status: research_required
+      parity_claim: false
+      certification_claim: false
+      operational_readiness_claim: false
     independent_mathematical_contract:
       expression_summary: time equals canonical_time multiplied by positive time_unit
       domain_summary: canonical_time is finite signed scalar; time_unit is finite and strictly positive
+    input_variables:
+      - name: canonical_time
+        units: canonical_time_unit
+        type: finite_signed_real_scalar
+      - name: time_unit
+        units: caller_supplied_time_unit
+        type: finite_strictly_positive_real_scalar
+    output_variable:
+      name: time
+      units: caller_supplied_time_unit
+      type: finite_signed_real_scalar
     output_units: caller_supplied_time_unit
+    coordinate_frame_dependence: none
+    time_scale_dependence: none
+    valid_domain: canonical_time is a finite signed scalar, including negative, zero, and positive values; time_unit is finite and strictly positive
+    invalid_inputs:
+      - nonfinite canonical_time
+      - nonfinite time_unit
+      - nonpositive time_unit
+      - overflow or nonfinite computed output
+    singularities: none within the valid domain
     branch_or_endpoint_behavior: single branch finite scalar product
-
+    tolerance_policy:
+      comparison_strategy: exact
+      absolute_tolerance: 1e-12
+      relative_tolerance: 1e-12
+      bounded_round_trip_or_algebraic_tests: true
+      rationale: retained explicit exact or tolerance-based contract tests over bounded finite f64 inputs; no arbitrary-magnitude exactness claim
+    reference_oracle:
+      type: independent_analytic_identity
+      identity: canonical_time_multiplied_by_time_unit
+    implementation_status: bounded_runtime_deployed_research_required
+    promotion_gate: deployed_metadata_complete_no_status_upgrade_without_future_equivalence_review
+    non_claim_caveats:
+      - no_certification_evidence
+      - no_flight_readiness
+      - no_mission_readiness
+      - no_operational_approval
+      - no_m07_or_scilab_parity_claim
+      - no_arbitrary_magnitude_exactness_claim
+      - no_exact_associativity_claim
+      - no_broader_m00_completion_claim
+      - no_m00_c3_readiness_claim
   - formula_id: formula_vault.m00.canonical.speed_to_canonical
+    public_function: m00_speed_to_canonical
     rust_function_alias: m00_speed_to_canonical
     m07_locator_aliases:
       - app_to_due_velocity release-gate row 8
+    primary_validation_link:
+      path: validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family validation card covers all ten formulas; one card per formula is not required
+    primary_source_link:
+      path: validation/source_registry/source_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family source seed covers all ten formulas; one seed per formula is not required
+    new_validation_card_required: false
+    new_source_seed_required: false
+    source_expression_review_status: reviewed_without_source_copy
+    runtime_decision:
+      codex_id: formula_vault.m00.canonical.speed_to_canonical
+      public_function: m00_speed_to_canonical
+      output_variable: canonical_speed
+      finite_input_policy: all scalar inputs must be finite; non-finite inputs are rejected
+      scale_policy: every unit scale is finite and strictly positive; zero or negative scales are rejected
+      signed_quantity_policy: negative, zero, and positive finite speeds are allowed; both unit scales are finite and strictly positive
+      finite_output_policy: the computed result must be finite; overflow or any non-finite output is rejected as numerical failure
+      failure_policy: reject non-finite inputs, reject nonpositive scales, reject overflow or non-finite output, and provide no silent clamp, fallback, or absolute-value substitution
+      range_or_endpoint_policy: not_applicable_to_scalar_unit_conversion
+      clamping_policy: no_clamping_no_fallback_no_absolute_value_substitution
+      rounding_policy: IEEE-754 f64 rounding applies
+      determinism_policy: deterministic for the same build and platform
+      test_strategy: tolerance-based retained contract vectors plus bounded tolerance-based round-trip tests
+      operation_ordering_policy: evaluate speed multiplied by time_unit, then divide by distance_unit; this ordering is not an exact associativity claim
+      numerical_sensitivity_policy: IEEE-754 f64 product and ratio rounding applies; execution is deterministic for the same build and platform; bounded exact or tolerance-based tests apply without arbitrary-magnitude exactness claims
+      validation_status: research_required
+      parity_claim: false
+      certification_claim: false
+      operational_readiness_claim: false
     independent_mathematical_contract:
       expression_summary: canonical_speed equals speed multiplied by time_unit divided by distance_unit
       domain_summary: speed is finite signed scalar; unit scales are finite and strictly positive
+    input_variables:
+      - name: speed
+        units: caller_supplied_distance_per_time_unit
+        type: finite_signed_real_scalar
+      - name: distance_unit
+        units: caller_supplied_distance_unit
+        type: finite_strictly_positive_real_scalar
+      - name: time_unit
+        units: caller_supplied_time_unit
+        type: finite_strictly_positive_real_scalar
+    output_variable:
+      name: canonical_speed
+      units: canonical_speed_unit
+      type: finite_signed_real_scalar
     output_units: canonical_speed_unit
+    coordinate_frame_dependence: none
+    time_scale_dependence: none
+    valid_domain: speed is a finite signed scalar, including negative, zero, and positive values; distance_unit and time_unit are finite and strictly positive
+    invalid_inputs:
+      - nonfinite speed
+      - nonfinite distance_unit
+      - nonfinite time_unit
+      - nonpositive distance_unit
+      - nonpositive time_unit
+      - overflow or nonfinite computed output
+    singularities: none within the valid domain
     branch_or_endpoint_behavior: single branch finite scalar product and ratio
-
+    tolerance_policy:
+      comparison_strategy: tolerance
+      absolute_tolerance: 1e-12
+      relative_tolerance: 1e-12
+      bounded_round_trip_or_algebraic_tests: true
+      rationale: retained explicit exact or tolerance-based contract tests over bounded finite f64 inputs; no arbitrary-magnitude exactness claim
+    reference_oracle:
+      type: independent_analytic_identity
+      identity: speed_times_time_unit_divided_by_distance_unit
+    implementation_status: bounded_runtime_deployed_research_required
+    promotion_gate: deployed_metadata_complete_no_status_upgrade_without_future_equivalence_review
+    non_claim_caveats:
+      - no_certification_evidence
+      - no_flight_readiness
+      - no_mission_readiness
+      - no_operational_approval
+      - no_m07_or_scilab_parity_claim
+      - no_arbitrary_magnitude_exactness_claim
+      - no_exact_associativity_claim
+      - no_broader_m00_completion_claim
+      - no_m00_c3_readiness_claim
   - formula_id: formula_vault.m00.canonical.speed_from_canonical
+    public_function: m00_speed_from_canonical
     rust_function_alias: m00_speed_from_canonical
     m07_locator_aliases:
       - app_from_due_velocity release-gate row 9
+    primary_validation_link:
+      path: validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family validation card covers all ten formulas; one card per formula is not required
+    primary_source_link:
+      path: validation/source_registry/source_formula_vault_m00_canonical_unit_conversions.yaml
+      resolved: true
+      governance_semantics: existing canonical-unit family source seed covers all ten formulas; one seed per formula is not required
+    new_validation_card_required: false
+    new_source_seed_required: false
+    source_expression_review_status: reviewed_without_source_copy
+    runtime_decision:
+      codex_id: formula_vault.m00.canonical.speed_from_canonical
+      public_function: m00_speed_from_canonical
+      output_variable: speed
+      finite_input_policy: all scalar inputs must be finite; non-finite inputs are rejected
+      scale_policy: every unit scale is finite and strictly positive; zero or negative scales are rejected
+      signed_quantity_policy: negative, zero, and positive finite canonical speeds are allowed; both unit scales are finite and strictly positive
+      finite_output_policy: the computed result must be finite; overflow or any non-finite output is rejected as numerical failure
+      failure_policy: reject non-finite inputs, reject nonpositive scales, reject overflow or non-finite output, and provide no silent clamp, fallback, or absolute-value substitution
+      range_or_endpoint_policy: not_applicable_to_scalar_unit_conversion
+      clamping_policy: no_clamping_no_fallback_no_absolute_value_substitution
+      rounding_policy: IEEE-754 f64 rounding applies
+      determinism_policy: deterministic for the same build and platform
+      test_strategy: tolerance-based retained contract vectors plus bounded tolerance-based round-trip tests
+      operation_ordering_policy: evaluate canonical_speed multiplied by distance_unit, then divide by time_unit; this ordering is not an exact associativity claim
+      numerical_sensitivity_policy: IEEE-754 f64 product and ratio rounding applies; execution is deterministic for the same build and platform; bounded exact or tolerance-based tests apply without arbitrary-magnitude exactness claims
+      validation_status: research_required
+      parity_claim: false
+      certification_claim: false
+      operational_readiness_claim: false
     independent_mathematical_contract:
       expression_summary: speed equals canonical_speed multiplied by distance_unit divided by time_unit
       domain_summary: canonical_speed is finite signed scalar; unit scales are finite and strictly positive
+    input_variables:
+      - name: canonical_speed
+        units: canonical_speed_unit
+        type: finite_signed_real_scalar
+      - name: distance_unit
+        units: caller_supplied_distance_unit
+        type: finite_strictly_positive_real_scalar
+      - name: time_unit
+        units: caller_supplied_time_unit
+        type: finite_strictly_positive_real_scalar
+    output_variable:
+      name: speed
+      units: caller_supplied_distance_per_time_unit
+      type: finite_signed_real_scalar
     output_units: caller_supplied_distance_per_time_unit
+    coordinate_frame_dependence: none
+    time_scale_dependence: none
+    valid_domain: canonical_speed is a finite signed scalar, including negative, zero, and positive values; distance_unit and time_unit are finite and strictly positive
+    invalid_inputs:
+      - nonfinite canonical_speed
+      - nonfinite distance_unit
+      - nonfinite time_unit
+      - nonpositive distance_unit
+      - nonpositive time_unit
+      - overflow or nonfinite computed output
+    singularities: none within the valid domain
     branch_or_endpoint_behavior: single branch finite scalar product and ratio
-
+    tolerance_policy:
+      comparison_strategy: tolerance
+      absolute_tolerance: 1e-12
+      relative_tolerance: 1e-12
+      bounded_round_trip_or_algebraic_tests: true
+      rationale: retained explicit exact or tolerance-based contract tests over bounded finite f64 inputs; no arbitrary-magnitude exactness claim
+    reference_oracle:
+      type: independent_analytic_identity
+      identity: canonical_speed_times_distance_unit_divided_by_time_unit
+    implementation_status: bounded_runtime_deployed_research_required
+    promotion_gate: deployed_metadata_complete_no_status_upgrade_without_future_equivalence_review
+    non_claim_caveats:
+      - no_certification_evidence
+      - no_flight_readiness
+      - no_mission_readiness
+      - no_operational_approval
+      - no_m07_or_scilab_parity_claim
+      - no_arbitrary_magnitude_exactness_claim
+      - no_exact_associativity_claim
+      - no_broader_m00_completion_claim
+      - no_m00_c3_readiness_claim
 global_policy:
   coordinate_frame_dependence: none
   time_scale_dependence: none
@@ -144,10 +888,19 @@ global_policy:
   zero_scale_policy: reject
   signed_value_policy: finite signed scalar values are allowed for converted distances, times, and speeds
   tolerance_policy:
-    absolute_tolerance: 1.0e-12
-    relative_tolerance: 1.0e-12
-    rationale: independent scalar identities and inverse-pair tests over finite f64 values
-
+    absolute_tolerance: 1e-12
+    relative_tolerance: 1e-12
+    rationale: independent scalar identities and inverse-pair tests over bounded finite f64 values
+  positive_scale_policy: all unit scales are finite and strictly positive; nonpositive scales are rejected
+  nonfinite_output_policy: reject overflow and every non-finite computed result
+  clamping_policy: no_clamping_no_fallback_no_absolute_value_substitution
+  rounding_model: IEEE-754 f64
+  determinism_scope: same build and platform
+  operation_ordering_policy: implemented operation ordering is retained and is not an exact associativity claim
+  test_policy:
+    explicit_exact_or_tolerance_based_tests_retained: true
+    bounded_round_trip_or_algebraic_tests: true
+    arbitrary_magnitude_exactness_claim: false
 non_claims:
   - no certification evidence
   - no flight readiness
@@ -155,3 +908,7 @@ non_claims:
   - no operational approval
   - no external Scilab parity claim
   - no M07 release certification
+  - no arbitrary-magnitude exactness claim
+  - no exact associativity claim
+  - no broader M00 completion claim
+  - no M00-C3 readiness claim
