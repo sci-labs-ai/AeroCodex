@@ -189,6 +189,17 @@ def validate_identifier(value: str, field: str) -> None:
     )
 
 
+def validate_rust_path(value: str, field: str) -> None:
+    parts = value.split("::")
+    require(parts and all(parts), f"{field} must be a nonempty Rust path: {value!r}")
+    for part in parts:
+        validate_identifier(part, field)
+
+
+def runtime_leaf_symbol(value: str) -> str:
+    return value.rsplit("::", 1)[-1]
+
+
 def validate_package_name(value: str) -> None:
     require(
         re.fullmatch(r"[a-z0-9][a-z0-9-]*", value) is not None,
@@ -417,7 +428,7 @@ def load_batch(repo_raw: str | Path, manifest_raw: str | Path) -> Batch:
         validate_formula_id(values["formula_id"])
         validate_package_name(values["package"])
         validate_identifier(values["crate_name"], "crate_name")
-        validate_identifier(values["runtime_symbol"], "runtime_symbol")
+        validate_rust_path(values["runtime_symbol"], "runtime_symbol")
         validate_identifier(values["output_variable"], "output_variable")
         require(values["validation_status"] == REQUIRED_VALIDATION_STATUS, f"manifest row {index} validation_status must remain research_required")
         require(values["test_strategy"] in ALLOWED_TEST_STRATEGIES, f"manifest row {index} has unsupported test_strategy {values['test_strategy']!r}")
@@ -447,7 +458,7 @@ def load_batch(repo_raw: str | Path, manifest_raw: str | Path) -> Batch:
         matches = [
             entry
             for entry in inventory
-            if entry.get("function_or_ref") == values["runtime_symbol"]
+            if entry.get("function_or_ref") == runtime_leaf_symbol(values["runtime_symbol"])
             and entry.get("source_path", "").startswith(package_source_prefix)
         ]
         require(
@@ -900,7 +911,7 @@ def write_fake_repo(root: Path) -> Path:
         encoding="utf-8",
     )
     (repo / "crates/example/src/lib.rs").write_text(
-        "#![forbid(unsafe_code)]\npub fn add_one(value: f64) -> Result<f64, ()> { Ok(value + 1.0) }\n",
+        "#![forbid(unsafe_code)]\npub fn add_one(value: f64) -> Result<f64, ()> { Ok(value + 1.0) }\npub mod nested { pub fn double(value: f64) -> Result<f64, ()> { Ok(value * 2.0) } }\n",
         encoding="utf-8",
     )
     (repo / "crates/other/Cargo.toml").write_text(
@@ -930,6 +941,7 @@ def write_fake_repo(root: Path) -> Path:
     inventory_header = "category\tid\tsource_path\tline\tfunction_or_ref\tstatus\tblocked\tblock_reason\trow_count\n"
     inventory_rows_text = (
         "executable_research_equation\texecutable.example.add_one\tcrates/example/src/lib.rs\t2\tadd_one\tresearch_required\ttrue\tresearch_only\t1\n"
+        "executable_research_equation\texecutable.example.nested.double\tcrates/example/src/lib.rs\t3\tdouble\tresearch_required\ttrue\tresearch_only\t1\n"
         "executable_research_equation\texecutable.other.add_one\tcrates/other/src/lib.rs\t2\tadd_one\tresearch_required\ttrue\tresearch_only\t1\n"
     )
     (repo / INVENTORY_PATH).write_text(inventory_header + inventory_rows_text, encoding="utf-8")
@@ -973,6 +985,40 @@ def command_self_test(_: argparse.Namespace) -> int:
         tests.append({"name": "valid_manifest", "result": "PASS"})
         tests.append({"name": "package_scoped_inventory_resolution", "result": "PASS"})
         tests.append({"name": "test_expression_workspace_dependency_resolution", "result": "PASS"})
+
+        nested_formula_id = "formula_vault.example.nested.double"
+        nested_contract = repo / "formula-vault/contracts/nested.yaml"
+        nested_contract.write_text(
+            f"record_status: research_required\nformula_id: {nested_formula_id}\nruntime_symbol: nested::double\nvalidation_status: research_required\n",
+            encoding="utf-8",
+        )
+        nested_values = [
+            SCHEMA_VERSION,
+            "nested-batch",
+            nested_formula_id,
+            "example-equations",
+            "example_equations",
+            "nested::double",
+            "result",
+            "formula-vault/contracts/nested.yaml",
+            "validation/cards/example.yaml",
+            "validation/source_registry/example.yaml",
+            "research_required",
+            "exact",
+            "matches!(example_equations::nested::double(2.0), Ok(value) if value == 4.0)",
+        ]
+        nested_manifest = repo / "equation-batches/nested.tsv"
+        nested_manifest.write_text(
+            "\t".join(MANIFEST_FIELDS) + "\n" + "\t".join(nested_values) + "\n",
+            encoding="utf-8",
+        )
+        nested_batch = load_batch(repo, nested_manifest)
+        require(nested_batch.rows[0].runtime_symbol == "nested::double", "module-qualified runtime symbol was not retained")
+        require(nested_batch.rows[0].runtime_path == "example_equations::nested::double", "module-qualified runtime path was not composed")
+        nested_source = generated_rust_source(nested_batch)
+        require("let _runtime_symbol = example_equations::nested::double;" in nested_source, "module-qualified compiler probe missing")
+        tests.append({"name": "module_qualified_runtime_symbol", "result": "PASS"})
+
         files = generation_files(batch)
         output = root / "generated"
         ensure_output_outside_repo(repo, output)

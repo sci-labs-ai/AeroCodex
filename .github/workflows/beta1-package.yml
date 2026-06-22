@@ -37,6 +37,8 @@ jobs:
           cargo run -p xtask -- equation-batch verify --manifest equation-batches/a5-aerodynamics-flight-structures.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a5" --timeout-seconds 600
           cargo run -p xtask -- equation-batch generate --manifest equation-batches/a6-propulsion-heat-transfer.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a6"
           cargo run -p xtask -- equation-batch verify --manifest equation-batches/a6-propulsion-heat-transfer.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a6" --timeout-seconds 600
+          cargo run -p xtask -- equation-batch generate --manifest equation-batches/a7-astrodynamics-orekit-foundation.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a7"
+          cargo run -p xtask -- equation-batch verify --manifest equation-batches/a7-astrodynamics-orekit-foundation.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a7" --timeout-seconds 600
       - name: Run native automated qualification and packaging
         run: cargo run -p xtask -- verify beta1-automated --output-dir "${{ runner.temp }}/aerocodex-beta1-automated"
       - name: Upload native candidate and reports

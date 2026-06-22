@@ -28,6 +28,10 @@ cargo run -p xtask -- equation-batch verify --manifest equation-batches/a5-aerod
 cargo run -p xtask -- equation-batch plan --manifest equation-batches/a6-propulsion-heat-transfer.tsv
 cargo run -p xtask -- equation-batch generate --manifest equation-batches/a6-propulsion-heat-transfer.tsv --output-dir <a6-directory-outside-the-repository>
 cargo run -p xtask -- equation-batch verify --manifest equation-batches/a6-propulsion-heat-transfer.tsv --output-dir <a6-directory-outside-the-repository>
+
+cargo run -p xtask -- equation-batch plan --manifest equation-batches/a7-astrodynamics-orekit-foundation.tsv
+cargo run -p xtask -- equation-batch generate --manifest equation-batches/a7-astrodynamics-orekit-foundation.tsv --output-dir <a7-directory-outside-the-repository>
+cargo run -p xtask -- equation-batch verify --manifest equation-batches/a7-astrodynamics-orekit-foundation.tsv --output-dir <a7-directory-outside-the-repository>
 ```
 
 `plan` validates the manifest and prints a stable json plan. `generate` writes a deterministic probe crate and artifact hashes outside the repository. `verify` regenerates the expected artifacts, checks their hashes, and runs the probe crate with Cargo in offline mode.
@@ -46,6 +50,7 @@ Rules:
 - A batch contains between 1 and 40 rows.
 - Formula identifiers and runtime paths are unique inside a batch.
 - The Cargo package and Rust crate names must match a library workspace member.
+- Module-qualified runtime symbols such as `elements::compute_raan` are supported while inventory identity remains tied to the terminal function name inside the selected Cargo package.
 - Additional workspace crates referenced by a test expression are added as direct probe dependencies; this supports typed inputs such as `aero_codex_core::Angle`.
 - Contract, validation-card, source-seed, and inventory links must resolve.
 - Validation remains `research_required`.
@@ -60,5 +65,6 @@ Rules:
 - `a4-atmosphere-thermo-gasdynamics.tsv` covers 28 existing atmosphere, thermodynamics, and gas-dynamics runtime equations.
 - `a5-aerodynamics-flight-structures.tsv` covers 15 existing aerodynamics, flight-dynamics, and structures runtime equations.
 - `a6-propulsion-heat-transfer.tsv` covers 9 existing propulsion and heat-transfer runtime equations.
+- `a7-astrodynamics-orekit-foundation.tsv` covers 23 existing two-body, transfer, elliptic-element, and non-solver Kepler runtime equations.
 
-The five manifests provide compiler-verified coverage for 79 existing runtime paths. Runtime identity is package-scoped, and typed test inputs can reference reviewed workspace dependencies without parsing Rust source. They do not change runtime kernels, expand the Beta 1 command-line surface, claim external reference parity, or imply that the full equation inventory is complete or operationally ready.
+The six manifests provide compiler-verified coverage for 102 existing runtime paths. Runtime identity is package-scoped, and typed test inputs can reference reviewed workspace dependencies without parsing Rust source. The A7 batch keeps frame, time-scale, TLE, aggregate-element, and iterative Kepler-solver APIs outside formula scope. Orekit remains reference-planning context only. These manifests do not change runtime kernels, expand the Beta 1 command-line surface, claim external reference parity, or imply that the full equation inventory is complete or operationally ready.

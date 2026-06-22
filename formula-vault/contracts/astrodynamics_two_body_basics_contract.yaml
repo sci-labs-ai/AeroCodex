@@ -1,0 +1,67 @@
+# Governed existing-runtime equation contract backfill.
+# Metadata and compiler-probe contract only; no runtime kernel is changed.
+
+schema_version: formula_vault_runtime_contract.v1
+record_status: existing_runtime_contract_research_required
+contract_id: formula_vault.astrodynamics.two_body_basics
+title: Scalar two-body astrodynamics basic contracts
+validation_status: research_required
+primary_validation_card: validation/cards/astrodynamics_two_body_basics.yaml
+primary_source_seed: validation/source_registry/astrodynamics_two_body_basics.yaml
+runtime_policy:
+  finite_inputs_required: true
+  positive_gravitational_parameter_required: true
+  positive_radius_required: true
+  positive_semimajor_axis_required_for_elliptic_formulas: true
+  negative_vis_viva_radicand_rejected: true
+  nonfinite_outputs_rejected: true
+  ieee754_f64_rounding_applies: true
+  deterministic_same_build_platform: true
+evidence_policy:
+  compiler_verified_runtime_symbols: true
+  bounded_contract_probes: true
+  validation_status_upgrade: blocked_without_exact_source_and_tolerance_review
+non_claims:
+  no_propagator_or_ephemeris_model: true
+  no_frame_or_time_scale_transform: true
+  no_perturbation_model: true
+  no_certification_evidence: true
+  no_operational_readiness_claim: true
+  no_external_reference_parity_claim: true
+  no_full_equation_inventory_completion_claim: true
+formulas:
+  - formula_id: formula_vault.astrodynamics.two_body.circular_orbit_speed
+    runtime_symbol: circular_orbit_speed
+    output_variable: speed_m_s
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_positive_finite_mu_and_radius_reject_nonfinite_result
+    numerical_policy: bounded_f64_square_root_probe
+  - formula_id: formula_vault.astrodynamics.two_body.orbital_period_circular
+    runtime_symbol: orbital_period_circular
+    output_variable: period_s
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_positive_finite_mu_and_radius_reject_overflow_or_nonfinite_result
+    numerical_policy: bounded_f64_period_probe
+  - formula_id: formula_vault.astrodynamics.two_body.escape_velocity
+    runtime_symbol: escape_velocity
+    output_variable: escape_speed_m_s
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_positive_finite_mu_and_radius_reject_nonfinite_result
+    numerical_policy: bounded_f64_square_root_probe
+  - formula_id: formula_vault.astrodynamics.two_body.vis_viva_speed
+    runtime_symbol: vis_viva_speed
+    output_variable: orbital_speed_m_s
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_positive_finite_mu_radius_and_axis_reject_negative_radicand_or_nonfinite_result
+    numerical_policy: bounded_f64_vis_viva_probe
+  - formula_id: formula_vault.astrodynamics.two_body.specific_orbital_energy
+    runtime_symbol: specific_orbital_energy
+    output_variable: specific_energy_m2_s2
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_positive_finite_mu_and_axis_reject_nonfinite_result
+    numerical_policy: bounded_f64_signed_energy_probe

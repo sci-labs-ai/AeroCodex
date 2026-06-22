@@ -1,0 +1,137 @@
+# Governed existing-runtime equation contract backfill.
+# Metadata and compiler-probe contract only; no runtime kernel is changed.
+
+schema_version: formula_vault_runtime_contract.v1
+record_status: existing_runtime_contract_research_required
+contract_id: formula_vault.astrodynamics.elliptic_elements_kepler_foundation
+title: Bounded elliptic element and Kepler scalar helper contracts
+validation_status: research_required
+primary_validation_card: validation/cards/validation_astrodynamics_time_frame_tle_foundation.yaml
+primary_source_seed: validation/source_registry/source_astrodynamics_time_frame_tle_foundation.yaml
+secondary_validation_context:
+  - validation/cards/validation_orekit_reference_oracle_mapping.yaml
+  - validation/source_registry/source_orekit_reference_oracle_mapping.yaml
+runtime_policy:
+  finite_inputs_required: true
+  positive_gravitational_parameter_required: true
+  positive_semimajor_axis_required: true
+  explicit_positive_singularity_tolerances_required: true
+  non_singular_elliptic_domain_only: true
+  angles_normalized_by_runtime_contract: true
+  nonfinite_outputs_rejected: true
+  ieee754_f64_rounding_applies: true
+  deterministic_same_build_platform: true
+evidence_policy:
+  compiler_verified_runtime_symbols: true
+  module_qualified_runtime_symbols_supported: true
+  bounded_contract_probes: true
+  orekit_role: external_reference_planning_only
+  validation_status_upgrade: blocked_without_exact_source_oracle_and_tolerance_review
+explicit_exclusions:
+  solve_kepler_elliptic_newton: solver_policy_blocked_not_a_formula_node_in_this_batch
+  compute_orbital_elements_basic: aggregate_helper_not_counted_as_an_individual_equation
+  frame_transform_functions: support_policy_not_formula_nodes
+  time_scale_functions: support_policy_not_formula_nodes
+  tle_functions: contract_only_parser_authorization_false
+non_claims:
+  no_orekit_source_tests_fixtures_or_architecture_import: true
+  no_orekit_parity_claim: true
+  no_solver_convergence_approval: true
+  no_frame_transform_or_time_scale_conversion: true
+  no_tle_parser_sgp4_or_teme_capability: true
+  no_orbit_determination_or_propagation_claim: true
+  no_certification_evidence: true
+  no_operational_readiness_claim: true
+  no_full_equation_inventory_completion_claim: true
+formulas:
+  - formula_id: formula_vault.astrodynamics.elements.specific_angular_momentum
+    runtime_symbol: elements::compute_specific_angular_momentum
+    output_variable: specific_angular_momentum_m2_s
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: reject_nonfinite_cartesian_components_and_nonfinite_cross_product
+    numerical_policy: bounded_f64_vector_cross_probe
+  - formula_id: formula_vault.astrodynamics.elements.node_vector
+    runtime_symbol: elements::compute_node_vector
+    output_variable: node_vector_m2_s
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: reject_nonfinite_vector_components_and_nonfinite_result
+    numerical_policy: bounded_f64_direct_vector_probe
+  - formula_id: formula_vault.astrodynamics.elements.eccentricity_vector
+    runtime_symbol: elements::compute_eccentricity_vector
+    output_variable: eccentricity_vector
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_finite_state_positive_mu_nonzero_radius_and_finite_result
+    numerical_policy: bounded_f64_vector_relation_probe
+  - formula_id: formula_vault.astrodynamics.elements.specific_orbital_energy_from_state
+    runtime_symbol: elements::compute_specific_orbital_energy_from_state
+    output_variable: specific_energy_m2_s2
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_finite_state_positive_mu_nonzero_radius_and_finite_result
+    numerical_policy: bounded_f64_signed_energy_probe
+  - formula_id: formula_vault.astrodynamics.elements.semimajor_axis_from_state
+    runtime_symbol: elements::compute_semimajor_axis_from_state
+    output_variable: semi_major_axis_m
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_negative_bounded_specific_energy_and_positive_explicit_tolerances
+    numerical_policy: bounded_f64_elliptic_inverse_energy_probe
+  - formula_id: formula_vault.astrodynamics.elements.inclination
+    runtime_symbol: elements::compute_inclination
+    output_variable: inclination_rad
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_zero_angular_momentum_nonfinite_vectors_and_invalid_tolerances
+    numerical_policy: bounded_f64_atan2_angle_probe
+  - formula_id: formula_vault.astrodynamics.elements.raan
+    runtime_symbol: elements::compute_raan
+    output_variable: raan_rad
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_equatorial_singularity_nonfinite_vectors_and_invalid_tolerances
+    numerical_policy: bounded_f64_normalized_atan2_probe
+  - formula_id: formula_vault.astrodynamics.elements.argument_of_periapsis
+    runtime_symbol: elements::compute_argument_of_periapsis
+    output_variable: argument_of_periapsis_rad
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_node_eccentricity_or_angular_momentum_singularities
+    numerical_policy: bounded_f64_oriented_angle_probe
+  - formula_id: formula_vault.astrodynamics.elements.true_anomaly
+    runtime_symbol: elements::compute_true_anomaly
+    output_variable: true_anomaly_rad
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_zero_radius_circular_or_angular_momentum_singularities
+    numerical_policy: bounded_f64_oriented_angle_probe
+  - formula_id: formula_vault.astrodynamics.kepler.mean_motion
+    runtime_symbol: kepler::mean_motion
+    output_variable: mean_motion_rad_s
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_positive_finite_mu_and_semimajor_axis_reject_unrepresentable_result
+    numerical_policy: bounded_f64_logarithmic_mean_motion_probe
+  - formula_id: formula_vault.astrodynamics.kepler.mean_anomaly_advance
+    runtime_symbol: kepler::mean_anomaly_advance
+    output_variable: mean_anomaly_rad
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_finite_anomaly_positive_mean_motion_and_finite_duration
+    numerical_policy: bounded_f64_normalized_scalar_advance_probe
+  - formula_id: formula_vault.astrodynamics.kepler.true_anomaly_from_eccentric_anomaly
+    runtime_symbol: kepler::true_anomaly_from_eccentric_anomaly
+    output_variable: true_anomaly_rad
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_finite_anomaly_and_eccentricity_in_closed_open_elliptic_domain
+    numerical_policy: bounded_f64_anomaly_conversion_probe
+  - formula_id: formula_vault.astrodynamics.kepler.radius_from_semimajor_eccentric_anomaly
+    runtime_symbol: kepler::radius_from_semimajor_eccentric_anomaly
+    output_variable: radius_m
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_positive_axis_finite_anomaly_and_elliptic_eccentricity_reject_nonpositive_result
+    numerical_policy: bounded_f64_elliptic_radius_probe

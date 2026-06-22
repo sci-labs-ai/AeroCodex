@@ -1,0 +1,69 @@
+# Governed existing-runtime equation contract backfill.
+# Metadata and compiler-probe contract only; no runtime kernel is changed.
+
+schema_version: formula_vault_runtime_contract.v1
+record_status: existing_runtime_contract_research_required
+contract_id: formula_vault.astrodynamics.transfer_celestial_basics
+title: Hohmann transfer and scalar celestial helper contracts
+validation_status: research_required
+primary_validation_card: validation/cards/astrodynamics_transfer_celestial_basics.yaml
+primary_source_seed: validation/source_registry/astrodynamics_transfer_celestial_basics.yaml
+runtime_policy:
+  finite_inputs_required: true
+  positive_gravitational_parameter_required: true
+  positive_orbit_radii_required: true
+  positive_distance_and_mass_inputs_required: true
+  impulse_outputs_are_magnitudes: true
+  same_radius_transfer_may_return_zero: true
+  nonfinite_outputs_rejected: true
+  ieee754_f64_rounding_applies: true
+  deterministic_same_build_platform: true
+evidence_policy:
+  compiler_verified_runtime_symbols: true
+  bounded_contract_probes: true
+  validation_status_upgrade: blocked_without_exact_source_and_tolerance_review
+non_claims:
+  no_finite_burn_or_phasing_model: true
+  no_launch_window_or_mission_optimization: true
+  no_patched_conic_or_restricted_three_body_claim: true
+  no_ephemeris_frame_or_time_scale_model: true
+  no_certification_evidence: true
+  no_operational_readiness_claim: true
+  no_external_reference_parity_claim: true
+  no_full_equation_inventory_completion_claim: true
+formulas:
+  - formula_id: formula_vault.astrodynamics.transfer.hohmann.delta_v1
+    runtime_symbol: hohmann_transfer_delta_v1
+    output_variable: delta_v1_m_s
+    test_strategy: invariant
+    contract_state: compiler_probe_ready
+    failure_policy: require_positive_finite_mu_and_radii_reject_nonfinite_result
+    numerical_policy: bounded_f64_first_impulse_magnitude_probe
+  - formula_id: formula_vault.astrodynamics.transfer.hohmann.delta_v2
+    runtime_symbol: hohmann_transfer_delta_v2
+    output_variable: delta_v2_m_s
+    test_strategy: invariant
+    contract_state: compiler_probe_ready
+    failure_policy: require_positive_finite_mu_and_radii_reject_nonfinite_result
+    numerical_policy: bounded_f64_second_impulse_magnitude_probe
+  - formula_id: formula_vault.astrodynamics.transfer.hohmann.total_delta_v
+    runtime_symbol: hohmann_transfer_total_delta_v
+    output_variable: total_delta_v_m_s
+    test_strategy: invariant
+    contract_state: compiler_probe_ready
+    failure_policy: require_positive_finite_mu_and_radii_reject_nonfinite_result
+    numerical_policy: bounded_f64_two_impulse_sum_probe
+  - formula_id: formula_vault.astrodynamics.transfer.hohmann.transfer_time
+    runtime_symbol: hohmann_transfer_time
+    output_variable: transfer_time_s
+    test_strategy: invariant
+    contract_state: compiler_probe_ready
+    failure_policy: require_positive_finite_mu_and_radii_reject_overflow_or_nonfinite_result
+    numerical_policy: bounded_f64_half_ellipse_time_probe
+  - formula_id: formula_vault.astrodynamics.celestial.sphere_of_influence_radius
+    runtime_symbol: sphere_of_influence_radius
+    output_variable: sphere_of_influence_radius_m
+    test_strategy: invariant
+    contract_state: compiler_probe_ready
+    failure_policy: require_positive_finite_distance_and_masses_reject_nonfinite_result
+    numerical_policy: bounded_f64_two_fifths_power_probe
