@@ -406,8 +406,17 @@ def load_batch(repo_raw: str | Path, manifest_raw: str | Path) -> Batch:
         require(yaml_has_research_required(validation_card.read_text(encoding="utf-8")), f"manifest row {index} validation card is not research_required")
         require(yaml_has_research_required(source_seed.read_text(encoding="utf-8")), f"manifest row {index} source seed is not research_required")
 
-        matches = [entry for entry in inventory if entry.get("function_or_ref") == values["runtime_symbol"]]
-        require(len(matches) == 1, f"manifest row {index} runtime_symbol must have exactly one inventory row, got {len(matches)}")
+        package_source_prefix = package.member_path + "/"
+        matches = [
+            entry
+            for entry in inventory
+            if entry.get("function_or_ref") == values["runtime_symbol"]
+            and entry.get("source_path", "").startswith(package_source_prefix)
+        ]
+        require(
+            len(matches) == 1,
+            f"manifest row {index} runtime_symbol must have exactly one inventory row inside package {package.package!r}, got {len(matches)}",
+        )
         inventory_row = matches[0]
         require(inventory_row.get("category") == "executable_research_equation", f"manifest row {index} inventory category is not executable_research_equation")
         require(inventory_row.get("status") == REQUIRED_VALIDATION_STATUS, f"manifest row {index} inventory status is not research_required")
@@ -833,18 +842,27 @@ def command_verify(args: argparse.Namespace) -> int:
 def write_fake_repo(root: Path) -> Path:
     repo = root / "repo"
     (repo / "crates/example/src").mkdir(parents=True)
+    (repo / "crates/other/src").mkdir(parents=True)
     (repo / "formula-vault/contracts").mkdir(parents=True)
     (repo / "validation/cards").mkdir(parents=True)
     (repo / "validation/source_registry").mkdir(parents=True)
     (repo / "validation").mkdir(exist_ok=True)
     (repo / "equation-batches").mkdir()
-    (repo / "Cargo.toml").write_text('[workspace]\nresolver = "2"\nmembers = ["crates/example"]\n', encoding="utf-8")
+    (repo / "Cargo.toml").write_text('[workspace]\nresolver = "2"\nmembers = ["crates/example", "crates/other"]\n', encoding="utf-8")
     (repo / "crates/example/Cargo.toml").write_text(
         '[package]\nname = "example-equations"\nversion = "0.0.0"\nedition = "2021"\n\n[lib]\nname = "example_equations"\npath = "src/lib.rs"\n',
         encoding="utf-8",
     )
     (repo / "crates/example/src/lib.rs").write_text(
         "#![forbid(unsafe_code)]\npub fn add_one(value: f64) -> Result<f64, ()> { Ok(value + 1.0) }\n",
+        encoding="utf-8",
+    )
+    (repo / "crates/other/Cargo.toml").write_text(
+        '[package]\nname = "other-equations"\nversion = "0.0.0"\nedition = "2021"\n\n[lib]\nname = "other_equations"\npath = "src/lib.rs"\n',
+        encoding="utf-8",
+    )
+    (repo / "crates/other/src/lib.rs").write_text(
+        "#![forbid(unsafe_code)]\npub fn add_one(value: f64) -> Result<f64, ()> { Ok(value + 2.0) }\n",
         encoding="utf-8",
     )
     formula_id = "formula_vault.example.add_one"
@@ -856,8 +874,11 @@ def write_fake_repo(root: Path) -> Path:
     (repo / "validation/cards/example.yaml").write_text("id: example\nstatus: research_required\n", encoding="utf-8")
     (repo / "validation/source_registry/example.yaml").write_text("id: source.example\nstatus: research_required\n", encoding="utf-8")
     inventory_header = "category\tid\tsource_path\tline\tfunction_or_ref\tstatus\tblocked\tblock_reason\trow_count\n"
-    inventory_row = "executable_research_equation\texecutable.example.add_one\tcrates/example/src/lib.rs\t2\tadd_one\tresearch_required\ttrue\tresearch_only\t1\n"
-    (repo / INVENTORY_PATH).write_text(inventory_header + inventory_row, encoding="utf-8")
+    inventory_rows_text = (
+        "executable_research_equation\texecutable.example.add_one\tcrates/example/src/lib.rs\t2\tadd_one\tresearch_required\ttrue\tresearch_only\t1\n"
+        "executable_research_equation\texecutable.other.add_one\tcrates/other/src/lib.rs\t2\tadd_one\tresearch_required\ttrue\tresearch_only\t1\n"
+    )
+    (repo / INVENTORY_PATH).write_text(inventory_header + inventory_rows_text, encoding="utf-8")
     manifest_values = [
         SCHEMA_VERSION,
         "example-batch",
@@ -890,7 +911,9 @@ def command_self_test(_: argparse.Namespace) -> int:
         manifest = repo / "equation-batches/example.tsv"
         batch = load_batch(repo, manifest)
         require(len(batch.rows) == 1, "self-test batch row count mismatch")
+        require(batch.rows[0].inventory_source_path == "crates/example/src/lib.rs", "package-scoped inventory resolution failed")
         tests.append({"name": "valid_manifest", "result": "PASS"})
+        tests.append({"name": "package_scoped_inventory_resolution", "result": "PASS"})
         files = generation_files(batch)
         output = root / "generated"
         ensure_output_outside_repo(repo, output)

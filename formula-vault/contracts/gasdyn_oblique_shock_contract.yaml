@@ -1,0 +1,54 @@
+# Governed existing-runtime equation contract backfill.
+# Metadata and compiler-probe contract only; no runtime kernel is changed.
+
+schema_version: formula_vault_runtime_contract.v1
+record_status: existing_runtime_contract_research_required
+contract_id: formula_vault.gasdyn.oblique_shock
+title: Branch-explicit attached oblique-shock contracts
+validation_status: research_required
+primary_validation_card: validation/cards/gasdyn_oblique_shock.yaml
+primary_source_seed: validation/source_registry/naca_report_1135.yaml
+runtime_policy:
+  finite_inputs_required: true
+  invalid_domain_returns_error: true
+  nonfinite_outputs_rejected: true
+  ieee754_f64_rounding_applies: true
+  deterministic_same_build_platform: true
+evidence_policy:
+  compiler_verified_runtime_symbols: true
+  bounded_contract_probes: true
+  validation_status_upgrade: blocked_without_source_and_tolerance_review
+non_claims:
+  no_certification_evidence: true
+  no_operational_readiness_claim: true
+  no_external_reference_parity_claim: true
+  no_full_equation_inventory_completion_claim: true
+formulas:
+  - formula_id: formula_vault.gasdyn.oblique_shock.theta_beta_mach_residual
+    runtime_symbol: theta_beta_mach_residual
+    output_variable: theta_beta_mach_residual
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.gasdyn.oblique_shock.beta
+    runtime_symbol: oblique_shock_beta
+    output_variable: beta
+    test_strategy: invariant
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.gasdyn.oblique_shock.normal_mach1
+    runtime_symbol: oblique_shock_normal_mach
+    output_variable: upstream_normal_mach
+    test_strategy: invariant
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.gasdyn.oblique_shock.downstream_mach
+    runtime_symbol: oblique_shock_downstream_mach
+    output_variable: downstream_mach
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe

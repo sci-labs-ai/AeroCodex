@@ -1,0 +1,68 @@
+# Governed existing-runtime equation contract backfill.
+# Metadata and compiler-probe contract only; no runtime kernel is changed.
+
+schema_version: formula_vault_runtime_contract.v1
+record_status: existing_runtime_contract_research_required
+contract_id: formula_vault.thermo.perfect_gas
+title: Calorically perfect-gas thermodynamics contracts
+validation_status: research_required
+primary_validation_card: validation/cards/thermo_perfect_gas.yaml
+primary_source_seed: validation/source_registry/nasa_glenn_thermo_cea.yaml
+runtime_policy:
+  finite_inputs_required: true
+  invalid_domain_returns_error: true
+  nonfinite_outputs_rejected: true
+  ieee754_f64_rounding_applies: true
+  deterministic_same_build_platform: true
+evidence_policy:
+  compiler_verified_runtime_symbols: true
+  bounded_contract_probes: true
+  validation_status_upgrade: blocked_without_source_and_tolerance_review
+non_claims:
+  no_certification_evidence: true
+  no_operational_readiness_claim: true
+  no_external_reference_parity_claim: true
+  no_full_equation_inventory_completion_claim: true
+formulas:
+  - formula_id: formula_vault.thermo.perfect_gas.density
+    runtime_symbol: ideal_gas_density
+    output_variable: density_kg_m3
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.thermo.perfect_gas.speed_of_sound
+    runtime_symbol: speed_of_sound
+    output_variable: speed_of_sound_m_s
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.thermo.perfect_gas.cp_from_gamma_r
+    runtime_symbol: cp_from_gamma_r
+    output_variable: cp_j_per_kg_k
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.thermo.perfect_gas.cv_from_gamma_r
+    runtime_symbol: cv_from_gamma_r
+    output_variable: cv_j_per_kg_k
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.thermo.perfect_gas.gamma_from_cp_cv
+    runtime_symbol: gamma_from_cp_cv
+    output_variable: gamma
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.thermo.perfect_gas.specific_gas_constant_from_molar_mass
+    runtime_symbol: specific_gas_constant_from_molar_mass
+    output_variable: specific_gas_constant_j_per_kg_k
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe

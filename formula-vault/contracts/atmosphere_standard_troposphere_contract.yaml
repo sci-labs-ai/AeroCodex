@@ -1,0 +1,61 @@
+# Governed existing-runtime equation contract backfill.
+# Metadata and compiler-probe contract only; no runtime kernel is changed.
+
+schema_version: formula_vault_runtime_contract.v1
+record_status: existing_runtime_contract_research_required
+contract_id: formula_vault.atmosphere.standard_troposphere
+title: Atmosphere standard-troposphere and perfect-gas speed-of-sound contracts
+validation_status: research_required
+primary_validation_card: validation/cards/atmosphere_standard_troposphere.yaml
+primary_source_seed: validation/source_registry/us_standard_atmosphere_1976.yaml
+runtime_policy:
+  finite_inputs_required: true
+  invalid_domain_returns_error: true
+  nonfinite_outputs_rejected: true
+  ieee754_f64_rounding_applies: true
+  deterministic_same_build_platform: true
+evidence_policy:
+  compiler_verified_runtime_symbols: true
+  bounded_contract_probes: true
+  validation_status_upgrade: blocked_without_source_and_tolerance_review
+non_claims:
+  no_certification_evidence: true
+  no_operational_readiness_claim: true
+  no_external_reference_parity_claim: true
+  no_full_equation_inventory_completion_claim: true
+formulas:
+  - formula_id: formula_vault.atmosphere.standard.troposphere.temperature
+    runtime_symbol: troposphere_temperature
+    output_variable: temperature_k
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.atmosphere.standard.troposphere.pressure
+    runtime_symbol: troposphere_pressure
+    output_variable: pressure_pa
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.atmosphere.standard.troposphere.density
+    runtime_symbol: troposphere_density
+    output_variable: density_kg_m3
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.atmosphere.standard.troposphere.state
+    runtime_symbol: troposphere_state
+    output_variable: atmosphere_state
+    test_strategy: invariant
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.atmosphere.perfect_gas.speed_of_sound
+    runtime_symbol: speed_of_sound
+    output_variable: speed_of_sound_m_s
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
