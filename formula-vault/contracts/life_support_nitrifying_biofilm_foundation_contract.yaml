@@ -1,0 +1,102 @@
+# Governed existing-runtime equation contract backfill.
+# Metadata and compiler-probe contract only; no runtime kernel is changed.
+
+schema_version: formula_vault_runtime_contract.v1
+record_status: existing_runtime_contract_research_required
+contract_id: formula_vault.life_support.nitrifying_biofilm_foundation
+title: MELiSSA C3 nitrifying fixed-bed biofilm foundation contracts
+validation_status: research_required
+supporting_governance_status: equation_traceable
+primary_validation_card: validation/cards/life_support_thinfilm_melissa_c3_nitrifying_biofilm.yaml
+primary_source_seed: validation/source_registry/life_support_montras_2009.yaml
+supporting_source_seeds:
+  - validation/source_registry/life_support_garcia_2021.yaml
+  - validation/source_registry/life_support_montras_2009.yaml
+runtime_policy:
+  finite_inputs_required: true
+  positive_radius_and_grid_spacing_required: true
+  nonnegative_diffusivity_concentrations_and_kinetic_terms_enforced: true
+  array_shape_checks_enforced: true
+  nonfinite_outputs_rejected: true
+  signed_fluxes_and_rates_preserved: true
+  ieee754_f64_rounding_applies: true
+  deterministic_same_build_platform: true
+evidence_policy:
+  compiler_verified_runtime_symbols: true
+  bounded_contract_probes: true
+  equation_traceable_governance_does_not_promote_batch_status: true
+  validation_status_upgrade: blocked_without_independent_reference_or_experiment_validation
+scope_boundaries:
+  kinetic_parameter_defaults_are_research_values_not_universal_constants: true
+  equation_traceable_evidence_retained_but_batch_status_research_required: true
+non_claims:
+  no_biofilm_calibration_claim: true
+  no_reactor_design_validation_claim: true
+  no_certification_evidence: true
+  no_operational_readiness_claim: true
+  no_external_reference_parity_claim: true
+  no_full_equation_inventory_completion_claim: true
+formulas:
+  - formula_id: formula_vault.life_support.thinfilm.c3.nitrification_fluxes
+    runtime_symbol: nitrifying_biofilm::nitrification_fluxes
+    output_variable: nitrification_fluxes
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_oxidation_extents_preserve_signed_stoichiometric_fluxes
+    numerical_policy: bounded_stoichiometric_invariant_probe
+  - formula_id: formula_vault.life_support.thinfilm.c3.spherical_diffusion_rate
+    runtime_symbol: nitrifying_biofilm::spherical_diffusion_reaction_rate
+    output_variable: diffusion_reaction_rate
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_positive_radius_nonnegative_diffusivity_and_finite_derivatives
+    numerical_policy: bounded_spherical_diffusion_probe
+  - formula_id: formula_vault.life_support.thinfilm.c3.spherical_diffusion_rhs_uniform
+    runtime_symbol: nitrifying_biofilm::spherical_diffusion_rhs_uniform
+    output_variable: diffusion_rhs_vector
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonempty_equal_arrays_positive_grid_step_nonnegative_diffusivity
+    numerical_policy: bounded_uniform_grid_rhs_probe
+  - formula_id: formula_vault.life_support.thinfilm.c3.fick_biofilm_flux
+    runtime_symbol: nitrifying_biofilm::fick_liquid_flux
+    output_variable: liquid_flux
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_diffusivity_and_finite_gradient_preserve_flux_sign
+    numerical_policy: bounded_signed_fick_flux_probe
+  - formula_id: formula_vault.life_support.thinfilm.c3.biofilm_solids_rate
+    runtime_symbol: nitrifying_biofilm::biofilm_solids_local_rate
+    output_variable: solids_local_rate
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_finite_flux_divergence_and_growth_source_preserve_signed_rate
+    numerical_policy: bounded_signed_difference_probe
+  - formula_id: formula_vault.life_support.thinfilm.c3.biofilm_thickness_rate
+    runtime_symbol: nitrifying_biofilm::biofilm_thickness_rate
+    output_variable: biofilm_thickness_rate
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_growth_and_detachment_velocities_preserve_signed_rate
+    numerical_policy: bounded_signed_difference_probe
+  - formula_id: formula_vault.life_support.thinfilm.c3.oxygen_transfer
+    runtime_symbol: nitrifying_biofilm::gas_liquid_transfer_flux
+    output_variable: gas_liquid_transfer_flux
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_transfer_coefficient_and_concentrations_preserve_signed_gradient
+    numerical_policy: bounded_signed_transfer_probe
+  - formula_id: formula_vault.life_support.thinfilm.c3.nitrifier_rates
+    runtime_symbol: nitrifying_biofilm::nitrifier_rates
+    output_variable: nitrifier_rates
+    test_strategy: invariant
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_concentrations_biomass_and_positive_kinetic_parameters
+    numerical_policy: bounded_positive_rate_invariant
+  - formula_id: formula_vault.life_support.thinfilm.c3.tank_biofilm_rate
+    runtime_symbol: nitrifying_biofilm::bulk_tank_biofilm_coupled_rate
+    output_variable: bulk_tank_rate
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_bulk_terms_finite_surface_flux_and_transfer_terms
+    numerical_policy: bounded_signed_coupled_balance_probe

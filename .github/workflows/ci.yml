@@ -33,6 +33,8 @@ jobs:
           cargo run -p xtask -- equation-batch verify --manifest equation-batches/a6-propulsion-heat-transfer.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a6" --timeout-seconds 600
           cargo run -p xtask -- equation-batch generate --manifest equation-batches/a7-astrodynamics-orekit-foundation.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a7"
           cargo run -p xtask -- equation-batch verify --manifest equation-batches/a7-astrodynamics-orekit-foundation.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a7" --timeout-seconds 600
+          cargo run -p xtask -- equation-batch generate --manifest equation-batches/a8-life-support-biosim-foundation.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a8"
+          cargo run -p xtask -- equation-batch verify --manifest equation-batches/a8-life-support-biosim-foundation.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a8" --timeout-seconds 600
       - name: Run Beta 1 automated qualification gate
         run: cargo run -p xtask -- verify beta1-automated --output-dir "${{ runner.temp }}/aerocodex-beta1-automated"
       - name: Upload automated gate reports

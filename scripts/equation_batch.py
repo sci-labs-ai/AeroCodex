@@ -43,6 +43,7 @@ MANIFEST_FIELDS = [
 ]
 ALLOWED_TEST_STRATEGIES = {"exact", "tolerance", "invariant", "mixed"}
 REQUIRED_VALIDATION_STATUS = "research_required"
+ALLOWED_GOVERNANCE_STATUSES = {"research_required", "equation_traceable"}
 INVENTORY_PATH = "validation/equation_inventory.tsv"
 VERIFICATION_REPORT = "equation-batch-verification-report.json"
 VERIFICATION_HASH = "equation-batch-verification-report.json.sha256"
@@ -249,8 +250,9 @@ def validate_test_expression(expression: str, runtime_path: str) -> None:
     validate_balanced_delimiters(expression)
 
 
-def yaml_has_research_required(text: str) -> bool:
-    return re.search(r"(?m)^\s*status:\s*research_required\s*$", text) is not None
+def yaml_has_compatible_governance_status(text: str) -> bool:
+    match = re.search(r"(?m)^status:\s*([a-z0-9_]+)\s*$", text)
+    return match is not None and match.group(1) in ALLOWED_GOVERNANCE_STATUSES
 
 
 def read_tsv(path: Path) -> tuple[list[str], list[dict[str, str]]]:
@@ -451,8 +453,8 @@ def load_batch(repo_raw: str | Path, manifest_raw: str | Path) -> Batch:
         require(values["formula_id"] in contract_text, f"manifest row {index} formula_id is absent from its contract")
         require(values["runtime_symbol"] in contract_text, f"manifest row {index} runtime_symbol is absent from its contract")
         require("research_required" in contract_text, f"manifest row {index} contract does not retain research_required")
-        require(yaml_has_research_required(validation_card.read_text(encoding="utf-8")), f"manifest row {index} validation card is not research_required")
-        require(yaml_has_research_required(source_seed.read_text(encoding="utf-8")), f"manifest row {index} source seed is not research_required")
+        require(yaml_has_compatible_governance_status(validation_card.read_text(encoding="utf-8")), f"manifest row {index} validation card status must be research_required or equation_traceable")
+        require(yaml_has_compatible_governance_status(source_seed.read_text(encoding="utf-8")), f"manifest row {index} source seed status must be research_required or equation_traceable")
 
         package_source_prefix = package.member_path + "/"
         matches = [
@@ -560,6 +562,7 @@ def plan_document(batch: Batch) -> dict[str, Any]:
             "no_rust_source_scraping": True,
             "runtime_symbols_verified_by_rust_compiler": True,
             "validation_status": REQUIRED_VALIDATION_STATUS,
+            "governance_statuses_accepted_without_batch_promotion": sorted(ALLOWED_GOVERNANCE_STATUSES),
         },
         "packages": [
             {
@@ -971,6 +974,10 @@ def command_self_test(_: argparse.Namespace) -> int:
     tests: list[dict[str, str]] = []
     require(sha256_bytes(b"abc") == "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", "SHA-256 implementation mismatch")
     tests.append({"name": "sha256_known_vector", "result": "PASS"})
+    require(yaml_has_compatible_governance_status("id: research\nstatus: research_required\n"), "research_required governance status was not accepted")
+    require(yaml_has_compatible_governance_status("id: traced\nstatus: equation_traceable\n"), "equation_traceable governance status was not accepted")
+    require(not yaml_has_compatible_governance_status("id: promoted\nstatus: implementation_verified\n"), "implementation_verified governance status was accepted without an explicit batch policy")
+    tests.append({"name": "governance_status_compatibility", "result": "PASS"})
     with tempfile.TemporaryDirectory(prefix="aerocodex-equation-batch-self-test-") as root_raw:
         root = Path(root_raw)
         repo = write_fake_repo(root)

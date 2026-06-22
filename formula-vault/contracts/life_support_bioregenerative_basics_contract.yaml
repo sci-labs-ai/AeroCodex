@@ -1,0 +1,90 @@
+# Governed existing-runtime equation contract backfill.
+# Metadata and compiler-probe contract only; no runtime kernel is changed.
+
+schema_version: formula_vault_runtime_contract.v1
+record_status: existing_runtime_contract_research_required
+contract_id: formula_vault.life_support.bioregenerative_basics
+title: Bioregenerative scalar life-support foundation contracts
+validation_status: research_required
+supporting_governance_status: research_required
+primary_validation_card: validation/cards/life_support_bioregenerative_mass_balance.yaml
+primary_source_seed: validation/source_registry/life_support_bioregenerative_mass_balance.yaml
+runtime_policy:
+  finite_inputs_required: true
+  nonnegative_inventory_and_rate_domains_enforced: true
+  positive_denominators_required: true
+  nonfinite_outputs_rejected: true
+  signed_net_balances_preserved: true
+  ieee754_f64_rounding_applies: true
+  deterministic_same_build_platform: true
+evidence_policy:
+  compiler_verified_runtime_symbols: true
+  bounded_contract_probes: true
+  equation_traceable_governance_does_not_promote_batch_status: true
+  validation_status_upgrade: blocked_without_independent_reference_or_experiment_validation
+scope_boundaries:
+  scalar_bookkeeping_only: true
+  storage_control_reliability_and_contingency_outside_scope: true
+non_claims:
+  no_eclss_design_validation_claim: true
+  no_habitat_safety_or_medical_claim: true
+  no_certification_evidence: true
+  no_operational_readiness_claim: true
+  no_full_equation_inventory_completion_claim: true
+formulas:
+  - formula_id: formula_vault.life_support.bioregenerative.closure_fraction
+    runtime_symbol: closure_fraction
+    output_variable: closure_fraction
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_recycled_and_positive_required_reject_nonfinite
+    numerical_policy: bounded_f64_ratio_probe
+  - formula_id: formula_vault.life_support.bioregenerative.required_production_area
+    runtime_symbol: required_production_area
+    output_variable: required_area
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_requirement_and_positive_productivity_reject_nonfinite
+    numerical_policy: bounded_f64_ratio_probe
+  - formula_id: formula_vault.life_support.bioregenerative.buffer_residence_time
+    runtime_symbol: buffer_residence_time
+    output_variable: residence_time
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_buffer_and_positive_flow_reject_nonfinite
+    numerical_policy: bounded_f64_ratio_probe
+  - formula_id: formula_vault.life_support.bioregenerative.crew_daily_requirement
+    runtime_symbol: crew_daily_requirement
+    output_variable: crew_daily_requirement
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_per_crew_rate_reject_overflow_or_nonfinite
+    numerical_policy: bounded_f64_product_probe
+  - formula_id: formula_vault.life_support.bioregenerative.net_daily_balance
+    runtime_symbol: net_daily_balance
+    output_variable: net_daily_balance
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_production_and_consumption_preserve_signed_balance
+    numerical_policy: bounded_signed_difference_probe
+  - formula_id: formula_vault.life_support.bioregenerative.oxygen_balance
+    runtime_symbol: oxygen_balance
+    output_variable: oxygen_daily_balance
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_production_and_consumption_preserve_signed_balance
+    numerical_policy: bounded_signed_difference_probe
+  - formula_id: formula_vault.life_support.bioregenerative.carbon_dioxide_balance
+    runtime_symbol: carbon_dioxide_balance
+    output_variable: carbon_dioxide_daily_balance
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_generation_and_removal_preserve_signed_balance
+    numerical_policy: bounded_signed_difference_probe
+  - formula_id: formula_vault.life_support.bioregenerative.water_recovery_balance
+    runtime_symbol: water_recovery_balance
+    output_variable: water_recovery_fraction
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_recovered_and_positive_required_reject_nonfinite
+    numerical_policy: bounded_f64_ratio_probe

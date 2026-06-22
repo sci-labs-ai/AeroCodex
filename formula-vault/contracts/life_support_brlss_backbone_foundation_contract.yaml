@@ -1,0 +1,88 @@
+# Governed existing-runtime equation contract backfill.
+# Metadata and compiler-probe contract only; no runtime kernel is changed.
+
+schema_version: formula_vault_runtime_contract.v1
+record_status: existing_runtime_contract_research_required
+contract_id: formula_vault.life_support.brlss_backbone_foundation
+title: BLSS mass-balance, stoichiometric, closure, and equivalent-system-mass foundation contracts
+validation_status: research_required
+supporting_governance_status: equation_traceable
+primary_validation_card: validation/cards/life_support_thinfilm_brlss_backbone.yaml
+primary_source_seed: validation/source_registry/life_support_thinfilm_blss_report_2026.yaml
+supporting_source_seeds:
+  - validation/source_registry/life_support_thinfilm_blss_report_2026.yaml
+  - validation/source_registry/life_support_vermeulen_2023.yaml
+  - validation/source_registry/life_support_detrell_2021.yaml
+runtime_policy:
+  finite_inputs_required: true
+  matrix_and_vector_shape_checks_enforced: true
+  nonnegative_physical_terms_enforced_where_documented: true
+  nonfinite_outputs_rejected: true
+  signed_residuals_and_rates_preserved: true
+  ieee754_f64_rounding_applies: true
+  deterministic_same_build_platform: true
+evidence_policy:
+  compiler_verified_runtime_symbols: true
+  bounded_contract_probes: true
+  equation_traceable_governance_does_not_promote_batch_status: true
+  validation_status_upgrade: blocked_without_independent_reference_or_experiment_validation
+scope_boundaries:
+  support_predicates_within_componentwise_bounds_and_esm_biological_is_favorable_not_formula_nodes: true
+  equation_traceable_evidence_retained_but_batch_status_research_required: true
+non_claims:
+  no_biological_calibration_claim: true
+  no_system_controller_claim: true
+  no_certification_evidence: true
+  no_operational_readiness_claim: true
+  no_external_reference_parity_claim: true
+  no_full_equation_inventory_completion_claim: true
+formulas:
+  - formula_id: formula_vault.life_support.thinfilm.generic_compartment.derivative
+    runtime_symbol: brlss_backbone::generic_compartment_derivative
+    output_variable: compartment_derivative
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_finite_slices_nonnegative_volume_and_matching_stoichiometry
+    numerical_policy: bounded_signed_mass_balance_probe
+  - formula_id: formula_vault.life_support.thinfilm.generic_compartment.stoichiometric_state_derivative
+    runtime_symbol: brlss_backbone::stoichiometric_state_derivative
+    output_variable: state_derivative_vector
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_rectangular_matrix_and_matching_vector_lengths_reject_nonfinite
+    numerical_policy: bounded_vector_linear_balance_probe
+  - formula_id: formula_vault.life_support.thinfilm.stoichiometry.element_balance_residual
+    runtime_symbol: brlss_backbone::element_balance_residual
+    output_variable: element_balance_residual
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_rectangular_element_matrix_and_matching_throughputs
+    numerical_policy: bounded_vector_residual_probe
+  - formula_id: formula_vault.life_support.thinfilm.stoichiometry.loop_balance_residual
+    runtime_symbol: brlss_backbone::loop_balance_residual
+    output_variable: loop_balance_residual
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_rectangular_commodity_matrix_and_matching_terms
+    numerical_policy: bounded_vector_residual_probe
+  - formula_id: formula_vault.life_support.thinfilm.system.element_inventory_balance
+    runtime_symbol: brlss_backbone::element_inventory_rate
+    output_variable: element_inventory_rate
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_rectangular_element_matrix_and_finite_open_rates
+    numerical_policy: bounded_vector_inventory_probe
+  - formula_id: formula_vault.life_support.thinfilm.system.closure_metric
+    runtime_symbol: brlss_backbone::thinfilm_closure_metric
+    output_variable: closure_metric
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_resupply_and_loss_positive_demand_preserve_signed_metric
+    numerical_policy: bounded_f64_closure_probe
+  - formula_id: formula_vault.life_support.thinfilm.system.equivalent_system_mass
+    runtime_symbol: brlss_backbone::equivalent_system_mass
+    output_variable: equivalent_system_mass_kg
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_terms_and_equivalence_factors_reject_nonfinite
+    numerical_policy: bounded_f64_weighted_sum_probe

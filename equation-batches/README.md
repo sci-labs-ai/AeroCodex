@@ -32,6 +32,11 @@ cargo run -p xtask -- equation-batch verify --manifest equation-batches/a6-propu
 cargo run -p xtask -- equation-batch plan --manifest equation-batches/a7-astrodynamics-orekit-foundation.tsv
 cargo run -p xtask -- equation-batch generate --manifest equation-batches/a7-astrodynamics-orekit-foundation.tsv --output-dir <a7-directory-outside-the-repository>
 cargo run -p xtask -- equation-batch verify --manifest equation-batches/a7-astrodynamics-orekit-foundation.tsv --output-dir <a7-directory-outside-the-repository>
+
+
+cargo run -p xtask -- equation-batch plan --manifest equation-batches/a8-life-support-biosim-foundation.tsv
+cargo run -p xtask -- equation-batch generate --manifest equation-batches/a8-life-support-biosim-foundation.tsv --output-dir <a8-directory-outside-the-repository>
+cargo run -p xtask -- equation-batch verify --manifest equation-batches/a8-life-support-biosim-foundation.tsv --output-dir <a8-directory-outside-the-repository>
 ```
 
 `plan` validates the manifest and prints a stable json plan. `generate` writes a deterministic probe crate and artifact hashes outside the repository. `verify` regenerates the expected artifacts, checks their hashes, and runs the probe crate with Cargo in offline mode.
@@ -53,7 +58,7 @@ Rules:
 - Module-qualified runtime symbols such as `elements::compute_raan` are supported while inventory identity remains tied to the terminal function name inside the selected Cargo package.
 - Additional workspace crates referenced by a test expression are added as direct probe dependencies; this supports typed inputs such as `aero_codex_core::Angle`.
 - Contract, validation-card, source-seed, and inventory links must resolve.
-- Validation remains `research_required`.
+- Batch exposure remains `research_required`. A linked validation card or source seed may be top-level `research_required` or `equation_traceable`; accepting equation-traceable evidence does not promote the batch status.
 - The test expression is a single, bounded Rust boolean expression that references the exact runtime path.
 - Generated output must be outside the Git repository and may not overwrite an existing directory.
 - Missing symbols, invalid expressions, stale governance links, compilation failures, and failed contract probes stop the batch.
@@ -66,5 +71,6 @@ Rules:
 - `a5-aerodynamics-flight-structures.tsv` covers 15 existing aerodynamics, flight-dynamics, and structures runtime equations.
 - `a6-propulsion-heat-transfer.tsv` covers 9 existing propulsion and heat-transfer runtime equations.
 - `a7-astrodynamics-orekit-foundation.tsv` covers 23 existing two-body, transfer, elliptic-element, and non-solver Kepler runtime equations.
+- `a8-life-support-biosim-foundation.tsv` covers 40 existing bioregenerative, BLSS-backbone, MELiSSA, nitrifying-biofilm, and attached-algal foundation runtime equations.
 
-The six manifests provide compiler-verified coverage for 102 existing runtime paths. Runtime identity is package-scoped, and typed test inputs can reference reviewed workspace dependencies without parsing Rust source. The A7 batch keeps frame, time-scale, TLE, aggregate-element, and iterative Kepler-solver APIs outside formula scope. Orekit remains reference-planning context only. These manifests do not change runtime kernels, expand the Beta 1 command-line surface, claim external reference parity, or imply that the full equation inventory is complete or operationally ready.
+The seven manifests provide compiler-verified coverage for 142 existing runtime paths. Runtime identity is package-scoped, and typed test inputs can reference reviewed workspace dependencies without parsing Rust source. The A8 batch keeps BioSim resource-ledger, transaction, scenario, replay, reporting, and CLI-smoke helpers outside formula scope because they are support algorithms rather than executable research equations. Ten advanced attached-algal PDE/ROM and habitat-coupling runtime equations remain explicitly deferred to a later bounded batch. Equation-traceable governance evidence is consumed conservatively while batch exposure remains `research_required`. These manifests do not change runtime kernels, expand the Beta 1 command-line surface, claim external reference parity, or imply that the full equation inventory is complete or operationally ready.

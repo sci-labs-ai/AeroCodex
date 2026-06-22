@@ -1,0 +1,123 @@
+# Governed existing-runtime equation contract backfill.
+# Metadata and compiler-probe contract only; no runtime kernel is changed.
+
+schema_version: formula_vault_runtime_contract.v1
+record_status: existing_runtime_contract_research_required
+contract_id: formula_vault.life_support.melissa_photobioreactor_foundation
+title: MELiSSA C4a photobioreactor and gas-balance foundation contracts
+validation_status: research_required
+supporting_governance_status: equation_traceable
+primary_validation_card: validation/cards/life_support_thinfilm_melissa_c4a_photobioreactor.yaml
+primary_source_seed: validation/source_registry/life_support_poughon_2021.yaml
+supporting_source_seeds:
+  - validation/source_registry/life_support_poughon_2021.yaml
+  - validation/source_registry/life_support_garcia_2021.yaml
+runtime_policy:
+  finite_inputs_required: true
+  nonnegative_concentrations_flows_and_rates_enforced_where_documented: true
+  fraction_and_ph_domains_enforced: true
+  positive_denominator_terms_required: true
+  nonfinite_outputs_rejected: true
+  signed_dynamic_rates_preserved: true
+  ieee754_f64_rounding_applies: true
+  deterministic_same_build_platform: true
+evidence_policy:
+  compiler_verified_runtime_symbols: true
+  bounded_contract_probes: true
+  equation_traceable_governance_does_not_promote_batch_status: true
+  validation_status_upgrade: blocked_without_independent_reference_or_experiment_validation
+scope_boundaries:
+  pbr_operating_point_feasible_pi_light_command_and_nitrate_dilution_command_remain_support_algorithms: true
+  equation_traceable_evidence_retained_but_batch_status_research_required: true
+non_claims:
+  no_photobioreactor_calibration_claim: true
+  no_autonomous_controller_claim: true
+  no_certification_evidence: true
+  no_operational_readiness_claim: true
+  no_external_reference_parity_claim: true
+  no_full_equation_inventory_completion_claim: true
+formulas:
+  - formula_id: formula_vault.life_support.thinfilm.pbr.flat_two_flux_irradiance_ratio
+    runtime_symbol: melissa_photobioreactor::flat_two_flux_irradiance_ratio
+    output_variable: irradiance_ratio
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_valid_phase_exponent_nonnegative_attenuation_positive_path_and_bounded_depth
+    numerical_policy: bounded_two_flux_probe
+  - formula_id: formula_vault.life_support.thinfilm.pbr.cylindrical_two_flux_irradiance_ratio
+    runtime_symbol: melissa_photobioreactor::cylindrical_two_flux_irradiance_ratio
+    output_variable: irradiance_ratio
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_valid_phase_exponent_nonnegative_radius_and_attenuation_positive_path
+    numerical_policy: bounded_bessel_series_probe
+  - formula_id: formula_vault.life_support.thinfilm.pbr.geometric_correction
+    runtime_symbol: melissa_photobioreactor::geometric_correction
+    output_variable: geometric_correction
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_calibrated_path_and_positive_optical_path
+    numerical_policy: bounded_clamped_ratio_probe
+  - formula_id: formula_vault.life_support.thinfilm.pbr.limnospira_biomass_rate
+    runtime_symbol: melissa_photobioreactor::limnospira_biomass_rate
+    output_variable: biomass_rate
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_rates_and_biomass_preserve_signed_net_growth
+    numerical_policy: bounded_signed_growth_probe
+  - formula_id: formula_vault.life_support.thinfilm.pbr.limnospira_tic_rate
+    runtime_symbol: melissa_photobioreactor::limnospira_tic_rate
+    output_variable: tic_rate
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_carbon_transfer_and_biomass_terms_preserve_signed_rate
+    numerical_policy: bounded_signed_tic_balance_probe
+  - formula_id: formula_vault.life_support.thinfilm.pbr.limnospira_oxygen_rate
+    runtime_symbol: melissa_photobioreactor::limnospira_oxygen_rate
+    output_variable: oxygen_rate
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_production_biomass_dilution_transfer_and_concentrations
+    numerical_policy: bounded_signed_oxygen_balance_probe
+  - formula_id: formula_vault.life_support.thinfilm.pbr.carbonate_species
+    runtime_symbol: melissa_photobioreactor::carbonate_species_from_total_and_ph
+    output_variable: carbonate_species
+    test_strategy: invariant
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_total_carbon_and_bounded_ph_pka_values
+    numerical_policy: bounded_species_sum_invariant
+  - formula_id: formula_vault.life_support.thinfilm.pbr.eps_fraction
+    runtime_symbol: melissa_photobioreactor::eps_fraction_from_photon_requirement
+    output_variable: eps_fraction
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_finite_photon_requirement_preserve_outside_domain_negative_relation
+    numerical_policy: bounded_linear_relation_probe
+  - formula_id: formula_vault.life_support.thinfilm.pbr.tank_series_rate
+    runtime_symbol: melissa_photobioreactor::tank_series_concentration_rate
+    output_variable: concentration_rate
+    test_strategy: exact
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_flow_concentrations_transfer_and_matching_reaction_arrays
+    numerical_policy: bounded_signed_tank_balance_probe
+  - formula_id: formula_vault.life_support.thinfilm.integration.oxygen_production_disconnected
+    runtime_symbol: melissa_photobioreactor::oxygen_production_rate_disconnected_gas
+    output_variable: oxygen_production_rate
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_flows_unit_fraction_and_positive_denominator_terms
+    numerical_policy: bounded_signed_gas_balance_probe
+  - formula_id: formula_vault.life_support.thinfilm.integration.oxygen_production_connected
+    runtime_symbol: melissa_photobioreactor::oxygen_production_rate_connected_gas
+    output_variable: oxygen_production_rate
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_nonnegative_flows_unit_fractions_and_positive_denominator_terms
+    numerical_policy: bounded_signed_gas_balance_probe
+  - formula_id: formula_vault.life_support.thinfilm.control.oxygen_fraction_error
+    runtime_symbol: melissa_photobioreactor::oxygen_fraction_error
+    output_variable: oxygen_fraction_error
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: require_setpoint_and_measurement_in_unit_interval_preserve_signed_error
+    numerical_policy: bounded_signed_difference_probe
