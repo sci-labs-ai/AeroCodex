@@ -287,6 +287,41 @@ def workspace_packages(repo: Path) -> dict[str, WorkspacePackage]:
     return packages
 
 
+BUILTIN_PATH_ROOTS = {
+    "alloc",
+    "bool",
+    "char",
+    "core",
+    "crate",
+    "f32",
+    "f64",
+    "i8",
+    "i16",
+    "i32",
+    "i64",
+    "i128",
+    "isize",
+    "self",
+    "std",
+    "str",
+    "super",
+    "u8",
+    "u16",
+    "u32",
+    "u64",
+    "u128",
+    "usize",
+}
+
+
+def test_expression_path_roots(expression: str) -> set[str]:
+    return {
+        match.group(1)
+        for match in re.finditer(r"(?<![A-Za-z0-9_:])([A-Za-z_][A-Za-z0-9_]*)::", expression)
+        if match.group(1) not in BUILTIN_PATH_ROOTS
+    }
+
+
 def inventory_rows(repo: Path) -> list[dict[str, str]]:
     inventory = repo / INVENTORY_PATH
     require(inventory.is_file(), f"missing equation inventory: {INVENTORY_PATH}")
@@ -357,6 +392,8 @@ def load_batch(repo_raw: str | Path, manifest_raw: str | Path) -> Batch:
     require(1 <= len(raw_rows) <= MAX_BATCH_ROWS, f"batch must contain 1..{MAX_BATCH_ROWS} rows, got {len(raw_rows)}")
 
     package_map = workspace_packages(repo)
+    package_by_crate = {package.crate_name: package for package in package_map.values()}
+    require(len(package_by_crate) == len(package_map), "workspace library crate names must be unique")
     inventory = inventory_rows(repo)
     rows: list[BatchRow] = []
     seen_formula_ids: set[str] = set()
@@ -431,6 +468,14 @@ def load_batch(repo_raw: str | Path, manifest_raw: str | Path) -> Batch:
 
         runtime_path = f"{values['crate_name']}::{values['runtime_symbol']}"
         validate_test_expression(values["test_expression"], runtime_path)
+        for crate_name in sorted(test_expression_path_roots(values["test_expression"])):
+            dependency = package_by_crate.get(crate_name)
+            require(
+                dependency is not None,
+                f"manifest row {index} test_expression references unknown workspace crate {crate_name!r}",
+            )
+            used_packages[dependency.package] = dependency
+            input_paths.add(f"{dependency.member_path}/Cargo.toml")
         require(values["formula_id"] not in seen_formula_ids, f"duplicate formula_id in batch: {values['formula_id']}")
         require(runtime_path not in seen_runtime_paths, f"duplicate runtime path in batch: {runtime_path}")
         seen_formula_ids.add(values["formula_id"])
@@ -843,12 +888,13 @@ def write_fake_repo(root: Path) -> Path:
     repo = root / "repo"
     (repo / "crates/example/src").mkdir(parents=True)
     (repo / "crates/other/src").mkdir(parents=True)
+    (repo / "crates/support/src").mkdir(parents=True)
     (repo / "formula-vault/contracts").mkdir(parents=True)
     (repo / "validation/cards").mkdir(parents=True)
     (repo / "validation/source_registry").mkdir(parents=True)
     (repo / "validation").mkdir(exist_ok=True)
     (repo / "equation-batches").mkdir()
-    (repo / "Cargo.toml").write_text('[workspace]\nresolver = "2"\nmembers = ["crates/example", "crates/other"]\n', encoding="utf-8")
+    (repo / "Cargo.toml").write_text('[workspace]\nresolver = "2"\nmembers = ["crates/example", "crates/other", "crates/support"]\n', encoding="utf-8")
     (repo / "crates/example/Cargo.toml").write_text(
         '[package]\nname = "example-equations"\nversion = "0.0.0"\nedition = "2021"\n\n[lib]\nname = "example_equations"\npath = "src/lib.rs"\n',
         encoding="utf-8",
@@ -863,6 +909,14 @@ def write_fake_repo(root: Path) -> Path:
     )
     (repo / "crates/other/src/lib.rs").write_text(
         "#![forbid(unsafe_code)]\npub fn add_one(value: f64) -> Result<f64, ()> { Ok(value + 2.0) }\n",
+        encoding="utf-8",
+    )
+    (repo / "crates/support/Cargo.toml").write_text(
+        '[package]\nname = "support-types"\nversion = "0.0.0"\nedition = "2021"\n\n[lib]\nname = "support_types"\npath = "src/lib.rs"\n',
+        encoding="utf-8",
+    )
+    (repo / "crates/support/src/lib.rs").write_text(
+        "#![forbid(unsafe_code)]\npub fn identity(value: f64) -> f64 { value }\n",
         encoding="utf-8",
     )
     formula_id = "formula_vault.example.add_one"
@@ -892,7 +946,7 @@ def write_fake_repo(root: Path) -> Path:
         "validation/source_registry/example.yaml",
         "research_required",
         "exact",
-        "matches!(example_equations::add_one(1.0), Ok(value) if value == 2.0)",
+        "matches!(example_equations::add_one(support_types::identity(1.0)), Ok(value) if value == 2.0)",
     ]
     (repo / "equation-batches/example.tsv").write_text(
         "\t".join(MANIFEST_FIELDS) + "\n" + "\t".join(manifest_values) + "\n",
@@ -912,8 +966,13 @@ def command_self_test(_: argparse.Namespace) -> int:
         batch = load_batch(repo, manifest)
         require(len(batch.rows) == 1, "self-test batch row count mismatch")
         require(batch.rows[0].inventory_source_path == "crates/example/src/lib.rs", "package-scoped inventory resolution failed")
+        require(
+            [package.package for package in batch.packages] == ["example-equations", "support-types"],
+            "test-expression workspace dependency resolution failed",
+        )
         tests.append({"name": "valid_manifest", "result": "PASS"})
         tests.append({"name": "package_scoped_inventory_resolution", "result": "PASS"})
+        tests.append({"name": "test_expression_workspace_dependency_resolution", "result": "PASS"})
         files = generation_files(batch)
         output = root / "generated"
         ensure_output_outside_repo(repo, output)
@@ -924,6 +983,8 @@ def command_self_test(_: argparse.Namespace) -> int:
         generated_source = (output / "src/lib.rs").read_text(encoding="utf-8")
         require("let _runtime_symbol = example_equations::add_one;" in generated_source, "self-test runtime symbol probe missing")
         require("matches!(example_equations::add_one" in generated_source, "self-test contract probe missing")
+        generated_cargo = (output / "Cargo.toml").read_text(encoding="utf-8")
+        require("support-types = { path =" in generated_cargo, "self-test support dependency missing")
         tests.append({"name": "compiler_probe_source", "result": "PASS"})
 
         duplicate = manifest.read_text(encoding="utf-8") + manifest.read_text(encoding="utf-8").splitlines()[1] + "\n"

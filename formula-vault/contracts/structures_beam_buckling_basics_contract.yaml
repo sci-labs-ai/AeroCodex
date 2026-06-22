@@ -1,0 +1,54 @@
+# Governed existing-runtime equation contract backfill.
+# Metadata and compiler-probe contract only; no runtime kernel is changed.
+
+schema_version: formula_vault_runtime_contract.v1
+record_status: existing_runtime_contract_research_required
+contract_id: formula_vault.structures.beam_buckling_basics
+title: Elementary stress, beam-deflection, and buckling contracts
+validation_status: research_required
+primary_validation_card: validation/cards/structures_beam_buckling_basics.yaml
+primary_source_seed: validation/source_registry/structures_basic_mechanics.yaml
+runtime_policy:
+  finite_inputs_required: true
+  invalid_domain_returns_error: true
+  nonfinite_outputs_rejected: true
+  ieee754_f64_rounding_applies: true
+  deterministic_same_build_platform: true
+evidence_policy:
+  compiler_verified_runtime_symbols: true
+  bounded_contract_probes: true
+  validation_status_upgrade: blocked_without_source_and_tolerance_review
+non_claims:
+  no_certification_evidence: true
+  no_operational_readiness_claim: true
+  no_external_reference_parity_claim: true
+  no_full_equation_inventory_completion_claim: true
+formulas:
+  - formula_id: formula_vault.structures.stress.axial
+    runtime_symbol: axial_stress
+    output_variable: axial_stress_pa
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.structures.stress.bending
+    runtime_symbol: bending_stress
+    output_variable: bending_stress_pa
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.structures.beam.cantilever_tip_deflection_end_load
+    runtime_symbol: cantilever_tip_deflection_end_load
+    output_variable: tip_deflection_m
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.structures.stability.euler_column_buckling_load
+    runtime_symbol: euler_column_buckling_load
+    output_variable: critical_buckling_load_n
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe

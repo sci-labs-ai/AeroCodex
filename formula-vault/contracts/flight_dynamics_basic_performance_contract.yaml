@@ -1,0 +1,62 @@
+# Governed existing-runtime equation contract backfill.
+# Metadata and compiler-probe contract only; no runtime kernel is changed.
+
+schema_version: formula_vault_runtime_contract.v1
+record_status: existing_runtime_contract_research_required
+contract_id: formula_vault.flight_dynamics.basic_performance
+title: Level-turn and basic flight-performance contracts
+validation_status: research_required
+primary_validation_card: validation/cards/flight_dynamics_basic_performance.yaml
+primary_source_seed: validation/source_registry/flight_dynamics_basic_performance.yaml
+runtime_policy:
+  finite_inputs_required: true
+  invalid_domain_returns_error: true
+  nonfinite_outputs_rejected: true
+  ieee754_f64_rounding_applies: true
+  deterministic_same_build_platform: true
+evidence_policy:
+  compiler_verified_runtime_symbols: true
+  typed_workspace_test_dependencies: true
+  bounded_contract_probes: true
+  validation_status_upgrade: blocked_without_source_and_tolerance_review
+non_claims:
+  no_certification_evidence: true
+  no_operational_readiness_claim: true
+  no_external_reference_parity_claim: true
+  no_full_equation_inventory_completion_claim: true
+formulas:
+  - formula_id: formula_vault.flight_dynamics.turn.load_factor_level_turn
+    runtime_symbol: load_factor_level_turn
+    output_variable: load_factor
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.flight_dynamics.turn.turn_rate
+    runtime_symbol: turn_rate
+    output_variable: turn_rate_rad_s
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.flight_dynamics.turn.turn_radius
+    runtime_symbol: turn_radius
+    output_variable: turn_radius_m
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.flight_dynamics.performance.stall_speed
+    runtime_symbol: stall_speed
+    output_variable: stall_speed_m_s
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe
+  - formula_id: formula_vault.flight_dynamics.performance.specific_excess_power
+    runtime_symbol: specific_excess_power
+    output_variable: specific_excess_power_m_s
+    test_strategy: tolerance
+    contract_state: compiler_probe_ready
+    failure_policy: reject_invalid_domain_and_nonfinite_results
+    numerical_policy: bounded_f64_contract_probe

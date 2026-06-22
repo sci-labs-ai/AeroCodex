@@ -20,6 +20,10 @@ cargo run -p xtask -- equation-batch verify --manifest equation-batches/m00-angl
 cargo run -p xtask -- equation-batch plan --manifest equation-batches/a4-atmosphere-thermo-gasdynamics.tsv
 cargo run -p xtask -- equation-batch generate --manifest equation-batches/a4-atmosphere-thermo-gasdynamics.tsv --output-dir <a4-directory-outside-the-repository>
 cargo run -p xtask -- equation-batch verify --manifest equation-batches/a4-atmosphere-thermo-gasdynamics.tsv --output-dir <a4-directory-outside-the-repository>
+
+cargo run -p xtask -- equation-batch plan --manifest equation-batches/a5-aerodynamics-flight-structures.tsv
+cargo run -p xtask -- equation-batch generate --manifest equation-batches/a5-aerodynamics-flight-structures.tsv --output-dir <a5-directory-outside-the-repository>
+cargo run -p xtask -- equation-batch verify --manifest equation-batches/a5-aerodynamics-flight-structures.tsv --output-dir <a5-directory-outside-the-repository>
 ```
 
 `plan` validates the manifest and prints a stable json plan. `generate` writes a deterministic probe crate and artifact hashes outside the repository. `verify` regenerates the expected artifacts, checks their hashes, and runs the probe crate with Cargo in offline mode.
@@ -38,6 +42,7 @@ Rules:
 - A batch contains between 1 and 40 rows.
 - Formula identifiers and runtime paths are unique inside a batch.
 - The Cargo package and Rust crate names must match a library workspace member.
+- Additional workspace crates referenced by a test expression are added as direct probe dependencies; this supports typed inputs such as `aero_codex_core::Angle`.
 - Contract, validation-card, source-seed, and inventory links must resolve.
 - Validation remains `research_required`.
 - The test expression is a single, bounded Rust boolean expression that references the exact runtime path.
@@ -49,5 +54,6 @@ Rules:
 - `m00-canonical-units.tsv` covers 10 canonical-unit equations.
 - `m00-angle-vector.tsv` covers 17 existing angle, wrapping, and vector-algebra runtime equations.
 - `a4-atmosphere-thermo-gasdynamics.tsv` covers 28 existing atmosphere, thermodynamics, and gas-dynamics runtime equations.
+- `a5-aerodynamics-flight-structures.tsv` covers 15 existing aerodynamics, flight-dynamics, and structures runtime equations.
 
-The three manifests provide compiler-verified coverage for 55 existing runtime paths. Runtime identity is package-scoped, so same-named functions in different crates remain unambiguous. They do not change runtime kernels, expand the Beta 1 command-line surface, claim external Scilab parity, or imply that the full equation inventory is complete or operationally ready.
+The four manifests provide compiler-verified coverage for 70 existing runtime paths. Runtime identity is package-scoped, and typed test inputs can reference reviewed workspace dependencies without parsing Rust source. They do not change runtime kernels, expand the Beta 1 command-line surface, claim external reference parity, or imply that the full equation inventory is complete or operationally ready.
