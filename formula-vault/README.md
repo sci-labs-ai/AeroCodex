@@ -139,7 +139,18 @@ A14 processes the first 40 rows in `8E_or_9A_classical_two_body_algebra_contract
 
 - disposition manifest: `formula-vault/resolutions/m07_two_body_algebra_wave1.tsv`;
 - verifier: `python3 scripts/verify_external_m07_two_body_algebra_wave1.py --repo .`;
-- cumulative external terminal dispositions: 152;
-- remaining external backlog: 1,171;
+- cumulative external terminal dispositions after A14: 152;
+- remaining external backlog after A14: 1,171;
+- validation status: `research_required`;
+- no raw Rust-port, M07, or Scilab source review or parity claim.
+
+## A15 external classical two-body algebra Wave 2
+
+A15 processes the remaining 9 rows in `8E_or_9A_classical_two_body_algebra_contracts` without adding a formula node or Rust kernel. Six exact aliases reuse existing governed A7 circular-speed, escape-speed, vis-viva, or mean-motion runtimes. Two specific-energy rows and one AU/TU mean-motion row remain contract-blocked. A14-A15 now cover all 49 rows in the group while preserving `medium_risk_requires_contract_review`.
+
+- disposition manifest: `formula-vault/resolutions/m07_two_body_algebra_wave2.tsv`;
+- verifier: `python3 scripts/verify_external_m07_two_body_algebra_wave2.py --repo .`;
+- cumulative external terminal dispositions: 161;
+- remaining external backlog: 1,162;
 - validation status: `research_required`;
 - no raw Rust-port, M07, or Scilab source review or parity claim.

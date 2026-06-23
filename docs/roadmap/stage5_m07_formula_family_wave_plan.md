@@ -74,3 +74,9 @@ A13 executes the remaining 34 rows, in source-row order, from `8D_helper_dedupli
 A14 processes the first 40 source-ordered rows from `8E_or_9A_classical_two_body_algebra_contracts`. Sixteen exact-name aliases reuse existing governed A7 circular-speed, circular-period, escape-speed, vis-viva, or mean-motion runtimes. Twenty-four rows remain contract-blocked because the alias alone does not establish a safe exact mapping for specific-energy input form, semilatus rectum, conic radius, apsis geometry, altitude/reference radius, general semimajor-axis period, or inverse energy-to-axis semantics.
 
 The classifier risk tier remains `medium_risk_requires_contract_review`; A14 does not relabel these rows as low risk. Nine rows remain in the 49-row group for a later bounded wave. A14 adds no formula node or Rust kernel and reduces the unprocessed external backlog from 1,211 to 1,171 rows.
+
+## A15 classical two-body algebra Wave 2
+
+A15 processes the remaining 9 source-ordered rows from `8E_or_9A_classical_two_body_algebra_contracts`. Six exact aliases reuse existing governed A7 circular-speed, escape-speed, vis-viva, or mean-motion runtimes. Two specific-energy rows remain blocked because the alias does not establish the input form, and the AU/TU mean-motion row remains blocked pending an explicit astronomical-unit/time-unit input, output, and scaling contract.
+
+A14-A15 now cover all 49 rows in the group with 22 aliases and 27 contract blocks. The classifier risk tier remains `medium_risk_requires_contract_review`. A15 adds no formula node or Rust kernel and reduces the unprocessed external backlog from 1,171 to 1,162 rows.

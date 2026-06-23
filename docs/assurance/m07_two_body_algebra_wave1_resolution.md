@@ -22,3 +22,7 @@ python3 scripts/verify_governance.py --repo .
 ```
 
 A14 raises cumulative terminally processed external rows from 112 to 152 and reduces the remaining backlog from 1,211 to 1,171. It uses classifier metadata and governed repository records only. It does not inspect or import raw Rust-port, M07, or Scilab source text and makes no source-parity, certification, safety, or operational-readiness claim.
+
+## Later aggregate accounting
+
+A15 adds a separate 9-row Wave 2 manifest for the remainder of the same classifier group. A14 itself remains a 40-row wave; A14-A15 together cover all 49 classical two-body algebra rows with 22 aliases and 27 contract blocks. Aggregate terminally processed external rows are now 161 and the remaining backlog is 1,162.

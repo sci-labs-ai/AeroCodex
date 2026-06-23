@@ -27,6 +27,7 @@ Start with:
 - [External M07 vector-helper Wave 1 resolution](assurance/m07_vector_helper_wave1_resolution.md)
 - [External M07 vector-helper Wave 2 resolution](assurance/m07_vector_helper_wave2_resolution.md)
 - [External M07 classical two-body algebra Wave 1 resolution](assurance/m07_two_body_algebra_wave1_resolution.md)
+- [External M07 classical two-body algebra Wave 2 resolution](assurance/m07_two_body_algebra_wave2_resolution.md)
 - [Equation batch compiler](../equation-batches/README.md)
 - [Validation-card generation policy](assurance/validation_card_generation_policy.md)
 - [Source-seed generation policy](assurance/source_seed_generation_policy.md)
