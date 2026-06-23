@@ -68,3 +68,9 @@ This wave plan by itself does not promote any row. The later A11 overlay records
 ### Post-Stage-5 A13 execution overlay
 
 A13 executes the remaining 34 rows, in source-row order, from `8D_helper_deduplication_then_low_risk_vector_contracts`. Twenty-six rows become provenance aliases to existing M00 vector-angle, cross, dot, norm, or unit-vector runtimes; five column-shape utilities are excluded from formula scope; two skew-matrix rows and one true-anomaly-from-r/rdot row remain contract-blocked. A12-A13 now cover all 74 rows in the vector-helper group. A13 adds no formula node or Rust kernel and reduces the unprocessed external backlog from 1,245 to 1,211 rows.
+
+## A14 classical two-body algebra Wave 1
+
+A14 processes the first 40 source-ordered rows from `8E_or_9A_classical_two_body_algebra_contracts`. Sixteen exact-name aliases reuse existing governed A7 circular-speed, circular-period, escape-speed, vis-viva, or mean-motion runtimes. Twenty-four rows remain contract-blocked because the alias alone does not establish a safe exact mapping for specific-energy input form, semilatus rectum, conic radius, apsis geometry, altitude/reference radius, general semimajor-axis period, or inverse energy-to-axis semantics.
+
+The classifier risk tier remains `medium_risk_requires_contract_review`; A14 does not relabel these rows as low risk. Nine rows remain in the 49-row group for a later bounded wave. A14 adds no formula node or Rust kernel and reduces the unprocessed external backlog from 1,211 to 1,171 rows.

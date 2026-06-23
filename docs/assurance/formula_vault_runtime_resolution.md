@@ -31,4 +31,4 @@ The verifier fails closed on duplicate or missing formula IDs, unresolved candid
 - Existing Rust equation kernels remain the sole executable implementation.
 - Validation remains `research_required`.
 - No M07 or Scilab source parity, certification, flight readiness, mission readiness, operational approval, or regulated-use approval is claimed.
-- A11-A13 assign terminal dispositions to 112 external rows; 1,211 external M07 rows remain unprocessed and incomplete. A12-A13 complete the 74-row vector-helper group with 56 aliases, 13 internal shape-helper exclusions, and 5 contract-blocked rows.
+- A11-A14 assign terminal dispositions to 152 external rows; 1,171 external M07 rows remain unprocessed and incomplete. A12-A13 complete the 74-row vector-helper group with 56 aliases, 13 internal shape-helper exclusions, and 5 contract-blocked rows. A14 processes the first 40 rows of the 49-row classical two-body algebra group with 16 aliases and 24 contract blocks, without downgrading the classifier risk tier.

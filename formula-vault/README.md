@@ -132,3 +132,14 @@ A13 processes the remaining 34 rows in `8D_helper_deduplication_then_low_risk_ve
 - verifier: `python3 scripts/verify_external_m07_vector_helper_wave2.py --repo .`;
 - validation status: `research_required`;
 - new validation cards or source seeds: none.
+
+## A14 external classical two-body algebra Wave 1
+
+A14 processes the first 40 rows in `8E_or_9A_classical_two_body_algebra_contracts` without adding a formula node or Rust kernel. Sixteen exact-name aliases reuse five existing governed A7 formulas: circular speed, circular period, escape speed, vis-viva speed, and mean motion. Twenty-four rows remain contract-blocked because source aliases alone do not establish the required input-shape, conic-branch, reference-radius, or inverse-relation contracts. Nine rows remain for a later wave, and the classifier risk tier remains `medium_risk_requires_contract_review`.
+
+- disposition manifest: `formula-vault/resolutions/m07_two_body_algebra_wave1.tsv`;
+- verifier: `python3 scripts/verify_external_m07_two_body_algebra_wave1.py --repo .`;
+- cumulative external terminal dispositions: 152;
+- remaining external backlog: 1,171;
+- validation status: `research_required`;
+- no raw Rust-port, M07, or Scilab source review or parity claim.
