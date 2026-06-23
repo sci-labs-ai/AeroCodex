@@ -10,11 +10,13 @@ requested_details:
   - Formula-vault metadata-only candidate-record count cross-check.
   - Exact candidate-to-runtime resolution cross-check against governed M00 equation-batch manifests.
   - Exact A11 classifier-to-terminal-disposition cross-check for the bounded external unit-conversion wave.
+  - Exact A12 first-40 classifier-to-terminal-disposition cross-check for the bounded external vector-helper wave.
   - External M07 processed and remaining-backlog aggregate count cross-checks.
   - Validation-card and source-registry seed count cross-checks.
 implementation_notes:
   - Dependency-free Python resolution verifiers plus the existing xtask verifier.
-  - A11 reuses existing M00 runtime, contract, validation-card, and source-seed records for aliases.
+  - A11-A12 reuse existing M00 runtime, contract, validation-card, and source-seed records for aliases.
+  - A12 excludes internal shape helpers from formula scope and keeps determinant/frame-sensitive rows contract-blocked.
   - No formula implementation is introduced.
   - No M07 source code, fixture, generated binary, or Scilab execution output is imported.
 limits:

@@ -21,6 +21,10 @@ Recommended action: decide whether each row is a provenance alias to existing ce
 
 A11 executes the first bounded external-backlog wave against the low-risk `8D_deduplicated_unit_conversion_helpers` subset. It assigns terminal dispositions to 38 rows: 37 are provenance aliases to existing governed M00 conversion runtimes and one `earth_rotation_rate_canonical` row remains blocked pending an angular-rate contract and runtime. The wave adds no formula node or Rust kernel and reduces the unprocessed external backlog from 1,323 to 1,285 rows.
 
+### Post-Stage-5 A12 execution overlay
+
+A12 executes the first 40 rows, in source-row order, from `8D_helper_deduplication_then_low_risk_vector_contracts`. Thirty rows become provenance aliases to existing governed M00 dot, cross, norm, unit-vector, or vector-angle runtimes; eight shape/identity utilities are excluded from formula scope; determinant-column and latitude/longitude unit-vector rows remain contract-blocked. The wave adds no formula node or Rust kernel and reduces the unprocessed external backlog from 1,285 to 1,245 rows.
+
 ## Wave 3 - classical two-body algebra contracts
 
 Scope: low-to-medium risk algebraic formulas from classical astrodynamics families, including circular speed, escape speed, vis-viva speed, mean motion, period, specific energy, semimajor-axis relations, and periapsis/apoapsis radius relations.

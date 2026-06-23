@@ -31,8 +31,7 @@ EXPECTED_ALIAS_ROWS = 37
 EXPECTED_BLOCKED_ROWS = 1
 EXPECTED_EXECUTABLE_ROWS = 152
 EXPECTED_METADATA_ROWS = 27
-EXPECTED_PROCESSED_ROWS = 38
-EXPECTED_EXTERNAL_BACKLOG_ROWS = 1285
+M07_REPRESENTED_FUNCTION_ROWS = 1350
 EXPECTED_TARGET_COUNTS = {
     "formula_vault.m00.angle.deg2rad": 12,
     "formula_vault.m00.angle.rad2deg": 12,
@@ -296,11 +295,24 @@ def verify_repo(repo: Path) -> dict[str, Any]:
     backlog = [row for row in inventory if row["category"] == "external_m07_backlog_row"]
     require(len(executable) == EXPECTED_EXECUTABLE_ROWS, f"executable inventory count mismatch: {len(executable)}")
     require(len(metadata) == EXPECTED_METADATA_ROWS, f"metadata inventory count mismatch: {len(metadata)}")
-    require(len(processed) == 1, f"expected one processed aggregate inventory row, found {len(processed)}")
-    require(processed[0]["source_path"] == RESOLUTION_PATH, "processed inventory source path mismatch")
-    require(processed[0]["row_count"] == str(EXPECTED_PROCESSED_ROWS), "processed inventory count mismatch")
+    processed_map = unique_map(processed, "source_path", "external processed inventory")
+    manifests = sorted((repo / "formula-vault/resolutions").glob("m07_*.tsv"))
+    require(manifests, "no external M07 resolution manifests found")
+    total_processed = 0
+    expected_paths: set[str] = set()
+    for manifest in manifests:
+        relative = manifest.relative_to(repo).as_posix()
+        expected_paths.add(relative)
+        manifest_rows = read_delimited(manifest, "\t", EXPECTED_HEADER)
+        inventory_row = processed_map.get(relative)
+        require(inventory_row is not None, f"missing processed inventory row for {relative}")
+        require(inventory_row["row_count"] == str(len(manifest_rows)), f"processed inventory count mismatch for {relative}")
+        total_processed += len(manifest_rows)
+    require(set(processed_map) == expected_paths, "processed inventory sources and resolution manifests are not an exact union")
+    require(processed_map[RESOLUTION_PATH]["row_count"] == str(EXPECTED_ROWS), "A11 processed inventory count mismatch")
     require(len(backlog) == 1, f"expected one backlog aggregate inventory row, found {len(backlog)}")
-    require(backlog[0]["row_count"] == str(EXPECTED_EXTERNAL_BACKLOG_ROWS), "external backlog count mismatch")
+    expected_backlog = M07_REPRESENTED_FUNCTION_ROWS - len(metadata) - total_processed
+    require(backlog[0]["row_count"] == str(expected_backlog), "external backlog count mismatch")
 
     return {
         "schema_version": SCHEMA_VERSION,
@@ -318,8 +330,9 @@ def verify_repo(repo: Path) -> dict[str, Any]:
         "distinct_source_files": len(source_files),
         "executable_research_equations": len(executable),
         "metadata_inventory_records": len(metadata),
-        "external_m07_processed_rows": int(processed[0]["row_count"]),
-        "external_m07_backlog_rows": int(backlog[0]["row_count"]),
+        "a11_wave_processed_rows": EXPECTED_ROWS,
+        "external_m07_processed_rows": total_processed,
+        "external_m07_backlog_rows": expected_backlog,
         "formula_count_delta": 0,
         "runtime_kernel_files_changed": 0,
         "new_validation_cards_required": 0,

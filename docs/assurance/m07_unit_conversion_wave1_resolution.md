@@ -36,3 +36,7 @@ python3 scripts/verify_external_m07_unit_conversion_wave1.py --repo .
 ```
 
 The verifier checks the 38-row classifier union, exact target reuse, the 37/1 disposition split, inventory accounting, and the absence of new validation cards, source seeds, kernels, parity claims, certification claims, or operational-readiness claims.
+
+## Later aggregate accounting
+
+A12 adds a separate 40-row vector-helper disposition manifest. A11 itself remains a 38-row wave; aggregate terminally processed rows are now 78 and the remaining external backlog is 1,245.

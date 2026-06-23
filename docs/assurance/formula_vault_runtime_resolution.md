@@ -31,4 +31,4 @@ The verifier fails closed on duplicate or missing formula IDs, unresolved candid
 - Existing Rust equation kernels remain the sole executable implementation.
 - Validation remains `research_required`.
 - No M07 or Scilab source parity, certification, flight readiness, mission readiness, operational approval, or regulated-use approval is claimed.
-- A11 assigns terminal dispositions to 38 separate external unit-conversion rows; 1,285 external M07 rows remain unprocessed and incomplete.
+- A11-A12 assign terminal dispositions to 78 external rows; 1,245 external M07 rows remain unprocessed and incomplete. A12 reuses existing M00 vector runtimes for 30 aliases, excludes 8 internal shape helpers, and keeps 2 rows contract-blocked.

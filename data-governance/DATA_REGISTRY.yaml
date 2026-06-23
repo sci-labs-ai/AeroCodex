@@ -240,6 +240,20 @@ artifacts:
     owner: AeroCodex maintainers
     update_cadence: append or revise only through explicit external-backlog resolution waves with deterministic verification
     notes: Records 37 aliases to existing governed M00 runtimes and one angular-rate contract block; reduces unprocessed backlog accounting from 1,323 to 1,285 without adding a Rust kernel, parity claim, certification claim, or operational-readiness claim.
+  - id: post_stage5.a12.m07_vector_helper_wave1_resolution.2026_06_23
+    title: A12 external M07 vector-helper Wave 1 terminal resolutions
+    local_path: formula-vault/resolutions/m07_vector_helper_wave1.tsv
+    artifact_kind: repo_file_external_backlog_resolution_research_metadata
+    origin: Post-Stage-5 A12 derivative of the registered M07 classifier metadata tied to stage4.m07_rust_port_v14.2026_06_15
+    license: MIT OR Apache-2.0 metadata with M07 source-boundary restrictions
+    sha256: f449945a61ea0d54c9f855fba7bf7170aacc6b8e7ff8e436b688373678c40743
+    hash_status: sha256_verified_current_repo_file
+    allowed_use: terminal alias, helper-exclusion, and contract-block disposition metadata only
+    bundling_decision: bundled repo-relative metadata only; no source/code/fixture import and no public API promotion
+    validation_status: repository_tracked_research_data
+    owner: AeroCodex maintainers
+    update_cadence: immutable bounded wave; later waves use separate manifests
+    notes: Records 30 aliases to existing governed M00 vector runtimes, eight internal helper exclusions, and two contract blocks; reduces unprocessed backlog accounting from 1,285 to 1,245 without adding a Rust kernel, parity claim, certification claim, or operational-readiness claim.
   - id: stage5.c2.m07_blocked_high_risk_derivative.2026_06_18
     title: M07 blocked/high-risk derivative metadata
     local_path: docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv

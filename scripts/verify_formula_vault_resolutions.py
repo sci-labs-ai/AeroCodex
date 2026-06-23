@@ -313,9 +313,22 @@ def verify_repo(repo: Path) -> dict[str, Any]:
     )
     require(len(metadata_rows) == EXPECTED_RESOLUTION_ROWS, f"metadata inventory row count mismatch: {len(metadata_rows)}")
     require(len(executable_rows) == EXPECTED_EXECUTABLE_INVENTORY_ROWS, f"executable inventory row count mismatch: {len(executable_rows)}")
-    require(len(processed_rows) == 1, f"expected one external processed aggregate row, found {len(processed_rows)}")
+    processed_map = unique_map(processed_rows, "source_path", "external processed inventory")
+    expected_manifest_paths = set(external_resolution["manifests"])
     require(
-        int(processed_rows[0]["row_count"]) == external_resolution["row_count"],
+        set(processed_map) == expected_manifest_paths,
+        "external processed inventory sources and resolution manifests are not an exact union",
+    )
+    processed_total = 0
+    for relative in external_resolution["manifests"]:
+        manifest_rows = read_tsv(repo_path(repo, relative), EXTERNAL_RESOLUTION_HEADER)
+        require(
+            int(processed_map[relative]["row_count"]) == len(manifest_rows),
+            f"external processed inventory count mismatch: {relative}",
+        )
+        processed_total += len(manifest_rows)
+    require(
+        processed_total == external_resolution["row_count"],
         "external processed count does not match resolution manifests",
     )
     require(len(external_rows) == 1, f"expected one external backlog aggregate row, found {len(external_rows)}")

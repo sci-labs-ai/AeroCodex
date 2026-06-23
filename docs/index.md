@@ -24,6 +24,7 @@ Start with:
 - [Equation inventory/readiness dashboard](assurance/equation_inventory_readiness_dashboard.md)
 - [Formula-vault runtime resolution](assurance/formula_vault_runtime_resolution.md)
 - [External M07 unit-conversion Wave 1 resolution](assurance/m07_unit_conversion_wave1_resolution.md)
+- [External M07 vector-helper Wave 1 resolution](assurance/m07_vector_helper_wave1_resolution.md)
 - [Equation batch compiler](../equation-batches/README.md)
 - [Validation-card generation policy](assurance/validation_card_generation_policy.md)
 - [Source-seed generation policy](assurance/source_seed_generation_policy.md)

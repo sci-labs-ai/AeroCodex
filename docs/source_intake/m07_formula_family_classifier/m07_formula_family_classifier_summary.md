@@ -38,6 +38,10 @@ C2 does not remove classifier rows from `external_m07_backlog_rows`, does not pr
 
 The table above is the historical C2 reconciliation baseline. A11 subsequently processes 38 low-risk rows from `8D_deduplicated_unit_conversion_helpers` using classifier metadata only. Thirty-seven rows are deduplicated aliases to existing governed M00 runtimes; `earth_rotation_rate_canonical` remains contract-blocked. Current external accounting is 38 terminally processed rows and 1,285 remaining backlog rows. No raw M07 or Scilab source is imported or executed.
 
+### Post-Stage-5 A12 overlay
+
+A12 subsequently processes the first 40 rows from `8D_helper_deduplication_then_low_risk_vector_contracts` using classifier metadata only. Thirty rows deduplicate to existing M00 vector runtimes, eight internal shape/identity helpers are excluded from formula scope, and two rows remain contract-blocked. Current external accounting is 78 terminally processed rows and 1,245 remaining backlog rows. No raw M07 or Scilab source is imported or executed.
+
 ## Counts by formula family
 
 | Formula family | Rows |

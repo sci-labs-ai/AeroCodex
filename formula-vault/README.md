@@ -90,6 +90,16 @@ A11 processes 38 low-risk external unit-conversion classifier rows without addin
 - validation status: `research_required`;
 - new validation cards or source seeds: none.
 
+
+## A12 external vector-helper resolution
+
+A12 processes the first 40 low-risk vector-helper classifier rows without adding a formula node or Rust kernel. Thirty rows are deduplicated aliases of existing governed M00 vector runtimes, eight shape/identity helpers are excluded as internal utilities, and two rows remain contract-blocked. The aggregate terminal-disposition count is 78 and the remaining external backlog is 1,245 rows.
+
+- disposition manifest: `formula-vault/resolutions/m07_vector_helper_wave1.tsv`;
+- verifier: `python3 scripts/verify_external_m07_vector_helper_wave1.py --repo .`;
+- validation status: `research_required`;
+- new validation cards or source seeds: none.
+
 ## Future allowed contents
 
 Future chunks may add reviewed metadata such as:
