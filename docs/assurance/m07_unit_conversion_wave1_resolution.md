@@ -39,4 +39,4 @@ The verifier checks the 38-row classifier union, exact target reuse, the 37/1 di
 
 ## Later aggregate accounting
 
-A12 adds a separate 40-row vector-helper disposition manifest. A11 itself remains a 38-row wave; aggregate terminally processed rows are now 78 and the remaining external backlog is 1,245.
+A12-A13 add two separate vector-helper disposition manifests covering 74 rows. A11 itself remains a 38-row wave; aggregate terminally processed rows are now 112 and the remaining external backlog is 1,211.

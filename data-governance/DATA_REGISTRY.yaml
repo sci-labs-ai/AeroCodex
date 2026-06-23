@@ -8,7 +8,7 @@ artifacts:
     artifact_kind: repo_file_manifest
     origin: current_repo
     license: MIT OR Apache-2.0 with source-material attribution boundaries
-    sha256: 31abe7113794c4f2f6b33a1635d19dcd75a0cda9253d6bdf7bb213b023463aa0
+    sha256: 5abafa79bf3435d45db6f440aaabb2f602bc643d3ad4b113138583e379b9a3ab
     hash_status: sha256_verified_current_repo_file
     allowed_use: in-repository provenance and thin-film source manifest tracking only
     bundling_decision: bundled repo-relative governance artifact; not an external-code import
@@ -50,7 +50,7 @@ artifacts:
     artifact_kind: repo_directory_validation_cards
     origin: current_repo
     license: MIT OR Apache-2.0
-    sha256: 167da1b31fda0d3414043360dd4f4bc3008990d43e2ce5d9c32c51292b453edb
+    sha256: be033014903ee9d223b2b77c5f57e8eb734a9e203db55dda535da1cf33eb4f75
     hash_status: aggregate_sha256_current_tracked_tree
     allowed_use: validation-card metadata and source-status tracking only
     bundling_decision: bundled repo-relative validation metadata; no external archive import
@@ -64,7 +64,7 @@ artifacts:
     artifact_kind: repo_directory_source_registry
     origin: current_repo
     license: MIT OR Apache-2.0 metadata with cited-source boundaries
-    sha256: 7213dc847f5941d3b47bc25456f9c46375678fd4c0265cbf678016f02acc03e1
+    sha256: cb600aded12c280c92ea0f9d70c1314bdf7cb17b927776ba388bd147ef9a46bf
     hash_status: aggregate_sha256_current_tracked_tree
     allowed_use: source seed registry and validation-card linkage only
     bundling_decision: bundled repo-relative source metadata; not external source-code import
@@ -78,7 +78,7 @@ artifacts:
     artifact_kind: repo_file_validation_inventory
     origin: current_repo
     license: MIT OR Apache-2.0 metadata
-    sha256: e1d4cb820e3c070f04c9f0dd747b05919bb75de91d601528f691575c9d6d9da7
+    sha256: 93df4a0f93dced5ec622968a390cb417258625dae7849f3e563158ea4a594742
     hash_status: sha256_verified_current_repo_file
     allowed_use: machine-readable equation inventory and readiness-dashboard counts only
     bundling_decision: bundled repo-relative validation metadata; no formula implementation, source archive import, generated code, fixture, or public application programming interface promotion
@@ -92,7 +92,7 @@ artifacts:
     artifact_kind: repo_directory_formula_vault_metadata
     origin: current_repo
     license: MIT OR Apache-2.0 metadata with source-boundary caveats
-    sha256: c4de76d224d076b692766a60e197807b613db2db1bc9ccf00bbfabb9e2aed1d8
+    sha256: baad6a01dff5ffe265e9dbf2bb4e2da5b0a2eec890fa7b6b186ba1ee2e20138b
     hash_status: aggregate_sha256_current_tracked_tree
     allowed_use: quarantined formula-vault planning metadata and future per-slice gate templates only
     bundling_decision: bundled repo-relative metadata; no external M07 source-code import, generated binary, fixture, or public application programming interface promotion
@@ -254,6 +254,20 @@ artifacts:
     owner: AeroCodex maintainers
     update_cadence: immutable bounded wave; later waves use separate manifests
     notes: Records 30 aliases to existing governed M00 vector runtimes, eight internal helper exclusions, and two contract blocks; reduces unprocessed backlog accounting from 1,285 to 1,245 without adding a Rust kernel, parity claim, certification claim, or operational-readiness claim.
+  - id: post_stage5.a13.m07_vector_helper_wave2_resolution.2026_06_23
+    title: A13 external M07 vector-helper Wave 2 terminal resolutions
+    local_path: formula-vault/resolutions/m07_vector_helper_wave2.tsv
+    artifact_kind: repo_file_external_backlog_resolution_research_metadata
+    origin: Post-Stage-5 A13 derivative of the registered M07 classifier metadata tied to stage4.m07_rust_port_v14.2026_06_15
+    license: MIT OR Apache-2.0 metadata with M07 source-boundary restrictions
+    sha256: 3c3cc52af28aadcb0b0a111b2a2cfb3a33aeba5f882177d624ddd6889fc6e578
+    hash_status: sha256_verified_current_repo_file
+    allowed_use: terminal alias, helper-exclusion, and contract-block disposition metadata only
+    bundling_decision: bundled repo-relative metadata only; no source/code/fixture import and no public API promotion
+    validation_status: repository_tracked_research_data
+    owner: AeroCodex maintainers
+    update_cadence: immutable bounded wave; later waves use separate manifests
+    notes: Records 26 aliases to existing governed M00 vector runtimes, five internal column-shape helper exclusions, and three contract blocks; completes the 74-row vector-helper group and reduces unprocessed backlog accounting from 1,245 to 1,211 without adding a Rust kernel, parity claim, certification claim, or operational-readiness claim.
   - id: stage5.c2.m07_blocked_high_risk_derivative.2026_06_18
     title: M07 blocked/high-risk derivative metadata
     local_path: docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv

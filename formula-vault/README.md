@@ -123,3 +123,12 @@ Stage 4 Chunk 7F adds a metadata-only source-expression and test-vector contract
 - source seed `source.formula_vault.m00_source_expression_test_vectors.research_required`
 
 The contract records independent mathematical summaries, finite-input domains, tolerance metadata, and endpoint-sensitive `wrap2pi` expectations. Post-Stage-5 deploys the single public `m00_wrap2pi` Rust API with research_required status, finite-input validation, `rem_euclid(std::f64::consts::TAU)`, [0, TAU) output, canonical positive zero, nonfinite rejection, no epsilon/ordinary-value clamping, and no M07/Scilab parity claim. It does not import M07 source, generate Rust from source material, import Scilab outputs or fixtures, or promote alternate public aliases.
+
+## A13 external vector-helper completion
+
+A13 processes the remaining 34 rows in `8D_helper_deduplication_then_low_risk_vector_contracts` without adding a formula node or Rust kernel. Twenty-six rows are deduplicated aliases of existing governed M00 vector runtimes, five column-shape helpers are excluded as internal utilities, and three rows remain contract-blocked. A12-A13 now cover the complete 74-row vector-helper group. Aggregate terminal dispositions are 112 and the remaining external backlog is 1,211 rows.
+
+- disposition manifest: `formula-vault/resolutions/m07_vector_helper_wave2.tsv`;
+- verifier: `python3 scripts/verify_external_m07_vector_helper_wave2.py --repo .`;
+- validation status: `research_required`;
+- new validation cards or source seeds: none.

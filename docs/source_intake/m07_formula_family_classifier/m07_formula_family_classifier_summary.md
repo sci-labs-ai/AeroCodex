@@ -158,3 +158,7 @@ This repository copy is the classifier dataset only. It preserves quarantined so
 The deployed dataset contains 1,333 classifier rows. The core classifier contains exactly 115 `source_file_locator` values beginning with `source_scilab_extracted_locator/`, zero obsolete absolute extraction prefixes, and zero preparation-machine absolute paths. Existing logical `source_scilab/` and `source_scilab_extracted_locator/` values are logical metadata locators, not imported source.
 
 The three CSV files have explicit DATA_REGISTRY coverage after the Stage 5 status reconciliation: the core classifier, low-risk derivative, and blocked/high-risk derivative each carry an exact SHA256 entry. DATA_MANIFEST.toml remains thin-film-specific and is not used to cover C2.
+
+### Post-Stage-5 A13 overlay
+
+A13 subsequently processes the remaining 34 rows from `8D_helper_deduplication_then_low_risk_vector_contracts` using classifier metadata only. Twenty-six rows deduplicate to existing M00 vector runtimes, five internal column-shape helpers are excluded from formula scope, and three rows remain contract-blocked. A12-A13 now cover the full 74-row group. Current external accounting is 112 terminally processed rows and 1,211 remaining backlog rows. No raw M07 or Scilab source is imported or executed.

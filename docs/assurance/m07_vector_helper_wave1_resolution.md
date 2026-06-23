@@ -18,3 +18,7 @@ python3 scripts/verify_external_m07_vector_helper_wave1.py --repo .
 ```
 
 A12 increases terminally processed external rows from 38 to 78 and reduces the unprocessed external backlog from 1,285 to 1,245. It does not inspect or import raw M07 or Scilab source text and makes no parity, certification, or operational-readiness claim.
+
+## Later aggregate accounting
+
+A13 adds a separate 34-row Wave 2 manifest for the remainder of the same classifier group. A12 itself remains a 40-row wave; A12-A13 together cover all 74 vector-helper rows. Aggregate terminally processed external rows are now 112 and the remaining backlog is 1,211.

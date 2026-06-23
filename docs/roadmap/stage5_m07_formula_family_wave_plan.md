@@ -64,3 +64,7 @@ Required action: keep these families policy-gated until dedicated source, frame/
 ## Non-claims
 
 This wave plan by itself does not promote any row. The later A11 overlay records metadata-only terminal dispositions, not formula implementations. It adds no validation card, source-registry seed, formula-vault candidate, executable research equation, helper algorithm, source archive, fixture, public API, generated equation code, or operational evidence. Every later modifying slice requires a separate prompt, live main sync, patch preflight, governed count verification, local gates, and exact-commit CI.
+
+### Post-Stage-5 A13 execution overlay
+
+A13 executes the remaining 34 rows, in source-row order, from `8D_helper_deduplication_then_low_risk_vector_contracts`. Twenty-six rows become provenance aliases to existing M00 vector-angle, cross, dot, norm, or unit-vector runtimes; five column-shape utilities are excluded from formula scope; two skew-matrix rows and one true-anomaly-from-r/rdot row remain contract-blocked. A12-A13 now cover all 74 rows in the vector-helper group. A13 adds no formula node or Rust kernel and reduces the unprocessed external backlog from 1,245 to 1,211 rows.
