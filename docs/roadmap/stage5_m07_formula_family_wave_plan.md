@@ -86,3 +86,7 @@ A14-A15 now cover all 49 rows in the group with 22 aliases and 27 contract block
 A16 processes the first 40 source-ordered rows from `9A_classical_elements_and_9E_mission_design_contracts`. Two exact aliases reuse the governed A7 specific-angular-momentum and eccentricity-vector runtimes. Ten generic math, parameter lookup, vector-force/acceleration, or state-derivative helpers are excluded from formula scope. Twenty-eight rows remain contract-blocked pending explicit state/frame/angle, conic-branch, apsis/ellipse, parabolic, or hyperbolic mission-geometry contracts.
 
 The classifier risk tier remains `medium_risk_requires_contract_review`; 337 rows remain in the group. A16 adds no formula node or Rust kernel and reduces the unprocessed external backlog from 1,162 to 1,122 rows.
+
+### Post-Stage-5 A17 overlay
+
+A17 processes the next 40 source-ordered rows from `9A_classical_elements_and_9E_mission_design_contracts`: 3 exact aliases reuse governed A7 runtimes, 15 internal/composite support helpers are excluded from formula scope, and 22 rows remain contract-blocked. The selected rows retain 38 `medium_risk_requires_contract_review` and 2 `high_risk_requires_numerical_policy` labels. A16-A17 cover 80 rows, leave 297 group rows, and update external accounting to 241 terminally processed rows and 1,082 remaining backlog rows. No raw Rust-port, M07, or Scilab source is imported or executed.

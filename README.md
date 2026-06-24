@@ -20,20 +20,20 @@ The core repository is intentionally pure Rust. It does not include C/C++/Fortra
 
 ## Current governed state
 
-This README reflects current `main` after compiler-batch coverage was completed for all 152 existing Rust equation runtimes, the 27 formula-vault intake records were linked to governed runtimes, and A11-A16 assigned terminal dispositions to six bounded external-backlog waves. The live governed counters remain verifier-derived; these waves change no runtime kernel count and leave every linked formula at `research_required`:
+This README reflects current `main` after compiler-batch coverage was completed for all 152 existing Rust equation runtimes, the 27 formula-vault intake records were linked to governed runtimes, and A11-A17 assigned terminal dispositions to seven bounded external-backlog waves. The live governed counters remain verifier-derived; these waves change no runtime kernel count and leave every linked formula at `research_required`:
 
 | Inventory class | Count | Meaning |
 |---|---:|---|
 | Executable research equations | 152 | Public Rust research/preliminary-design equation kernels inventoried by `validation/equation_inventory.tsv`. |
 | Metadata-only formula-vault candidate records | 27 | Intake/provenance records; A10 links 27/27 to existing governed runtimes, leaving 0 unresolved candidate formula IDs. The metadata files are not implementations by themselves. |
-| External M07 rows with terminal dispositions | 201 | A11-A16: 117 deduplicated aliases, 23 excluded internal helpers, and 61 contract-blocked rows. |
-| External M07 backlog rows | 1,122 | Registered external M07 represented rows that still lack a terminal disposition. |
+| External M07 rows with terminal dispositions | 241 | A11-A17: 120 deduplicated aliases, 38 excluded internal helpers, and 83 contract-blocked rows. |
+| External M07 backlog rows | 1,082 | Registered external M07 represented rows that still lack a terminal disposition. |
 | Validation cards | 46 | Conservative validation/governance records. They are not certification evidence. |
 | Source-registry seeds | 44 | Source/governance traceability seeds. |
 | Validation-card-only records | 46 | Metadata records, not formula implementations. |
 | Helper algorithms | 262 | Support routines not counted as executable research equations. |
 
-A10 runtime-resolution status: `linked_to_existing_runtime=27`, `unresolved=0`, with 3 angle/unit, 14 vector-algebra, and 10 canonical-unit links in `formula-vault/resolutions/m00_runtime_links.tsv`. A11-A16 external status: `terminal_dispositions=201`, `deduplicated_aliases=117`, `excluded_internal_helpers=23`, and `contract_blocked=61`, across six bounded `formula-vault/resolutions/m07_*.tsv` manifests. A14-A15 preserve the classifier risk tier `medium_risk_requires_contract_review` and complete the 49-row classical two-body algebra group; A16 preserves the same medium-risk tier while processing the first 40 rows of orbital-geometry and conic-branch review; none of these records claims M07/Scilab parity, certification, or operational readiness.
+A10 runtime-resolution status: `linked_to_existing_runtime=27`, `unresolved=0`, with 3 angle/unit, 14 vector-algebra, and 10 canonical-unit links in `formula-vault/resolutions/m00_runtime_links.tsv`. A11-A17 external status: `terminal_dispositions=241`, `deduplicated_aliases=120`, `excluded_internal_helpers=38`, and `contract_blocked=83`, across seven bounded `formula-vault/resolutions/m07_*.tsv` manifests. A14-A15 complete the 49-row classical two-body algebra group. A16-A17 process the first 80 source-ordered rows of orbital-geometry and conic-branch review while preserving each classifier risk tier; none of these records claims M07/Scilab parity, certification, or operational readiness.
 
 Stage 5 and immediate post-Stage-5 work have deployed several bounded, adapted slices: Chunk 0 intake/queue baseline, Session D policy/templates and taxonomy remediation, Session C1 documentation/policy adaptation, Session C2 classifier planning metadata, Session B canonical-unit scalar expansion, Orekit v3 O2a time/frame/state foundation, Orekit v3 O2b classical-elements/Kepler research foundation, Orekit v3 O2c oracle-record/tolerance-comparison helpers, Orekit v3 O2d two-line-element contract/source-policy metadata, BioSim v3 corrected B2a scenario-domain and structural-validation foundation, BioSim v3 B2b-1 process-types/validated-constructor/intent-planner foundation, BioSim v3 B2b-2 bounded compartment replay/compact-digest/atomic-event foundation, BioSim v3 B2c replay-integrity/ledger/report/example/governance, adapted Session E BioSim-plus docs/contracts, Session G friend-test material, Session A wrap2pi endpoint contract/test metadata, professional hardening slices, adapted Session F Orekit reference-oracle planning metadata, a docs/governance-only final Stage 5 closeout/status consolidation, and the bounded post-Stage-5 `m00_wrap2pi` runtime deployment.
 
