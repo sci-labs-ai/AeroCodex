@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Verify A19 orbital-geometry/conic Wave 4 terminal dispositions.
+"""Verify A20 orbital-geometry/conic Wave 5 terminal dispositions.
 
-This dependency-free verifier consumes classifier metadata, A16-A18 manifests,
+This dependency-free verifier consumes classifier metadata, A16-A19 manifests,
 existing A7 batch metadata, prior external resolution manifests, and explicit
-A19 terminal resolution records. It never opens or parses raw Rust-port, M07,
+A20 terminal resolution records. It never opens or parses raw Rust-port, M07,
 or Scilab source text.
 """
 from __future__ import annotations
@@ -22,7 +22,8 @@ CLASSIFIER_PATH = 'docs/source_intake/m07_formula_family_classifier/m07_formula_
 WAVE1_PATH = 'formula-vault/resolutions/m07_orbital_geometry_conic_wave1.tsv'
 WAVE2_PATH = 'formula-vault/resolutions/m07_orbital_geometry_conic_wave2.tsv'
 WAVE3_PATH = 'formula-vault/resolutions/m07_orbital_geometry_conic_wave3.tsv'
-RESOLUTION_PATH = 'formula-vault/resolutions/m07_orbital_geometry_conic_wave4.tsv'
+WAVE4_PATH = 'formula-vault/resolutions/m07_orbital_geometry_conic_wave4.tsv'
+RESOLUTION_PATH = 'formula-vault/resolutions/m07_orbital_geometry_conic_wave5.tsv'
 A7_BATCH_PATH = 'equation-batches/a7-astrodynamics-orekit-foundation.tsv'
 INVENTORY_PATH = 'validation/equation_inventory.tsv'
 SOURCE_ARTIFACT_ID = 'stage4.m07_rust_port_v14.2026_06_15'
@@ -32,15 +33,16 @@ EXPECTED_CLASSIFIER_GROUP_ROWS = 377
 EXPECTED_WAVE1_ROWS = 40
 EXPECTED_WAVE2_ROWS = 40
 EXPECTED_WAVE3_ROWS = 40
+EXPECTED_WAVE4_ROWS = 40
 EXPECTED_ROWS = 40
-EXPECTED_GROUP_REMAINING_ROWS = 217
+EXPECTED_GROUP_REMAINING_ROWS = 177
 EXPECTED_EXECUTABLE_ROWS = 152
 EXPECTED_METADATA_ROWS = 27
 EXPECTED_CUMULATIVE_PROCESSED = 361
 EXPECTED_REMAINING_BACKLOG = 962
-EXPECTED_RISK_COUNTS = Counter({'medium_risk_requires_contract_review': 37, 'high_risk_requires_numerical_policy': 3})
-EXPECTED_TARGET_COUNTS = {'formula_vault.astrodynamics.elements.semimajor_axis_from_state': 1, 'formula_vault.astrodynamics.kepler.true_anomaly_from_eccentric_anomaly': 1, 'formula_vault.astrodynamics.elements.eccentricity_vector': 1}
-EXPECTED_DISPOSITIONS = Counter({'blocked_missing_reciprocal_semimajor_axis_state_units_and_branch_contract': 2, 'blocked_missing_semilatus_rectum_from_state_units_and_degeneracy_contract': 2, 'deduplicated_alias_to_existing_runtime': 3, 'excluded_lagrange_fg_identity_or_state_composition_helper_not_formula': 2, 'blocked_until_lagrange_fg_anomaly_branch_and_numerical_policy': 3, 'excluded_composite_orbit_identity_or_summary_algorithm_not_formula': 3, 'blocked_missing_conic_mean_anomaly_branch_and_units_contract': 2, 'blocked_until_conic_time_of_flight_branch_wrap_direction_and_units_contract': 10, 'blocked_missing_anomaly_conversion_branch_angle_and_domain_contract': 5, 'blocked_missing_parabolic_anomaly_from_state_domain_contract': 1, 'excluded_universal_variable_bundle_helper_not_formula': 1, 'blocked_missing_stumpff_function_branch_series_and_numerical_contract': 4, 'excluded_internal_scalar_validation_or_math_helper_not_formula': 2})
+EXPECTED_RISK_COUNTS = Counter({'medium_risk_requires_contract_review': 26, 'high_risk_requires_numerical_policy': 14})
+EXPECTED_TARGET_COUNTS: dict[str, int] = {}
+EXPECTED_DISPOSITIONS = Counter({'blocked_until_lagrange_fg_series_order_branch_and_numerical_policy': 3, 'excluded_internal_fg_series_intermediate_helper_not_formula': 3, 'excluded_internal_branch_or_direction_helper_not_formula': 1, 'blocked_until_gauss_lambert_solver_geometry_and_numerical_policy': 2, 'excluded_solver_residual_or_search_orchestration_helper_not_formula': 2, 'blocked_until_frame_rotation_time_and_units_contract': 1, 'blocked_until_orbit_determination_rank_observation_and_frame_policy': 1, 'excluded_orbit_determination_linear_system_helper_not_formula': 1, 'excluded_universal_variable_bundle_helper_not_formula': 1, 'blocked_missing_stumpff_function_branch_series_and_numerical_contract': 4, 'blocked_missing_ballistic_parameter_units_state_and_conic_contract': 6, 'excluded_ballistic_classification_or_summary_helper_not_formula': 2, 'blocked_until_ballistic_range_time_branch_and_numerical_policy': 13})
 EXPECTED_HEADER = ['schema_version', 'resolution_id', 'source_artifact_id', 'classifier_path', 'source_row_locator', 'source_row_number', 'rust_function_alias', 'scilab_function_alias', 'source_file_locator', 'formula_family', 'risk_tier', 'recommended_chunk_group', 'target_formula_id', 'target_resolution_id', 'target_batch_manifest', 'target_package', 'target_crate_name', 'target_runtime_symbol', 'target_runtime_path', 'target_contract_path', 'target_validation_card_path', 'target_source_seed_path', 'validation_status', 'disposition', 'block_reason']
 TARGET_MATCH_FIELDS = {
     'target_package': 'package',
@@ -50,19 +52,19 @@ TARGET_MATCH_FIELDS = {
     'target_validation_card_path': 'validation_card_path',
     'target_source_seed_path': 'source_seed_path',
 }
-ALIASES = {'ch4::semimajor_axis_from_rv': 'formula_vault.astrodynamics.elements.semimajor_axis_from_state', 'ch4::elliptic_e_to_true': 'formula_vault.astrodynamics.kepler.true_anomaly_from_eccentric_anomaly', 'ch5::eccentricity_vector': 'formula_vault.astrodynamics.elements.eccentricity_vector'}
-RECIPROCAL_A = {'ch5::reciprocal_semimajor_axis', 'ch4::reciprocal_semimajor_axis'}
-SEMILATUS_FROM_STATE = {'ch4::semilatus_rectum_from_rv', 'ch5::semilatus_rectum_from_rv'}
-FG_NUMERICAL = {'ch4::lagrange_fg_delta_true', 'ch4::lagrange_fg_delta_f', 'ch4::lagrange_fg_delta_e'}
-ANOMALY_CONVERSION = {'ch4::hyperbolic_f_to_true', 'ch4::true_to_parabolic_d', 'ch4::true_to_elliptic_e', 'ch4::parabolic_d_to_true', 'ch4::true_to_hyperbolic_f'}
-MEAN_ANOMALY = {'ch4::elliptic_mean_anomaly', 'ch4::hyperbolic_mean_anomaly'}
-TIME_OF_FLIGHT = {'ch4::elliptic_tof_forward_between_true', 'ch4::elliptic_tof_from_periapsis', 'ch4::hyperbolic_tof_between_true', 'ch4::elliptic_tof_between_e', 'ch4::hyperbolic_tof_between_f', 'ch4::parabolic_tof_from_periapsis', 'ch4::elliptic_tof_between_true', 'ch4::parabolic_tof_between_d', 'ch4::parabolic_tof_between_true', 'ch4::hyperbolic_tof_from_periapsis'}
-PARABOLIC_FROM_STATE = {'ch4::parabolic_d_from_rv'}
-STUMPFF_SCALARS = {'ch4::stumpff_ds', 'ch4::stumpff_dc', 'ch4::stumpff_s', 'ch4::stumpff_c'}
-EXCLUDED_FG = {'ch4::rv_from_fg', 'ch4::fg_identity'}
-EXCLUDED_COMPOSITE = {'ch4::elliptic_identities_from_rv', 'ch4::hyperbolic_identities_from_rv', 'ch5::basic_orbit_from_rv'}
-EXCLUDED_UNIVERSAL_BUNDLE = {'ch4::stumpff'}
-EXCLUDED_SCALAR_HELPERS = {'ch5::isfinite_scalar', 'ch5::atan2'}
+SET_BLOCKED_UNTIL_LAGRANGE_FG_SERIES_ORDER_BRANCH_AND_NUMERICAL_POLICY = {'ch5::fg_series', 'ch5::fg_series_coefficients', 'ch5::gauss_fg_series'}
+SET_EXCLUDED_INTERNAL_FG_SERIES_INTERMEDIATE_HELPER_NOT_FORMULA = {'ch5::fg_series_from_upq', 'ch5::fg_series_coefficients_from_upq', 'ch5::upq'}
+SET_EXCLUDED_INTERNAL_BRANCH_OR_DIRECTION_HELPER_NOT_FORMULA = {'ch5::direction_to_dm'}
+SET_BLOCKED_UNTIL_GAUSS_LAMBERT_SOLVER_GEOMETRY_AND_NUMERICAL_POLICY = {'ch5::gauss_transfer_geometry', 'ch5::gauss_original'}
+SET_EXCLUDED_SOLVER_RESIDUAL_OR_SEARCH_ORCHESTRATION_HELPER_NOT_FORMULA = {'ch5::original_gauss_x_function', 'ch5::intercept_grid'}
+SET_BLOCKED_UNTIL_FRAME_ROTATION_TIME_AND_UNITS_CONTRACT = {'ch5::velocity_from_rotation'}
+SET_BLOCKED_UNTIL_ORBIT_DETERMINATION_RANK_OBSERVATION_AND_FRAME_POLICY = {'ch5::orbit_from_sightings_fg'}
+SET_EXCLUDED_ORBIT_DETERMINATION_LINEAR_SYSTEM_HELPER_NOT_FORMULA = {'ch5::sighting_linear_system'}
+SET_EXCLUDED_UNIVERSAL_VARIABLE_BUNDLE_HELPER_NOT_FORMULA = {'ch5::stumpff'}
+SET_BLOCKED_MISSING_STUMPFF_FUNCTION_BRANCH_SERIES_AND_NUMERICAL_CONTRACT = {'ch5::stumpff_s', 'ch5::stumpff_c', 'ch5::stumpff_ds', 'ch5::stumpff_dc'}
+SET_BLOCKED_MISSING_BALLISTIC_PARAMETER_UNITS_STATE_AND_CONIC_CONTRACT = {'ch6::semimajor_from_r_q', 'ch6::ballistic_parameter_p', 'ch6::q_from_r_a', 'ch6::q_parameter', 'ch6::q_from_state', 'ch6::ballistic_eccentricity'}
+SET_EXCLUDED_BALLISTIC_CLASSIFICATION_OR_SUMMARY_HELPER_NOT_FORMULA = {'ch6::q_orbit_type', 'ch6::ballistic_elements'}
+SET_BLOCKED_UNTIL_BALLISTIC_RANGE_TIME_BRANCH_AND_NUMERICAL_POLICY = {'ch6::free_flight_range_angle', 'ch6::max_range_angle_from_q', 'ch6::phi_for_max_range', 'ch6::ground_range_from_angle', 'ch6::q_for_max_range', 'ch6::total_ground_range', 'ch6::angle_from_ground_range', 'ch6::minimum_burnout_speed_for_range', 'ch6::free_flight_time', 'ch6::total_range_angle', 'ch6::free_flight_time_from_range', 'ch6::flight_path_angle_for_range', 'ch6::flight_path_angles_for_range'}
 
 
 class VerificationError(RuntimeError):
@@ -112,34 +114,33 @@ def source_row_number(locator: str) -> int:
 
 
 def expected_resolution(alias: str) -> tuple[str, str | None, str]:
-    if alias in ALIASES:
-        return ('deduplicated_alias_to_existing_runtime', ALIASES[alias], 'not_applicable_existing_runtime_and_contract_reused')
-    if alias in RECIPROCAL_A:
-        return ('blocked_missing_reciprocal_semimajor_axis_state_units_and_branch_contract', None, 'reciprocal semimajor axis from state requires explicit position velocity gravitational parameter units conic branch zero energy tolerance infinite semimajor axis and nonfinite output contract')
-    if alias in SEMILATUS_FROM_STATE:
-        return ('blocked_missing_semilatus_rectum_from_state_units_and_degeneracy_contract', None, 'semilatus rectum from state requires explicit state and gravitational parameter units angular momentum norm definition zero momentum degeneracy conic branch and nonfinite output contract')
-    if alias in FG_NUMERICAL:
-        return ('blocked_until_lagrange_fg_anomaly_branch_and_numerical_policy', None, 'Lagrange f and g coefficient evaluation requires explicit anomaly definition conic branch direction of flight state units denominator singularity numerical conditioning and reference oracle policy')
-    if alias in ANOMALY_CONVERSION:
-        return ('blocked_missing_anomaly_conversion_branch_angle_and_domain_contract', None, 'anomaly conversion requires explicit elliptic hyperbolic or parabolic branch angle interval wrap orientation inverse branch domain singularity tolerance and nonfinite policy')
-    if alias in MEAN_ANOMALY:
-        return ('blocked_missing_conic_mean_anomaly_branch_and_units_contract', None, 'mean anomaly relation requires explicit conic branch anomaly convention angular units wrap policy eccentricity domain and nonfinite output contract')
-    if alias in TIME_OF_FLIGHT:
-        return ('blocked_until_conic_time_of_flight_branch_wrap_direction_and_units_contract', None, 'time of flight relation requires explicit conic branch anomaly convention forward or signed direction revolution count gravitational parameter and length units wrap policy domain singularity and oracle validation')
-    if alias in PARABOLIC_FROM_STATE:
-        return ('blocked_missing_parabolic_anomaly_from_state_domain_contract', None, 'parabolic anomaly from state requires explicit parabolic tolerance state and gravitational parameter units orientation branch degeneracy and nonfinite output contract')
-    if alias in STUMPFF_SCALARS:
-        return ('blocked_missing_stumpff_function_branch_series_and_numerical_contract', None, 'Stumpff scalar or derivative requires explicit argument domain positive negative and near zero branches series truncation tolerance overflow behavior derivative convention and oracle validation')
-    if alias in EXCLUDED_FG:
-        return ('excluded_lagrange_fg_identity_or_state_composition_helper_not_formula', None, 'Lagrange f g identity checking or multi vector state composition is a validation or composition helper rather than a separate bounded formula node')
-    if alias in EXCLUDED_COMPOSITE:
-        return ('excluded_composite_orbit_identity_or_summary_algorithm_not_formula', None, 'multi output orbit identity or state summary is a composite algorithm rather than a separate bounded formula node')
-    if alias in EXCLUDED_UNIVERSAL_BUNDLE:
+    if alias in SET_BLOCKED_UNTIL_LAGRANGE_FG_SERIES_ORDER_BRANCH_AND_NUMERICAL_POLICY:
+        return ('blocked_until_lagrange_fg_series_order_branch_and_numerical_policy', None, 'f and g series evaluation requires explicit expansion order truncation remainder bounds independent variable definition conic branch state units direction of flight derivative convention conditioning and reference oracle policy')
+    if alias in SET_EXCLUDED_INTERNAL_FG_SERIES_INTERMEDIATE_HELPER_NOT_FORMULA:
+        return ('excluded_internal_fg_series_intermediate_helper_not_formula', None, 'u p q intermediate conversion or bundle assembly is internal f and g series support rather than a separate bounded formula node')
+    if alias in SET_EXCLUDED_INTERNAL_BRANCH_OR_DIRECTION_HELPER_NOT_FORMULA:
+        return ('excluded_internal_branch_or_direction_helper_not_formula', None, 'direction to branch-sign conversion is internal solver control support rather than a separate formula node')
+    if alias in SET_BLOCKED_UNTIL_GAUSS_LAMBERT_SOLVER_GEOMETRY_AND_NUMERICAL_POLICY:
+        return ('blocked_until_gauss_lambert_solver_geometry_and_numerical_policy', None, 'Gauss or Lambert transfer geometry requires explicit short or long way branch revolution count direction of motion root selection convergence tolerance singular geometry units and reference oracle policy')
+    if alias in SET_EXCLUDED_SOLVER_RESIDUAL_OR_SEARCH_ORCHESTRATION_HELPER_NOT_FORMULA:
+        return ('excluded_solver_residual_or_search_orchestration_helper_not_formula', None, 'solver residual evaluation or search-grid orchestration is internal numerical algorithm support rather than a separate bounded formula node')
+    if alias in SET_BLOCKED_UNTIL_FRAME_ROTATION_TIME_AND_UNITS_CONTRACT:
+        return ('blocked_until_frame_rotation_time_and_units_contract', None, 'velocity from rotation requires explicit source and target frames angular velocity orientation convention time scale units sign and nonfinite output contract')
+    if alias in SET_BLOCKED_UNTIL_ORBIT_DETERMINATION_RANK_OBSERVATION_AND_FRAME_POLICY:
+        return ('blocked_until_orbit_determination_rank_observation_and_frame_policy', None, 'orbit determination from sightings requires explicit observation model frames epochs rank tolerance branch selection iteration convergence covariance and reference oracle policy')
+    if alias in SET_EXCLUDED_ORBIT_DETERMINATION_LINEAR_SYSTEM_HELPER_NOT_FORMULA:
+        return ('excluded_orbit_determination_linear_system_helper_not_formula', None, 'sighting linear-system assembly is internal orbit-determination support rather than a separate formula node')
+    if alias in SET_EXCLUDED_UNIVERSAL_VARIABLE_BUNDLE_HELPER_NOT_FORMULA:
         return ('excluded_universal_variable_bundle_helper_not_formula', None, 'combined Stumpff function dispatch and bundle return is universal variable solver support rather than a separate bounded formula node')
-    if alias in EXCLUDED_SCALAR_HELPERS:
-        return ('excluded_internal_scalar_validation_or_math_helper_not_formula', None, 'generic scalar math or finite value validation wrapper is an internal utility rather than a separate formula node')
-    raise VerificationError(f'unsupported A19 alias: {alias}')
-
+    if alias in SET_BLOCKED_MISSING_STUMPFF_FUNCTION_BRANCH_SERIES_AND_NUMERICAL_CONTRACT:
+        return ('blocked_missing_stumpff_function_branch_series_and_numerical_contract', None, 'Stumpff scalar or derivative requires explicit argument domain positive negative and near zero branches series truncation tolerance overflow behavior derivative convention and oracle validation')
+    if alias in SET_BLOCKED_MISSING_BALLISTIC_PARAMETER_UNITS_STATE_AND_CONIC_CONTRACT:
+        return ('blocked_missing_ballistic_parameter_units_state_and_conic_contract', None, 'ballistic parameter relation requires explicit state radius altitude reference body gravitational parameter units conic branch domain singularity and nonfinite output contract')
+    if alias in SET_EXCLUDED_BALLISTIC_CLASSIFICATION_OR_SUMMARY_HELPER_NOT_FORMULA:
+        return ('excluded_ballistic_classification_or_summary_helper_not_formula', None, 'orbit-type classification or multi-output ballistic element summary is a composite support algorithm rather than a separate bounded formula node')
+    if alias in SET_BLOCKED_UNTIL_BALLISTIC_RANGE_TIME_BRANCH_AND_NUMERICAL_POLICY:
+        return ('blocked_until_ballistic_range_time_branch_and_numerical_policy', None, 'ballistic free-flight range or time relation requires explicit spherical-body geometry burnout state altitude frame angle branch feasible-domain root selection numerical tolerance and reference oracle policy')
+    raise VerificationError(f'unsupported A20 alias: {alias}')
 
 def require_logical_source_locator(locator: str, row_index: int) -> None:
     require(locator != '', f'row {row_index} source_file_locator is empty')
@@ -190,6 +191,7 @@ def verify_repo(repo: Path) -> dict[str, Any]:
         (WAVE1_PATH, EXPECTED_WAVE1_ROWS),
         (WAVE2_PATH, EXPECTED_WAVE2_ROWS),
         (WAVE3_PATH, EXPECTED_WAVE3_ROWS),
+        (WAVE4_PATH, EXPECTED_WAVE4_ROWS),
     ]
     prior_rows: list[dict[str, str]] = []
     for path, expected_count in prior_specs:
@@ -197,8 +199,8 @@ def verify_repo(repo: Path) -> dict[str, Any]:
         require(len(rows) == expected_count, f'prior wave count mismatch for {path}: {len(rows)}')
         prior_rows.extend(rows)
     prior_locators = {row['source_row_locator'] for row in prior_rows}
-    require(len(prior_locators) == 120, 'prior orbital-geometry locators are not unique')
-    require(prior_locators == {row['m07_row_id_or_alias'] for row in group[:120]}, 'A16-A18 are not exact first-120 selection')
+    require(len(prior_locators) == 160, 'prior orbital-geometry locators are not unique')
+    require(prior_locators == {row['m07_row_id_or_alias'] for row in group[:160]}, 'A16-A19 are not exact first-160 selection')
 
     remaining = [row for row in group if row['m07_row_id_or_alias'] not in prior_locators]
     selected = remaining[:EXPECTED_ROWS]
@@ -229,7 +231,7 @@ def verify_repo(repo: Path) -> dict[str, Any]:
         number = source_row_number(locator)
         numbers.append(number)
         require(row['schema_version'] == SCHEMA_VERSION, f'row {index} schema mismatch')
-        require(row['resolution_id'] == f'resolution.external_m07.orbital_geometry_conic_wave4.{number:04d}', f'row {index} resolution ID mismatch')
+        require(row['resolution_id'] == f'resolution.external_m07.orbital_geometry_conic_wave5.{number:04d}', f'row {index} resolution ID mismatch')
         require(row['source_artifact_id'] == SOURCE_ARTIFACT_ID, f'row {index} source artifact mismatch')
         require(row['classifier_path'] == CLASSIFIER_PATH, f'row {index} classifier path mismatch')
         require(row['source_row_number'] == str(number), f'row {index} source row mismatch')
@@ -282,11 +284,12 @@ def verify_repo(repo: Path) -> dict[str, Any]:
     return {
         'schema_version': SCHEMA_VERSION,
         'result': 'PASS',
-        'wave_id': 'a19_external_m07_orbital_geometry_conic_wave4',
+        'wave_id': 'a20_external_m07_orbital_geometry_conic_wave5',
         'classifier_group_rows': len(group),
         'wave1_rows': EXPECTED_WAVE1_ROWS,
         'wave2_rows': EXPECTED_WAVE2_ROWS,
         'wave3_rows': EXPECTED_WAVE3_ROWS,
+        'wave4_rows': EXPECTED_WAVE4_ROWS,
         'prior_group_rows': len(prior_rows),
         'classifier_rows_selected': len(selected),
         'classifier_group_remaining_rows': len(after),
@@ -316,12 +319,14 @@ def verify_repo(repo: Path) -> dict[str, Any]:
 def self_test() -> dict[str, Any]:
     require(stable_json({'b': 2, 'a': 1}).startswith('{\n  "a"'), 'stable JSON ordering failed')
     cases = {
-        'ch4::semimajor_axis_from_rv': ('deduplicated_alias_to_existing_runtime', 'formula_vault.astrodynamics.elements.semimajor_axis_from_state'),
-        'ch4::elliptic_e_to_true': ('deduplicated_alias_to_existing_runtime', 'formula_vault.astrodynamics.kepler.true_anomaly_from_eccentric_anomaly'),
-        'ch5::eccentricity_vector': ('deduplicated_alias_to_existing_runtime', 'formula_vault.astrodynamics.elements.eccentricity_vector'),
-        'ch4::fg_identity': ('excluded_lagrange_fg_identity_or_state_composition_helper_not_formula', None),
-        'ch4::elliptic_tof_between_e': ('blocked_until_conic_time_of_flight_branch_wrap_direction_and_units_contract', None),
-        'ch4::stumpff_c': ('blocked_missing_stumpff_function_branch_series_and_numerical_contract', None),
+        'ch5::fg_series': ('blocked_until_lagrange_fg_series_order_branch_and_numerical_policy', None),
+        'ch5::fg_series_coefficients_from_upq': ('excluded_internal_fg_series_intermediate_helper_not_formula', None),
+        'ch5::gauss_transfer_geometry': ('blocked_until_gauss_lambert_solver_geometry_and_numerical_policy', None),
+        'ch5::original_gauss_x_function': ('excluded_solver_residual_or_search_orchestration_helper_not_formula', None),
+        'ch5::stumpff_c': ('blocked_missing_stumpff_function_branch_series_and_numerical_contract', None),
+        'ch6::q_parameter': ('blocked_missing_ballistic_parameter_units_state_and_conic_contract', None),
+        'ch6::q_orbit_type': ('excluded_ballistic_classification_or_summary_helper_not_formula', None),
+        'ch6::free_flight_range_angle': ('blocked_until_ballistic_range_time_branch_and_numerical_policy', None),
     }
     for alias, expected in cases.items():
         require(expected_resolution(alias)[:2] == expected, f'mapping self-test failed: {alias}')
