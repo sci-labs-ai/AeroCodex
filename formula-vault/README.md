@@ -154,3 +154,14 @@ A15 processes the remaining 9 rows in `8E_or_9A_classical_two_body_algebra_contr
 - remaining external backlog: 1,162;
 - validation status: `research_required`;
 - no raw Rust-port, M07, or Scilab source review or parity claim.
+
+## A16 external orbital-geometry and conic-branch Wave 1
+
+A16 processes the first 40 rows in `9A_classical_elements_and_9E_mission_design_contracts` without adding a formula node or Rust kernel. Two exact aliases reuse the governed A7 specific-angular-momentum and eccentricity-vector runtimes. Ten generic math, parameter-lookup, force/acceleration, or state-derivative helpers are excluded from formula scope. Twenty-eight rows remain contract-blocked pending explicit geometry, frame, angle, conic-branch, apsis/ellipse, parabolic, or hyperbolic mission-design contracts. The classifier risk tier remains `medium_risk_requires_contract_review`, and 337 rows remain in the group.
+
+- disposition manifest: `formula-vault/resolutions/m07_orbital_geometry_conic_wave1.tsv`;
+- verifier: `python3 scripts/verify_external_m07_orbital_geometry_conic_wave1.py --repo .`;
+- cumulative external terminal dispositions: 201;
+- remaining external backlog: 1,122;
+- validation status: `research_required`;
+- no raw Rust-port, M07, or Scilab source review or parity claim.

@@ -80,3 +80,9 @@ The classifier risk tier remains `medium_risk_requires_contract_review`; A14 doe
 A15 processes the remaining 9 source-ordered rows from `8E_or_9A_classical_two_body_algebra_contracts`. Six exact aliases reuse existing governed A7 circular-speed, escape-speed, vis-viva, or mean-motion runtimes. Two specific-energy rows remain blocked because the alias does not establish the input form, and the AU/TU mean-motion row remains blocked pending an explicit astronomical-unit/time-unit input, output, and scaling contract.
 
 A14-A15 now cover all 49 rows in the group with 22 aliases and 27 contract blocks. The classifier risk tier remains `medium_risk_requires_contract_review`. A15 adds no formula node or Rust kernel and reduces the unprocessed external backlog from 1,171 to 1,162 rows.
+
+## A16 orbital geometry and conic branch Wave 1
+
+A16 processes the first 40 source-ordered rows from `9A_classical_elements_and_9E_mission_design_contracts`. Two exact aliases reuse the governed A7 specific-angular-momentum and eccentricity-vector runtimes. Ten generic math, parameter lookup, vector-force/acceleration, or state-derivative helpers are excluded from formula scope. Twenty-eight rows remain contract-blocked pending explicit state/frame/angle, conic-branch, apsis/ellipse, parabolic, or hyperbolic mission-geometry contracts.
+
+The classifier risk tier remains `medium_risk_requires_contract_review`; 337 rows remain in the group. A16 adds no formula node or Rust kernel and reduces the unprocessed external backlog from 1,162 to 1,122 rows.

@@ -296,6 +296,20 @@ artifacts:
     owner: AeroCodex maintainers
     update_cadence: immutable bounded wave; later families use separate manifests
     notes: Records six aliases to existing governed A7 astrodynamics runtimes and three contract blocks; completes the 49-row two-body algebra group, preserves the medium-risk classifier tier, and reduces unprocessed backlog accounting from 1,171 to 1,162 without adding a Rust kernel, parity claim, certification claim, or operational-readiness claim.
+  - id: post_stage5.a16.m07_orbital_geometry_conic_wave1_resolution.2026_06_23
+    title: External M07 orbital-geometry and conic-branch Wave 1 terminal resolutions
+    local_path: formula-vault/resolutions/m07_orbital_geometry_conic_wave1.tsv
+    artifact_kind: repo_file_external_backlog_resolution_research_metadata
+    origin: Post-Stage-5 A16 derivative of the registered M07 classifier metadata tied to stage4.m07_rust_port_v14.2026_06_15
+    license: MIT OR Apache-2.0 metadata with M07 source-boundary restrictions
+    sha256: 0f2dced4802cb851caeca44186b4e45d07b00b0334daba9b277d3478f5a1c60c
+    hash_status: sha256_verified_current_repo_file
+    allowed_use: terminal alias, helper-exclusion, and contract-block disposition metadata only
+    bundling_decision: bundled repo-relative metadata only; no source/code/fixture import and no public API promotion
+    validation_status: repository_tracked_research_data
+    owner: AeroCodex maintainers
+    update_cadence: immutable bounded wave; later rows use separate manifests
+    notes: Records two aliases to existing governed A7 astrodynamics runtimes, ten internal support-helper exclusions, and twenty-eight contract blocks; preserves the medium-risk classifier tier, leaves 337 group rows, and reduces unprocessed backlog accounting from 1,162 to 1,122 without adding a Rust kernel, parity claim, certification claim, or operational-readiness claim.
   - id: stage5.c2.m07_blocked_high_risk_derivative.2026_06_18
     title: M07 blocked/high-risk derivative metadata
     local_path: docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv

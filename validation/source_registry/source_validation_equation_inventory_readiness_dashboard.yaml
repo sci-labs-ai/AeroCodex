@@ -13,12 +13,14 @@ requested_details:
   - Exact A12 first-40 classifier-to-terminal-disposition cross-check for the bounded external vector-helper wave.
   - Exact A13 remaining-34 classifier-to-terminal-disposition cross-check completing the 74-row vector-helper group.
   - Exact A14 first-40 and A15 remaining-9 classifier-to-terminal-disposition cross-checks for the complete 49-row classical two-body algebra group, including preservation of the medium-risk classifier tier.
+  - Exact A16 first-40 classifier-to-terminal-disposition cross-check for the orbital-geometry and conic-branch group, including alias, helper-exclusion, contract-block, remaining-group, and medium-risk-tier preservation counts.
   - External M07 processed and remaining-backlog aggregate count cross-checks.
   - Validation-card and source-registry seed count cross-checks.
 implementation_notes:
   - Dependency-free Python resolution verifiers plus the existing xtask verifier.
   - A11-A13 reuse existing M00 runtime, contract, validation-card, and source-seed records for aliases.
   - A14-A15 reuse existing A7 equation-batch runtime, contract, validation-card, and source-seed records for exact aliases; ambiguous, unsupported, or unit-system-specific algebra remains contract-blocked.
+  - A16 reuses existing A7 specific-angular-momentum and eccentricity-vector records for exact aliases, excludes support helpers from formula scope, and keeps geometry/conic-branch-sensitive rows contract-blocked.
   - A12-A13 exclude internal shape helpers from formula scope and keep determinant/frame, skew-matrix, and true-anomaly contract-sensitive rows blocked.
   - No formula implementation is introduced.
   - No M07 source code, fixture, generated binary, or Scilab execution output is imported.
