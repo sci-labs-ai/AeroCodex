@@ -41,12 +41,12 @@ The verifier is expected to report:
 - validation-card-only records: 36
 - helper algorithms: 89
 
-The remaining external M07 backlog is derived from the registered 1,350 represented rows minus 27 formula-vault candidate records and minus rows with terminal external-resolution dispositions. A11-A17 assign 241 terminal dispositions, leaving 1,082 rows unprocessed.
+The remaining external M07 backlog is derived from the registered 1,350 represented rows minus 27 formula-vault candidate records and minus rows with terminal external-resolution dispositions. A11-A18 assign 281 terminal dispositions, leaving 1,042 rows unprocessed.
 
 
-## Current post-A17 resolution state
+## Current post-A18 resolution state
 
-The current governed inventory contains 152 executable research equations, 27 metadata-only intake records, 241 external M07 rows with terminal dispositions, 1,082 remaining external M07 backlog rows, 46 validation-card-only records, and 262 helper algorithms. The A10 runtime-resolution counters remain:
+The current governed inventory contains 152 executable research equations, 27 metadata-only intake records, 281 external M07 rows with terminal dispositions, 1,042 remaining external M07 backlog rows, 46 validation-card-only records, and 262 helper algorithms. The A10 runtime-resolution counters remain:
 
 - runtime-linked formula-vault records: 27;
 - unresolved formula-vault candidate formula IDs: 0;
@@ -54,7 +54,7 @@ The current governed inventory contains 152 executable research equations, 27 me
 - vector-algebra links: 14;
 - canonical-unit links: 10.
 
-`formula-vault/resolutions/m00_runtime_links.tsv` must exactly match the formula IDs in the candidate records and the runtime, contract, validation-card, and source-seed fields in the two governed M00 equation-batch manifests. A11 processes 38 unit-conversion rows. A12-A13 process all 74 vector-helper rows: 56 aliases, 13 excluded internal utilities, and 5 contract blocks. A14-A15 process all 49 classical two-body algebra rows: 22 aliases and 27 contract blocks. A16-A17 process the first 80 rows of `9A_classical_elements_and_9E_mission_design_contracts`: 5 aliases, 25 internal/composite-helper exclusions, and 50 contract blocks, leaving 297 group rows. A17 preserves 38 medium-risk and 2 high-risk classifier labels without downgrade. No executable or metadata-candidate count changes.
+`formula-vault/resolutions/m00_runtime_links.tsv` must exactly match the formula IDs in the candidate records and the runtime, contract, validation-card, and source-seed fields in the two governed M00 equation-batch manifests. A11 processes 38 unit-conversion rows. A12-A13 process all 74 vector-helper rows: 56 aliases, 13 excluded internal utilities, and 5 contract blocks. A14-A15 process all 49 classical two-body algebra rows: 22 aliases and 27 contract blocks. A16-A18 process the first 120 rows of `9A_classical_elements_and_9E_mission_design_contracts`: 6 aliases, 32 internal/composite-helper exclusions, and 82 contract blocks, leaving 257 group rows. A18 preserves 33 medium-risk and 7 high-risk classifier labels without downgrade. No executable or metadata-candidate count changes.
 
 ## Readiness rule
 

@@ -90,3 +90,7 @@ The classifier risk tier remains `medium_risk_requires_contract_review`; 337 row
 ### Post-Stage-5 A17 overlay
 
 A17 processes the next 40 source-ordered rows from `9A_classical_elements_and_9E_mission_design_contracts`: 3 exact aliases reuse governed A7 runtimes, 15 internal/composite support helpers are excluded from formula scope, and 22 rows remain contract-blocked. The selected rows retain 38 `medium_risk_requires_contract_review` and 2 `high_risk_requires_numerical_policy` labels. A16-A17 cover 80 rows, leave 297 group rows, and update external accounting to 241 terminally processed rows and 1,082 remaining backlog rows. No raw Rust-port, M07, or Scilab source is imported or executed.
+
+### Post-Stage-5 A18 overlay
+
+A18 processes the next 40 source-ordered rows from `9A_classical_elements_and_9E_mission_design_contracts`: 1 exact alias reuses the governed A7 eccentricity-vector runtime, 7 internal/composite maneuver helpers are excluded from formula scope, and 32 rows remain contract-blocked. The selected rows retain 33 `medium_risk_requires_contract_review` and 7 `high_risk_requires_numerical_policy` labels. A16-A18 cover 120 rows, leave 257 group rows, and update external accounting to 281 terminally processed rows and 1,042 remaining backlog rows. No raw Rust-port, M07, or Scilab source is imported or executed.

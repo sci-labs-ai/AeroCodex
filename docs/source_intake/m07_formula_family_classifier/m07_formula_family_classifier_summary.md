@@ -168,3 +168,7 @@ A16 then processes the first 40 source-ordered rows from `9A_classical_elements_
 ### Post-Stage-5 A17 overlay
 
 A17 processes the next 40 source-ordered rows from `9A_classical_elements_and_9E_mission_design_contracts` using classifier metadata only. Three exact aliases reuse governed A7 runtimes, fifteen internal/composite helpers are excluded from formula scope, and twenty-two rows remain contract-blocked. The selected set retains 38 medium-risk and 2 high-risk labels. A16-A17 cover 80 rows, leave 297 group rows, and update external accounting to 241 terminally processed rows and 1,082 remaining backlog rows. No raw Rust-port, M07, or Scilab source is imported or executed.
+
+### Post-Stage-5 A18 overlay
+
+A18 processes the next 40 source-ordered rows from `9A_classical_elements_and_9E_mission_design_contracts` using classifier metadata only. One exact alias reuses the governed A7 eccentricity-vector runtime, seven internal/composite maneuver helpers are excluded from formula scope, and thirty-two rows remain contract-blocked. The selected set retains 33 medium-risk and 7 high-risk labels. A16-A18 cover 120 rows, leave 257 group rows, and update external accounting to 281 terminally processed rows and 1,042 remaining backlog rows. No raw Rust-port, M07, or Scilab source is imported or executed.

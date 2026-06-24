@@ -324,6 +324,20 @@ artifacts:
     owner: AeroCodex maintainers
     update_cadence: immutable bounded wave; later rows use separate manifests
     notes: Records three aliases to existing governed A7 astrodynamics runtimes, fifteen internal/composite support-helper exclusions, and twenty-two contract blocks; preserves 38 medium-risk and 2 high-risk classifier labels, leaves 297 group rows, and reduces unprocessed backlog accounting from 1,122 to 1,082 without adding a Rust kernel, parity claim, certification claim, or operational-readiness claim.
+  - id: post_stage5.a18.m07_orbital_geometry_conic_wave3_resolution.2026_06_24
+    title: External M07 orbital-geometry and conic-branch Wave 3 terminal resolutions
+    local_path: formula-vault/resolutions/m07_orbital_geometry_conic_wave3.tsv
+    artifact_kind: repo_file_external_backlog_resolution_research_metadata
+    origin: Post-Stage-5 A18 derivative of the registered M07 classifier metadata tied to stage4.m07_rust_port_v14.2026_06_15
+    license: MIT OR Apache-2.0 metadata with M07 source-boundary restrictions
+    sha256: 6222fdc0802c7a37746caf6d65e735814ea49d4b84d815ec63d25f583a049c16
+    hash_status: sha256_verified_current_repo_file
+    allowed_use: terminal alias, helper-exclusion, and contract-block disposition metadata only
+    bundling_decision: bundled repo-relative metadata only; no source/code/fixture import and no public API promotion
+    validation_status: repository_tracked_research_data
+    owner: AeroCodex maintainers
+    update_cadence: immutable bounded wave; later rows use separate manifests
+    notes: Records one alias to the existing governed A7 eccentricity-vector runtime, seven internal/composite maneuver exclusions, and thirty-two contract blocks; preserves 33 medium-risk and 7 high-risk classifier labels, leaves 257 group rows, and reduces unprocessed backlog accounting from 1,082 to 1,042 without adding a Rust kernel, parity claim, certification claim, or operational-readiness claim.
   - id: stage5.c2.m07_blocked_high_risk_derivative.2026_06_18
     title: M07 blocked/high-risk derivative metadata
     local_path: docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv
