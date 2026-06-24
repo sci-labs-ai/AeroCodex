@@ -103,3 +103,5 @@ Certification caveat: AeroCodex is for research, education, verification-oriente
 The Phase 0.001 life-support crate has reviewed scalar closure-fraction, required production-area, buffer residence-time, crew daily-requirement, net daily-balance, and optional O2/CO2/water bookkeeping helpers. Closure fractions above 1 are returned with warning metadata and `OutsideDocumentedDomain` validity rather than clipped. These remain simple mass-balance primitives with `research_required` trace metadata and are not validated ECLSS design models.
 
 - [External M07 orbital-geometry and conic Wave 5 resolution](assurance/m07_orbital_geometry_conic_wave5_resolution.md)
+
+- [External M07 orbital-geometry/conic Wave 6 resolution](assurance/m07_orbital_geometry_conic_wave6_resolution.md)

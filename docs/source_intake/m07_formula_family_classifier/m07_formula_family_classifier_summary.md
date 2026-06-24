@@ -180,3 +180,5 @@ A19 processes the fourth 40 source-ordered rows from `9A_classical_elements_and_
 ### Post-Stage-5 A20 overlay
 
 A20 processes the fifth 40 source-ordered rows from `9A_classical_elements_and_9E_mission_design_contracts`: no exact runtime alias is asserted, 10 internal/intermediate or composite helpers are excluded from formula scope, and 30 rows remain contract- or policy-blocked. The selected rows retain 26 `medium_risk_requires_contract_review` and 14 `high_risk_requires_numerical_policy` labels. A16-A20 cover 200 rows, leave 177 group rows, and update external accounting to 361 terminally processed rows and 962 remaining backlog rows. No raw Rust-port, M07, or Scilab source is imported or executed.
+
+A21 adds the sixth 40-row orbital-geometry/conic slice: 1 existing-runtime alias, 13 helper exclusions, and 26 contract or policy blocks, while retaining 18 medium-risk and 22 high-risk labels.
