@@ -184,3 +184,5 @@ A20 processes the fifth 40 source-ordered rows from `9A_classical_elements_and_9
 A21 adds the sixth 40-row orbital-geometry/conic slice: 1 existing-runtime alias, 13 helper exclusions, and 26 contract or policy blocks, while retaining 18 medium-risk and 22 high-risk labels.
 
 A22 adds the seventh 40-row orbital-geometry/conic slice: 1 existing-runtime alias, 17 helper exclusions, and 22 contract or policy blocks, while retaining 38 medium-risk and 2 high-risk labels.
+
+A23 adds the eighth 40-row orbital-geometry/conic slice: 1 existing-runtime alias, 10 helper exclusions, and 29 contract or policy blocks, while retaining 30 medium-risk and 10 high-risk labels. A16-A23 cover 320 rows, leave 57 group rows, and update external accounting to 481 terminally processed rows and 842 remaining backlog rows.

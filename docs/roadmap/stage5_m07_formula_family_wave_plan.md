@@ -110,3 +110,7 @@ A21 processes the sixth 40 source-ordered rows from `9A_classical_elements_and_9
 ### Post-Stage-5 A22 overlay
 
 A22 processes the seventh 40 source-ordered rows from `9A_classical_elements_and_9E_mission_design_contracts`: 1 exact alias reuses the governed A7 sphere-of-influence runtime, 17 internal/composite helpers are excluded from formula scope, and 22 rows remain contract- or policy-blocked. The selected rows retain 38 `medium_risk_requires_contract_review` and 2 `high_risk_requires_numerical_policy` labels. A16-A22 cover 280 rows, leave 97 group rows, and update external accounting to 441 terminally processed rows and 882 remaining backlog rows. No raw Rust-port, M07, or Scilab source is imported or executed.
+
+### Post-Stage-5 A23 overlay
+
+A23 processes the eighth 40 source-ordered rows from `9A_classical_elements_and_9E_mission_design_contracts`: 1 exact alias reuses the governed A7 sphere-of-influence runtime, 10 internal/composite helpers are excluded from formula scope, and 29 rows remain contract- or policy-blocked. The selected rows retain 30 `medium_risk_requires_contract_review` and 10 `high_risk_requires_numerical_policy` labels. A16-A23 cover 320 rows, leave 57 group rows, and update external accounting to 481 terminally processed rows and 842 remaining backlog rows. No raw Rust-port, M07, or Scilab source is imported or executed.
