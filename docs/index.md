@@ -108,3 +108,5 @@ The Phase 0.001 life-support crate has reviewed scalar closure-fraction, require
 - [External M07 orbital-geometry/conic Wave 7 resolution](assurance/m07_orbital_geometry_conic_wave7_resolution.md)
 
 - [External M07 orbital-geometry/conic Wave 8 resolution](assurance/m07_orbital_geometry_conic_wave8_resolution.md)
+
+- [External M07 orbital-geometry/conic Wave 9 resolution](assurance/m07_orbital_geometry_conic_wave9_resolution.md)

@@ -52,7 +52,7 @@ If a step fails, the scripts stop at that step and return a non-zero exit code. 
 | `cargo run -p aero-codex-cli -- version --json` | exits successfully | The Beta 1 concept binary reports its bounded release identity and research-only status. |
 | `cargo run -p aero-codex-cli -- run ... --json` | exits successfully and reports `canonical_distance=-6` in JSON | One exact signed conversion reaches the existing checked Rust kernel through the user-facing CLI. |
 | `cargo run -p aero-codex-cli -- self-check --json` | exits successfully with `passed=14` and `failed=0` | All ten supported formulas and four fail-closed negative cases pass the bounded CLI smoke gate. |
-| `python scripts/verify_governance.py --repo .` | exits successfully | Formula-vault runtime resolutions, A11-A23 external dispositions, and the configured xtask governance verifiers completed as a group. |
+| `python scripts/verify_governance.py --repo .` | exits successfully | Formula-vault runtime resolutions, A11-A24 external dispositions, and the configured xtask governance verifiers completed as a group. |
 | `cargo run -p xtask -- dependency-policy` | exits successfully | The workspace did not add dependency tokens blocked by the current policy. |
 | `python scripts/verify_thinfilm_artifact.py` | exits successfully, or `python3` fallback succeeds when bare `python` is unavailable | Thin-film governed artifact checks pass. |
 | `python nomenclature/tooling/aerocodex_nom_lint.py --root nomenclature` | exits successfully | Nomenclature policy lint passes. |
@@ -69,8 +69,8 @@ These current-main counts come from the governed equation-inventory verifier and
 |---|---:|---|
 | Executable research equations | 152 | Public Rust research/preliminary-design equation kernels inventoried by `validation/equation_inventory.tsv`. |
 | Metadata-only formula-vault candidate records | 27 | Intake/provenance records; 27/27 are runtime-linked and 0 remain unresolved. The records are not implementations by themselves. |
-| External M07 rows with terminal dispositions | 481 | A11-A23 record 127 aliases, 103 excluded internal/composite helpers, and 251 contract- or policy-blocked rows. |
-| External M07 backlog rows | 842 | Registered external M07 represented rows that still lack a terminal disposition. |
+| External M07 rows with terminal dispositions | 521 | A11-A24 record 127 aliases, 103 excluded internal/composite helpers, and 291 contract- or policy-blocked rows. |
+| External M07 backlog rows | 802 | Registered external M07 represented rows that still lack a terminal disposition. |
 | Validation cards | 46 | Conservative validation/governance records. They are not certification evidence. |
 | Source-registry seeds | 44 | Source/governance traceability seeds. |
 | Validation-card-only records | 46 | Metadata records, not formula implementations. |
@@ -120,3 +120,5 @@ Additional notes:
 - the A22 verifier reports the seventh 40 orbital-geometry/conic rows with 1 alias, 17 helper exclusions, 22 contract or policy blocks, 97 group rows remaining, 38 medium-risk plus 2 high-risk labels retained, and an aggregate remaining backlog of 882;
 
 - the A23 verifier reports the eighth 40 orbital-geometry/conic rows with 1 alias, 10 helper exclusions, 29 contract or policy blocks, 57 group rows remaining, 30 medium-risk plus 10 high-risk labels retained, and an aggregate remaining backlog of 842;
+
+- the A24 verifier reports the ninth 40 orbital-geometry/conic rows with 0 aliases, 0 helper exclusions, 40 contract or policy blocks, 17 group rows remaining, 34 medium-risk plus 6 high-risk labels retained, and an aggregate remaining backlog of 802;

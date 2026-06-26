@@ -242,3 +242,14 @@ A23 processes the eighth 40 source-ordered rows in `9A_classical_elements_and_9E
 - remaining external backlog: 842;
 - validation status: `research_required`;
 - no raw Rust-port, M07, or Scilab source review or parity claim.
+
+## A24 external orbital-geometry and conic Wave 9
+
+A24 processes the ninth 40 source-ordered rows in `9A_classical_elements_and_9E_mission_design_contracts` without adding a formula node or Rust kernel. All 40 rows remain contract- or policy-blocked pending explicit orbit-geometry/conic branch conventions, frame/unit contracts, numerical policy, source registry, and independent validation oracles. The selected risk tiers remain unchanged: 34 medium-risk contract-review rows and 6 high-risk numerical-policy rows. A16-A24 now cover 360 rows, leaving 17 group rows.
+
+- disposition manifest: `formula-vault/resolutions/m07_orbital_geometry_conic_wave9.tsv`;
+- verifier: `python3 scripts/verify_external_m07_orbital_geometry_conic_wave9.py --repo .`;
+- cumulative external terminal dispositions: 521;
+- remaining external backlog: 802;
+- validation status: `research_required`;
+- no raw Rust-port, M07, or Scilab source review or parity claim.
