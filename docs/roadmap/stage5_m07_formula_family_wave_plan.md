@@ -118,3 +118,7 @@ A23 processes the eighth 40 source-ordered rows from `9A_classical_elements_and_
 ### Post-Stage-5 A24 overlay
 
 A24 processes the ninth 40 source-ordered rows from `9A_classical_elements_and_9E_mission_design_contracts`: 0 exact aliases, 0 helper exclusions, and 40 rows remain contract- or policy-blocked. The selected rows retain 34 `medium_risk_requires_contract_review` and 6 `high_risk_requires_numerical_policy` labels. A16-A24 cover 360 rows, leave 17 group rows, and update external accounting to 521 terminally processed rows and 802 remaining backlog rows. No raw Rust-port, M07, or Scilab source is imported or executed.
+
+### Post-Stage-5 A25 overlay
+
+A25 processes the final 17 source-ordered rows from `9A_classical_elements_and_9E_mission_design_contracts`: 0 exact aliases, 0 helper exclusions, and 17 rows remain contract- or policy-blocked. The selected rows retain 14 `medium_risk_requires_contract_review` and 3 `high_risk_requires_numerical_policy` labels. A16-A25 cover all 377 rows in the group, leave 0 group rows, and update external accounting to 538 terminally processed rows and 785 remaining backlog rows. No raw Rust-port, M07, or Scilab source is imported or executed.

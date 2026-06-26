@@ -422,6 +422,20 @@ artifacts:
     owner: AeroCodex maintainers
     update_cadence: immutable bounded wave; later rows use separate manifests
     notes: Records zero aliases, zero helper exclusions, and forty contract or policy blocks; preserves 34 medium-risk and 6 high-risk classifier labels, leaves 17 group rows, and reduces unprocessed backlog accounting from 842 to 802 without adding a Rust kernel, parity claim, certification claim, or operational-readiness claim.
+  - id: post_stage5.a25.m07_orbital_geometry_conic_wave10_resolution.2026_06_26
+    title: External M07 orbital-geometry and conic Wave 10 terminal resolutions
+    local_path: formula-vault/resolutions/m07_orbital_geometry_conic_wave10.tsv
+    artifact_kind: repo_file_external_backlog_resolution_research_metadata
+    origin: Post-Stage-5 A25 derivative of the registered M07 classifier metadata tied to stage4.m07_rust_port_v14.2026_06_15
+    license: MIT OR Apache-2.0 metadata with M07 source-boundary restrictions
+    sha256: 9b29e2dbf58d1b5cf8c792dd61a09b671f072397f7463dd35ddfc392da1d55e0
+    hash_status: sha256_verified_current_repo_file
+    allowed_use: terminal contract-or-policy-block disposition metadata only
+    bundling_decision: bundled repo-relative metadata only; no source/code/fixture import and no public API promotion
+    validation_status: repository_tracked_research_data
+    owner: AeroCodex maintainers
+    update_cadence: immutable bounded wave; completes this bounded classifier group
+    notes: Records zero aliases, zero helper exclusions, and seventeen contract or policy blocks; preserves 14 medium-risk and 3 high-risk classifier labels, leaves 0 group rows, and reduces unprocessed backlog accounting from 802 to 785 without adding a Rust kernel, parity claim, certification claim, or operational-readiness claim.
   - id: stage5.c2.m07_blocked_high_risk_derivative.2026_06_18
     title: M07 blocked/high-risk derivative metadata
     local_path: docs/source_intake/m07_formula_family_classifier/blocked_high_risk_rows.csv
