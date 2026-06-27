@@ -116,3 +116,4 @@ The Phase 0.001 life-support crate has reviewed scalar closure-fraction, require
 - [External M07 coordinate-transform/frame-time policy Wave 1 resolution](assurance/m07_coordinate_transform_frame_time_policy_wave1_resolution.md)
 
 - [External M07 coordinate-transform/frame-time policy Wave 2 resolution](assurance/m07_coordinate_transform_frame_time_policy_wave2_resolution.md)
+- [A28 solver policy Wave 1 resolution](assurance/m07_solver_policy_wave1_resolution.md)

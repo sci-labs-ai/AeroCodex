@@ -41,12 +41,12 @@ The verifier is expected to report:
 - validation-card-only records: 36
 - helper algorithms: 89
 
-The remaining external M07 backlog is derived from the registered 1,350 represented rows minus 27 formula-vault candidate records and minus rows with terminal external-resolution dispositions. A11-A27 assign 623 terminal dispositions, leaving 700 rows unprocessed.
+The remaining external M07 backlog is derived from the registered 1,350 represented rows minus 27 formula-vault candidate records and minus rows with terminal external-resolution dispositions. A11-A28 assign 623 terminal dispositions, leaving 660 rows unprocessed.
 
 
 ## Current post-A27 resolution state
 
-The current governed inventory contains 152 executable research equations, 27 metadata-only intake records, 623 external M07 rows with terminal dispositions, 700 remaining external M07 backlog rows, 46 validation-card-only records, and 262 helper algorithms. The A10 runtime-resolution counters remain:
+The current governed inventory contains 152 executable research equations, 27 metadata-only intake records, 663 external M07 rows with terminal dispositions, 660 remaining external M07 backlog rows, 46 validation-card-only records, and 262 helper algorithms. The A10 runtime-resolution counters remain:
 
 - runtime-linked formula-vault records: 27;
 - unresolved formula-vault candidate formula IDs: 0;

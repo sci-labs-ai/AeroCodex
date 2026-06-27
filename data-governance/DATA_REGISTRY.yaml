@@ -536,3 +536,19 @@ artifacts:
     owner: AeroCodex maintainers
     update_cadence: refresh only when updated planning archive is supplied and re-hashed
     notes: Prior consolidated planning notes; registry inclusion does not imply any implementation, certification, operational, habitat-safe, medical, or regulated-use approval.
+
+  - id: stage4.m07.solver_policy_wave1.2026_06_27
+    title: External M07 solver / least-squares / root-selection policy Wave 1 terminal resolutions
+    local_path: formula-vault/resolutions/m07_solver_policy_wave1.tsv
+    artifact_kind: repo_file_external_backlog_resolution_research_metadata
+    origin: Post-Stage-5 A28 derivative of the registered M07 classifier metadata tied to stage4.m07_rust_port_v14.2026_06_15
+    license: MIT OR Apache-2.0 metadata with M07 source-boundary restrictions
+    sha256: fa65df63896a624c3573b2324f2630e43401551f5db67c9ca2c2c80f1c16ef37
+    hash_status: sha256_verified_current_repo_file
+    allowed_use: terminal contract-or-policy-block disposition metadata only
+    bundling_decision: bundled repo-relative metadata only; no source/code/fixture import and no public API promotion
+    validation_status: repository_tracked_research_data
+    owner: AeroCodex maintainers
+    update_cadence: immutable bounded wave; leaves later solver-policy waves for bounded rollout
+    notes: Records zero aliases, zero helper exclusions, and forty contract or policy blocks; preserves forty blocked-until-solver-policy labels; no source import, runtime promotion, or parity claim.
+

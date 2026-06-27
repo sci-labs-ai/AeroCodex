@@ -21,13 +21,13 @@ sha256 = "cbca8994de4ffe26e4ba28d9b004f6745195b3172f7839b3510f0be27c3be37d"
 
 [[files]]
 path = "README.md"
-bytes = 17180
-sha256 = "3738b357633a89210acdbee99abf4d2f3e91cc4d40da31a80678ffe02e8bb091"
+bytes = 17179
+sha256 = "9b2bb0ff251b8e854054e210a15a812d231a3abf6882b3c3dc717ece20912458"
 
 [[files]]
 path = "checksums/SHA256SUMS"
-bytes = 10173
-sha256 = "c87552213d070849c70404d6b834a09d445cbfedc253b7834f665a4d3652606c"
+bytes = 10529
+sha256 = "ebb6fb2a881f878bdf29f0615c5f0509b8723e4195e36710ddec75ca1e83b1a7"
 
 [[files]]
 path = "citations/blss_thinfilm_refs.bib"
@@ -231,18 +231,18 @@ sha256 = "04aea134d70750d9acbedb4ee93ce7016b1634c2b5a967676c458f4ec8a9722e"
 
 [[files]]
 path = "data-governance/DATA_REGISTRY.yaml"
-bytes = 44121
-sha256 = "1c0d72765a802692faeda287fdc7f1c59d154b05ec7c5e4275d6e673e6ba9462"
+bytes = 45330
+sha256 = "b969b932ef58f941ba92f702247f458e3a16e53bdd7b7f53a35b4b19be84678f"
 
 [[files]]
 path = "docs/assurance/equation_inventory_readiness_dashboard.md"
 bytes = 4348
-sha256 = "38e1cb3c04fe949dc7a5cf344a1572f86d862102f7f72e83c335dd9c8fac3af4"
+sha256 = "19068b8e03e50b8194dc9e358bcfca03ffae108d42c8bcea774182a7489fb42d"
 
 [[files]]
 path = "docs/assurance/formula_vault_runtime_resolution.md"
-bytes = 2348
-sha256 = "72508648a4aff92fe15dd0ec5a3f7c7dc3583b3d1cd3ac94ae5be81effd63105"
+bytes = 2510
+sha256 = "7fbebbb82b54c65753330b8b09ee1987b4b4a124b41340520bf90260542ce213"
 
 [[files]]
 path = "docs/assurance/m07_coordinate_transform_frame_time_policy_wave1_resolution.md"
@@ -251,33 +251,33 @@ sha256 = "80958a5ab221210cc1931595eecc7f3de595932ee57432cb7d85ff191c9c6a82"
 
 [[files]]
 path = "docs/index.md"
-bytes = 9794
-sha256 = "3dc8c6294cd7d4f06ed4ed868130f8586a22be9c797592bcbd0483e4ba396633"
+bytes = 9883
+sha256 = "1645bc5fec11f813f7b923f919204a057f3c054af230820f71d2442e234fa6ba"
 
 [[files]]
 path = "docs/roadmap/public_alpha_readiness_dashboard.md"
 bytes = 6856
-sha256 = "91e1fac1d7f939dc10dd175da6d33a97cc15d183e568cebbc3aac7b4b9ef1260"
+sha256 = "a41f2772d05779b00cae66d952f7fb7fc81941e6002a15c141175ad2fe7f7799"
 
 [[files]]
 path = "docs/roadmap/stage5_m07_formula_family_wave_plan.md"
-bytes = 15583
-sha256 = "570d14e5930850abf03f33a473daf1d05599ce9b16213f12cf4191544d3e4e8e"
+bytes = 16320
+sha256 = "06bf554f3d77449ce80ab6c2e6bf759c31dc22f1eae634e8961a1c1c14da1268"
 
 [[files]]
 path = "docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier_summary.md"
-bytes = 15005
-sha256 = "be789298473591dcfc05c25868d3d1a0a7117853bfc14f42256fd4ce04ee1f4e"
+bytes = 15575
+sha256 = "8e147df607ff077ce9c12f7dd23f150f432cd4fee8961e85f9607f25e6856bf8"
 
 [[files]]
 path = "docs/testing/friend_test_expected_output.md"
 bytes = 13207
-sha256 = "99b5f3252527b14a2f5a527bab160c26ebd3005c671e7f333ca3bf7ab04cf050"
+sha256 = "9ff75d6503e081281a64383b90e9b71a409ca7c4f58e89c01896b7a7539eb153"
 
 [[files]]
 path = "formula-vault/README.md"
-bytes = 22191
-sha256 = "3f688eb13110ae020e2e89aeab2ea687f5ea187c913f42be8ee22e9e0a85015f"
+bytes = 23069
+sha256 = "ac958b0cc82247d8525fecc50cdb044da7f91c506f60378da681835e58d2cf8d"
 
 [[files]]
 path = "formula-vault/resolutions/m07_coordinate_transform_frame_time_policy_wave1.tsv"
@@ -287,77 +287,77 @@ sha256 = "4c2a14ff5ab0ffc65b27c62b0953274230312924efd3481ef5c6273e87283a67"
 [[files]]
 path = "scripts/verify_external_m07_coordinate_transform_frame_time_policy_wave1.py"
 bytes = 16262
-sha256 = "f1676da674ee0daa26fc0db92be076603472a7263eeccb0456078a6e63d889ec"
+sha256 = "fa8054d4428ebae852cc3d6e9ecb7d5b59b3602df23377edb97c847dfdd8851a"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave1.py"
 bytes = 24177
-sha256 = "646ca8b8c1191aeabf5a5a00b864da90fe9275b530722c0b61471a9f49cc87ee"
+sha256 = "49796f8f669a639ad531bf9f8d32829b3981bd868cc3caa9ca07e49d52803f84"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave10.py"
 bytes = 14193
-sha256 = "a1356cee8e8f869525e8372fc0bdc7b8fcd5e53f7ccc76063a5f39cabcc6c889"
+sha256 = "23869fefda4efb459c71d698ace50418b2a124ec7ab5d0b10afb4fa540617588"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave2.py"
 bytes = 20196
-sha256 = "f0ef83992a910e18d62ad9495acf88ae2631e80546a0d2eef067eb84cc2e14dd"
+sha256 = "b97cc5abfdf3a78b9b535e798c22b362d7f2e1f4f7053a59cb8101abe7baa121"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave3.py"
 bytes = 21042
-sha256 = "6a20d567a73dfd757bb115035bd052473bf344847e4438b1a61d84807dd9a668"
+sha256 = "d7932df9f182e8e92509ab7ba849e14618abc7e3c21c0d1d782ed4381cd96c2c"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave4.py"
 bytes = 24089
-sha256 = "1fbb20d6f3554a8f2f9226735f98c13c89bd214fa9af223d4e260ee82bc907b6"
+sha256 = "afc56ea27147932882ea8b6e1deb26a24fe5916b4027c6e9e09389a0f7f09ffc"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave5.py"
 bytes = 25228
-sha256 = "b456ebb7298f7725c35b7048241ff93a0c169485b5cd357e6d162ef2ba616a12"
+sha256 = "ce2c75d03834ac917cb237673775cab549d50948c688eef8987fd8c4c23083ca"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave6.py"
 bytes = 27238
-sha256 = "e5c3e3646d80ac11a9448a024425e50887d4400ce4d1b9d418a3e3562b2f2fe1"
+sha256 = "8c047e42958d26fdec55efe7d9852ba5799973926ca3c8903c6b3f1db364f66e"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave7.py"
 bytes = 26886
-sha256 = "c393d65cd8b859ee4995f6c5505d57532c9b2ac878005725d9f07c6917980cbb"
+sha256 = "2ced4f07b7b8dabdc623f790b2c4b5d411456a5b933e100ce46e1c33043b7db0"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave8.py"
 bytes = 27480
-sha256 = "e39f1be58c9fef2a70070216b5534076612406c67a4dd876109181c7ec45720e"
+sha256 = "cd78f29893ddeca3c6279a16014008f3e8be60fdd6d47cdff54fefe63a172449"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave9.py"
 bytes = 14122
-sha256 = "6efc79aed3f0463e9f3d07672dcbaa2ba4d64529c9b5d62b2f8c4d1353376e24"
+sha256 = "ab380b5ab74cb306159215677e21214f4de962af393951fb6bcda917452457ca"
 
 [[files]]
 path = "scripts/verify_external_m07_two_body_algebra_wave1.py"
 bytes = 20939
-sha256 = "4d07552a808ae9981209d164305ea6c76a54de153a7a047c19a8fab45262de4c"
+sha256 = "9b837867219264bcc5b78173d277e2f7265fd5e3d162856c86288e9137faac77"
 
 [[files]]
 path = "scripts/verify_external_m07_two_body_algebra_wave2.py"
 bytes = 18003
-sha256 = "6d01b67b983254391c48b18efc805dda665a1ac50bbb6b2653181ba822620d3c"
+sha256 = "e9b93742b6cc81bd23af1cd96bbe8d94ebd269f54b323a8094b4a974af45e627"
 
 [[files]]
 path = "scripts/verify_external_m07_vector_helper_wave2.py"
 bytes = 15402
-sha256 = "3b9c59df4e150f83454e1ca3d0de88db31e5ca32c7156485895e45c9b6f58650"
+sha256 = "c562cf0ed8d161800a4ffafc967b0bea5361933a0a2c56295c7f8986caa3bb8e"
 
 [[files]]
 path = "validation/equation_inventory.tsv"
-bytes = 133098
-sha256 = "f7b73582408e130985f14ab8eacc074b1e6d4da465560328f5f1e0271569fe0b"
+bytes = 133374
+sha256 = "d28b881a3027049b4919430933010fab2aa56b9ac9f1c6233a54312a9db4bf11"
 
 [[files]]
 path = "docs/assurance/m07_coordinate_transform_frame_time_policy_wave2_resolution.md"
@@ -372,4 +372,95 @@ sha256 = "2f5f68eb55d5034d7a64cdf06a9b60a0a139ff5a6fb5d847293aad941ebc7d01"
 [[files]]
 path = "scripts/verify_external_m07_coordinate_transform_frame_time_policy_wave2.py"
 bytes = 16260
-sha256 = "891eebabd9792390136ebc6ae644c8bc5934d43de14eebc486617a6eaf53789c"
+sha256 = "5db98180ae890d562c412a7bae10080da68dc3437ff1e53f10ba68d005a69aa9"
+
+[[files]]
+path = ".github/PULL_REQUEST_TEMPLATE.md"
+bytes = 2031
+sha256 = "3c7af66186cd4776da0444865be8bc91d1b2c6575a593120e00985e911222f18"
+
+[[files]]
+path = "docs/deployment/deploy_agent_prompt_nomenclature_policy_v0_002.md"
+bytes = 6220
+sha256 = "06ad28edc8d34746202642e34ad4105828bb0f72ce16f8b82fb1e89be7eb6d11"
+
+[[files]]
+path = "docs/nomenclature_policy.md"
+bytes = 2959
+sha256 = "c93ba02cb771bbbc32e7b006aa82671f2b693a329e95457ce727b28614f8d9e0"
+
+[[files]]
+path = "nomenclature/MANIFEST.json"
+bytes = 8229
+sha256 = "b10c4692197fc849da8bcc62d7ba13d84e6132596a3a381d9926df78f1fab9fd"
+
+[[files]]
+path = "nomenclature/docs/ACX-NOM-001.md"
+bytes = 22516
+sha256 = "fd14d56bc5105c4928aec670f7898172e42b9d457106905fa8df17fdf7de9f51"
+
+[[files]]
+path = "nomenclature/generated/current_repo_acronym_baseline.json"
+bytes = 10952
+sha256 = "547099d88e4ec38b98354a172322637dc090cb37f53df8ef079d44ea220b1aac"
+
+[[files]]
+path = "nomenclature/generated/current_repo_acronym_inventory.csv"
+bytes = 186645
+sha256 = "9b4ea695dd0db1e87a1f3382b397f141564eefa3f218b2da84a12fe8181538f1"
+
+[[files]]
+path = "nomenclature/generated/current_repo_acronym_inventory.json"
+bytes = 1208880
+sha256 = "0e8497c792c66b07d46c0b9b91c059ef6fe5a39f705464ce3fb88b2fb8777633"
+
+[[files]]
+path = "nomenclature/generated/current_repo_acronym_inventory.md"
+bytes = 37802
+sha256 = "3140317c58837354f4a204c52eaed716a77c2a72624917c0d7c287492074d5aa"
+
+[[files]]
+path = "nomenclature/generated/terminology/index.jsonl"
+bytes = 44674
+sha256 = "d2c169d2fb104e2d01e2d21ab2ed178a90c2f23b0efc654fd3ab47d3180d8f65"
+
+[[files]]
+path = "nomenclature/registry/acronyms.yaml"
+bytes = 55222
+sha256 = "edfaac21e47b77d95d4ac3ba0a0dd19647666ecf56e14b662d865207fab34a71"
+
+[[files]]
+path = "nomenclature/registry/terminology_sources.yaml"
+bytes = 7941
+sha256 = "64568aa3ad06ba7b280dfac82f5a1320829f264634378072a85f03810ba60847"
+
+[[files]]
+path = "nomenclature/tooling/aerocodex_acronym_inventory.py"
+bytes = 17673
+sha256 = "05d92930ffedfc203b47953e9d207c8c3e6d70db4ad996f768aa6a72844eb157"
+
+[[files]]
+path = "nomenclature/tooling/aerocodex_nom_lint.py"
+bytes = 16388
+sha256 = "42937c69385860c4a96fe61dfa7bafbc4a89c915dd421ea0032bf121cc1e933d"
+
+[[files]]
+path = "nomenclature/tooling/aerocodex_terminology.py"
+bytes = 14413
+sha256 = "887c964b7d77dbd6d1b95b48442b500b2a325f2b25e044d7d467846f1c32b4a5"
+
+[[files]]
+path = "formula-vault/resolutions/m07_solver_policy_wave1.tsv"
+bytes = 41473
+sha256 = "fa65df63896a624c3573b2324f2630e43401551f5db67c9ca2c2c80f1c16ef37"
+
+[[files]]
+path = "scripts/verify_external_m07_solver_policy_wave1.py"
+bytes = 14671
+sha256 = "a885fbf2ea6a2db84485911c574c009609f0e0fb1fdb880665a8590ccf999ce6"
+
+[[files]]
+path = "docs/assurance/m07_solver_policy_wave1_resolution.md"
+bytes = 2181
+sha256 = "e2c9d8fe0bd701c34a1152fe127906c3a0e24904f0708f4a88fdd0a9e183b1db"
+

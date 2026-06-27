@@ -286,3 +286,14 @@ A27 processes the remaining 45 source-ordered rows in the governed 9B coordinate
 - remaining external backlog: 700;
 - no runtime, source-seed, validation-card, parity, certification, or operational-readiness claim is made.
 
+
+## A28 external solver / least-squares / root-selection policy Wave 1
+
+A28 processes the first 40 source-ordered rows in the governed 9C solver-policy backlog without adding a formula node or Rust kernel. All 40 rows remain contract- or policy-blocked pending explicit iteration/root-selection, rank/tolerance, convergence/failure-state, source-registry, and independent numerical-oracle policies. The selected risk tiers remain unchanged: 40 solver-policy blocked rows. This leaves 83 rows in the solver-policy candidate pool.
+
+- resolution manifest: `formula-vault/resolutions/m07_solver_policy_wave1.tsv`;
+- verifier: `scripts/verify_external_m07_solver_policy_wave1.py --repo .`;
+- cumulative external terminal dispositions: 663;
+- remaining external backlog: 660;
+- validation status: `research_required`;
+- no raw Rust-port, M07, or Scilab source review or parity claim.
