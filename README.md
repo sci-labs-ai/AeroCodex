@@ -27,7 +27,7 @@ This README reflects current `main` after compiler-batch coverage was completed 
 | Executable research equations | 152 | Public Rust research/preliminary-design equation kernels inventoried by `validation/equation_inventory.tsv`. |
 | Metadata-only formula-vault candidate records | 27 | Intake/provenance records; A10 links 27/27 to existing governed runtimes, leaving 0 unresolved candidate formula IDs. The metadata files are not implementations by themselves. |
 | External M07 rows with terminal dispositions | 786 | A11-A31: 127 deduplicated aliases, 103 excluded internal/composite helpers, and 554 contract- or policy-blocked rows. |
-| External M07 backlog rows | 537 | Registered external M07 represented rows that still lack a terminal disposition. |
+| External M07 backlog rows | 198 | Registered external M07 represented rows that still lack a terminal disposition. |
 | Validation cards | 46 | Conservative validation/governance records. They are not certification evidence. |
 | Source-registry seeds | 44 | Source/governance traceability seeds. |
 | Validation-card-only records | 46 | Metadata records, not formula implementations. |
@@ -207,3 +207,8 @@ A38 records 40 metadata-only terminal dispositions for the second bounded J2 per
 ### A39 external M07 J2 perturbation / numerical propagation policy Wave 3
 
 A39 closes the remaining 48 metadata-only terminal dispositions for the J2 perturbation / numerical-propagation policy candidate pool. It raises the external M07 processed counter to 1080 rows and leaves 243 rows in the external backlog. No runtime source, Scilab source, certification, or external parity claim is added.
+
+
+### A40 external M07 SGP4 / TEME frame-time policy Wave 1
+
+A40 records 45 metadata-only terminal dispositions for the SGP4/TEME frame-time policy and helper-exclusion candidate pool. It raises the external M07 processed counter to 1125 rows and leaves 198 rows in the external backlog. No runtime source, Scilab source, certification, or external parity claim is added.

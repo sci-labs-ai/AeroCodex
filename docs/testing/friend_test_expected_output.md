@@ -70,7 +70,7 @@ These current-main counts come from the governed equation-inventory verifier and
 | Executable research equations | 152 | Public Rust research/preliminary-design equation kernels inventoried by `validation/equation_inventory.tsv`. |
 | Metadata-only formula-vault candidate records | 27 | Intake/provenance records; 27/27 are runtime-linked and 0 remain unresolved. The records are not implementations by themselves. |
 | External M07 rows with terminal dispositions | 855 | A11-A33 record 129 aliases, 103 excluded internal/composite helpers, and 623 contract- or policy-blocked rows. |
-| External M07 backlog rows | 468 | Registered external M07 represented rows that still lack a terminal disposition. |
+| External M07 backlog rows | 198 | Registered external M07 represented rows that still lack a terminal disposition. |
 | Validation cards | 46 | Conservative validation/governance records. They are not certification evidence. |
 | Source-registry seeds | 44 | Source/governance traceability seeds. |
 | Validation-card-only records | 46 | Metadata records, not formula implementations. |
@@ -141,3 +141,5 @@ A37 J2 perturbation / numerical propagation policy Wave 1 is metadata-only; frie
 A38 J2 perturbation / numerical propagation policy Wave 2 is metadata-only; friend-test runtime output is unchanged.
 
 A39 J2 perturbation / numerical propagation policy Wave 3 is metadata-only; friend-test runtime output is unchanged.
+
+A40 SGP4 / TEME frame-time policy Wave 1 is metadata-only; friend-test runtime output is unchanged.

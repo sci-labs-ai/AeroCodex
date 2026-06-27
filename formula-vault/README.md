@@ -365,3 +365,5 @@ A33 records:
 
 - `formula-vault/resolutions/m07_j2_perturbation_policy_wave2.tsv` records A38 metadata-only terminal dispositions for the second bounded J2 perturbation / numerical propagation slice.
 - `formula-vault/resolutions/m07_j2_perturbation_policy_wave3.tsv` records A39 metadata-only terminal dispositions for the remaining J2 perturbation / numerical propagation policy slice, closing that governed candidate pool.
+
+- `formula-vault/resolutions/m07_sgp4_teme_policy_wave1.tsv` records A40 metadata-only terminal dispositions for the SGP4 / TEME frame-time policy and helper-exclusion candidate pool, closing that governed candidate pool.

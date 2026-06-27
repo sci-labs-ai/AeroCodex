@@ -22,7 +22,7 @@ The current main counts below are verifier-derived and include Session G, later 
 | Executable research equations | 152 | Public Rust research/preliminary-design equation kernels inventoried by `validation/equation_inventory.tsv`. |
 | Metadata-only formula-vault candidates | 27 | Formula-vault candidate metadata records; not implementations by themselves. |
 | External M07 rows with terminal dispositions | 855 | A11-A33 record 129 aliases, 103 excluded internal/composite helpers, and 623 contract- or policy-blocked rows. |
-| External M07 backlog rows | 468 | Registered external M07 represented rows that still lack a terminal disposition. |
+| External M07 backlog rows | 198 | Registered external M07 represented rows that still lack a terminal disposition. |
 | Validation cards | 46 | Conservative validation/governance records. They are not certification evidence. |
 | Source-registry seeds | 44 | Source/governance traceability seeds. |
 | Validation-card-only records | 46 | Metadata records, not formula implementations. |
@@ -88,3 +88,8 @@ A38 is metadata-only and blocks 40 J2 perturbation / numerical-propagation sourc
 ### A39 external M07 J2 perturbation / numerical propagation policy Wave 3
 
 A39 is metadata-only and blocks 48 J2 perturbation / numerical-propagation source rows pending force-model, frame/time, source-registry, numerical integration, and validation-oracle policy. External M07 counters after A39: 1080 processed / 243 backlog.
+
+
+### A40 external M07 SGP4 / TEME frame-time policy Wave 1
+
+A40 is metadata-only and records 45 SGP4/TEME frame-time policy terminal dispositions or helper exclusions. External M07 counters after A40: 1125 processed / 198 backlog.

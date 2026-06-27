@@ -84,3 +84,8 @@ A38 adds 40 research-required terminal dispositions for `10B_J2_perturbation_and
 ### A39 external M07 J2 perturbation / numerical propagation policy Wave 3
 
 A39 adds 48 research-required terminal dispositions for `10B_J2_perturbation_and_numerical_policy`, closing that governed candidate pool and bringing external M07 processed/backlog counters to 1080/243.
+
+
+### A40 external M07 SGP4 / TEME frame-time policy Wave 1
+
+A40 adds 45 research-required terminal dispositions for `10C_sgp4_teme_oracle_and_frame_time_gate` and `10C_sgp4_hold_no_public_helper_import`, bringing external M07 processed/backlog counters to 1125/198.

@@ -231,3 +231,8 @@ Selected 40 rows from `10B_J2_perturbation_and_numerical_policy`. All remain blo
 ### A39 J2 perturbation / numerical propagation policy Wave 3 summary
 
 Selected 48 rows from `10B_J2_perturbation_and_numerical_policy`, closing that governed candidate pool. All remain blocked until J2 perturbation force-model and numerical validation policy is approved. External M07 processed/backlog after A39: 1080/243.
+
+
+### A40 SGP4 / TEME frame-time policy Wave 1 summary
+
+Selected 45 rows from `10C_sgp4_teme_oracle_and_frame_time_gate` and `10C_sgp4_hold_no_public_helper_import`, closing the SGP4/TEME candidate pool. External M07 processed/backlog after A40: 1125/198.
