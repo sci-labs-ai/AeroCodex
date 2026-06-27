@@ -26,8 +26,8 @@ sha256 = "c57fd001a7d1c7050e5a6875dca00295dd693c666dc195093f63480bb981127d"
 
 [[files]]
 path = "checksums/SHA256SUMS"
-bytes = 9914
-sha256 = "e3e3a1f244ebdbbb026a136a8f819f5da5c9dad688c5aec7128abeb8460502d1"
+bytes = 9742
+sha256 = "bfd0bd04a579239e1518637251e55a770bda601a261484c3f57e12bb680ef436"
 
 [[files]]
 path = "citations/blss_thinfilm_refs.bib"
@@ -246,8 +246,8 @@ sha256 = "80d6293662c3bcb8b87e09702b61e810608052d9c6fe1b0d896af0c6b6f2064b"
 
 [[files]]
 path = "docs/assurance/m07_coordinate_transform_frame_time_policy_wave1_resolution.md"
-bytes = 1893
-sha256 = "0946a08b08b51ff0d961320a4bbe32e1a707fdef5dab90095452a8290c161ee0"
+bytes = 1900
+sha256 = "80958a5ab221210cc1931595eecc7f3de595932ee57432cb7d85ff191c9c6a82"
 
 [[files]]
 path = "docs/index.md"
@@ -359,7 +359,3 @@ path = "validation/equation_inventory.tsv"
 bytes = 132747
 sha256 = "61a07904898788098f85e048ee060937fabd1d00b539d806ab5ea4414a034454"
 
-[[files]]
-path = "DATA_MANIFEST.toml"
-bytes = 12259
-sha256 = "bfa1ffe67dacf273fb7d788c534bcc53456a7b9c355880cf523729cdbb42b167"

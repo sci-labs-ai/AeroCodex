@@ -5,7 +5,7 @@ A26 assigns terminal metadata dispositions to the first governed coordinate-tran
 ## Selection
 
 - Wave: A26 external M07 coordinate-transform / frame-graph / time-scale policy Wave 1.
-- Selection policy: `POLICY_GOVERNED_BACKLOG_FAMILY` from the A26 row-selection adjudication package.
+- Selection policy: the governed backlog-family policy chosen by the A26 row-selection adjudication package.
 - Selected rows: `PORT_STATUS_RELEASE_GATE.csv:row_0013` through `PORT_STATUS_RELEASE_GATE.csv:row_0404`, 40 source rows.
 - Source groups: 29 coordinate-transform contract rows, 9 time-scale/sidereal policy rows, and 2 frame-graph/time-policy rows.
 
