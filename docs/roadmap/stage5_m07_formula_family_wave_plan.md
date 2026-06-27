@@ -154,3 +154,7 @@ A31 processes the first 40 source-ordered rows from the governed relative-motion
 
 A32 processes the second 40 source-ordered rows from the governed relative-motion and finite-burn scalar policy backlog: 0 exact aliases, 0 helper exclusions, and 40 rows remain contract- or policy-blocked. The selected rows span the relative-motion frame-policy group (10), the rocket-vehicle policy group (23), and the rocket-equation scalar contract group (7), while retaining 10 frame/time-policy blocked labels, 23 high-risk numerical-policy labels, and 7 medium-risk contract-review labels. A32 leaves 29 rows in this candidate pool and updates external accounting to 826 terminally processed rows and 497 remaining backlog rows. No raw Rust-port, M07, or Scilab source is imported or executed.
 
+
+### Post-Stage-5 A33 overlay
+
+A33 processes the final 29 source-ordered rows from the governed relative-motion and finite-burn scalar policy backlog: 0 exact aliases, 0 helper exclusions, and 29 rows remain contract- or policy-blocked. The selected rows span the rocket-vehicle policy group (28) and the rocket-equation scalar contract group (1), while retaining 28 high-risk numerical-policy labels and 1 medium-risk contract-review label. A33 leaves 0 rows in this candidate pool and updates external accounting to 855 terminally processed rows and 468 remaining backlog rows. No raw Rust-port, M07, or Scilab source is imported or executed.

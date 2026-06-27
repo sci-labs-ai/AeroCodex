@@ -182,4 +182,4 @@ AeroCodex core repository code is licensed under `MIT OR Apache-2.0` unless a fi
 
 A28-A30 complete the governed solver / numerical propagation policy backlog with 123 contract- or policy-blocked rows and leave 0 rows in that candidate pool. A31 starts the relative-motion and finite-burn scalar policy backlog with 40 contract- or policy-blocked rows and leaves 69 rows in that candidate pool.
 
-A28-A30 complete the governed solver / numerical propagation policy backlog with 123 contract- or policy-blocked rows and leave 0 rows in that candidate pool. A31-A32 continue the relative-motion and finite-burn scalar policy backlog with 80 contract- or policy-blocked rows and leave 29 rows in that candidate pool.
+A28-A30 complete the governed solver / numerical propagation policy backlog with 123 contract- or policy-blocked rows and leave 0 rows in that candidate pool. A31-A33 complete the relative-motion and finite-burn scalar policy backlog with 109 contract- or policy-blocked rows and leave 0 rows in that candidate pool.
