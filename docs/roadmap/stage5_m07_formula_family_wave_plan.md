@@ -144,3 +144,8 @@ A29 processes the next 40 source-ordered rows from the remaining governed solver
 ### Post-Stage-5 A30 overlay
 
 A30 processes the remaining 43 source-ordered rows from the governed solver / numerical propagation policy backlog: 0 exact aliases, 0 helper exclusions, and 43 rows remain contract- or policy-blocked. The selected rows all belong to `9C_kepler_lambert_gauss_solver_policy_or_10B_numerical_propagation_policy`, retain 43 `blocked_until_solver_policy` labels, close the solver-policy candidate pool, and update external accounting to 746 terminally processed rows and 577 remaining backlog rows. No raw Rust-port, M07, or Scilab source is imported or executed.
+
+
+### Post-Stage-5 A31 overlay
+
+A31 processes the first 40 source-ordered rows from the governed relative-motion and finite-burn scalar policy backlog: 0 exact aliases, 0 helper exclusions, and 40 rows remain contract- or policy-blocked. The selected rows span the relative-motion frame-policy group (19), the rocket-vehicle policy group (19), and the rocket-equation scalar contract group (2), while retaining 19 frame/time-policy blocked labels, 19 high-risk numerical-policy labels, and 2 medium-risk contract-review labels. A31 leaves 69 rows in this candidate pool and updates external accounting to 786 terminally processed rows and 537 remaining backlog rows. No raw Rust-port, M07, or Scilab source is imported or executed.

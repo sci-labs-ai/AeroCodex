@@ -21,8 +21,8 @@ The current main counts below are verifier-derived and include Session G, later 
 |---|---:|---|
 | Executable research equations | 152 | Public Rust research/preliminary-design equation kernels inventoried by `validation/equation_inventory.tsv`. |
 | Metadata-only formula-vault candidates | 27 | Formula-vault candidate metadata records; not implementations by themselves. |
-| External M07 rows with terminal dispositions | 746 | A11-A30 record 129 aliases, 103 excluded internal/composite helpers, and 514 contract- or policy-blocked rows. |
-| External M07 backlog rows | 577 | Registered external M07 represented rows that still lack a terminal disposition. |
+| External M07 rows with terminal dispositions | 786 | A11-A31 record 129 aliases, 103 excluded internal/composite helpers, and 554 contract- or policy-blocked rows. |
+| External M07 backlog rows | 537 | Registered external M07 represented rows that still lack a terminal disposition. |
 | Validation cards | 46 | Conservative validation/governance records. They are not certification evidence. |
 | Source-registry seeds | 44 | Source/governance traceability seeds. |
 | Validation-card-only records | 46 | Metadata records, not formula implementations. |
@@ -49,7 +49,7 @@ The current main counts below are verifier-derived and include Session G, later 
 - BioSim docs/contracts, flat resource/tick primitives, corrected B2a scenario-domain structural validation, B2b-1 process/intent-planner helpers, B2b-2 bounded replay/digest/event helpers, and B2c replay-integrity/ledger/report/example helpers remain research-only and incomplete as a full scenario engine or controller; no flat-resource adapter exists in B2c, B2b-3 is skipped/not required for the deployed B2c consumer path, and no biological-fidelity, habitat-safety, medical, operational, parity, certification, or regulated-use claim is made.
 - Session F provides Orekit reference-oracle planning metadata only and does not provide certified Orekit parity.
 - M07 material remains quarantined source material and is not bulk-imported.
-- A11-A30 resolve twenty bounded metadata waves: 129 aliases reuse existing governed runtimes, 103 internal/composite helpers are excluded from formula scope, and 514 rows remain contract- or policy-blocked. A14-A15 complete all 49 classical two-body algebra rows; A16-A25 complete all 377 orbital-geometry/conic rows and leave 0 rows in that classifier group. A26-A27 complete the coordinate-transform/frame-graph/time-scale policy backlog, retain 58 medium-risk and 27 frame/time-policy blocked labels, and leave a 577-row external backlog incomplete.
+- A11-A31 resolve twenty-one bounded metadata waves: 129 aliases reuse existing governed runtimes, 103 internal/composite helpers are excluded from formula scope, and 554 rows remain contract- or policy-blocked. A14-A15 complete all 49 classical two-body algebra rows; A16-A25 complete all 377 orbital-geometry/conic rows and leave 0 rows in that classifier group. A26-A27 complete the coordinate-transform/frame-graph/time-scale policy backlog, retain 58 medium-risk and 27 frame/time-policy blocked labels, and leave a 537-row external backlog incomplete.
 
 ## Minimum friend-test acceptance criteria
 

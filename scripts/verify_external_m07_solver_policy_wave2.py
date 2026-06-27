@@ -73,8 +73,8 @@ EXPECTED_ROWS=40
 EXPECTED_REMAINING_CANDIDATE_POOL_ROWS=43
 EXPECTED_EXECUTABLE_ROWS=152
 EXPECTED_METADATA_ROWS=27
-EXPECTED_CUMULATIVE_PROCESSED=746
-EXPECTED_REMAINING_BACKLOG=577
+EXPECTED_CUMULATIVE_PROCESSED=786
+EXPECTED_REMAINING_BACKLOG=537
 EXPECTED_RISK_COUNTS=Counter({'blocked_until_solver_policy': 40})
 EXPECTED_FAMILY_COUNTS=Counter({'iterative_solver': 40})
 EXPECTED_SOURCE_GROUP_COUNTS=Counter({'9C_kepler_lambert_gauss_solver_policy_or_10B_numerical_propagation_policy': 26, '9C_or_10B_generic_numerical_method_policy': 14})
@@ -202,8 +202,8 @@ def self_test()->dict[str,Any]:
     require(len(SELECTED_LOCATORS)==EXPECTED_ROWS,'self-test selected count mismatch')
     require(SELECTED_LOCATORS[0]=='PORT_STATUS_RELEASE_GATE.csv:row_0416','self-test first locator mismatch')
     require(SELECTED_LOCATORS[-1]=='PORT_STATUS_RELEASE_GATE.csv:row_0884','self-test last locator mismatch')
-    require(EXPECTED_CUMULATIVE_PROCESSED==746,'self-test processed counter mismatch')
-    require(EXPECTED_REMAINING_BACKLOG==577,'self-test backlog counter mismatch')
+    require(EXPECTED_CUMULATIVE_PROCESSED==786,'self-test processed counter mismatch')
+    require(EXPECTED_REMAINING_BACKLOG==537,'self-test backlog counter mismatch')
     return {
         'schema_version':'aerocodex.external_m07.solver_policy_wave2.self_test.v1',
         'result':'PASS',

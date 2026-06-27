@@ -21,13 +21,13 @@ sha256 = "cbca8994de4ffe26e4ba28d9b004f6745195b3172f7839b3510f0be27c3be37d"
 
 [[files]]
 path = "README.md"
-bytes = 17339
-sha256 = "2cfbf65d4f276863535e52b65952bf333199edec9763a1c0224c1b1d03dda764"
+bytes = 17493
+sha256 = "cd06471e3a9dcc5b6b450e8ff0cebc93238da705a68c6d2ecb43bf4b5d418b75"
 
 [[files]]
 path = "checksums/SHA256SUMS"
-bytes = 11241
-sha256 = "9eb1466c74a3c963735f07ac7c0063fae14a1fac5b7e32e4b151a53db1b3d3a7"
+bytes = 11660
+sha256 = "730f73e2066f5fbe97f9bf0331642ff5dc912848cc883f0240eda443e5a4607f"
 
 [[files]]
 path = "citations/blss_thinfilm_refs.bib"
@@ -231,18 +231,18 @@ sha256 = "04aea134d70750d9acbedb4ee93ce7016b1634c2b5a967676c458f4ec8a9722e"
 
 [[files]]
 path = "data-governance/DATA_REGISTRY.yaml"
-bytes = 47733
-sha256 = "893f6b1992e96e79c06696faf49299bb52540446eb43a6cd77eaca2e201904df"
+bytes = 48998
+sha256 = "b627d6557e1e038dd861cfa3dd3c8b3d2cef0848f5bcc6a110a2539b283434a8"
 
 [[files]]
 path = "docs/assurance/equation_inventory_readiness_dashboard.md"
 bytes = 4348
-sha256 = "c77d307c48b9e78a9e41b3c82e7a35f90546c522df0e056644025c8c2322ba2a"
+sha256 = "410df29360d64601203240a6afd1b8c128aa51196d8c4c23c330bea9b8745f88"
 
 [[files]]
 path = "docs/assurance/formula_vault_runtime_resolution.md"
-bytes = 2568
-sha256 = "771d77067c269b82c7f24dda8c10716f7b677345589af8f7a95d80dbb71d8ce5"
+bytes = 2804
+sha256 = "98d1d2267c42f68c7d59ee825f562c0a296c803c1d89d8b6346b08ea92ea9184"
 
 [[files]]
 path = "docs/assurance/m07_coordinate_transform_frame_time_policy_wave1_resolution.md"
@@ -251,33 +251,33 @@ sha256 = "80958a5ab221210cc1931595eecc7f3de595932ee57432cb7d85ff191c9c6a82"
 
 [[files]]
 path = "docs/index.md"
-bytes = 10062
-sha256 = "9b806a9c1c694ad804bab3b5d577a5a9e1f781e4fac0da962cfb352378b53ed0"
+bytes = 10194
+sha256 = "006bf0294dab4ac8b526f9a9f161f7dd9b82a818f5aad70a25d68ee7273b0fbd"
 
 [[files]]
 path = "docs/roadmap/public_alpha_readiness_dashboard.md"
-bytes = 6853
-sha256 = "03e6308888ea837b64ec95c713d751f6d0720fdde62f919aace39306f3128464"
+bytes = 6857
+sha256 = "f76e588abee6c03ca2edba6cce77e84861e5a67811cfedf50d707b0716a71077"
 
 [[files]]
 path = "docs/roadmap/stage5_m07_formula_family_wave_plan.md"
-bytes = 17583
-sha256 = "76693f05147bb4c5d48f31c36d67b098f82d46f192e660f898fb7613a236efd9"
+bytes = 18315
+sha256 = "21a041d7d046d01daab5237337b192bd9920dc8776d207eae33536364fb4637e"
 
 [[files]]
 path = "docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier_summary.md"
-bytes = 16485
-sha256 = "4ec1bb5afe27721869050afd511d2b66c4825ffdc7877cb9b2fbf389dcfa1018"
+bytes = 16900
+sha256 = "5d1ebc9e22d0a3d76914719532c776366bff962ad68b238f8fea5a1eba923cf6"
 
 [[files]]
 path = "docs/testing/friend_test_expected_output.md"
 bytes = 13207
-sha256 = "d6bcc1f41c4bb05a26402bce284a67495c0b3022b1eeda38ae9b68bc64482957"
+sha256 = "c788750833a7bc47b0125a8ed8be7383e65caff986a85040771f38dbcea31d28"
 
 [[files]]
 path = "formula-vault/README.md"
-bytes = 24789
-sha256 = "c0d6bd4124a276b77b854195f7de5f5521995a4a3cb5c25aa730bf8151257dea"
+bytes = 25735
+sha256 = "33d0b08812cf1d859c0f0dafdb11e1f590a6c8e3e336b95b48929ef2e3b105a2"
 
 [[files]]
 path = "formula-vault/resolutions/m07_coordinate_transform_frame_time_policy_wave1.tsv"
@@ -287,77 +287,77 @@ sha256 = "4c2a14ff5ab0ffc65b27c62b0953274230312924efd3481ef5c6273e87283a67"
 [[files]]
 path = "scripts/verify_external_m07_coordinate_transform_frame_time_policy_wave1.py"
 bytes = 16262
-sha256 = "803ab5c3c51de5758a3815833a4e974a18ddc2153bc816fee89548d170da3167"
+sha256 = "06b26c974c66a124148c39280d01f2a6fa11a2b8b8280b9935449efefcece453"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave1.py"
 bytes = 24177
-sha256 = "10a4a858f970752beac3693f139010aeab2171112f78af787d81867ebbbbcfa4"
+sha256 = "f701bbba4d6e09f00bdf08ec1a57ff2bca496b7c89875117ea43884af1429040"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave10.py"
 bytes = 14193
-sha256 = "4c926232561053e7c4336c20dae7aa7b4f6607ff7c1e3938aa2d0d98b114aa2c"
+sha256 = "d0c343d1a24c8a5c1791ca66bd585eb93b5d50bbcf518c65d0f46571017fca9c"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave2.py"
 bytes = 20196
-sha256 = "cb67ab5bceff50b72aa1523f446f2b6f01aae9f8bf840858108109e01a8e4272"
+sha256 = "14acf4949ab691d15678b78e0a1a09e89e7e452ca04eed5e354bf2d117f8537d"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave3.py"
 bytes = 21042
-sha256 = "467300a50b0a3eb5f1fda4e5204749405442e522eb43ab4e7b3c8e3a107c92c8"
+sha256 = "b44b1113c8de90dbd8d53750c4a067a96fe9c9719b003e5f3d97f2aa95f4bbb7"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave4.py"
 bytes = 24089
-sha256 = "8f2e6af5091b5068ac793273484a5fd9fbfcda0e9f659b992860b4c3e72b2ac8"
+sha256 = "1cf29a12407945bd06992873e610b0cdb6da5c29ff94e0885fed73ee78190ab6"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave5.py"
 bytes = 25228
-sha256 = "9ea7403140e13f1eb9e2d37a0e6d7e774c7f04bb531f422c014e16fca2410b80"
+sha256 = "1c069277c3646db71a64382b7db0bda261f8387bf5b27b8d9417538389a111ee"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave6.py"
 bytes = 27238
-sha256 = "6824b9066de4821d7cb16f906b7bd5fc7236b0e8874f73b7569379b9c2f10948"
+sha256 = "4f7241130037e2aebbbd6542c7eb62572c3993692e00be112c8633e10b6131aa"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave7.py"
 bytes = 26886
-sha256 = "486066ae874ef2b4338b96730db14bf96381bd2eae0ae4fd3810fc04067b046f"
+sha256 = "aa339edfb2926ca42f4d43318908a8c1eed70529669e7903b1214da154b3f032"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave8.py"
 bytes = 27480
-sha256 = "774da1733605a3cfba87a3cbf36a71b9f14beeaa98e7a9710fe3f3c1a2c25578"
+sha256 = "bf00dfb2a49a30f88b8160fd10a8e9679a2cd83d46806157f80d26e02ca76423"
 
 [[files]]
 path = "scripts/verify_external_m07_orbital_geometry_conic_wave9.py"
 bytes = 14122
-sha256 = "e9128c9d799015e030ea6b0cf966f035c60b5647b071c86e3b5f69ed3d15a84b"
+sha256 = "858ff3dbe30e7992211f888096dad88b98f66c311c13d5df44b8f3cebe7bbfbb"
 
 [[files]]
 path = "scripts/verify_external_m07_two_body_algebra_wave1.py"
 bytes = 20939
-sha256 = "a2f7094cbca0e51fd5d8cd1bda1a285b71aeb51f06a37d637f030ffdffd794c5"
+sha256 = "17d00eef4361d9e6ba70aa6991453be46327f42c64d9eb8e28764a0c9cf0d7c5"
 
 [[files]]
 path = "scripts/verify_external_m07_two_body_algebra_wave2.py"
 bytes = 18003
-sha256 = "e45143771f5f3c5a7dbad4a4ad9d185b124fd1b88224b773dd724e1cf6a367a3"
+sha256 = "044b46702f19201a907a6dc49d156a3b5abaf4e521ec7beab91b532a83bb67e9"
 
 [[files]]
 path = "scripts/verify_external_m07_vector_helper_wave2.py"
 bytes = 15402
-sha256 = "ebd4d301e48d696c2e81b5808cd30820938c591feac0045c8e5d2c890ba2c2ac"
+sha256 = "68c7f7a25e7ef966cbfc9c13d38e7578e60df7a8ade38ba4b36f1c4ca23bd523"
 
 [[files]]
 path = "validation/equation_inventory.tsv"
-bytes = 133926
-sha256 = "214f062c08ccb3a0d76456bb89f843371cae1247d53eca1dc98299f9fb0a8fa8"
+bytes = 134265
+sha256 = "bd881989cd97858ecb892dc081781a6a26f38736fb54a84c2d4a25e641d8ff8c"
 
 [[files]]
 path = "docs/assurance/m07_coordinate_transform_frame_time_policy_wave2_resolution.md"
@@ -372,7 +372,7 @@ sha256 = "2f5f68eb55d5034d7a64cdf06a9b60a0a139ff5a6fb5d847293aad941ebc7d01"
 [[files]]
 path = "scripts/verify_external_m07_coordinate_transform_frame_time_policy_wave2.py"
 bytes = 16260
-sha256 = "8ae09789dc3ef6d9a9d801b716e74650bc4209bde2fbf78545ed04d3267fc0f9"
+sha256 = "e76f413e93bf15d6ead4c77761fce7ebb527a332c55a17f1520a7dae03188fdf"
 
 [[files]]
 path = ".github/PULL_REQUEST_TEMPLATE.md"
@@ -457,7 +457,7 @@ sha256 = "fa65df63896a624c3573b2324f2630e43401551f5db67c9ca2c2c80f1c16ef37"
 [[files]]
 path = "scripts/verify_external_m07_solver_policy_wave1.py"
 bytes = 14870
-sha256 = "45ff341b79e053c992f5751589f1ca4f119703f9710cd40f1fe037ec8ff51899"
+sha256 = "eb168f1d2c8d71d4866594b0e6a9767b82b4c188459a0f12b02e11765a5d4845"
 
 [[files]]
 path = "docs/assurance/m07_solver_policy_wave1_resolution.md"
@@ -483,7 +483,7 @@ block_reason = "external_m07_terminal_metadata_not_runtime_implementation"
 [[files]]
 path = "scripts/verify_external_m07_solver_policy_wave2.py"
 bytes = 14523
-sha256 = "609421d2bcb71c2b7899111495d954ab07eb339a51d175549db14ccef1710f1f"
+sha256 = "10624f6706a7538dfffd8950d20446e8d75dc11a1d65ea8f4f0a438e4badf4ef"
 status = "research_required"
 blocked = true
 block_reason = "external_m07_terminal_metadata_not_runtime_implementation"
@@ -499,4 +499,16 @@ sha256 = "53ef2528f3467519efcbca59b912813cf1d332a5f41d1613e99d05c764e5e341"
 [[files]]
 path = "scripts/verify_external_m07_solver_policy_wave3.py"
 bytes = 12303
-sha256 = "d56fce23235c018e40003f7adfacd262f0b526da36f84e1f174a7bd9334c064d"
+sha256 = "b18ed05af1b8b4b69476cb189d28b7c6441a7df16f4cdaaa194c5a5281174b1c"
+[[files]]
+path = "docs/assurance/m07_relative_motion_finite_burn_policy_wave1_resolution.md"
+bytes = 972
+sha256 = "cdc057881ab1c56afaae3d3a7dd8769519810d01578f71a8aced049c3cde07ad"
+[[files]]
+path = "formula-vault/resolutions/m07_relative_motion_finite_burn_policy_wave1.tsv"
+bytes = 36724
+sha256 = "c78c279273a9505eb4df5d31d3470879e5b6d36b34a6654d4786ddc51bd9e822"
+[[files]]
+path = "scripts/verify_external_m07_relative_motion_finite_burn_policy_wave1.py"
+bytes = 13450
+sha256 = "6c5fff9a55a2dee84ddaa370a93a6b6ed9a1cc51d469f2171992c0f92c208de7"
