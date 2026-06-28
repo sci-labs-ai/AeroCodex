@@ -1696,7 +1696,9 @@ fn verify_equation_inventory_text(
                 row.id
             ));
         }
-        if row.row_count == 0 {
+        let external_backlog_zero_closure =
+            row.category == "external_m07_backlog_row" && expected.external_m07_backlog_rows == 0;
+        if row.row_count == 0 && !external_backlog_zero_closure {
             return Err(format!(
                 "{} line {} inventory item `{}` row_count must be positive",
                 path.display(),
