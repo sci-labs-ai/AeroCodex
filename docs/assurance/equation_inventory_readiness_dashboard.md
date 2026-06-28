@@ -97,3 +97,7 @@ A42 adds 45 research-required terminal dispositions for classifier-refresh and m
 ### A43 external M07 scalar/unit helper policy Wave 1
 
 A43 adds 45 research-required terminal dispositions for scalar-helper and unit/constants helper rows, bringing external M07 processed/backlog counters to 1260/63.
+
+### A44 external M07 residual scalar/unit/helper policy Wave 1
+
+A44 adds 45 research-required terminal dispositions for residual scalar/unit/helper rows, bringing external M07 processed/backlog counters to 1305/18.

@@ -141,3 +141,5 @@ The Phase 0.001 life-support crate has reviewed scalar closure-fraction, require
 - A42 records classifier-refresh/manual source-review metadata-only terminal dispositions and leaves runtime/public API behavior unchanged.
 
 - A43 records scalar-helper and unit/constants helper metadata-only terminal dispositions and leaves runtime/public API behavior unchanged.
+
+- A44 records residual angle endpoint, scalar-helper, and unit/constants metadata-only dispositions and leaves runtime/public API behavior unchanged.

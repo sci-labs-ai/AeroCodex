@@ -18,8 +18,8 @@ EXPECTED_ROWS=45
 EXPECTED_REMAINING_CANDIDATE_POOL_ROWS=13
 EXPECTED_EXECUTABLE_ROWS=152
 EXPECTED_METADATA_ROWS=27
-EXPECTED_CUMULATIVE_PROCESSED=1260
-EXPECTED_REMAINING_BACKLOG=63
+EXPECTED_CUMULATIVE_PROCESSED=1305
+EXPECTED_REMAINING_BACKLOG=18
 EXPECTED_RISK_COUNTS=Counter({'medium_risk_requires_contract_review': 45})
 EXPECTED_FAMILY_COUNTS=Counter({'ambiguous_source_or_contract': 45})
 EXPECTED_SOURCE_GROUP_COUNTS=Counter({'10E_classifier_refresh_or_manual_source_review': 45})
@@ -68,7 +68,7 @@ def verify_repo(repo):
     metadata=[r for r in inventory if r['category']=='metadata_only_formula_vault_candidate']; executable=[r for r in inventory if r['category']=='executable_research_equation']; require(len(metadata)==EXPECTED_METADATA_ROWS,f'metadata count mismatch: {len(metadata)}'); require(len(executable)==EXPECTED_EXECUTABLE_ROWS,f'executable count mismatch: {len(executable)}')
     return {'schema_version':'aerocodex.external_m07.classifier_refresh_manual_source_review_wave1.verifier.v1','result':'PASS','wave_id':WAVE_ID,'resolution_path':RESOLUTION_PATH,'selected_rows':SELECTED_LOCATORS,'candidate_pool_rows':EXPECTED_CANDIDATE_POOL_ROWS,'remaining_candidate_pool_rows':EXPECTED_REMAINING_CANDIDATE_POOL_ROWS,'terminal_disposition_rows':EXPECTED_ROWS,'source_group_counts':dict(sorted(source_group_counts.items())),'risk_tier_counts':dict(sorted(risk_counts.items())),'formula_family_counts':dict(sorted(family_counts.items())),'block_reason_counts':dict(sorted(block_counts.items())),'distinct_source_files':len(source_files),'deduplicated_alias_rows':0,'excluded_helper_rows':0,'contract_blocked_rows':EXPECTED_ROWS,'external_m07_processed_rows':EXPECTED_CUMULATIVE_PROCESSED,'external_m07_backlog_rows':EXPECTED_REMAINING_BACKLOG,'metadata_inventory_records':EXPECTED_METADATA_ROWS,'executable_research_equations':EXPECTED_EXECUTABLE_ROWS,'validation_status':'research_required','no_rust_m07_or_scilab_source_scraping':True,'no_external_parity_claim':True,'no_certification_or_operational_readiness_claim':True,**validation_contract_fields([])}
 def self_test():
-    require(len(SELECTED_LOCATORS)==EXPECTED_ROWS,'self selected count mismatch'); require(EXPECTED_CUMULATIVE_PROCESSED==1260,'processed counter mismatch'); require(EXPECTED_REMAINING_BACKLOG==63,'backlog counter mismatch')
+    require(len(SELECTED_LOCATORS)==EXPECTED_ROWS,'self selected count mismatch'); require(EXPECTED_CUMULATIVE_PROCESSED==1305,'processed counter mismatch'); require(EXPECTED_REMAINING_BACKLOG==18,'backlog counter mismatch')
     return {'schema_version':'aerocodex.external_m07.classifier_refresh_manual_source_review_wave1.self_test.v1','result':'PASS','selected_count':len(SELECTED_LOCATORS),'candidate_pool_rows':EXPECTED_CANDIDATE_POOL_ROWS,'remaining_candidate_pool_rows':EXPECTED_REMAINING_CANDIDATE_POOL_ROWS,'external_m07_processed_rows':EXPECTED_CUMULATIVE_PROCESSED,'external_m07_backlog_rows':EXPECTED_REMAINING_BACKLOG,**validation_contract_fields([])}
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__); parser.add_argument('--self-test',action='store_true'); parser.add_argument('--repo'); args=parser.parse_args(argv)

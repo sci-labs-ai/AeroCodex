@@ -246,3 +246,7 @@ Selected 45 rows from `10E_classifier_refresh_or_manual_source_review`, leaving 
 ### A43 scalar/unit helper policy Wave 1 summary
 
 Selected 45 rows from `8D_helper_deduplication_then_low_risk_scalar_contracts` and `8C_remaining_M00_unit_conversion_contracts`, closing those candidate pools. All remain blocked until scalar helper deduplication and unit/constants contract policy are complete. External M07 processed/backlog after A43: 1260/63.
+
+### A44 residual scalar/unit/helper policy Wave 1 summary
+
+Selected 45 rows from residual angle endpoint, helper exclusion, and unit/constants groups. They remain blocked or excluded until endpoint semantics, duplicate-helper policy, and unit/constants source contracts are complete. External M07 processed/backlog after A44: 1305/18.

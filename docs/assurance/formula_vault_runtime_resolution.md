@@ -49,3 +49,5 @@ The verifier fails closed on duplicate or missing formula IDs, unresolved candid
 A42 classifier-refresh/manual source-review dispositions remain metadata-only and do not add runtime links, formula IDs, or public formula candidates.
 
 A43 scalar/unit helper dispositions remain metadata-only and do not add runtime links, formula IDs, or public formula candidates.
+
+A44 residual scalar/unit/helper dispositions remain metadata-only and do not add runtime links, formula IDs, or public formula candidates.

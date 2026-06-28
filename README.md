@@ -222,3 +222,7 @@ A42 records 45 metadata-only terminal dispositions for the first bounded classif
 ### A43 external M07 scalar/unit helper policy Wave 1
 
 A43 records 45 metadata-only terminal dispositions for remaining scalar-helper and unit/constants helper policy rows. It raises the external M07 processed counter to 1260 rows and leaves 63 rows in the external backlog. No runtime source, Scilab source, certification, or external parity claim is added.
+
+### A44 external M07 residual scalar/unit/helper policy Wave 1
+
+A44 records 45 metadata-only terminal dispositions for residual angle endpoint, helper exclusion, and unit/constants policy rows. It raises the external M07 processed counter to 1305 rows and leaves 18 rows in the external backlog. No runtime source, Scilab source, certification, or external parity claim is added.

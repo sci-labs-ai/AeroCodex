@@ -778,3 +778,18 @@ artifacts:
     owner: AeroCodex maintainers
     update_cadence: immutable bounded wave; closes scalar-helper and remaining M00 unit/constants helper policy candidate pools
     notes: Records zero aliases, zero helper exclusions, and forty-five contract or policy blocks; preserves scalar helper deduplication and unit/constants contract-review labels; no source import, runtime promotion, fixture import, or parity claim.
+
+  - id: stage4.m07.residual_scalar_unit_helper_policy_wave1.2026_06_28
+    title: External M07 residual scalar/unit/helper policy Wave 1 terminal resolutions
+    local_path: formula-vault/resolutions/m07_residual_scalar_unit_helper_policy_wave1.tsv
+    artifact_kind: repo_file_external_backlog_resolution_research_metadata
+    origin: Post-Stage-5 A44 derivative of the registered M07 classifier metadata tied to stage4.m07_rust_port_v14.2026_06_15
+    license: MIT OR Apache-2.0 metadata with M07 source-boundary restrictions
+    sha256: dde17a457f875e7bf383cc1523f1ae88ee5621a8381ee059887b5abf53866b45
+    hash_status: sha256_verified_current_repo_file
+    allowed_use: terminal contract-or-policy-block disposition metadata only
+    bundling_decision: bundled repo-relative metadata only; no source/code/fixture import and no public API promotion
+    validation_status: repository_tracked_research_data
+    owner: AeroCodex maintainers
+    update_cadence: immutable bounded wave; leaves residual candidate-tail rows for the next bounded rollout
+    notes: Records zero aliases, 15 helper exclusions, and 30 contract or policy blocks; preserves angle endpoint, duplicate-helper, and unit/constants contract-review labels; no source import, runtime promotion, fixture import, or parity claim.
