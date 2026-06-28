@@ -139,3 +139,5 @@ The Phase 0.001 life-support crate has reviewed scalar closure-fraction, require
 - [A40 external M07 SGP4 / TEME frame-time policy Wave 1](assurance/m07_sgp4_teme_policy_wave1_resolution.md)
 - [A41 external M07 CR3BP / external-data / input-output policy Wave 1](assurance/m07_cr3bp_external_data_policy_wave1_resolution.md)
 - A42 records classifier-refresh/manual source-review metadata-only terminal dispositions and leaves runtime/public API behavior unchanged.
+
+- A43 records scalar-helper and unit/constants helper metadata-only terminal dispositions and leaves runtime/public API behavior unchanged.

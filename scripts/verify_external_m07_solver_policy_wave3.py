@@ -61,8 +61,8 @@ EXPECTED_ROWS=43
 EXPECTED_REMAINING_CANDIDATE_POOL_ROWS=0
 EXPECTED_EXECUTABLE_ROWS=152
 EXPECTED_METADATA_ROWS=27
-EXPECTED_CUMULATIVE_PROCESSED=1215
-EXPECTED_REMAINING_BACKLOG=108
+EXPECTED_CUMULATIVE_PROCESSED=1260
+EXPECTED_REMAINING_BACKLOG=63
 EXPECTED_RISK_COUNTS=Counter({'blocked_until_solver_policy':43})
 EXPECTED_FAMILY_COUNTS=Counter({'iterative_solver':43})
 EXPECTED_SOURCE_GROUP_COUNTS=Counter({'9C_kepler_lambert_gauss_solver_policy_or_10B_numerical_propagation_policy':43})
@@ -143,8 +143,8 @@ def self_test():
     require(len(SELECTED_LOCATORS)==EXPECTED_ROWS,'selected count mismatch')
     require(SELECTED_LOCATORS[0]=='PORT_STATUS_RELEASE_GATE.csv:row_0885','first locator mismatch')
     require(SELECTED_LOCATORS[-1]=='PORT_STATUS_RELEASE_GATE.csv:row_1251','last locator mismatch')
-    require(EXPECTED_CUMULATIVE_PROCESSED==1215,'processed counter mismatch')
-    require(EXPECTED_REMAINING_BACKLOG==108,'backlog counter mismatch')
+    require(EXPECTED_CUMULATIVE_PROCESSED==1260,'processed counter mismatch')
+    require(EXPECTED_REMAINING_BACKLOG==63,'backlog counter mismatch')
     return {'schema_version':'aerocodex.external_m07.solver_policy_wave3.self_test.v1','result':'PASS','selected_count':len(SELECTED_LOCATORS),'candidate_pool_rows':EXPECTED_CANDIDATE_POOL_ROWS,'remaining_candidate_pool_rows':EXPECTED_REMAINING_CANDIDATE_POOL_ROWS,'external_m07_processed_rows':EXPECTED_CUMULATIVE_PROCESSED,'external_m07_backlog_rows':EXPECTED_REMAINING_BACKLOG}
 def main()->int:
     parser=argparse.ArgumentParser(description='Verify A30 external M07 solver / numerical propagation policy Wave 3 metadata.')

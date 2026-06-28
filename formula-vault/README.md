@@ -371,3 +371,7 @@ A33 records:
 ### A42 classifier-refresh / manual source-review policy Wave 1
 
 Records 45 research-required terminal dispositions in `m07_classifier_refresh_manual_source_review_wave1.tsv`. No runtime formulas, source scraping, or parity claims are introduced. External M07 processed/backlog after A42: 1215/108.
+
+### A43 scalar/unit helper policy Wave 1
+
+Records 45 research-required terminal dispositions in `m07_scalar_unit_helper_policy_wave1.tsv`. No runtime formulas, source scraping, or parity claims are introduced. External M07 processed/backlog after A43: 1260/63.

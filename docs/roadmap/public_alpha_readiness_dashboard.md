@@ -99,3 +99,7 @@ Status: research-required metadata only. A41 adds no public API and no readiness
 ### A42 classifier-refresh / manual source-review policy Wave 1
 
 Status: research-required metadata only. A42 records 45 terminal dispositions and leaves 108 external M07 backlog rows. No public API readiness promotion is made.
+
+### A43 scalar/unit helper policy Wave 1
+
+Status: research-required metadata only. A43 records 45 terminal dispositions and leaves 63 external M07 backlog rows. No public API readiness promotion is made.

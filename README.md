@@ -218,3 +218,7 @@ A41 records 45 metadata-only terminal dispositions for the CR3BP family/oracle p
 ### A42 external M07 classifier-refresh / manual source-review policy Wave 1
 
 A42 records 45 metadata-only terminal dispositions for the first bounded classifier-refresh and manual source-review policy slice. It raises the external M07 processed counter to 1215 rows, leaves 108 rows in the external backlog, and leaves 13 rows in this classifier-refresh/manual-review candidate pool. No runtime source, Scilab source, certification, or external parity claim is added.
+
+### A43 external M07 scalar/unit helper policy Wave 1
+
+A43 records 45 metadata-only terminal dispositions for remaining scalar-helper and unit/constants helper policy rows. It raises the external M07 processed counter to 1260 rows and leaves 63 rows in the external backlog. No runtime source, Scilab source, certification, or external parity claim is added.

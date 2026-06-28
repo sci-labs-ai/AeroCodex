@@ -47,3 +47,5 @@ The verifier fails closed on duplicate or missing formula IDs, unresolved candid
 - `formula-vault/resolutions/m07_sgp4_teme_policy_wave1.tsv`: A40 SGP4 / TEME frame-time policy Wave 1, 45 research-required terminal rows, no runtime mappings.
 - `formula-vault/resolutions/m07_cr3bp_external_data_policy_wave1.tsv`: A41 CR3BP / external-data / input-output policy Wave 1, 45 research-required terminal rows, no runtime mappings.
 A42 classifier-refresh/manual source-review dispositions remain metadata-only and do not add runtime links, formula IDs, or public formula candidates.
+
+A43 scalar/unit helper dispositions remain metadata-only and do not add runtime links, formula IDs, or public formula candidates.
