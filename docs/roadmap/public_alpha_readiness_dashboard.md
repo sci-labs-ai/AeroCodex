@@ -107,3 +107,7 @@ Status: research-required metadata only. A43 records 45 terminal dispositions an
 ### A44 residual scalar/unit/helper policy Wave 1
 
 Status: research-required metadata only. A44 records 45 terminal dispositions and leaves 18 external M07 backlog rows. No public API readiness promotion is made.
+
+### A45 final residual backlog closure Wave 1
+
+Status: research-required metadata only. A45 records 18 terminal dispositions and leaves zero external M07 backlog rows. No public API readiness promotion is made.

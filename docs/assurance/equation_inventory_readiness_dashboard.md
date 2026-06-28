@@ -101,3 +101,7 @@ A43 adds 45 research-required terminal dispositions for scalar-helper and unit/c
 ### A44 external M07 residual scalar/unit/helper policy Wave 1
 
 A44 adds 45 research-required terminal dispositions for residual scalar/unit/helper rows, bringing external M07 processed/backlog counters to 1305/18.
+
+### A45 final residual backlog closure Wave 1
+
+A45 updates external M07 terminal-disposition accounting to 1323 processed rows and 0 remaining backlog rows. The new records are research-required metadata only.

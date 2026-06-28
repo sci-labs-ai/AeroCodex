@@ -379,3 +379,7 @@ Records 45 research-required terminal dispositions in `m07_scalar_unit_helper_po
 ### A44 residual scalar/unit/helper policy Wave 1
 
 Records 45 research-required terminal dispositions in `m07_residual_scalar_unit_helper_policy_wave1.tsv`. Helper/test utilities remain excluded, and angle/unit rows remain policy blocked. External M07 processed/backlog after A44: 1305/18.
+
+### A45 final residual backlog closure Wave 1
+
+Records 18 research-required terminal dispositions in `m07_final_residual_backlog_closure_wave1.tsv`. No runtime formulas, source scraping, or parity claims are introduced. External M07 processed/backlog after A45: 1323/0.

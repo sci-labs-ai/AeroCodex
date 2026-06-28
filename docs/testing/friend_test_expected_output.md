@@ -149,3 +149,7 @@ A42 external M07 metadata-only wave: processed/backlog counters 1215/108; no exe
 A43 external M07 metadata-only wave: processed/backlog counters 1260/63; no executable output changes expected.
 
 A44 external M07 metadata-only wave: processed/backlog counters 1305/18; no executable output changes expected.
+
+### A45 final residual backlog closure Wave 1
+
+No executable friend-test output changes are expected. A45 is metadata-only and records 18 terminal dispositions with no runtime promotion.

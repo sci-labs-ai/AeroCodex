@@ -6,6 +6,7 @@ from collections import Counter
 from pathlib import Path
 SCHEMA_VERSION='aerocodex.external_m07_resolution.v1'
 CLASSIFIER_PATH='docs/source_intake/m07_formula_family_classifier/m07_formula_family_classifier.csv'
+FUTURE_SAME_POOL_RESOLUTION_PATHS={'formula-vault/resolutions/m07_final_residual_backlog_closure_wave1.tsv'}
 RESOLUTION_PATH='formula-vault/resolutions/m07_residual_scalar_unit_helper_policy_wave1.tsv'
 INVENTORY_PATH='validation/equation_inventory.tsv'
 SOURCE_ARTIFACT_ID='stage4.m07_rust_port_v14.2026_06_15'
@@ -17,8 +18,8 @@ EXPECTED_ROWS=45
 EXPECTED_REMAINING_CANDIDATE_POOL_ROWS=15
 EXPECTED_EXECUTABLE_ROWS=152
 EXPECTED_METADATA_ROWS=27
-EXPECTED_CUMULATIVE_PROCESSED=1305
-EXPECTED_REMAINING_BACKLOG=18
+EXPECTED_CUMULATIVE_PROCESSED=1323
+EXPECTED_REMAINING_BACKLOG=0
 EXPECTED_RISK_COUNTS=Counter({'do_not_import': 15, 'medium_risk_requires_contract_review': 30})
 EXPECTED_FAMILY_COUNTS=Counter({'ambiguous_source_or_contract': 15, 'angle_normalization': 19, 'unit_conversion': 11})
 EXPECTED_SOURCE_GROUP_COUNTS=Counter({'8B_or_8D_angle_endpoint_policy_then_deduplicate_wrappers': 19, '8D_deduplicate_helpers_and_test_utility_policy': 15, '8D_deduplicated_unit_conversion_helpers': 11})
@@ -42,7 +43,7 @@ def prior_external_locators(repo):
     locators=set()
     for path in sorted((Path(repo)/'formula-vault/resolutions').glob('m07_*.tsv')):
         rel=path.relative_to(repo).as_posix()
-        if rel==RESOLUTION_PATH: continue
+        if rel==RESOLUTION_PATH or rel in FUTURE_SAME_POOL_RESOLUTION_PATHS: continue
         try: rows=read_delimited(path,'	',EXPECTED_HEADER)
         except Exception: continue
         for row in rows: locators.add(row['source_row_locator'])
@@ -71,7 +72,7 @@ def verify_repo(repo):
     metadata=[r for r in inventory if r['category']=='metadata_only_formula_vault_candidate']; executable=[r for r in inventory if r['category']=='executable_research_equation']; require(len(metadata)==EXPECTED_METADATA_ROWS,f'metadata count mismatch: {len(metadata)}'); require(len(executable)==EXPECTED_EXECUTABLE_ROWS,f'executable count mismatch: {len(executable)}')
     return {'schema_version':'aerocodex.external_m07.residual_scalar_unit_helper_policy_wave1.verifier.v1','result':'PASS','wave_id':WAVE_ID,'resolution_path':RESOLUTION_PATH,'selected_rows':SELECTED_LOCATORS,'candidate_pool_rows':EXPECTED_CANDIDATE_POOL_ROWS,'remaining_candidate_pool_rows':EXPECTED_REMAINING_CANDIDATE_POOL_ROWS,'terminal_disposition_rows':EXPECTED_ROWS,'source_group_counts':dict(sorted(source_group_counts.items())),'risk_tier_counts':dict(sorted(risk_counts.items())),'formula_family_counts':dict(sorted(family_counts.items())),'disposition_counts':dict(sorted(disposition_counts.items())),'distinct_source_files':len(source_files),'deduplicated_alias_rows':0,'excluded_helper_rows':EXPECTED_HELPER_EXCLUSIONS,'contract_blocked_rows':EXPECTED_CONTRACT_BLOCKS,'external_m07_processed_rows':EXPECTED_CUMULATIVE_PROCESSED,'external_m07_backlog_rows':EXPECTED_REMAINING_BACKLOG,'metadata_inventory_records':EXPECTED_METADATA_ROWS,'executable_research_equations':EXPECTED_EXECUTABLE_ROWS,'validation_status':'research_required','no_rust_m07_or_scilab_source_scraping':True,'no_external_parity_claim':True,'no_certification_or_operational_readiness_claim':True,**validation_contract_fields([])}
 def self_test():
-    require(len(SELECTED_LOCATORS)==EXPECTED_ROWS,'self selected count mismatch'); require(EXPECTED_CUMULATIVE_PROCESSED==1305,'processed counter mismatch'); require(EXPECTED_REMAINING_BACKLOG==18,'backlog counter mismatch'); require(EXPECTED_HELPER_EXCLUSIONS==15,'helper exclusion mismatch')
+    require(len(SELECTED_LOCATORS)==EXPECTED_ROWS,'self selected count mismatch'); require(EXPECTED_CUMULATIVE_PROCESSED==1323,'processed counter mismatch'); require(EXPECTED_REMAINING_BACKLOG==0,'backlog counter mismatch'); require(EXPECTED_HELPER_EXCLUSIONS==15,'helper exclusion mismatch')
     return {'schema_version':'aerocodex.external_m07.residual_scalar_unit_helper_policy_wave1.self_test.v1','result':'PASS','selected_count':len(SELECTED_LOCATORS),'candidate_pool_rows':EXPECTED_CANDIDATE_POOL_ROWS,'remaining_candidate_pool_rows':EXPECTED_REMAINING_CANDIDATE_POOL_ROWS,'external_m07_processed_rows':EXPECTED_CUMULATIVE_PROCESSED,'external_m07_backlog_rows':EXPECTED_REMAINING_BACKLOG,**validation_contract_fields([])}
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__); parser.add_argument('--self-test',action='store_true'); parser.add_argument('--repo'); args=parser.parse_args(argv)

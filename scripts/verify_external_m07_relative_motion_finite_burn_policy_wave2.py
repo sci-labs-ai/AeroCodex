@@ -63,8 +63,8 @@ EXPECTED_ROWS=40
 EXPECTED_REMAINING_CANDIDATE_POOL_ROWS=29
 EXPECTED_EXECUTABLE_ROWS=152
 EXPECTED_METADATA_ROWS=27
-EXPECTED_CUMULATIVE_PROCESSED=1305
-EXPECTED_REMAINING_BACKLOG=18
+EXPECTED_CUMULATIVE_PROCESSED=1323
+EXPECTED_REMAINING_BACKLOG=0
 EXPECTED_RISK_COUNTS=Counter({'blocked_until_frame_time_policy': 10, 'high_risk_requires_numerical_policy': 23, 'medium_risk_requires_contract_review': 7})
 EXPECTED_FAMILY_COUNTS=Counter({'frame_graph_sensitive': 10, 'orbit_two_body': 15, 'iterative_solver': 8, 'low_risk_scalar_math': 7})
 EXPECTED_SOURCE_GROUP_COUNTS=Counter({'9D_relative_motion_CW_LVLH_policy': 10, '9E_rocket_vehicle_policy_then_bounded_scalar_slice': 23, '9E_rocket_equation_scalar_subset_after_contract': 7})
@@ -145,8 +145,8 @@ def self_test():
     require(len(SELECTED_LOCATORS)==EXPECTED_ROWS,'selected count mismatch')
     require(SELECTED_LOCATORS[0]=='PORT_STATUS_RELEASE_GATE.csv:row_0972','first locator mismatch')
     require(SELECTED_LOCATORS[-1]=='PORT_STATUS_RELEASE_GATE.csv:row_1270','last locator mismatch')
-    require(EXPECTED_CUMULATIVE_PROCESSED==1305,'processed counter mismatch')
-    require(EXPECTED_REMAINING_BACKLOG==18,'backlog counter mismatch')
+    require(EXPECTED_CUMULATIVE_PROCESSED==1323,'processed counter mismatch')
+    require(EXPECTED_REMAINING_BACKLOG==0,'backlog counter mismatch')
     return {'schema_version':'aerocodex.external_m07.relative_motion_finite_burn_policy_wave2.self_test.v1','result':'PASS','selected_count':len(SELECTED_LOCATORS),'candidate_pool_rows':EXPECTED_CANDIDATE_POOL_ROWS,'remaining_candidate_pool_rows':EXPECTED_REMAINING_CANDIDATE_POOL_ROWS,'external_m07_processed_rows':EXPECTED_CUMULATIVE_PROCESSED,'external_m07_backlog_rows':EXPECTED_REMAINING_BACKLOG}
 def main()->int:
     parser=argparse.ArgumentParser(description='Verify A32 external M07 relative-motion / finite-burn scalar policy Wave 2 metadata.')

@@ -51,3 +51,7 @@ A42 classifier-refresh/manual source-review dispositions remain metadata-only an
 A43 scalar/unit helper dispositions remain metadata-only and do not add runtime links, formula IDs, or public formula candidates.
 
 A44 residual scalar/unit/helper dispositions remain metadata-only and do not add runtime links, formula IDs, or public formula candidates.
+
+### A45 final residual backlog closure Wave 1
+
+A45 adds a metadata-only terminal-disposition manifest for the final 18 external M07 backlog rows. It adds no formula runtime and makes no external parity claim.

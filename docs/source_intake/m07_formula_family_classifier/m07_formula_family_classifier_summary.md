@@ -250,3 +250,7 @@ Selected 45 rows from `8D_helper_deduplication_then_low_risk_scalar_contracts` a
 ### A44 residual scalar/unit/helper policy Wave 1 summary
 
 Selected 45 rows from residual angle endpoint, helper exclusion, and unit/constants groups. They remain blocked or excluded until endpoint semantics, duplicate-helper policy, and unit/constants source contracts are complete. External M07 processed/backlog after A44: 1305/18.
+
+### A45 final residual backlog closure Wave 1
+
+A45 records 18 research-required terminal dispositions from manual source-review and helper-exclusion groups. Remaining external M07 backlog after A45: 0.

@@ -226,3 +226,7 @@ A43 records 45 metadata-only terminal dispositions for remaining scalar-helper a
 ### A44 external M07 residual scalar/unit/helper policy Wave 1
 
 A44 records 45 metadata-only terminal dispositions for residual angle endpoint, helper exclusion, and unit/constants policy rows. It raises the external M07 processed counter to 1305 rows and leaves 18 rows in the external backlog. No runtime source, Scilab source, certification, or external parity claim is added.
+
+### A45 external M07 final residual backlog closure Wave 1
+
+A45 records the final 18 manual-review and helper-exclusion terminal dispositions. No runtime source, Scilab source, certification, or external parity claim is added.

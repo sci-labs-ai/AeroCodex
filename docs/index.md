@@ -143,3 +143,5 @@ The Phase 0.001 life-support crate has reviewed scalar closure-fraction, require
 - A43 records scalar-helper and unit/constants helper metadata-only terminal dispositions and leaves runtime/public API behavior unchanged.
 
 - A44 records residual angle endpoint, scalar-helper, and unit/constants metadata-only dispositions and leaves runtime/public API behavior unchanged.
+
+- [A45 final residual backlog closure Wave 1](assurance/m07_final_residual_backlog_closure_wave1_resolution.md)
