@@ -1,5 +1,9 @@
 # AeroCodex
 
+<p align="center">
+  <img src="assets/aerocodex_patch.png" alt="AeroCodex mission patch" width="420">
+</p>
+
 **Source-traceable aerospace, astrodynamics, and bio-regenerative life-support mathematics in pure Rust.**
 
 AeroCodex is a Phase 0.001 Rust workspace for research, education, verification-oriented development, and preliminary design. The human roadmap phase is `Phase 0.001`; Cargo-compatible package versions remain `0.0.1` during this phase. Do not use `0.001` as a Cargo package version.

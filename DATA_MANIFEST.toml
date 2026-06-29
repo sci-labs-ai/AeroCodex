@@ -80,8 +80,8 @@ status = "repository_tracked_public_repo_file"
 
 [[files]]
 path = "README.md"
-bytes = 10627
-sha256 = "18604e700168dd2517f7ed08ac4769927bc479f7161bc343a7144b19806b3fe8"
+bytes = 10735
+sha256 = "7d7a17ad8cfdeb23dc7c87e97bb44fbc43058c7a90992d4a1ddc77255a6b6399"
 source = "AeroCodex governed repository file"
 status = "repository_tracked_public_repo_file"
 
