@@ -22,14 +22,14 @@ source = "AeroCodex governed repository file"
 status = "repository_tracked_research_data"
 [[files]]
 path = "README.md"
-bytes = 22540
-sha256 = "276fcab92bcc51c328ad648d92496a095d562fc71a4037b615bb0bb4da0c9c4d"
+bytes = 11132
+sha256 = "d419ee7dcf38b3ff7695ea40774b41c460bd97a7b373e54e44516a6b866dc3ce"
 source = "AeroCodex governed repository file"
 status = "repository_tracked_research_data"
 [[files]]
 path = "checksums/SHA256SUMS"
 bytes = 17232
-sha256 = "c1321bb6b0ee8b55a8bfebce31566dbb9ff83205ace1982c6cd4c42f016db6ee"
+sha256 = "8eb46825872b5af24a3cab04b7ae70b5998feab19520091e190f1d7eccc53244"
 source = "AeroCodex governed repository file"
 status = "repository_tracked_research_data"
 [[files]]
