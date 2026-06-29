@@ -17,7 +17,7 @@ The canonical machine-readable equation map is `data/thinfilm/equation_manifest.
 Run:
 
 ```bash
-python3 scripts/verify_thinfilm_artifact.py
+cargo run -p xtask -- verify data-registry
 ```
 
 The script checks source files, manifests, citation files, validation cards, source-registry seeds, and equation-map coverage.

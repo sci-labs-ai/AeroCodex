@@ -44,7 +44,7 @@ Every math or code capability must have an equation contract before it can be tr
 
 ## M07 formula-vault policy
 
-The M07 Scilab-to-Rust workspace reports 1,350 represented function rows and 188 Scilab equivalence jobs. Its packaging includes static provenance and Python invariant summaries, but it remains release-candidate material and is not certified.
+The M07 Scilab-to-Rust workspace reports 1,350 represented function rows and 188 Scilab equivalence jobs. Its packaging includes static provenance and static invariant summaries, but it remains release-candidate material and is not certified.
 
 M07 may be used as a quarantined formula-vault candidate only after intake records identify source IDs, license status, equation contracts, tolerance policy, and validation status. M07 must not replace `crates/aero-codex-astrodynamics` and must not become public API until Rust checks, Scilab equivalence, and SGP4 certification pass.
 

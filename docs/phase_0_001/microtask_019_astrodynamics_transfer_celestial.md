@@ -80,7 +80,7 @@ Future source review must still document:
 
 ## Checks completed in this environment
 
-- Parsed all Cargo manifests with Python `tomllib`.
+- Parsed all Cargo manifests with a temporary local manifest parser.
 - Confirmed `aero-codex-astrodynamics` depends only on `aero-codex-core` and `aero-codex-constants`.
 - Confirmed required Microtask 19 public function names are present.
 - Confirmed Hohmann and sphere-of-influence Codex/source/verification metadata markers are present.

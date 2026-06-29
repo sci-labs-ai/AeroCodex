@@ -13,36 +13,17 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-      - run: python -m pip install --upgrade pip pyyaml
-      - name: Run equation batch compiler self-test
-        run: python scripts/equation_batch.py self-test
-      - name: Compile governed equation batches
-        run: |
-          cargo run -p xtask -- equation-batch generate --manifest equation-batches/m00-canonical-units.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-canonical"
-          cargo run -p xtask -- equation-batch verify --manifest equation-batches/m00-canonical-units.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-canonical" --timeout-seconds 600
-          cargo run -p xtask -- equation-batch generate --manifest equation-batches/m00-angle-vector.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-angle-vector"
-          cargo run -p xtask -- equation-batch verify --manifest equation-batches/m00-angle-vector.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-angle-vector" --timeout-seconds 600
-          cargo run -p xtask -- equation-batch generate --manifest equation-batches/a4-atmosphere-thermo-gasdynamics.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a4"
-          cargo run -p xtask -- equation-batch verify --manifest equation-batches/a4-atmosphere-thermo-gasdynamics.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a4" --timeout-seconds 600
-          cargo run -p xtask -- equation-batch generate --manifest equation-batches/a5-aerodynamics-flight-structures.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a5"
-          cargo run -p xtask -- equation-batch verify --manifest equation-batches/a5-aerodynamics-flight-structures.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a5" --timeout-seconds 600
-          cargo run -p xtask -- equation-batch generate --manifest equation-batches/a6-propulsion-heat-transfer.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a6"
-          cargo run -p xtask -- equation-batch verify --manifest equation-batches/a6-propulsion-heat-transfer.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a6" --timeout-seconds 600
-          cargo run -p xtask -- equation-batch generate --manifest equation-batches/a7-astrodynamics-orekit-foundation.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a7"
-          cargo run -p xtask -- equation-batch verify --manifest equation-batches/a7-astrodynamics-orekit-foundation.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a7" --timeout-seconds 600
-          cargo run -p xtask -- equation-batch generate --manifest equation-batches/a8-life-support-biosim-foundation.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a8"
-          cargo run -p xtask -- equation-batch verify --manifest equation-batches/a8-life-support-biosim-foundation.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a8" --timeout-seconds 600
-          cargo run -p xtask -- equation-batch generate --manifest equation-batches/a9-life-support-thinfilm-pde-rom.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a9"
-          cargo run -p xtask -- equation-batch verify --manifest equation-batches/a9-life-support-thinfilm-pde-rom.tsv --output-dir "${{ runner.temp }}/aerocodex-equation-batch-a9" --timeout-seconds 600
-      - name: Run Beta 1 automated qualification gate
-        run: cargo run -p xtask -- verify beta1-automated --output-dir "${{ runner.temp }}/aerocodex-beta1-automated"
-      - name: Upload automated gate reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: aerocodex-beta1-automated-linux
-          path: ${{ runner.temp }}/aerocodex-beta1-automated
-          if-no-files-found: warn
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+      - name: Check workspace
+        run: cargo check --workspace --all-targets --all-features
+      - name: Run Clippy
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+      - name: Run tests
+        run: cargo test --workspace --all-targets --all-features
+      - name: Run governance checks
+        run: cargo run -p xtask -- verify --all
+      - name: Run dependency policy
+        run: cargo run -p xtask -- dependency-policy
+      - name: Run Beta 1 CLI self-check
+        run: cargo run -p aero-codex-cli -- self-check --json

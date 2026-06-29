@@ -19,4 +19,4 @@ A20 assigns terminal metadata dispositions to the fifth 40 source-ordered rows i
 
 The wave keeps f/g series, Gauss/Lambert transfer, frame-rotation velocity, sighting-based orbit determination, Stumpff scalar, and ballistic free-flight relations blocked until explicit branch, units, singularity, solver, numerical-tolerance, and reference-oracle policies exist. Internal intermediate bundles, residual/search orchestration, linear-system assembly, and classification/summary helpers are excluded from formula scope. No parity, certification, or operational-readiness claim is made.
 
-Verifier: `python3 scripts/verify_external_m07_orbital_geometry_conic_wave5.py --repo .`
+Verifier: `cargo run -p xtask -- verify formula-vault`

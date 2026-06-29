@@ -14,7 +14,7 @@ A12 assigns terminal metadata dispositions to the first 40 rows, in source-row o
 The machine-readable dispositions are in `formula-vault/resolutions/m07_vector_helper_wave1.tsv`. Verify them with:
 
 ```text
-python3 scripts/verify_external_m07_vector_helper_wave1.py --repo .
+cargo run -p xtask -- verify formula-vault
 ```
 
 A12 increases terminally processed external rows from 38 to 78 and reduces the unprocessed external backlog from 1,285 to 1,245. It does not inspect or import raw M07 or Scilab source text and makes no parity, certification, or operational-readiness claim.

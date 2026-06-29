@@ -17,6 +17,6 @@ The alias records reuse `equation-batches/a7-astrodynamics-orekit-foundation.tsv
 ## Verification
 
 ```text
-python3 scripts/verify_external_m07_orbital_geometry_conic_wave2.py --self-test
-python3 scripts/verify_external_m07_orbital_geometry_conic_wave2.py --repo .
+cargo run -p xtask -- verify formula-vault --self-test
+cargo run -p xtask -- verify formula-vault
 ```

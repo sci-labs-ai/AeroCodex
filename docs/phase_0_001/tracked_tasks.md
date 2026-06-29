@@ -32,7 +32,7 @@ cargo doc --workspace --all-features --no-deps
 When touching thin-film BLSS artifact-tracked files, also run:
 
 ```bash
-python3 scripts/verify_thinfilm_artifact.py
+cargo run -p xtask -- verify data-registry
 ```
 
 ## Tasks
@@ -231,7 +231,7 @@ python3 scripts/verify_thinfilm_artifact.py
 - **Title:** Plan optional thin-film BLSS solver/scenario layer without core dependency drift.
 - **Objective:** Convert `docs/phase_0_001/thinfilm_implementation_plan.md` Phase 2 into implementable tasks for optional ODE/DAE, nonlinear algebraic solving, tank-in-series wrappers, ROM calibration interfaces, and scenario cards.
 - **Files/areas:** `crates/aero-codex-life-support/src/`; `data/thinfilm/`; `docs/phase_0_001/thinfilm_implementation_plan.md`; validation cards/source registry.
-- **Verification gate:** Full global Rust gate plus `python3 scripts/verify_thinfilm_artifact.py` if artifact-tracked files change.
+- **Verification gate:** Full global Rust gate plus `cargo run -p xtask -- verify data-registry` if artifact-tracked files change.
 - **Dependencies:** AC-P0.001-T009, AC-P0.001-T010.
 - **Acceptance criteria:** Solver/scenario layer remains optional and pure Rust; no life-support readiness, habitat-safety, or mission suitability is implied.
 

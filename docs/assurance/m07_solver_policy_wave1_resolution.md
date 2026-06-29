@@ -33,8 +33,8 @@ The A28 selected rows are the first 40 source-ordered rows from the 123-row gove
 The repository verifier is:
 
 ```bash
-python3 scripts/verify_external_m07_solver_policy_wave1.py --repo .
-python3 scripts/verify_external_m07_solver_policy_wave1.py --self-test
+cargo run -p xtask -- verify formula-vault
+cargo run -p xtask -- verify formula-vault --self-test
 ```
 
 Both modes emit JSON with `result=PASS` on success, matching the promoted external runner v2 validation contract.

@@ -72,13 +72,13 @@ A10 resolves every existing formula-vault intake formula ID without adding or du
 Run the dependency-free resolution check with:
 
 ```text
-python3 scripts/verify_formula_vault_resolutions.py --repo .
+cargo run -p xtask -- verify formula-vault
 ```
 
 The complete governance wrapper runs this check before the existing xtask gate:
 
 ```text
-python3 scripts/verify_governance.py --repo .
+cargo run -p xtask -- verify --all
 ```
 
 ## A11 external unit-conversion resolution
@@ -86,7 +86,7 @@ python3 scripts/verify_governance.py --repo .
 A11 processes 38 low-risk external unit-conversion classifier rows without adding a formula node or Rust kernel. Thirty-seven rows are recorded as deduplicated aliases of existing governed M00 runtimes; `earth_rotation_rate_canonical` remains contract-blocked. The remaining external backlog is 1,285 rows.
 
 - disposition manifest: `formula-vault/resolutions/m07_unit_conversion_wave1.tsv`;
-- verifier: `python3 scripts/verify_external_m07_unit_conversion_wave1.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - validation status: `research_required`;
 - new validation cards or source seeds: none.
 
@@ -96,7 +96,7 @@ A11 processes 38 low-risk external unit-conversion classifier rows without addin
 A12 processes the first 40 low-risk vector-helper classifier rows without adding a formula node or Rust kernel. Thirty rows are deduplicated aliases of existing governed M00 vector runtimes, eight shape/identity helpers are excluded as internal utilities, and two rows remain contract-blocked. The aggregate terminal-disposition count is 78 and the remaining external backlog is 1,245 rows.
 
 - disposition manifest: `formula-vault/resolutions/m07_vector_helper_wave1.tsv`;
-- verifier: `python3 scripts/verify_external_m07_vector_helper_wave1.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - validation status: `research_required`;
 - new validation cards or source seeds: none.
 
@@ -129,7 +129,7 @@ The contract records independent mathematical summaries, finite-input domains, t
 A13 processes the remaining 34 rows in `8D_helper_deduplication_then_low_risk_vector_contracts` without adding a formula node or Rust kernel. Twenty-six rows are deduplicated aliases of existing governed M00 vector runtimes, five column-shape helpers are excluded as internal utilities, and three rows remain contract-blocked. A12-A13 now cover the complete 74-row vector-helper group. Aggregate terminal dispositions are 112 and the remaining external backlog is 1,211 rows.
 
 - disposition manifest: `formula-vault/resolutions/m07_vector_helper_wave2.tsv`;
-- verifier: `python3 scripts/verify_external_m07_vector_helper_wave2.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - validation status: `research_required`;
 - new validation cards or source seeds: none.
 
@@ -138,7 +138,7 @@ A13 processes the remaining 34 rows in `8D_helper_deduplication_then_low_risk_ve
 A14 processes the first 40 rows in `8E_or_9A_classical_two_body_algebra_contracts` without adding a formula node or Rust kernel. Sixteen exact-name aliases reuse five existing governed A7 formulas: circular speed, circular period, escape speed, vis-viva speed, and mean motion. Twenty-four rows remain contract-blocked because source aliases alone do not establish the required input-shape, conic-branch, reference-radius, or inverse-relation contracts. Nine rows remain for a later wave, and the classifier risk tier remains `medium_risk_requires_contract_review`.
 
 - disposition manifest: `formula-vault/resolutions/m07_two_body_algebra_wave1.tsv`;
-- verifier: `python3 scripts/verify_external_m07_two_body_algebra_wave1.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions after A14: 152;
 - remaining external backlog after A14: 1,171;
 - validation status: `research_required`;
@@ -149,7 +149,7 @@ A14 processes the first 40 rows in `8E_or_9A_classical_two_body_algebra_contract
 A15 processes the remaining 9 rows in `8E_or_9A_classical_two_body_algebra_contracts` without adding a formula node or Rust kernel. Six exact aliases reuse existing governed A7 circular-speed, escape-speed, vis-viva, or mean-motion runtimes. Two specific-energy rows and one AU/TU mean-motion row remain contract-blocked. A14-A15 now cover all 49 rows in the group while preserving `medium_risk_requires_contract_review`.
 
 - disposition manifest: `formula-vault/resolutions/m07_two_body_algebra_wave2.tsv`;
-- verifier: `python3 scripts/verify_external_m07_two_body_algebra_wave2.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions: 161;
 - remaining external backlog: 1,162;
 - validation status: `research_required`;
@@ -160,7 +160,7 @@ A15 processes the remaining 9 rows in `8E_or_9A_classical_two_body_algebra_contr
 A16 processes the first 40 rows in `9A_classical_elements_and_9E_mission_design_contracts` without adding a formula node or Rust kernel. Two exact aliases reuse the governed A7 specific-angular-momentum and eccentricity-vector runtimes. Ten generic math, parameter-lookup, force/acceleration, or state-derivative helpers are excluded from formula scope. Twenty-eight rows remain contract-blocked pending explicit geometry, frame, angle, conic-branch, apsis/ellipse, parabolic, or hyperbolic mission-design contracts. The classifier risk tier remains `medium_risk_requires_contract_review`, and 337 rows remain in the group.
 
 - disposition manifest: `formula-vault/resolutions/m07_orbital_geometry_conic_wave1.tsv`;
-- verifier: `python3 scripts/verify_external_m07_orbital_geometry_conic_wave1.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions: 201;
 - remaining external backlog: 1,122;
 - validation status: `research_required`;
@@ -171,7 +171,7 @@ A16 processes the first 40 rows in `9A_classical_elements_and_9E_mission_design_
 A17 processes the next 40 source-ordered rows in `9A_classical_elements_and_9E_mission_design_contracts` without adding a formula node or Rust kernel. Three exact aliases reuse governed A7 specific-angular-momentum, eccentricity-vector, and node-vector runtimes. Fifteen generic math, state/element conversion, orbit-determination, or composite-summary helpers are excluded from formula scope. Twenty-two rows remain contract-blocked. The selected risk tiers remain unchanged: 38 medium-risk contract-review rows and 2 high-risk numerical-policy rows. A16-A17 now cover 80 rows, leaving 297 group rows.
 
 - disposition manifest: `formula-vault/resolutions/m07_orbital_geometry_conic_wave2.tsv`;
-- verifier: `python3 scripts/verify_external_m07_orbital_geometry_conic_wave2.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions: 241;
 - remaining external backlog: 1,082;
 - validation status: `research_required`;
@@ -182,7 +182,7 @@ A17 processes the next 40 source-ordered rows in `9A_classical_elements_and_9E_m
 A18 processes the third 40 source-ordered rows in `9A_classical_elements_and_9E_mission_design_contracts` without adding a formula node or Rust kernel. One exact alias reuses the governed A7 eccentricity-vector runtime. Seven generic math or composite maneuver helpers are excluded from formula scope. Thirty-two rows remain contract-blocked. The selected risk tiers remain unchanged: 33 medium-risk contract-review rows and 7 high-risk numerical-policy rows. A16-A18 now cover 120 rows, leaving 257 group rows.
 
 - disposition manifest: `formula-vault/resolutions/m07_orbital_geometry_conic_wave3.tsv`;
-- verifier: `python3 scripts/verify_external_m07_orbital_geometry_conic_wave3.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions: 281;
 - remaining external backlog: 1,042;
 - validation status: `research_required`;
@@ -193,7 +193,7 @@ A18 processes the third 40 source-ordered rows in `9A_classical_elements_and_9E_
 A19 processes the fourth 40 source-ordered rows in `9A_classical_elements_and_9E_mission_design_contracts` without adding a formula node or Rust kernel. Three exact aliases reuse governed A7 runtimes, eight internal/composite helpers are excluded from formula scope, and twenty-nine rows remain contract- or policy-blocked. The selected risk tiers remain unchanged: 37 medium-risk contract-review rows and 3 high-risk numerical-policy rows. A16-A19 now cover 160 rows, leaving 217 group rows.
 
 - disposition manifest: `formula-vault/resolutions/m07_orbital_geometry_conic_wave4.tsv`;
-- verifier: `python3 scripts/verify_external_m07_orbital_geometry_conic_wave4.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions: 321;
 - remaining external backlog: 1,002;
 - validation status: `research_required`;
@@ -204,7 +204,7 @@ A19 processes the fourth 40 source-ordered rows in `9A_classical_elements_and_9E
 A20 processes the fifth 40 source-ordered rows in `9A_classical_elements_and_9E_mission_design_contracts` without adding a formula node or Rust kernel. No exact runtime alias is asserted, ten internal/intermediate or composite helpers are excluded from formula scope, and thirty rows remain contract- or policy-blocked. The selected risk tiers remain unchanged: 26 medium-risk contract-review rows and 14 high-risk numerical-policy rows. A16-A20 now cover 200 rows, leaving 177 group rows.
 
 - disposition manifest: `formula-vault/resolutions/m07_orbital_geometry_conic_wave5.tsv`;
-- verifier: `python3 scripts/verify_external_m07_orbital_geometry_conic_wave5.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions: 361;
 - remaining external backlog: 962;
 - validation status: `research_required`;
@@ -215,7 +215,7 @@ A20 processes the fifth 40 source-ordered rows in `9A_classical_elements_and_9E_
 A21 processes the sixth 40 source-ordered rows in `9A_classical_elements_and_9E_mission_design_contracts` without adding a formula node or Rust kernel. One exact alias reuses the governed A7 eccentricity-vector runtime, thirteen internal/composite helpers are excluded from formula scope, and twenty-six rows remain contract- or policy-blocked. The selected risk tiers remain unchanged: 18 medium-risk contract-review rows and 22 high-risk numerical-policy rows. A16-A21 now cover 240 rows, leaving 137 group rows.
 
 - disposition manifest: `formula-vault/resolutions/m07_orbital_geometry_conic_wave6.tsv`;
-- verifier: `python3 scripts/verify_external_m07_orbital_geometry_conic_wave6.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions: 401;
 - remaining external backlog: 922;
 - validation status: `research_required`;
@@ -226,7 +226,7 @@ A21 processes the sixth 40 source-ordered rows in `9A_classical_elements_and_9E_
 A22 processes the seventh 40 source-ordered rows in `9A_classical_elements_and_9E_mission_design_contracts` without adding a formula node or Rust kernel. One exact alias reuses the governed A7 sphere-of-influence runtime, seventeen internal/composite helpers are excluded from formula scope, and twenty-two rows remain contract- or policy-blocked. The selected risk tiers remain unchanged: 38 medium-risk contract-review rows and 2 high-risk numerical-policy rows. A16-A22 now cover 280 rows, leaving 97 group rows.
 
 - disposition manifest: `formula-vault/resolutions/m07_orbital_geometry_conic_wave7.tsv`;
-- verifier: `python3 scripts/verify_external_m07_orbital_geometry_conic_wave7.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions: 441;
 - remaining external backlog: 882;
 - validation status: `research_required`;
@@ -237,7 +237,7 @@ A22 processes the seventh 40 source-ordered rows in `9A_classical_elements_and_9
 A23 processes the eighth 40 source-ordered rows in `9A_classical_elements_and_9E_mission_design_contracts` without adding a formula node or Rust kernel. One exact alias reuses the governed A7 sphere-of-influence runtime, ten internal/composite helpers are excluded from formula scope, and twenty-nine rows remain contract- or policy-blocked. The selected risk tiers remain unchanged: 30 medium-risk contract-review rows and 10 high-risk numerical-policy rows. A16-A23 now cover 320 rows, leaving 57 group rows.
 
 - disposition manifest: `formula-vault/resolutions/m07_orbital_geometry_conic_wave8.tsv`;
-- verifier: `python3 scripts/verify_external_m07_orbital_geometry_conic_wave8.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions: 481;
 - remaining external backlog: 842;
 - validation status: `research_required`;
@@ -248,7 +248,7 @@ A23 processes the eighth 40 source-ordered rows in `9A_classical_elements_and_9E
 A24 processes the ninth 40 source-ordered rows in `9A_classical_elements_and_9E_mission_design_contracts` without adding a formula node or Rust kernel. All 40 rows remain contract- or policy-blocked pending explicit orbit-geometry/conic branch conventions, frame/unit contracts, numerical policy, source registry, and independent validation oracles. The selected risk tiers remain unchanged: 34 medium-risk contract-review rows and 6 high-risk numerical-policy rows. A16-A24 now cover 360 rows, leaving 17 group rows.
 
 - disposition manifest: `formula-vault/resolutions/m07_orbital_geometry_conic_wave9.tsv`;
-- verifier: `python3 scripts/verify_external_m07_orbital_geometry_conic_wave9.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions: 521;
 - remaining external backlog: 802;
 - validation status: `research_required`;
@@ -259,7 +259,7 @@ A24 processes the ninth 40 source-ordered rows in `9A_classical_elements_and_9E_
 A25 processes the final 17 source-ordered rows in `9A_classical_elements_and_9E_mission_design_contracts` without adding a formula node or Rust kernel. All 17 rows remain contract- or policy-blocked pending explicit orbit-geometry/conic branch conventions, frame/unit contracts, numerical policy, source registry, and independent validation oracles. The selected risk tiers remain unchanged: 14 medium-risk contract-review rows and 3 high-risk numerical-policy rows. A16-A25 now cover all 377 rows in the group, leaving 0 group rows.
 
 - disposition manifest: `formula-vault/resolutions/m07_orbital_geometry_conic_wave10.tsv`;
-- verifier: `python3 scripts/verify_external_m07_orbital_geometry_conic_wave10.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions: 538;
 - remaining external backlog: 785;
 - validation status: `research_required`;
@@ -270,7 +270,7 @@ A25 processes the final 17 source-ordered rows in `9A_classical_elements_and_9E_
 A26 processes the first 40 source-ordered rows in the governed 9B coordinate-transform, frame-graph, and time-scale policy backlog without adding a formula node or Rust kernel. All 40 rows remain contract- or policy-blocked pending explicit frame/sign/rotation-order contracts, epoch/time-scale and sidereal policy, source registry, and independent validation oracles. The selected risk tiers remain unchanged: 29 medium-risk contract-review rows and 11 frame/time-policy blocked rows. This leaves 45 rows in the 9B candidate pool.
 
 - disposition manifest: `formula-vault/resolutions/m07_coordinate_transform_frame_time_policy_wave1.tsv`;
-- verifier: `python3 scripts/verify_external_m07_coordinate_transform_frame_time_policy_wave1.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions: 578;
 - remaining external backlog: 745;
 - validation status: `research_required`;
@@ -281,7 +281,7 @@ A26 processes the first 40 source-ordered rows in the governed 9B coordinate-tra
 A27 processes the remaining 45 source-ordered rows in the governed 9B coordinate-transform, frame-graph, and time-scale policy backlog without adding a formula node or Rust kernel. All 45 rows remain contract- or policy-blocked pending explicit frame/sign/rotation-order contracts, epoch/time-scale and sidereal policy, relative-frame conventions, source registry, and independent validation oracles. The selected risk tiers remain unchanged: 29 medium-risk contract-review rows and 16 frame/time-policy blocked rows. This leaves 0 rows in the 9B candidate pool.
 
 - resolution manifest: `formula-vault/resolutions/m07_coordinate_transform_frame_time_policy_wave2.tsv`;
-- verifier: `scripts/verify_external_m07_coordinate_transform_frame_time_policy_wave2.py`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions: 623;
 - remaining external backlog: 700;
 - no runtime, source-seed, validation-card, parity, certification, or operational-readiness claim is made.
@@ -292,7 +292,7 @@ A27 processes the remaining 45 source-ordered rows in the governed 9B coordinate
 A28 processes the first 40 source-ordered rows in the governed 9C solver-policy backlog without adding a formula node or Rust kernel. All 40 rows remain contract- or policy-blocked pending explicit iteration/root-selection, rank/tolerance, convergence/failure-state, source-registry, and independent numerical-oracle policies. The selected risk tiers remain unchanged: 40 solver-policy blocked rows. This leaves 83 rows in the solver-policy candidate pool.
 
 - resolution manifest: `formula-vault/resolutions/m07_solver_policy_wave1.tsv`;
-- verifier: `scripts/verify_external_m07_solver_policy_wave1.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions: 663;
 - remaining external backlog: 660;
 - validation status: `research_required`;
@@ -304,7 +304,7 @@ A28 processes the first 40 source-ordered rows in the governed 9C solver-policy 
 A29 processes the second 40 source-ordered rows in the governed 9C/10B solver-policy backlog without adding a formula node or Rust kernel. All 40 rows remain contract- or policy-blocked pending explicit iteration, root-selection, integration tolerance, convergence/failure-state, source-registry, and independent numerical-oracle policies. The selected risk tiers remain unchanged: 40 solver-policy blocked rows. This leaves 43 rows in the solver-policy candidate pool.
 
 - resolution manifest: `formula-vault/resolutions/m07_solver_policy_wave2.tsv`;
-- verifier: `scripts/verify_external_m07_solver_policy_wave2.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions: 703;
 - remaining external backlog: 620;
 - no M07/Scilab parity, certification, operational-readiness, or public api claim is made.
@@ -314,7 +314,7 @@ A29 processes the second 40 source-ordered rows in the governed 9C/10B solver-po
 A30 processes the remaining 43 source-ordered rows in the governed 9C solver-policy backlog without adding a formula node or Rust kernel. All 43 rows remain contract- or policy-blocked pending explicit iteration, root-selection, integration tolerance, convergence/failure-state, source-registry, and independent numerical-oracle policies. The selected risk tiers remain unchanged: 43 solver-policy blocked rows. This closes the solver-policy candidate pool.
 
 - resolution manifest: `formula-vault/resolutions/m07_solver_policy_wave3.tsv`;
-- verifier: `scripts/verify_external_m07_solver_policy_wave3.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions: 746;
 - remaining external backlog: 577;
 - no runtime implementation, parity, certification, or operational-readiness claim is made.
@@ -325,7 +325,7 @@ A30 processes the remaining 43 source-ordered rows in the governed 9C solver-pol
 A31 processes the first 40 source-ordered rows in the governed relative-motion and finite-burn scalar policy backlog without adding a formula node or Rust kernel. All 40 rows remain contract- or policy-blocked pending explicit relative-frame, finite-burn, rocket-vehicle, unit-domain, source-registry, and independent validation-oracle policies. The selected risk tiers remain unchanged: 19 frame/time-policy blocked rows, 19 high-risk numerical-policy rows, and 2 medium-risk contract-review rows.
 
 - resolution manifest: `formula-vault/resolutions/m07_relative_motion_finite_burn_policy_wave1.tsv`;
-- verifier: `scripts/verify_external_m07_relative_motion_finite_burn_policy_wave1.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions: 786;
 - remaining external backlog: 537;
 - no runtime implementation, parity, certification, or operational-readiness claim is made.
@@ -335,7 +335,7 @@ A31 processes the first 40 source-ordered rows in the governed relative-motion a
 A32 processes the second 40 source-ordered rows in the governed relative-motion and finite-burn scalar policy backlog without adding a formula node or Rust kernel. All 40 rows remain contract- or policy-blocked pending explicit relative-frame, finite-burn, rocket-vehicle, unit-domain, source-registry, and independent validation-oracle policies. The selected risk tiers remain unchanged: 10 frame/time-policy blocked rows, 23 high-risk numerical-policy rows, and 7 medium-risk contract-review rows.
 
 - resolution manifest: `formula-vault/resolutions/m07_relative_motion_finite_burn_policy_wave2.tsv`;
-- verifier: `scripts/verify_external_m07_relative_motion_finite_burn_policy_wave2.py --repo .`;
+- public verification: `cargo run -p xtask -- verify formula-vault`;
 - cumulative external terminal dispositions: 826;
 - remaining external backlog: 497;
 - no runtime implementation, parity, certification, or operational-readiness claim is made.

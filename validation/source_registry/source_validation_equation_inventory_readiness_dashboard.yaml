@@ -23,7 +23,7 @@ requested_details:
   - External M07 processed and remaining-backlog aggregate count cross-checks.
   - Validation-card and source-registry seed count cross-checks.
 implementation_notes:
-  - Dependency-free Python resolution verifiers plus the existing xtask verifier.
+  - Dependency-free historical resolution verifiers plus the existing xtask verifier.
   - A11-A13 reuse existing M00 runtime, contract, validation-card, and source-seed records for aliases.
   - A14-A15 reuse existing A7 equation-batch runtime, contract, validation-card, and source-seed records for exact aliases; ambiguous, unsupported, or unit-system-specific algebra remains contract-blocked.
   - A16 reuses existing A7 specific-angular-momentum and eccentricity-vector records for exact aliases, excludes support helpers from formula scope, and keeps geometry/conic-branch-sensitive rows contract-blocked.

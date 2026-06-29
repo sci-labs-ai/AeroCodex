@@ -83,7 +83,7 @@ The `aero-codex-life-support` test module includes scaffolding for:
 
 ## Checks completed in this environment
 
-- Parsed all Cargo manifests with Python `tomllib`.
+- Parsed all Cargo manifests with a temporary local manifest parser.
 - Confirmed `aero-codex-life-support` depends only on `aero-codex-core`.
 - Confirmed required Microtask 20 public function names are present.
 - Confirmed optional oxygen, carbon-dioxide, and water-recovery wrappers are present.

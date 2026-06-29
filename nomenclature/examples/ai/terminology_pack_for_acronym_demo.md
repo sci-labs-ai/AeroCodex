@@ -1,18 +1,11 @@
-# Example AI Terminology Pack
+# Example AI terminology pack for acronym demo
 
-Generated from `examples/specs/acronym_resolution_demo.md` using:
+This example illustrates the kind of compact terminology context an AI assistant should receive for acronym-heavy review. Generated pack tooling is not tracked in the public repository; maintainers may create packs outside the public tree from the reviewed registries.
 
-```bash
-python tooling/aerocodex_terminology.py --root . pack \
-  --text-file examples/specs/acronym_resolution_demo.md \
-  --domain spacecraft \
-  --domain systems_engineering \
-  --domain aviation
-```
+## Terms to resolve
 
-Expected behavior:
+- `RCS` is ambiguous without local context.
+- `CDR` is ambiguous without local context.
+- `AC` is ambiguous without local context.
 
-- `PDR` should resolve as a systems-engineering review candidate.
-- `CDR` should appear as ambiguous unless design-review context dominates.
-- `GNC`, `EDL`, `ADS-B`, and FAA `AC` should be detected.
-- `RCS` should appear with both Reaction Control System and Radar Cross Section candidates because both contexts appear in the document.
+The assistant should flag ambiguity instead of inventing a single expansion.

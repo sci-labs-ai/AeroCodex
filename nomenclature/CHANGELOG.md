@@ -13,7 +13,7 @@ Added:
 - `docs/ai_terminology_integration.md`.
 - `templates/ACRONYM_PROPOSAL.md`.
 - `templates/AI_TERMINOLOGY_PACK.md`.
-- `tooling/aerocodex_terminology.py` for lookup, JSONL export, and AI terminology-pack generation.
+- Public repository now retains registry data, schemas, templates, examples, and docs; generated terminology-pack tooling is maintained outside the public tree.
 - Example acronym-resolution spec, generated example AI pack, and retrieval-friendly `generated/terminology/index.jsonl`.
 
 Changed:

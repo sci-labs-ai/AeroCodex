@@ -32,7 +32,7 @@ The resolution is a deduplication record, not an external parity claim. Source a
 ## Verification
 
 ```text
-python3 scripts/verify_external_m07_unit_conversion_wave1.py --repo .
+cargo run -p xtask -- verify formula-vault
 ```
 
 The verifier checks the 38-row classifier union, exact target reuse, the 37/1 disposition split, inventory accounting, and the absence of new validation cards, source seeds, kernels, parity claims, certification claims, or operational-readiness claims.

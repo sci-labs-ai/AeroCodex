@@ -36,7 +36,7 @@ For directory entries, `sha256` is a deterministic aggregate over the sorted fil
 
 ## Schema validation status
 
-JSON Schema validation is deferred for Chunk 1. The registry intentionally uses a dependency-free Rust verifier in `xtask` instead of adding third-party Rust or Python dependencies for this governance skeleton.
+JSON Schema validation is deferred for Chunk 1. The registry intentionally uses a dependency-free Rust verifier in `xtask` instead of adding third-party Rust or non-Rust scripting dependencies for this governance skeleton.
 
 Run:
 

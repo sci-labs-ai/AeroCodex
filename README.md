@@ -26,7 +26,7 @@ Negative statements such as “not certified” and “does not currently provid
 
 ## Pure Rust policy
 
-The core repository is intentionally pure Rust. It does not include C/C++/Fortran source, BLAS/LAPACK native linkage, CEA/REFPROP/CoolProp/Cantera wrappers, Python/Matlab/Julia runtime dependencies, `bindgen`, `cc`, `cmake`, `pkg-config`, `vcpkg`, native binary blobs, generated binaries, or a committed root `Cargo.lock`.
+The core repository is intentionally pure Rust. It does not include C/C++/Fortran source, BLAS/LAPACK native linkage, CEA/REFPROP/CoolProp/Cantera wrappers, non-Rust scripting or numerical-runtime dependencies, `bindgen`, `cc`, `cmake`, `pkg-config`, `vcpkg`, native binary blobs, generated binaries, or a committed root `Cargo.lock`.
 
 The repository intentionally keeps the root `Cargo.lock` absent during the current workspace phase.
 
@@ -40,7 +40,7 @@ It also provides governance machinery:
 - data/source registry policy and governed in-repo artifact hashes;
 - formula-vault intake/provenance records and runtime-resolution manifests;
 - equation inventory/readiness accounting;
-- nomenclature, acronym, symbol, terminology, and waiver policy;
+- nomenclature, acronym, symbol, terminology, and waiver policy data;
 - clean-room BioSim-RS-style resource identity, transaction, deterministic replay, ledger, and smoke/friend-test primitives;
 - clean-room BioSim-plus synthetic scenario-domain records, structural validation, process records, intent-planning helpers, bounded compartment replay/digest/event helpers, and replay-integrity/ledger/report helpers for research metadata only;
 - a bounded `aerocodex` Beta 1 concept CLI for deterministic text/JSON execution and self-checking of the ten governed M00 canonical-unit formulas.
@@ -64,7 +64,7 @@ AeroCodex does **not** currently provide certified flight software, a complete B
 | `aero-codex-astrodynamics` | Two-body orbital helpers, Hohmann transfer helpers, sphere of influence, bounded M00 angle/unit/vector helpers including `m00_wrap2pi`, classical-elements/Kepler research helpers, oracle-record/tolerance-comparison metadata helpers, contract-only two-line-element source-policy helpers, and runtime-linked formula-vault intake records. |
 | `aero-codex-life-support` | BLSS mass-balance helpers, thin-film/MELiSSA research kernels, clean-room BioSim-style resource/tick primitives, BioSim-plus synthetic scenario-domain validation, bounded process/intent helpers, compartment replay/digest/event helpers, and replay-integrity/ledger/report helpers. |
 | `aero-codex-cli` | Beta 1 concept binary for ten governed M00 canonical-unit formulas, stable JSON output, exit codes, and bounded self-checks. |
-| `xtask` | Dependency-free local governance, validation, data-registry, formula-vault, and inventory checks. |
+| `xtask` | Dependency-free Rust local governance, validation, data-registry, formula-vault, equation-batch-manifest, and inventory checks. |
 
 ## Quick start
 
@@ -72,7 +72,7 @@ AeroCodex does **not** currently provide certified flight software, a complete B
 git clone https://github.com/sci-labs-ai/AeroCodex.git
 cd AeroCodex
 cargo test --workspace --all-features
-python3 scripts/verify_governance.py --repo .
+cargo run -p xtask -- verify --all
 ```
 
 ## Beta 1 concept CLI
@@ -128,17 +128,8 @@ cargo test --workspace --all-targets --all-features
 cargo run -p aero-codex-cli -- version --json
 cargo run -p aero-codex-cli -- run formula_vault.m00.canonical.distance_to_canonical distance=-42 distance_unit=7 --json
 cargo run -p aero-codex-cli -- self-check --json
-python3 scripts/verify_governance.py --repo .
+cargo run -p xtask -- verify --all
 cargo run -p xtask -- dependency-policy
-python3 scripts/verify_thinfilm_artifact.py
-python3 nomenclature/tooling/aerocodex_nom_lint.py --root nomenclature
-python3 nomenclature/tooling/aerocodex_acronym_inventory.py --repo-root . \
-  --nomenclature-root nomenclature \
-  --check-new \
-  --baseline nomenclature/generated/current_repo_acronym_baseline.json
-python3 nomenclature/tooling/aerocodex_terminology.py --root nomenclature export-jsonl \
-  --output nomenclature/generated/terminology/index.jsonl
-git diff --exit-code nomenclature/generated/terminology/index.jsonl
 RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps
 ```
 

@@ -20,6 +20,7 @@ data_validation_status:
     - release_candidate_not_certified
     - repository_tracked_citation_support
     - repository_tracked_manifest
+    - repository_tracked_metadata
     - repository_tracked_research_data
     - repository_tracked_source_material
     - repository_tracked_status_vocabulary

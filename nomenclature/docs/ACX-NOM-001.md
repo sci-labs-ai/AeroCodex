@@ -738,7 +738,7 @@ When an acronym token has multiple plausible meanings:
 
 ### 8.6 AI terminology packs
 
-AI tools should use `tooling/aerocodex_terminology.py pack` or an equivalent service to receive a small scoped pack containing detected acronyms, canonical terms, alias mappings, collision warnings, and source status.
+AI tools should use a maintainer-provided terminology-pack service outside the public repository, or an equivalent reviewed process, to receive a small scoped pack containing detected acronyms, canonical terms, alias mappings, collision warnings, and source status.
 
 Example pack fragment:
 

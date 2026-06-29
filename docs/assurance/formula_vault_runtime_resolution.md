@@ -19,8 +19,8 @@ The 27 rows comprise 3 angle/unit, 14 vector-algebra, and 10 canonical-unit form
 ## Verification
 
 ```text
-python3 scripts/verify_formula_vault_resolutions.py --repo .
-python3 scripts/verify_governance.py --repo .
+cargo run -p xtask -- verify formula-vault
+cargo run -p xtask -- verify --all
 ```
 
 The verifier fails closed on duplicate or missing formula IDs, unresolved candidates, mismatched runtime or governance fields, missing repository paths, changed inventory dispositions, or a changed external backlog aggregate. It does not scrape Rust source text.

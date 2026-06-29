@@ -86,6 +86,6 @@ A Chunk 6A closeout must include:
 1. focused test-first evidence for the new Rust module;
 2. workspace Rust gates;
 3. `xtask` validation/source/status/data registry gates;
-4. nomenclature/acronym/terminology checks, with bare-`python` unavailability recorded separately if applicable;
+4. nomenclature/acronym/terminology policy review through the Rust-only public governance gate;
 5. staged forbidden-file, local-path, archive, evidence, and secret scans;
 6. remote `main` and GitHub Actions proof after merge/push.

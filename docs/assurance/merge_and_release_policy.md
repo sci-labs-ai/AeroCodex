@@ -23,7 +23,7 @@ AeroCodex is research and preliminary-design software. It is not certified, flig
 
 ## Merge gates
 
-Before merging a Stage 4 chunk, run the required checks listed in `docs/deployment/stage4_agent_operating_rules.md` or the active prompt, whichever is stricter. Record pass, fail, or unavailable status exactly. If a check is unavailable, do not call the chunk fully verified; report the tool dependency.
+Before merging a Stage 4 chunk, run the required checks listed in `removed deployment operating-rules document` or the active prompt, whichever is stricter. Record pass, fail, or unavailable status exactly. If a check is unavailable, do not call the chunk fully verified; report the tool dependency.
 
 ## Source-boundary release gates
 

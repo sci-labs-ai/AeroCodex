@@ -27,6 +27,7 @@ Status upgrades require evidence in the same review. Registry inclusion, source-
 These values are used by `data-governance/DATA_REGISTRY.yaml` in `validation_status`. They describe source-material governance state, not mathematical certification:
 
 - `repository_tracked_manifest`
+- `repository_tracked_metadata`
 - `repository_tracked_citation_support`
 - `repository_tracked_research_data`
 - `verified_by_xtask_cards`

@@ -20,6 +20,6 @@ A22 assigns terminal metadata dispositions to the seventh 40 source-ordered rows
 
 The one alias reuses the governed A7 sphere-of-influence runtime. Hyperbolic aiming-radius, turn-angle, patched-conic capture/departure, flyby-feasibility, conic-radius, and elliptic-period relations remain blocked pending explicit branch, unit, frame, and numerical policies. Composite gravity-assist, patched-conic, orbit-state construction, coordinate-rotation, validation, and interactive-I/O helpers are excluded from formula scope.
 
-Verifier: `python3 scripts/verify_external_m07_orbital_geometry_conic_wave7.py --repo .`
+Verifier: `cargo run -p xtask -- verify formula-vault`
 
 No parity, certification, operational-readiness, or public-API promotion claim is made.

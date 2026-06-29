@@ -41,19 +41,19 @@ outputs:
   - terminal alias, internal-helper exclusion, or contract-blocked dispositions for the bounded A11-A22 waves
   - blocked item reasons for every inventory row
 tests:
-  - python3 scripts/verify_formula_vault_resolutions.py --repo .
-  - python3 scripts/verify_external_m07_unit_conversion_wave1.py --repo .
-  - python3 scripts/verify_external_m07_vector_helper_wave1.py --repo .
-  - python3 scripts/verify_external_m07_vector_helper_wave2.py --repo .
-  - python3 scripts/verify_external_m07_two_body_algebra_wave1.py --repo .
-  - python3 scripts/verify_external_m07_two_body_algebra_wave2.py --repo .
-  - python3 scripts/verify_external_m07_orbital_geometry_conic_wave1.py --repo .
-  - python3 scripts/verify_external_m07_orbital_geometry_conic_wave2.py --repo .
-  - python3 scripts/verify_external_m07_orbital_geometry_conic_wave3.py --repo .
-  - python3 scripts/verify_external_m07_orbital_geometry_conic_wave4.py --repo .
-  - python3 scripts/verify_external_m07_orbital_geometry_conic_wave5.py --repo .
-  - python3 scripts/verify_external_m07_orbital_geometry_conic_wave6.py --repo .
-  - python3 scripts/verify_external_m07_orbital_geometry_conic_wave7.py --repo .
+  - cargo run -p xtask -- verify formula-vault
+  - cargo run -p xtask -- verify formula-vault
+  - cargo run -p xtask -- verify formula-vault
+  - cargo run -p xtask -- verify formula-vault
+  - cargo run -p xtask -- verify formula-vault
+  - cargo run -p xtask -- verify formula-vault
+  - cargo run -p xtask -- verify formula-vault
+  - cargo run -p xtask -- verify formula-vault
+  - cargo run -p xtask -- verify formula-vault
+  - cargo run -p xtask -- verify formula-vault
+  - cargo run -p xtask -- verify formula-vault
+  - cargo run -p xtask -- verify formula-vault
+  - cargo run -p xtask -- verify formula-vault
   - cargo test -p xtask equation_inventory
   - cargo run -p xtask -- verify equation-inventory
   - cargo run -p xtask -- verify --all

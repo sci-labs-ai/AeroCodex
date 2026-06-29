@@ -47,7 +47,7 @@ cargo run -p xtask -- dependency-policy
 
 The `xtask` checks intentionally avoid YAML/JSON parser dependencies in Phase 0.001. They check required top-level fields, nonempty list sections, known status/category strings, card-to-source-registry ID links, schema markers, formula-vault candidate metadata cross-links, equation-inventory counts/block reasons, data-governance status vocabulary coverage, forbidden readiness markers, and native-dependency policy. They are a scaffold, not a replacement for later schema validation, source review, numerical validation, or certification evidence.
 
-A11 adds `python3 scripts/verify_external_m07_unit_conversion_wave1.py --repo .` to the governance wrapper. It verifies metadata-only terminal dispositions and does not read raw M07 or Scilab implementation source.
+A11 adds `cargo run -p xtask -- verify formula-vault` to the governance wrapper. It verifies metadata-only terminal dispositions and does not read raw M07 or Scilab implementation source.
 
 ## Card authoring rules
 

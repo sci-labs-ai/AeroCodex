@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 cd "${REPO_ROOT}"
 
-TOTAL_STEPS=18
+TOTAL_STEPS=13
 CURRENT_STEP=0
 
 info() {
@@ -48,23 +48,12 @@ if ! command -v sha256sum >/dev/null 2>&1; then
   exit 127
 fi
 
-if command -v python >/dev/null 2>&1; then
-  PYTHON_CMD=python
-elif command -v python3 >/dev/null 2>&1; then
-  PYTHON_CMD=python3
-  info "python: using python3 fallback because bare python was not found"
-else
-  info "ERROR: neither python nor python3 was found on the command search path"
-  exit 127
-fi
-
 if command -v rustc >/dev/null 2>&1; then
   info "rustc: $(rustc --version)"
 else
   info "rustc: not found on the command search path"
 fi
 info "cargo: $(cargo --version)"
-info "python command: ${PYTHON_CMD} ($(${PYTHON_CMD} --version 2>&1))"
 
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   info "git commit: $(git log -1 --format=%h)"
@@ -90,20 +79,10 @@ run_step "cargo run -p aero-codex-cli -- run canonical distance smoke" \
   cargo run -p aero-codex-cli -- run formula_vault.m00.canonical.distance_to_canonical distance=-42 distance_unit=7 --json
 run_step "cargo run -p aero-codex-cli -- self-check --json" \
   cargo run -p aero-codex-cli -- self-check --json
-run_step "${PYTHON_CMD} scripts/verify_governance.py --repo ." \
-  "${PYTHON_CMD}" scripts/verify_governance.py --repo .
+run_step "cargo run -p xtask -- verify --all" \
+  cargo run -p xtask -- verify --all
 run_step "cargo run -p xtask -- dependency-policy" \
   cargo run -p xtask -- dependency-policy
-run_step "${PYTHON_CMD} scripts/verify_thinfilm_artifact.py" \
-  "${PYTHON_CMD}" scripts/verify_thinfilm_artifact.py
-run_step "${PYTHON_CMD} nomenclature/tooling/aerocodex_nom_lint.py --root nomenclature" \
-  "${PYTHON_CMD}" nomenclature/tooling/aerocodex_nom_lint.py --root nomenclature
-run_step "${PYTHON_CMD} nomenclature/tooling/aerocodex_acronym_inventory.py --repo-root . --nomenclature-root nomenclature --check-new --baseline nomenclature/generated/current_repo_acronym_baseline.json" \
-  "${PYTHON_CMD}" nomenclature/tooling/aerocodex_acronym_inventory.py --repo-root . --nomenclature-root nomenclature --check-new --baseline nomenclature/generated/current_repo_acronym_baseline.json
-run_step "${PYTHON_CMD} nomenclature/tooling/aerocodex_terminology.py --root nomenclature export-jsonl --output nomenclature/generated/terminology/index.jsonl" \
-  "${PYTHON_CMD}" nomenclature/tooling/aerocodex_terminology.py --root nomenclature export-jsonl --output nomenclature/generated/terminology/index.jsonl
-run_step "git diff --exit-code nomenclature/generated/terminology/index.jsonl" \
-  git diff --exit-code nomenclature/generated/terminology/index.jsonl
 run_shell_step "RUSTDOCFLAGS=\"-D warnings\" cargo doc --workspace --all-features --no-deps" \
   'RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps'
 

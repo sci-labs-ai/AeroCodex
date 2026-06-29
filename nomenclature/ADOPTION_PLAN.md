@@ -33,84 +33,23 @@ registry/waivers.yaml
 
 Assign one owner for nomenclature changes.
 
-Seed external terminology sources as `candidate_source`, not as authoritative imports. Bulk-imported acronyms should start as `candidate` or `external` until reviewed.
-
 ## Phase 2 — Review workflow
 
-Require `templates/PR_CHECKLIST.md` for PRs that touch:
-
-- Specs.
-- Equations.
-- Schemas.
-- Rust identifiers in public APIs.
-- Unit-bearing or frame-bearing values.
-- Source ingestion rules.
-- User-facing terminology.
-- Acronym lists, glossary pages, AI context packs, or external terminology-source mappings.
+Require `templates/PR_CHECKLIST.md` for PRs that touch specs, equations, schemas, Rust public APIs, source ingestion, user-facing terminology, acronym lists, glossary pages, AI context packs, or external terminology-source mappings.
 
 Use `templates/ACRONYM_PROPOSAL.md` for any new acronym meaning or collision.
 
-## Phase 3 — Soft linting
+## Phase 3 — Public CI enforcement
 
-Run:
-
-```bash
-python tooling/aerocodex_nom_lint.py --root .
-```
-
-Treat the first run as discovery. Do not fail CI until the baseline is triaged.
-
-For acronym-heavy repositories, also run:
+Use the repository-level Rust gate:
 
 ```bash
-python tooling/aerocodex_nom_lint.py --root . --scan-acronyms
+cargo run -p xtask -- verify --all
+cargo run -p xtask -- dependency-policy
 ```
 
-Unknown-acronym scanning is intentionally noisy at first. Use it to populate candidate records and waivers.
+Human reviewers remain responsible for acronym collisions, unknown durable acronyms, candidate-source promotion, and waiver justification.
 
-## Phase 4 — AI terminology-pack pilot
+## Phase 4 — Maintainer-only generated artifacts
 
-For requirements, ICDs, review packages, flight/software specs, source imports, and aerospace summaries, generate a scoped AI pack:
-
-```bash
-python tooling/aerocodex_terminology.py --root . pack \
-  --text-file path/to/document.md \
-  --domain spacecraft \
-  --domain systems_engineering
-```
-
-Pilot rule:
-
-- AI may use a single unambiguous approved term directly.
-- AI must flag candidate-only meanings when they matter.
-- AI must return ambiguity for collisions such as `RCS`, `CDR`, or `AC` unless local context resolves them.
-- AI must not invent expansions for unregistered acronyms in durable outputs.
-
-## Phase 5 — CI enforcement
-
-Add the GitHub Actions example from `ci/github-actions-example.yml`.
-
-Fail CI for:
-
-- Unbound symbols in declared specs.
-- Ambiguous alias records.
-- Ambiguous acronym records without disambiguation metadata.
-- Unknown acronyms in durable docs after the baseline is established.
-- Missing terminology-source references for imported external acronyms.
-- Missing physical units.
-- Missing frames where required.
-- Missing Rust–math bridge records.
-- Deprecated canonical terms in schemas or durable Rust code.
-- Raw Rust identifiers without waiver.
-
-## Phase 6 — Generated docs and IDE integration
-
-Longer-term targets:
-
-- Generate glossary pages from registry files.
-- Generate acronym collision pages from `registry/acronyms.yaml`.
-- Generate symbol tables from `symbols.yaml`.
-- Generate Rust doc links from bridge records.
-- Generate AI terminology packs on demand for editor, review, and assistant workflows.
-- Add editor diagnostics for ambiguous symbols and acronyms.
-- Add schema validation for ingestion mappings.
+Generated acronym inventories and compact terminology packs are maintainer artifacts, not public repository payloads. They may be regenerated outside the public repository when needed, then summarized through normal review notes.

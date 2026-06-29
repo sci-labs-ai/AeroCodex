@@ -25,4 +25,4 @@ A19 assigns terminal metadata dispositions to the fourth 40 source-ordered rows 
 
 The remaining rows are excluded as internal/composite solver support or remain blocked pending explicit conic branch, anomaly, time-of-flight, Lagrange f/g, Stumpff numerical, state-unit, degeneracy, and validation-oracle contracts. No parity, certification, or operational-readiness claim is made.
 
-Verifier: `python3 scripts/verify_external_m07_orbital_geometry_conic_wave4.py --repo .`
+Verifier: `cargo run -p xtask -- verify formula-vault`

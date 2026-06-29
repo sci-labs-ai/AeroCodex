@@ -1,71 +1,36 @@
-# Friend-test quickstart
+# AeroCodex friend-test quickstart
 
-This guide is for outside testers who want to clone AeroCodex, run the CI-equivalent local checks, and report whether the research workspace builds cleanly on their machine.
+This friend-test runs the public Rust-only repository gate from a local checkout. It exercises formatting, build, Clippy, tests, governed metadata checks through `xtask`, dependency policy, documentation, and the Beta 1 CLI smoke path.
 
-AeroCodex is research/preliminary-design software. It is not certified, not operational, not flight-ready, not habitat-safe, not medical-use software, and not approved for regulated use. Passing these checks only means the repository’s local software gates completed on your machine; it does not prove physical validity, safety, certification, or mission readiness.
-
-## What this friend test covers
-
-The friend-test package covers repository hygiene and governance checks:
-
-- Git status, whitespace, checksum, and generated-file cleanliness;
-- Rust formatting, checking, linting, all-target tests, and warning-deny documentation generation;
-- the Beta 1 concept CLI version, exact signed-conversion smoke, and bounded self-check;
-- validation-card, source-registry, equation-inventory, formula-vault, external M07 terminal-resolution, data-registry, status-vocabulary, and dependency-policy gates exposed through `xtask` and `scripts/verify_governance.py`;
-- thin-film provenance artifact verification;
-- nomenclature, acronym, and generated terminology checks;
-- a clear distinction between executable research equations, formula-vault metadata candidates, external rows with terminal dispositions, unprocessed external backlog rows, validation-card-only records, helper algorithms, and blocked items.
-
-It does not validate flight behavior, mission behavior, habitat safety, medical behavior, regulated use, or formula physical correctness beyond the repository checks that already exist.
+Passing this package does **not** prove physical validity, safety, certification, mission readiness, habitat safety, medical suitability, or regulated-use approval.
 
 ## Prerequisites
 
-Install the Rust toolchain with `cargo`, `rustc`, `rustfmt`, and `clippy` available on your command search path. The scripts also require `git` and either `python` or `python3`. The Bash script requires `sha256sum`; the PowerShell script can use either `sha256sum` or its built-in `Get-FileHash` fallback. The nomenclature tooling imports the Python `yaml` package; if that import is missing, install `pyyaml` in your chosen Python environment.
-
-Useful environment details to include in reports:
+Install the Rust toolchain with `cargo`, `rustc`, `rustfmt`, and `clippy` available on your command search path. The scripts also require `git`. The Bash script requires `sha256sum`; the PowerShell script can use either `sha256sum` or its built-in `Get-FileHash` fallback.
 
 ```bash
-rustc --version
 cargo --version
-rustup show
-python --version || python3 --version
+rustc --version
+git --version
 ```
 
-On Windows, PowerShell users can run the `.ps1` script. On Linux, Git Bash, or Windows Subsystem for Linux, use the `.sh` script. On macOS, install a package that provides `sha256sum` or run the commands manually with an equivalent checksum manifest checker.
+## Run the package
 
-## Automated qualification gate
-
-For the complete machine-readable Beta 1 gate, including CLI edge cases, deterministic repeatability, native packaging, packaged-binary checks, and tamper rejection, run:
+On macOS/Linux:
 
 ```bash
-cargo run -p xtask -- verify beta1-automated
+scripts/friend_test_local.sh
 ```
 
-This writes JSON, JUnit report, and a full log under `target/beta1-automated/<UTC timestamp>/` unless `--output-dir` is supplied. The friend-test scripts below remain a useful readable local diagnostic sequence.
-
-## One-command local run
-
-From the repository root:
-
-```bash
-bash scripts/friend_test_local.sh
-```
-
-From PowerShell:
+On Windows PowerShell:
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/friend_test_local.ps1
+.\scripts\friend_test_local.ps1
 ```
 
-If `pwsh` is not installed, Windows PowerShell can usually run the same script:
+## CI-equivalent sequence
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/friend_test_local.ps1
-```
-
-## Manual command sequence
-
-The scripts run this CI-equivalent sequence in order. If bare `python` is unavailable locally, use `python3` for the Python commands and report that fallback.
+The scripts run this sequence in order:
 
 ```bash
 git status --short
@@ -78,32 +43,11 @@ cargo test --workspace --all-targets --all-features
 cargo run -p aero-codex-cli -- version --json
 cargo run -p aero-codex-cli -- run formula_vault.m00.canonical.distance_to_canonical distance=-42 distance_unit=7 --json
 cargo run -p aero-codex-cli -- self-check --json
-python scripts/verify_governance.py --repo .
+cargo run -p xtask -- verify --all
 cargo run -p xtask -- dependency-policy
-python scripts/verify_thinfilm_artifact.py
-python nomenclature/tooling/aerocodex_nom_lint.py --root nomenclature
-python nomenclature/tooling/aerocodex_acronym_inventory.py --repo-root . --nomenclature-root nomenclature --check-new --baseline nomenclature/generated/current_repo_acronym_baseline.json
-python nomenclature/tooling/aerocodex_terminology.py --root nomenclature export-jsonl --output nomenclature/generated/terminology/index.jsonl
-git diff --exit-code nomenclature/generated/terminology/index.jsonl
 RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps
 ```
 
-A failure in any one command is a useful test result. Do not continue by hiding errors; report the first failing command, the operating system, Rust version, and enough terminal output to reproduce the issue.
+## What to report
 
-## What to send back
-
-A good friend-test report contains:
-
-- operating system and shell;
-- `rustc --version` and `cargo --version`;
-- `python --version` or `python3 --version`, including any fallback used by the script;
-- repository commit hash, if available from `git log -1 --format=%h`;
-- whether you used the Bash script, PowerShell script, or manual commands;
-- the first failing command and the surrounding terminal output, or a note that all commands completed;
-- whether a local `Cargo.lock` was generated at the repository root.
-
-The root `Cargo.lock` may be generated by local Cargo commands. That can be normal for a local run, but it should not be submitted unless the project deliberately changes its lockfile policy.
-
-## Interpreting a clean run
-
-A clean local run means the repository completed its configured local checks on your machine. It does not mean AeroCodex is physically validated, certified, safe for operations, safe for habitats, approved for medical use, approved for regulated use, or ready for missions. Formula-vault candidates and validation cards do not automatically mean formulas are implemented or validated.
+Include the OS, Rust versions, the exact failing command, the first error line, and whether a root `Cargo.lock` appeared after the run. Do not report a green friend-test as certification, flight readiness, habitat safety, medical suitability, or regulated-use approval.

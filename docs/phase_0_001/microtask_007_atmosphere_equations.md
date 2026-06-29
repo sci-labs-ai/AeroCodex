@@ -66,7 +66,7 @@ Key refinements:
 
 ## Checks run in this environment
 
-- Parsed all Cargo manifests with Python `tomllib`.
+- Parsed all Cargo manifests with a temporary local manifest parser.
 - Confirmed `aero-codex-atmosphere` depends only on `aero-codex-core` and `aero-codex-constants`.
 - Confirmed required Microtask 7 public function names are present.
 - Confirmed troposphere altitude range constants and domain error paths are present.

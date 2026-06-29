@@ -4,7 +4,7 @@ Set-StrictMode -Version Latest
 $RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $RepoRoot
 
-$script:TotalSteps = 18
+$script:TotalSteps = 13
 $script:CurrentStep = 0
 
 function Write-FriendTestInfo {
@@ -73,26 +73,12 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     exit 127
 }
 
-$PythonCommand = Get-Command python -ErrorAction SilentlyContinue
-if (-not $PythonCommand) {
-    $PythonCommand = Get-Command python3 -ErrorAction SilentlyContinue
-    if ($PythonCommand) {
-        Write-FriendTestInfo "python: using python3 fallback because bare python was not found"
-    }
-}
-if (-not $PythonCommand) {
-    Write-FriendTestInfo "ERROR: neither python nor python3 was found on the command search path"
-    exit 127
-}
-$PythonExe = $PythonCommand.Source
-
 if (Get-Command rustc -ErrorAction SilentlyContinue) {
     Write-FriendTestInfo "rustc: $(& rustc --version)"
 } else {
     Write-FriendTestInfo "rustc: not found on the command search path"
 }
 Write-FriendTestInfo "cargo: $(& cargo --version)"
-Write-FriendTestInfo "python command: $PythonExe ($(& $PythonExe --version 2>&1))"
 
 & git rev-parse --is-inside-work-tree *> $null
 if ($LASTEXITCODE -eq 0) {
@@ -130,26 +116,11 @@ Invoke-FriendTestStep "cargo run -p aero-codex-cli -- run canonical distance smo
 Invoke-FriendTestStep "cargo run -p aero-codex-cli -- self-check --json" {
     cargo run -p aero-codex-cli -- self-check --json
 }
-Invoke-FriendTestStep "$PythonExe scripts/verify_governance.py --repo ." {
-    & $PythonExe scripts/verify_governance.py --repo .
+Invoke-FriendTestStep "cargo run -p xtask -- verify --all" {
+    cargo run -p xtask -- verify --all
 }
 Invoke-FriendTestStep "cargo run -p xtask -- dependency-policy" {
     cargo run -p xtask -- dependency-policy
-}
-Invoke-FriendTestStep "$PythonExe scripts/verify_thinfilm_artifact.py" {
-    & $PythonExe scripts/verify_thinfilm_artifact.py
-}
-Invoke-FriendTestStep "$PythonExe nomenclature/tooling/aerocodex_nom_lint.py --root nomenclature" {
-    & $PythonExe nomenclature/tooling/aerocodex_nom_lint.py --root nomenclature
-}
-Invoke-FriendTestStep "$PythonExe nomenclature/tooling/aerocodex_acronym_inventory.py --repo-root . --nomenclature-root nomenclature --check-new --baseline nomenclature/generated/current_repo_acronym_baseline.json" {
-    & $PythonExe nomenclature/tooling/aerocodex_acronym_inventory.py --repo-root . --nomenclature-root nomenclature --check-new --baseline nomenclature/generated/current_repo_acronym_baseline.json
-}
-Invoke-FriendTestStep "$PythonExe nomenclature/tooling/aerocodex_terminology.py --root nomenclature export-jsonl --output nomenclature/generated/terminology/index.jsonl" {
-    & $PythonExe nomenclature/tooling/aerocodex_terminology.py --root nomenclature export-jsonl --output nomenclature/generated/terminology/index.jsonl
-}
-Invoke-FriendTestStep "git diff --exit-code nomenclature/generated/terminology/index.jsonl" {
-    git diff --exit-code nomenclature/generated/terminology/index.jsonl
 }
 Invoke-FriendTestStep "RUSTDOCFLAGS=\"-D warnings\" cargo doc --workspace --all-features --no-deps" {
     $PreviousRustdocFlags = $env:RUSTDOCFLAGS

@@ -16,9 +16,9 @@ Existing A7 batch and family-contract metadata are reused directly for the two a
 ## Verification
 
 ```text
-python3 scripts/verify_external_m07_orbital_geometry_conic_wave1.py --self-test
-python3 scripts/verify_external_m07_orbital_geometry_conic_wave1.py --repo .
-python3 scripts/verify_governance.py --repo .
+cargo run -p xtask -- verify formula-vault --self-test
+cargo run -p xtask -- verify formula-vault
+cargo run -p xtask -- verify --all
 ```
 
 A16 raises cumulative terminally processed external rows from 161 to 201 and reduces the remaining backlog from 1,162 to 1,122. It uses classifier metadata and governed repository records only. It does not inspect or import raw Rust-port, M07, or Scilab source text and makes no source-parity, certification, safety, or operational-readiness claim.

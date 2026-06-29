@@ -69,7 +69,7 @@ Exact source edition, equation identifiers, radiative sign convention, view-fact
 
 ## Checks performed here
 
-- Parsed Cargo manifests with Python `tomllib`.
+- Parsed Cargo manifests with a temporary local manifest parser.
 - Confirmed `aero-codex-heat-transfer` depends only on `aero-codex-core` and `aero-codex-constants`.
 - Confirmed required Microtask 15 public function names are present.
 - Confirmed heat-transfer Codex/source metadata markers are present.

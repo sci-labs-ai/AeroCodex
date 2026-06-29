@@ -30,8 +30,8 @@ A26 increases cumulative external M07 terminal dispositions from 538 to 578 and 
 The repository verifier is:
 
 ```bash
-python3 scripts/verify_external_m07_coordinate_transform_frame_time_policy_wave1.py --repo .
-python3 scripts/verify_external_m07_coordinate_transform_frame_time_policy_wave1.py --self-test
+cargo run -p xtask -- verify formula-vault
+cargo run -p xtask -- verify formula-vault --self-test
 ```
 
 Both modes emit JSON with `result=PASS` on success, matching the promoted external runner v2 validation contract.

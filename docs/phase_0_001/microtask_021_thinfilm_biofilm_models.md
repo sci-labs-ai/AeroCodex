@@ -15,7 +15,7 @@ The implementation adds four source modules:
 
 ## Implementation policy
 
-The current AeroCodex repository has a pure Rust policy. No external crates, native libraries, BLAS/LAPACK, Python, Matlab, Julia, C/C++/Fortran, generated binaries, or FFI wrappers were added. The cylindrical two-flux helper uses an internal pure-Rust modified-Bessel power-series evaluator to avoid dependency drift.
+The current AeroCodex repository has a pure Rust policy. No external crates, native libraries, BLAS/LAPACK, Non-Rust scripting runtime, Matlab, Julia, C/C++/Fortran, generated binaries, or FFI wrappers were added. The cylindrical two-flux helper uses an internal pure-Rust modified-Bessel power-series evaluator to avoid dependency drift.
 
 ## Citation preservation
 
@@ -33,7 +33,7 @@ Citation information is preserved in five places:
 - All 51 report equations from the thin-film report and appendix service equations are mapped in `data/thinfilm/equation_manifest.csv`.
 - Source metadata from the supplied BibTeX was cross-checked against publisher, university, or indexed records and summarized in `data/thinfilm/source_verification.csv`.
 - AeroCodex validation cards and source-registry YAML files were added for the new implementation.
-- A static artifact verification script is included at `scripts/verify_thinfilm_artifact.py`.
+- A static artifact verification script is included at `cargo run -p xtask -- verify data-registry`.
 
 ## Important limitation
 

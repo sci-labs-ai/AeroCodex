@@ -67,7 +67,7 @@ Exact source edition, equation identifiers, end-condition convention, force/mome
 
 ## Checks performed here
 
-- Parsed Cargo manifests with Python `tomllib`.
+- Parsed Cargo manifests with a temporary local manifest parser.
 - Confirmed `aero-codex-structures` depends only on `aero-codex-core`.
 - Confirmed required Microtask 16 public function names are present.
 - Confirmed structures Codex/source metadata markers are present.

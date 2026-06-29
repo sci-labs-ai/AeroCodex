@@ -8,4 +8,4 @@ The selected rows remain blocked until explicit relative-motion frame contracts,
 
 Resolution manifest: `formula-vault/resolutions/m07_relative_motion_finite_burn_policy_wave1.tsv`.
 
-Verifier: `scripts/verify_external_m07_relative_motion_finite_burn_policy_wave1.py --repo .`.
+Verifier: `cargo run -p xtask -- verify formula-vault`.

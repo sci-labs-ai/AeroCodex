@@ -16,9 +16,9 @@ Existing A7 batch and family-contract metadata are reused directly for aliases. 
 ## Verification
 
 ```text
-python3 scripts/verify_external_m07_two_body_algebra_wave2.py --self-test
-python3 scripts/verify_external_m07_two_body_algebra_wave2.py --repo .
-python3 scripts/verify_governance.py --repo .
+cargo run -p xtask -- verify formula-vault --self-test
+cargo run -p xtask -- verify formula-vault
+cargo run -p xtask -- verify --all
 ```
 
 A15 raises cumulative terminally processed external rows from 152 to 161 and reduces the remaining backlog from 1,171 to 1,162. It uses classifier metadata and governed repository records only. It does not inspect or import raw Rust-port, M07, or Scilab source text and makes no source-parity, certification, safety, or operational-readiness claim.

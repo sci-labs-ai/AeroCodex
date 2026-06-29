@@ -20,6 +20,6 @@ A21 assigns terminal metadata dispositions to the sixth 40 source-ordered rows i
 
 The one alias reuses the governed A7 eccentricity-vector runtime. Spherical navigation, launch-error sensitivity, ballistic targeting, rotating-body transforms, conic time-of-flight, B-plane construction, and gravity-assist relations remain blocked pending explicit contracts and numerical policies. Composite launch-error and gravity-assist orchestration helpers are excluded from formula scope.
 
-Verifier: `python3 scripts/verify_external_m07_orbital_geometry_conic_wave6.py --repo .`
+Verifier: `cargo run -p xtask -- verify formula-vault`
 
 No parity, certification, operational-readiness, or public-API promotion claim is made.

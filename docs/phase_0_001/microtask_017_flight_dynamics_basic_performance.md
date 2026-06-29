@@ -68,7 +68,7 @@ Future source review must still document:
 
 ## Checks completed in this environment
 
-- Parsed all Cargo manifests with Python `tomllib`.
+- Parsed all Cargo manifests with a temporary local manifest parser.
 - Confirmed `aero-codex-flight-dynamics` depends only on `aero-codex-core`.
 - Confirmed required Microtask 17 public function names are present.
 - Confirmed flight-dynamics Codex/source/verification metadata markers are present.

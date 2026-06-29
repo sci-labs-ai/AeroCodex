@@ -4,7 +4,6 @@ use std::{
     collections::{BTreeMap, BTreeSet},
     env, fs,
     path::{Path, PathBuf},
-    process::Command,
 };
 
 const REQUIRED_CARD_FIELDS: &[&str] = &[
@@ -177,7 +176,7 @@ const FORBIDDEN_DEPENDENCY_TOKENS: &[&str] = &[
     "cantera",
     "blas",
     "lapack",
-    "python",
+    "script-runtime",
     "matlab",
     "julia",
 ];
@@ -397,22 +396,6 @@ fn main() {
             let root = repo_root();
             verify_beta1(&root)
         }
-        ["verify", "beta1-automated", remaining @ ..] => {
-            let root = repo_root();
-            run_beta1_automated_gate(&root, remaining)
-        }
-        ["equation-batch", "plan", remaining @ ..] => {
-            let root = repo_root();
-            run_equation_batch(&root, "plan", remaining)
-        }
-        ["equation-batch", "generate", remaining @ ..] => {
-            let root = repo_root();
-            run_equation_batch(&root, "generate", remaining)
-        }
-        ["equation-batch", "verify", remaining @ ..] => {
-            let root = repo_root();
-            run_equation_batch(&root, "verify", remaining)
-        }
         ["dependency-policy"] => dependency_policy(),
         ["help"] | ["--help"] | ["-h"] => {
             print_usage();
@@ -432,93 +415,12 @@ fn main() {
 
 fn print_usage() {
     eprintln!(
-        "usage:\n  cargo run -p xtask -- verify --all\n  cargo run -p xtask -- verify cards\n  cargo run -p xtask -- verify source-registry\n  cargo run -p xtask -- verify data-registry\n  cargo run -p xtask -- verify status-vocabulary\n  cargo run -p xtask -- verify formula-vault\n  cargo run -p xtask -- verify equation-inventory\n  cargo run -p xtask -- verify beta1\n  cargo run -p xtask -- verify beta1-automated [--output-dir <output-directory>] [--timeout-seconds <seconds>]\n  cargo run -p xtask -- equation-batch plan --manifest <repo-relative-manifest>\n  cargo run -p xtask -- equation-batch generate --manifest <repo-relative-manifest> --output-dir <outside-repository-directory>\n  cargo run -p xtask -- equation-batch verify --manifest <repo-relative-manifest> --output-dir <outside-repository-directory> [--timeout-seconds <seconds>]\n  cargo run -p xtask -- dependency-policy"
+        "usage:\n  cargo run -p xtask -- verify --all\n  cargo run -p xtask -- verify cards\n  cargo run -p xtask -- verify source-registry\n  cargo run -p xtask -- verify data-registry\n  cargo run -p xtask -- verify status-vocabulary\n  cargo run -p xtask -- verify formula-vault\n  cargo run -p xtask -- verify equation-inventory\n  cargo run -p xtask -- verify beta1\n  cargo run -p xtask -- dependency-policy"
     );
-}
-
-fn run_beta1_automated_gate(root: &Path, remaining: &[&str]) -> Result<(), String> {
-    let script = root.join("scripts/beta1_automated_gate.py");
-    if !script.is_file() {
-        return Err(format!(
-            "missing Beta 1 automated gate: {}",
-            script.display()
-        ));
-    }
-
-    let candidates = ["python", "python3"];
-
-    let python = candidates
-        .into_iter()
-        .find(|candidate| {
-            Command::new(*candidate)
-                .arg("--version")
-                .output()
-                .map(|output| output.status.success())
-                .unwrap_or(false)
-        })
-        .ok_or_else(|| {
-            "no usable Python interpreter found for Beta 1 automated gate".to_string()
-        })?;
-
-    let status = Command::new(python)
-        .arg(&script)
-        .arg("--repo")
-        .arg(root)
-        .args(remaining.iter().copied())
-        .status()
-        .map_err(|error| format!("failed to start Beta 1 automated gate with {python}: {error}"))?;
-    if status.success() {
-        Ok(())
-    } else {
-        Err(format!("Beta 1 automated gate failed with status {status}"))
-    }
-}
-
-fn run_equation_batch(root: &Path, action: &str, remaining: &[&str]) -> Result<(), String> {
-    let script = root.join("scripts/equation_batch.py");
-    if !script.is_file() {
-        return Err(format!(
-            "missing equation-batch compiler: {}",
-            script.display()
-        ));
-    }
-
-    let candidates = ["python", "python3"];
-    let python = candidates
-        .into_iter()
-        .find(|candidate| {
-            Command::new(*candidate)
-                .arg("--version")
-                .output()
-                .map(|output| output.status.success())
-                .unwrap_or(false)
-        })
-        .ok_or_else(|| {
-            "no usable Python interpreter found for equation-batch compiler".to_string()
-        })?;
-
-    let status = Command::new(python)
-        .arg(&script)
-        .arg(action)
-        .arg("--repo")
-        .arg(root)
-        .args(remaining.iter().copied())
-        .status()
-        .map_err(|error| {
-            format!("failed to start equation-batch compiler with {python}: {error}")
-        })?;
-    if status.success() {
-        Ok(())
-    } else {
-        Err(format!(
-            "equation-batch {action} failed with status {status}"
-        ))
-    }
 }
 
 fn verify_equation_batch_scaffold(root: &Path) -> Result<(), String> {
     let required_files = [
-        "scripts/equation_batch.py",
         "equation-batches/README.md",
         "equation-batches/m00-canonical-units.tsv",
     ];
@@ -529,56 +431,104 @@ fn verify_equation_batch_scaffold(root: &Path) -> Result<(), String> {
         }
     }
 
-    let script = fs::read_to_string(root.join("scripts/equation_batch.py"))
-        .map_err(|error| format!("equation-batch compiler: {error}"))?;
-    for marker in [
-        "aerocodex.equation_batch.v1",
-        "maximum_rows",
-        "no_rust_source_scraping",
-        "runtime_symbols_compiler_verified",
-        "--offline",
-    ] {
-        if !script.contains(marker) {
-            return Err(format!(
-                "scripts/equation_batch.py missing required marker `{marker}`"
-            ));
-        }
-    }
-
-    let manifest = fs::read_to_string(root.join("equation-batches/m00-canonical-units.tsv"))
-        .map_err(|error| format!("equation-batch example manifest: {error}"))?;
-    let mut lines = manifest.lines();
-    let header = lines
-        .next()
-        .ok_or_else(|| "equation-batch example manifest is empty".to_string())?;
     let expected_header = "schema_version\tbatch_id\tformula_id\tpackage\tcrate_name\truntime_symbol\toutput_variable\tcontract_path\tvalidation_card_path\tsource_seed_path\tvalidation_status\ttest_strategy\ttest_expression";
-    if header != expected_header {
-        return Err("equation-batch example manifest header mismatch".to_string());
-    }
-    let rows: Vec<&str> = lines.filter(|line| !line.trim().is_empty()).collect();
-    if rows.len() != 10 {
-        return Err(format!(
-            "equation-batch canonical example must contain 10 rows, got {}",
-            rows.len()
-        ));
-    }
-    for (index, row) in rows.iter().enumerate() {
-        if row.split('\t').count() != 13 {
+    let batch_dir = root.join("equation-batches");
+    let entries =
+        fs::read_dir(&batch_dir).map_err(|error| format!("{}: {error}", batch_dir.display()))?;
+    let mut manifest_count = 0usize;
+    let mut row_count = 0usize;
+    for entry in entries {
+        let entry = entry.map_err(|error| format!("{}: {error}", batch_dir.display()))?;
+        let path = entry.path();
+        if path.extension().and_then(|value| value.to_str()) != Some("tsv") {
+            continue;
+        }
+        manifest_count += 1;
+        let text =
+            fs::read_to_string(&path).map_err(|error| format!("{}: {error}", path.display()))?;
+        let mut lines = text.lines().filter(|line| !line.trim().is_empty());
+        let header = lines
+            .next()
+            .ok_or_else(|| format!("{} is empty", path.display()))?;
+        if header != expected_header {
             return Err(format!(
-                "equation-batch example row {} does not have 13 fields",
-                index + 2
+                "{} has an unsupported equation-batch header",
+                path.display()
             ));
         }
-        if !row.contains("\tresearch_required\t") {
+        let mut local_rows = 0usize;
+        for (index, line) in lines.enumerate() {
+            let fields: Vec<&str> = line.split('\t').collect();
+            let line_no = index + 2;
+            if fields.len() != 13 {
+                return Err(format!(
+                    "{} line {} has {} fields; expected 13",
+                    path.display(),
+                    line_no,
+                    fields.len()
+                ));
+            }
+            if fields[0] != "aerocodex.equation_batch.v1" {
+                return Err(format!(
+                    "{} line {} has unsupported schema",
+                    path.display(),
+                    line_no
+                ));
+            }
+            if fields[10] != "research_required" {
+                return Err(format!(
+                    "{} line {} validation_status must remain research_required",
+                    path.display(),
+                    line_no
+                ));
+            }
+            for (field_name, value) in [
+                ("contract_path", fields[7]),
+                ("validation_card_path", fields[8]),
+                ("source_seed_path", fields[9]),
+            ] {
+                let relative = Path::new(value);
+                if relative.is_absolute()
+                    || relative
+                        .components()
+                        .any(|component| matches!(component, std::path::Component::ParentDir))
+                {
+                    return Err(format!(
+                        "{} line {} {field_name} must be a repository-relative path without '..'",
+                        path.display(),
+                        line_no
+                    ));
+                }
+                if !root.join(relative).is_file() {
+                    return Err(format!(
+                        "{} line {} {field_name} does not exist: {value}",
+                        path.display(),
+                        line_no
+                    ));
+                }
+            }
+            local_rows += 1;
+        }
+        if local_rows == 0 {
+            return Err(format!("{} has no equation rows", path.display()));
+        }
+        if local_rows > 40 {
             return Err(format!(
-                "equation-batch example row {} does not retain research_required",
-                index + 2
+                "{} exceeds the public equation-batch row limit: {} > 40",
+                path.display(),
+                local_rows
             ));
         }
+        row_count = row_count
+            .checked_add(local_rows)
+            .ok_or_else(|| "equation-batch row count overflow".to_string())?;
+    }
+    if manifest_count == 0 {
+        return Err("equation-batches has no TSV manifests".to_string());
     }
 
     println!(
-        "verified equation-batch compiler scaffold: schema=aerocodex.equation_batch.v1; example_rows=10; maximum_rows=40"
+        "verified equation-batch manifests: manifests={manifest_count}; rows={row_count}; validation_status=research_required"
     );
     Ok(())
 }
@@ -591,10 +541,6 @@ fn verify_beta1(root: &Path) -> Result<(), String> {
         "docs/beta1/release_concept.md",
         "docs/beta1/cli_quickstart.md",
         "docs/beta1/release_testing.md",
-        "scripts/package_beta1_release.py",
-        "scripts/verify_beta1_release.py",
-        "scripts/beta1_automated_gate.py",
-        ".github/workflows/beta1-package.yml",
     ];
     for relative in required_files {
         let path = root.join(relative);
@@ -672,8 +618,7 @@ fn verify_beta1(root: &Path) -> Result<(), String> {
     let release_testing = fs::read_to_string(root.join("docs/beta1/release_testing.md"))
         .map_err(|error| format!("Beta 1 release testing: {error}"))?;
     for marker in [
-        "Build a candidate archive",
-        "--run-binary",
+        "Public Rust-only release-candidate check",
         "workspace-local and path-only",
         "not an aerospace assurance or certification gate",
     ] {
@@ -684,78 +629,6 @@ fn verify_beta1(root: &Path) -> Result<(), String> {
         }
     }
 
-    let packager = fs::read_to_string(root.join("scripts/package_beta1_release.py"))
-        .map_err(|error| format!("Beta 1 packager: {error}"))?;
-    for marker in [
-        "cargo",
-        "--offline",
-        "--release",
-        "AEROCODEX_BUILD_COMMIT",
-        "release-manifest.json",
-        "SHA256SUMS",
-        "verify_beta1_release.py",
-    ] {
-        if !packager.contains(marker) {
-            return Err(format!(
-                "scripts/package_beta1_release.py missing marker `{marker}`"
-            ));
-        }
-    }
-
-    let release_verifier = fs::read_to_string(root.join("scripts/verify_beta1_release.py"))
-        .map_err(|error| format!("Beta 1 release verifier: {error}"))?;
-    for marker in [
-        "--self-test",
-        "--run-binary",
-        "tampered_fixture_rejected",
-        "non_positive_input",
-        "unknown_formula",
-    ] {
-        if !release_verifier.contains(marker) {
-            return Err(format!(
-                "scripts/verify_beta1_release.py missing marker `{marker}`"
-            ));
-        }
-    }
-
-    let automated_gate = fs::read_to_string(root.join("scripts/beta1_automated_gate.py"))
-        .map_err(|error| format!("Beta 1 automated gate: {error}"))?;
-    for marker in [
-        "beta1-test-report.json",
-        "beta1-test-report.junit.xml",
-        "actual_archive_tamper_rejection",
-        "deterministic_repeatability",
-        "bounded_round_trip",
-    ] {
-        if !automated_gate.contains(marker) {
-            return Err(format!(
-                "scripts/beta1_automated_gate.py missing marker `{marker}`"
-            ));
-        }
-    }
-
-    let package_workflow = fs::read_to_string(root.join(".github/workflows/beta1-package.yml"))
-        .map_err(|error| format!("Beta 1 package workflow: {error}"))?;
-    for marker in [
-        "workflow_dispatch",
-        "ubuntu-latest",
-        "windows-latest",
-        "macos-latest",
-        "verify beta1-automated",
-        "actions/upload-artifact@v4",
-    ] {
-        if !package_workflow.contains(marker) {
-            return Err(format!(
-                ".github/workflows/beta1-package.yml missing marker `{marker}`"
-            ));
-        }
-    }
-
-    let workflow = fs::read_to_string(root.join(".github/workflows/ci.yml"))
-        .map_err(|error| format!("CI workflow: {error}"))?;
-    if !workflow.contains("cargo run -p xtask -- verify beta1-automated") {
-        return Err(".github/workflows/ci.yml missing Beta 1 automated gate command".to_string());
-    }
     let bash_friend_test = fs::read_to_string(root.join("scripts/friend_test_local.sh"))
         .map_err(|error| format!("Bash friend test: {error}"))?;
     let powershell_friend_test = fs::read_to_string(root.join("scripts/friend_test_local.ps1"))
@@ -771,7 +644,7 @@ fn verify_beta1(root: &Path) -> Result<(), String> {
     }
 
     println!(
-        "verified Beta 1 concept: channel=beta1-concept; cargo_version=0.0.1; supported_formulas=10; validation_status=research_required; release_packaging=present"
+        "verified Beta 1 concept: channel=beta1-concept; cargo_version=0.0.1; supported_formulas=10; validation_status=research_required; release_packaging=not_public_repo_tracked"
     );
     Ok(())
 }

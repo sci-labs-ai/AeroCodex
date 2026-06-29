@@ -149,7 +149,7 @@ Microtask 20 and final packaging primarily changed or confirmed:
 ```text
 README.md
 docs/index.md
-docs/deployment/deploy_agent_prompt_v0_001_microtasks_001_020.md
+removed deployment prompt document
 docs/phase_0_001/api_summary.md
 docs/phase_0_001/final_microtasks_001_020_report.md
 docs/phase_0_001/microtask_020_bioregenerative_life_support.md
@@ -175,7 +175,7 @@ The generation environment did not include Rust tooling, so checks were static a
 
 - uploaded SHA256 verification;
 - ZIP extraction and ZIP integrity checks;
-- Cargo manifest parsing with Python `tomllib`;
+- Cargo manifest parsing with Non-Rust scripting runtime `tomllib`;
 - workspace member existence checks;
 - required root file/directory checks;
 - static forbidden native/wrapper dependency token scans across Cargo manifests;

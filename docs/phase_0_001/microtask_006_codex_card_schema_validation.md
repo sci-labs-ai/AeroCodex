@@ -57,9 +57,9 @@ The Codex Card scaffold is stricter, source-registry linkage is checked by `xtas
 
 The local environment does not provide `cargo`, `rustc`, `rustfmt`, or `clippy-driver`, so Rust execution checks were not run here. Instead, the following static checks were completed:
 
-- Parsed every `Cargo.toml` with Python `tomllib`.
+- Parsed every `Cargo.toml` with a temporary local manifest parser.
 - Confirmed `xtask` still has no dependencies.
-- Confirmed the Codex Card schema is valid JSON with Python `json` tooling.
+- Confirmed the Codex Card schema is valid JSON with a temporary local JSON parser.
 - Confirmed required schema markers, status strings, and category strings are present.
 - Confirmed every validation card has the required top-level fields.
 - Confirmed every validation card has nonempty `assumptions`, `inputs`, `outputs`, `tests`, and `failure_modes` lists.

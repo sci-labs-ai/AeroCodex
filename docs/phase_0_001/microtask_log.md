@@ -50,7 +50,7 @@ Actions completed:
 - Extracted `AeroCodex_repository_foundation_v0_001_microtasks_001_020.zip` as the current working baseline.
 - Confirmed the repository foundation extracts with repository contents at ZIP root and no extra nested repository-root mistake.
 - Inspected required root items: `Cargo.toml`, `crates/`, `docs/`, `validation/`, `xtask/`, `.github/`, `README.md`, and license files.
-- Parsed all Cargo manifests with Python `tomllib`.
+- Parsed all Cargo manifests with a temporary local manifest parser.
 - Recorded crate inventory, missing crate status, local tool availability, and known limitations in `docs/phase_0_001/working_inventory.md`.
 - Updated source-research backlog language for the current session.
 
@@ -69,7 +69,7 @@ Checks run:
 - `sha256sum /mnt/data/aerocodex_work/input/AeroCodex_repository_foundation_v0_001_microtasks_001_020.zip`
 - `unzip -l` on uploaded and nested ZIP files
 - Required file and directory presence checks
-- Python `tomllib` parse of all Cargo manifests
+- Cargo manifest parse of all workspace manifests
 - Cargo dependency-name inventory across all manifests
 
 Could not run:
@@ -107,7 +107,7 @@ Files changed:
 
 - `README.md`
 - `docs/index.md`
-- `docs/deployment/deploy_agent_prompt_v0_001_microtasks_001_020.md`
+- `removed deployment prompt document`
 - `docs/roadmap/versioning.md`
 - `docs/roadmap/milestones.md`
 - `docs/roadmap/post_1_0_expansion.md`
@@ -121,7 +121,7 @@ Files changed:
 
 Checks run:
 
-- Python `tomllib` parse of all Cargo manifests.
+- Cargo manifest parse of all workspace manifests.
 - Workspace package version check for `0.0.1`.
 - Workspace member version inheritance check for `version.workspace = true`.
 - Static scan confirming no Cargo manifest contains Cargo package version `0.001`.
@@ -184,7 +184,7 @@ Files changed:
 
 Checks run:
 
-- Python `tomllib` parse of all Cargo manifests.
+- Cargo manifest parse of all workspace manifests.
 - Static scan for all required Microtask 3 public type names.
 - Static scan for all required `AeroError` variants.
 - Static scan for all required `VerificationStatus` variants and snake-case text forms.
@@ -244,7 +244,7 @@ Files changed:
 
 Checks run:
 
-- Python `tomllib` parse of all Cargo manifests.
+- Cargo manifest parse of all workspace manifests.
 - Static scan confirming `aero-codex-core` still has no external dependencies.
 - Static scan confirming all required Microtask 4 scalar type names are present.
 - Static scan confirming required angle, Mach, Gamma, pressure, temperature, and length method names are present.
@@ -308,7 +308,7 @@ Files changed:
 
 Checks run:
 
-- Python `tomllib` parse of all Cargo manifests.
+- Cargo manifest parse of all workspace manifests.
 - Static scan confirming `aero-codex-constants` still has no external dependencies.
 - Static scan confirming all required Microtask 5 constants are present.
 - Static scan confirming `ConstantSeed`, `PHASE_0_001_CONSTANT_SEEDS`, and `constant_seed` are present.
@@ -360,7 +360,7 @@ Files changed:
 
 - `README.md`
 - `docs/index.md`
-- `docs/deployment/deploy_agent_prompt_v0_001_microtasks_001_020.md`
+- `removed deployment prompt document`
 - `docs/phase_0_001/api_summary.md`
 - `docs/phase_0_001/microtask_006_codex_card_schema_validation.md`
 - `docs/phase_0_001/working_inventory.md`
@@ -374,9 +374,9 @@ Files changed:
 
 Checks run:
 
-- Python `tomllib` parse of all Cargo manifests.
+- Cargo manifest parse of all workspace manifests.
 - Static scan confirming `xtask` still has no external dependencies.
-- Python JSON parse of `validation/schema/codex_card.schema.json`.
+- JSON parse of `validation/schema/codex_card.schema.json`.
 - Static scan confirming required schema markers, status strings, category strings, and `additionalProperties: false` are present.
 - Static scan confirming every validation card has required top-level fields and nonempty required list sections.
 - Static scan confirming every validation card references a source-registry ID that exists.
@@ -442,7 +442,7 @@ Files changed:
 
 Checks run:
 
-- Python `tomllib` parse of all Cargo manifests.
+- Cargo manifest parse of all workspace manifests.
 - Static scan confirming `aero-codex-atmosphere` depends only on `aero-codex-core` and `aero-codex-constants`.
 - Static scan confirming all required Microtask 7 public function names are present.
 - Static scan confirming public troposphere altitude domain constants are present.
@@ -510,7 +510,7 @@ Files changed:
 
 Checks run:
 
-- Python `tomllib` parse of all Cargo manifests.
+- Cargo manifest parse of all workspace manifests.
 - Static scan for all required Microtask 8 public function names.
 - Static scan confirming positive temperature checks for density and speed of sound.
 - Static scan confirming `cp > cv` handling.
@@ -579,7 +579,7 @@ Files changed:
 
 Checks run:
 
-- Python `tomllib` parse of all Cargo manifests.
+- Cargo manifest parse of all workspace manifests.
 - Static scan confirming `aero-codex-gas-dynamics` depends only on workspace Rust crates.
 - Static scan for all required Microtask 9 isentropic public function names.
 - Static scan confirming isentropic Codex ID constants and conservative trace metadata.
@@ -647,7 +647,7 @@ Files changed:
 
 Checks run:
 
-- Python `tomllib` parse of all Cargo manifests.
+- Cargo manifest parse of all workspace manifests.
 - Static scan confirming `aero-codex-gas-dynamics` depends only on workspace Rust crates.
 - Static scan for all required Microtask 10 normal-shock public function names.
 - Static scan confirming normal-shock Codex ID constants and conservative trace metadata.
@@ -714,7 +714,7 @@ Files changed:
 
 Checks run:
 
-- Python `tomllib` parse of all Cargo manifests.
+- Cargo manifest parse of all workspace manifests.
 - Static scan confirming `aero-codex-gas-dynamics` depends only on `aero-codex-core` and `aero-codex-constants`.
 - Static scan for all required Microtask 11 public function names.
 - Static scan confirming Mach-angle and Prandtl-Meyer Codex/source constants and conservative trace metadata.
@@ -781,7 +781,7 @@ Files changed:
 
 Checks run:
 
-- Python `tomllib` parse of all Cargo manifests.
+- Cargo manifest parse of all workspace manifests.
 - Static scan confirming `aero-codex-gas-dynamics` depends only on `aero-codex-core` and `aero-codex-constants`.
 - Static scan for all required Microtask 12 public function names and `ShockBranch` variants.
 - Static scan confirming oblique-shock Codex/source constants and conservative trace metadata.
@@ -828,7 +828,7 @@ Summary:
 
 Checks completed in this environment:
 
-- Parsed all Cargo manifests with Python `tomllib`.
+- Parsed all Cargo manifests with a temporary local manifest parser.
 - Confirmed `aero-codex-aerodynamics` depends only on `aero-codex-core`.
 - Confirmed required Microtask 13 public function names and Codex/source markers are present.
 - Confirmed domain-check markers for nonnegative density/velocity/q/area, positive inverse q/area, positive aspect ratio, and positive Oswald efficiency.
@@ -873,7 +873,7 @@ Summary:
 
 Checks completed in this environment:
 
-- Parsed all Cargo manifests with Python `tomllib`.
+- Parsed all Cargo manifests with a temporary local manifest parser.
 - Confirmed `aero-codex-propulsion` depends only on `aero-codex-core`.
 - Confirmed required Microtask 14 public function names and Codex/source markers are present.
 - Confirmed domain-check markers for positive Isp, positive `g0`, `initial_mass > final_mass > 0`, nonnegative delta-v, nonnegative thrust inputs, `gamma > 1`, positive gas constant, nonnegative stagnation pressure, and positive stagnation temperature.
@@ -918,7 +918,7 @@ Summary:
 
 Checks completed in this environment:
 
-- Parsed all Cargo manifests with Python `tomllib`.
+- Parsed all Cargo manifests with a temporary local manifest parser.
 - Confirmed `aero-codex-heat-transfer` depends only on `aero-codex-core` and `aero-codex-constants`.
 - Confirmed required Microtask 15 public function names and Codex/source markers are present.
 - Confirmed domain-check markers for emissivity range, nonnegative absolute temperatures, nonnegative heat-transfer coefficient, nonnegative thickness, positive conductivity, positive area, and positive resistance.
@@ -963,7 +963,7 @@ Summary:
 
 Checks completed in this environment:
 
-- Parsed all Cargo manifests with Python `tomllib`.
+- Parsed all Cargo manifests with a temporary local manifest parser.
 - Confirmed `aero-codex-structures` depends only on `aero-codex-core`.
 - Confirmed required Microtask 16 public function names and Codex/source markers are present.
 - Confirmed domain-check markers for finite signed force/moment coordinates, positive area, positive length, positive elastic modulus, positive second moment of area, and positive effective length factor.
@@ -1009,7 +1009,7 @@ Summary:
 
 Checks completed in this environment:
 
-- Parsed all Cargo manifests with Python `tomllib`.
+- Parsed all Cargo manifests with a temporary local manifest parser.
 - Confirmed `aero-codex-flight-dynamics` depends only on `aero-codex-core`.
 - Confirmed required Microtask 17 public function names and Codex/source markers are present.
 - Confirmed domain-check markers for bank-angle, positive gravity/velocity, positive stall-speed denominators, nonnegative specific-excess-power velocity, and finite signed thrust/drag.
@@ -1055,7 +1055,7 @@ Summary:
 
 Checks completed in this environment:
 
-- Parsed all Cargo manifests with Python `tomllib`.
+- Parsed all Cargo manifests with a temporary local manifest parser.
 - Confirmed `aero-codex-astrodynamics` depends only on `aero-codex-core` and `aero-codex-constants`.
 - Confirmed required Microtask 18 public function names and Codex/source markers are present.
 - Confirmed positive-domain validation markers for `mu`, `radius`, and `semi_major_axis`.
@@ -1100,7 +1100,7 @@ Summary:
 
 Checks completed in this environment:
 
-- Parsed all Cargo manifests with Python `tomllib`.
+- Parsed all Cargo manifests with a temporary local manifest parser.
 - Confirmed `aero-codex-astrodynamics` depends only on `aero-codex-core` and `aero-codex-constants`.
 - Confirmed required Microtask 19 public function names and Codex/source markers are present.
 - Confirmed positive-domain validation markers for `mu`, `r1`, `r2`, `primary_distance`, `secondary_mass`, and `primary_mass`.
@@ -1147,7 +1147,7 @@ Summary:
 
 Checks completed in this environment:
 
-- Parsed all Cargo manifests with Python `tomllib`.
+- Parsed all Cargo manifests with a temporary local manifest parser.
 - Confirmed `aero-codex-life-support` depends only on `aero-codex-core`.
 - Confirmed required Microtask 20 public function names and Codex/source markers are present.
 - Confirmed nonnegative/positive domain validation markers for recycled/required rates, production-area inputs, buffer/flow inputs, crew demand, net balance, gas balance, and water recovery inputs.

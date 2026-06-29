@@ -46,6 +46,6 @@ Use this checklist for any PR that touches terminology, schemas, math specs, sou
 - [ ] I updated bridge files where needed.
 - [ ] I generated or reviewed an AI terminology pack for acronym-heavy docs.
 - [ ] I added a waiver if I intentionally violated a rule.
-- [ ] I ran `python tooling/aerocodex_nom_lint.py --root .`.
-- [ ] I ran `python tooling/aerocodex_nom_lint.py --root . --scan-acronyms` if durable docs changed.
+- [ ] I ran `cargo run -p xtask -- verify --all`.
+- [ ] I reviewed durable acronym, symbol, terminology, and waiver changes against the nomenclature registries.
 - [ ] I ran Rust formatting/linting if Rust code changed.

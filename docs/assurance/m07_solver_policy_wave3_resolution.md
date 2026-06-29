@@ -11,4 +11,4 @@ Disposition summary:
 - contract or policy blocks: 43
 - risk tier retained: 43 `blocked_until_solver_policy` rows
 
-The corresponding resolution manifest is `formula-vault/resolutions/m07_solver_policy_wave3.tsv`, and the dependency-free verifier is `scripts/verify_external_m07_solver_policy_wave3.py --repo .`.
+The corresponding resolution manifest is `formula-vault/resolutions/m07_solver_policy_wave3.tsv`, and the dependency-free verifier is `cargo run -p xtask -- verify formula-vault`.

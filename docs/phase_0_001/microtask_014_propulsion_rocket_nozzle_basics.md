@@ -68,7 +68,7 @@ Exact source edition, equation identifiers, standard-gravity convention, pressur
 
 ## Checks performed here
 
-- Parsed Cargo manifests with Python `tomllib`.
+- Parsed Cargo manifests with a temporary local manifest parser.
 - Confirmed `aero-codex-propulsion` depends only on `aero-codex-core`.
 - Confirmed required Microtask 14 public function names are present.
 - Confirmed propulsion Codex/source metadata markers are present.

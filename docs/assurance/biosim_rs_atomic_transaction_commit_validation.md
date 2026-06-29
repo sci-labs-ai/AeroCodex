@@ -72,5 +72,5 @@ A complete Chunk 6B closeout should keep evidence outside the repository and inc
 - `cargo run -p xtask -- verify status-vocabulary`;
 - `cargo run -p xtask -- dependency-policy`;
 - `cargo doc --workspace --all-features --no-deps`;
-- thin-film artifact and nomenclature checks using the existing prompt-required Python shim if bare `python` is unavailable;
+- Rust-only public governance checks using `cargo run -p xtask -- verify --all`;
 - safety scans proving no GPL source, archives, fixtures, generated binaries, evidence logs, `target/`, or root `Cargo.lock` are staged.

@@ -71,19 +71,15 @@ cargo run -p aero-codex-cli -- self-check --json
 cargo run -p xtask -- verify beta1
 ```
 
-The complete repository gate remains `python scripts/verify_governance.py --repo .` plus the other CI commands documented in the friend-test quickstart.
-## Build a testable release archive
+The complete repository gate is `cargo run -p xtask -- verify --all` plus the other Rust CI commands documented in the friend-test quickstart.
+## Public release-candidate gate
 
-From a clean committed checkout:
-
-```bash
-python scripts/package_beta1_release.py --repo . --output-dir dist/beta1
-```
-
-Verify the resulting ZIP and execute its packaged binary smoke contract:
+From a clean checkout, run:
 
 ```bash
-python scripts/verify_beta1_release.py --archive dist/beta1/aerocodex-0.0.1-beta1-concept-<target>-<commit12>.zip --run-binary
+cargo run -p xtask -- verify --all
+cargo run -p xtask -- dependency-policy
+cargo run -p aero-codex-cli -- self-check --json
 ```
 
-The archive records the exact Git commit and target. This remains a `research_required` Beta 1 concept artifact, not a certified or operational release. See [`release_testing.md`](release_testing.md).
+This remains a `research_required` Beta 1 concept check, not a certified or operational release. See [`release_testing.md`](release_testing.md).

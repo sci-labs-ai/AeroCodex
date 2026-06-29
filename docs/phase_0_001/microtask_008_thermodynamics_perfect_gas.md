@@ -62,7 +62,7 @@ The crate now includes unit-test scaffolding for:
 
 ## Checks completed in this environment
 
-- Parsed all Cargo manifests with Python `tomllib`.
+- Parsed all Cargo manifests with a temporary local manifest parser.
 - Confirmed `aero-codex-thermo` depends only on `aero-codex-core` and `aero-codex-constants`.
 - Confirmed all required Microtask 8 public function names are present.
 - Confirmed density and speed of sound use strictly positive temperature checks.

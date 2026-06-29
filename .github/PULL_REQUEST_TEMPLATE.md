@@ -12,11 +12,6 @@ Describe the change and list the affected crates, docs, validation cards, data f
 - [ ] `cargo test --workspace --all-targets --all-features`
 - [ ] `cargo run -p xtask -- verify --all`
 - [ ] `cargo run -p xtask -- dependency-policy`
-- [ ] `python scripts/verify_thinfilm_artifact.py`
-- [ ] `python nomenclature/tooling/aerocodex_nom_lint.py --root nomenclature`
-- [ ] `python nomenclature/tooling/aerocodex_acronym_inventory.py --repo-root . --nomenclature-root nomenclature --check-new --baseline nomenclature/generated/current_repo_acronym_baseline.json`
-- [ ] `python nomenclature/tooling/aerocodex_terminology.py --root nomenclature export-jsonl --output nomenclature/generated/terminology/index.jsonl`
-- [ ] `git diff --exit-code nomenclature/generated/terminology/index.jsonl`
 - [ ] `RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps`
 
 ## Nomenclature / acronym policy
@@ -25,7 +20,6 @@ Describe the change and list the affected crates, docs, validation cards, data f
 - [ ] Any new acronym record has a source in `nomenclature/registry/terminology_sources.yaml`.
 - [ ] Ambiguous acronyms include collision/disambiguation metadata.
 - [ ] Durable docs expand acronyms at first use unless the artifact already defines them or a waiver applies.
-- [ ] `nomenclature/generated/terminology/index.jsonl` is regenerated when registry records change.
 
 ## Safety / readiness caveat
 

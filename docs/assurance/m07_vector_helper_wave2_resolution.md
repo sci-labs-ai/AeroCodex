@@ -16,9 +16,9 @@ The target alias counts are one vector-angle, six cross-product, six dot-product
 ## Verification
 
 ```text
-python3 scripts/verify_external_m07_vector_helper_wave2.py --self-test
-python3 scripts/verify_external_m07_vector_helper_wave2.py --repo .
-python3 scripts/verify_governance.py --repo .
+cargo run -p xtask -- verify formula-vault --self-test
+cargo run -p xtask -- verify formula-vault
+cargo run -p xtask -- verify --all
 ```
 
 A13 raises cumulative terminally processed external rows from 78 to 112 and reduces the remaining backlog from 1,245 to 1,211. It does not inspect or import raw M07 or Scilab source text and makes no source-parity, certification, safety, or operational-readiness claim.
