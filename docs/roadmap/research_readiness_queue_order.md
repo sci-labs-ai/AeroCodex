@@ -6,7 +6,7 @@ Source of truth: `AeroCodex_Research_Readiness_Master_Execution_Plan_v0_7_2.md` 
 
 This queue is organized by **Execution Wave**. Execution Waves define recommended merge order; they do not define PR groups. Each LOCK or RR task is one reviewable PR or one clean commit series unless a maintainer explicitly batches adjacent non-overlapping docs-only tasks.
 
-Agents must not treat a wave as permission to implement the whole wave. Start only the assigned task ID, preserve its file-scope warnings, and stop at the task's acceptance criteria.
+Agents must not treat a wave as permission to implement the whole wave. Start only the assigned task ID, preserve its file-scope warnings, and stop at the task's acceptance criteria. Use `docs/roadmap/research_readiness_dependency_conflict_matrix.md` as the dependency/conflict matrix before starting parallel implementation work.
 
 ## Merge-order queue
 
@@ -28,6 +28,7 @@ Agents must not treat a wave as permission to implement the whole wave. Start on
 ## Serialized contract checkpoints
 
 - LOCK-001 must establish task-as-PR and Execution Wave terminology before agents treat wave labels as scheduling guidance.
+- LOCK-002 adds `docs/roadmap/research_readiness_dependency_conflict_matrix.md`; use that dependency/conflict matrix to decide whether parallel work is allowed, blocked, or requires maintainer file partitioning.
 - RR-024 and RR-025 must merge before RR-022, RR-023, and RR-031.
 - RR-018 must merge before RR-015 so alias policy exists before ID normalization.
 - RR-055 must define fixtures and golden output paths before parser, verifier, or CLI output work relies on them.

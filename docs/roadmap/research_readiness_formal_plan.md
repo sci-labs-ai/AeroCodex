@@ -31,7 +31,12 @@ Do not batch:
 
 The v0.7.2 lockdown sequence starts with Execution Wave 00 contract hardening before normal formula execution work. JSON/error envelopes and status gates must merge before input parsing and execution dispatch. M00 Slice A remains the first normal execution scope. M07 remains quarantined as visible blocked candidates until a later family-by-family promotion task explicitly changes that status.
 
+## Dependency/conflict matrix
+
+`docs/roadmap/research_readiness_dependency_conflict_matrix.md` records the queue-safe dependency/conflict matrix for serialized implementation zones. Agents must check it before starting parser, verifier, registry, CLI, status-gate, generated-artifact, Cargo workspace, validation-status, runtime execution, or M07 quarantine work. A conflicting task must not start until its dependency has merged or a maintainer explicitly partitions the files.
+
 ## Related roadmap docs
 
 - `docs/roadmap/research_readiness_execution_waves.md` defines Execution Wave terminology, ordering, and batching examples.
 - `docs/roadmap/research_readiness_queue_order.md` lists the v0.7.2 queue in merge-order form while preserving the one-task-one-PR rule.
+- `docs/roadmap/research_readiness_dependency_conflict_matrix.md` defines serialized zones, critical ordering constraints, and safe-parallel-work boundaries.
