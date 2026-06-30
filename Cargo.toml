@@ -21,7 +21,7 @@ members = [
 version = "0.0.1"
 edition = "2021"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/ConorMcGibboney/AeroCodex"
+repository = "https://github.com/sci-labs-ai/AeroCodex"
 readme = "README.md"
 rust-version = "1.74"
 
