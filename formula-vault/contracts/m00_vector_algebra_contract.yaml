@@ -236,7 +236,7 @@ formulas:
       reviewed_line_span: lines 64 through 68 in the registered M07 source locator
     source_expression_review_status: reviewed_without_source_copy
     independent_mathematical_contract:
-      expression_summary: ||a × b|| <= tolerance max(1, ||a|| ||b||)
+      expression_summary: "||a × b|| <= tolerance max(1, ||a|| ||b||)"
       domain_summary: finite real 3-vector inputs with operation-specific exclusions
     units_summary: boolean
     branch_or_endpoint_behavior: explicit nonnegative tolerance
@@ -328,7 +328,7 @@ formulas:
       reviewed_line_span: lines 91 through 93 in the registered M07 source locator
     source_expression_review_status: reviewed_without_source_copy
     independent_mathematical_contract:
-      expression_summary: ||a - b||
+      expression_summary: "||a - b||"
       domain_summary: finite real 3-vector inputs with operation-specific exclusions
     units_summary: same_as_input_component_unit
     branch_or_endpoint_behavior: single branch Euclidean distance

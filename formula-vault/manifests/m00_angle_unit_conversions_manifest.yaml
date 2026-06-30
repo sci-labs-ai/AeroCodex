@@ -94,7 +94,7 @@ review_checklist:
     - wrap2pi interval convention recorded as reviewed interval [0, 2*pi) with endpoint-sensitive expected values
     - no generated code, fixtures, Scilab outputs, raw source, alternate public alias, or status upgrade added
   post_stage5_runtime_deployment:
-    - `m00_wrap2pi` bounded Rust research/preliminary runtime deployed with finite-input validation, rem_euclid(2*pi), [0, 2*pi) output, canonical positive zero, exact-TAU remainder-roundoff endpoint repair, and nonfinite rejection
+    - "`m00_wrap2pi` bounded Rust research/preliminary runtime deployed with finite-input validation, rem_euclid(2*pi), [0, 2*pi) output, canonical positive zero, exact-TAU remainder-roundoff endpoint repair, and nonfinite rejection"
   blocked_until_future_explicit_authorization:
     - source expression transcription or translation
     - additional implementation code, generated Rust, or alternate public API beyond bounded `m00_wrap2pi`

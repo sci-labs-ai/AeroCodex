@@ -8,14 +8,13 @@ artifacts:
     artifact_kind: repo_file_manifest
     origin: current_repo
     license: MIT OR Apache-2.0 with source-material attribution boundaries
-    sha256: 5abafa79bf3435d45db6f440aaabb2f602bc643d3ad4b113138583e379b9a3ab
-    hash_status: sha256_verified_current_repo_file
+    hash_status: pending_with_reason_recursive_manifest_reference
     allowed_use: in-repository provenance and thin-film source manifest tracking only
     bundling_decision: bundled repo-relative governance artifact; not an external-code import
     validation_status: repository_tracked_manifest
     owner: AeroCodex maintainers
     update_cadence: refresh when tracked thin-film artifact manifest changes
-    notes: Existing repository manifest for thin-film BLSS materials; does not certify operational, flight, habitat, medical, or regulated use.
+    notes: Existing repository manifest for thin-film BLSS materials; digest is tracked by checksums/SHA256SUMS rather than embedded here to avoid a recursive DATA_MANIFEST/DATA_REGISTRY hash loop; does not certify operational, flight, habitat, medical, or regulated use.
   - id: in_repo.citations
     title: Citation bibliography directory
     local_path: citations/
@@ -644,7 +643,7 @@ artifacts:
     update_cadence: immutable bounded wave; completes the attitude representation and inertia-policy candidate pool
     notes: Records zero aliases, zero helper exclusions, and nineteen contract or policy blocks; preserves nineteen medium-risk contract-review labels; no source import, runtime promotion, or parity claim.
 
-- id: stage4.m07.attitude_dynamics_control_policy_wave1.2026_06_27
+  - id: stage4.m07.attitude_dynamics_control_policy_wave1.2026_06_27
     title: External M07 attitude dynamics/control policy Wave 1 terminal resolutions
     local_path: formula-vault/resolutions/m07_attitude_dynamics_control_policy_wave1.tsv
     artifact_kind: repo_file_external_backlog_resolution_research_metadata
@@ -659,7 +658,7 @@ artifacts:
     update_cadence: immutable bounded wave; completes the attitude dynamics/control policy candidate pool
     notes: Records zero aliases, zero helper exclusions, and thirty-eight contract or policy blocks; preserves thirty-eight high-risk numerical-policy labels; no source import, runtime promotion, or parity claim.
 
-- id: stage4.m07.j2_perturbation_policy_wave1.2026_06_27
+  - id: stage4.m07.j2_perturbation_policy_wave1.2026_06_27
     title: External M07 J2 perturbation / numerical propagation policy Wave 1 terminal resolutions
     local_path: formula-vault/resolutions/m07_j2_perturbation_policy_wave1.tsv
     artifact_kind: repo_file_external_backlog_resolution_research_metadata
@@ -674,7 +673,7 @@ artifacts:
     update_cadence: immutable bounded wave; leaves later J2 perturbation and numerical-propagation rows for bounded rollout
     notes: Records zero aliases, zero helper exclusions, and forty policy blocks; preserves forty high-risk numerical-policy labels; no source import, runtime promotion, or parity claim.
 
-- id: stage4.m07.j2_perturbation_policy_wave2.2026_06_27
+  - id: stage4.m07.j2_perturbation_policy_wave2.2026_06_27
     title: External M07 J2 perturbation / numerical propagation policy Wave 2 terminal resolutions
     local_path: formula-vault/resolutions/m07_j2_perturbation_policy_wave2.tsv
     artifact_kind: repo_file_external_backlog_resolution_research_metadata
@@ -689,7 +688,7 @@ artifacts:
     update_cadence: immutable bounded wave; leaves later J2 perturbation and numerical-propagation rows for bounded rollout
     notes: Records zero aliases, zero helper exclusions, and forty policy blocks; preserves forty high-risk numerical-policy labels; no source import, runtime promotion, or parity claim.
 
-- id: stage4.m07.j2_perturbation_policy_wave3.2026_06_27
+  - id: stage4.m07.j2_perturbation_policy_wave3.2026_06_27
     title: External M07 J2 perturbation / numerical propagation policy Wave 3 terminal resolutions
     local_path: formula-vault/resolutions/m07_j2_perturbation_policy_wave3.tsv
     artifact_kind: repo_file_external_backlog_resolution_research_metadata
