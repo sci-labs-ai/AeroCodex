@@ -88,7 +88,7 @@ reference_oracle:
   endpoint_non_claim: this is not external Scilab parity evidence and not certification evidence
 
 runtime_implementation:
-  public_api: pub fn m00_wrap2pi(angle_radians: f64) -> AeroResult<f64>
+  public_api: "pub fn m00_wrap2pi(angle_radians: f64) -> AeroResult<f64>"
   codex_id: formula_vault.m00.angle.wrap2pi
   implementation_rules:
     - reject nonfinite inputs before wrapping

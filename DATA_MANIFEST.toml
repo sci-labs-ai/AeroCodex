@@ -2,10 +2,10 @@
 # Generated after removing public deployment script artifacts and prompt archives.
 schema_version = "1.1"
 artifact_id = "aerocodex-public-repo-clean-manifest"
-generated_utc = "2026-06-29T01:31:32Z"
+generated_utc = "2026-06-30T01:16:45Z"
 phase = "public_repo_cleanup_2026_06_29"
 tracked_file_count = 418
-total_bytes = 8849222
+total_bytes = 8849506
 source_materials = ["blss_thinfilm_report.pdf", "blss_thinfilm_report.tex", "blss_thinfilm_refs.bib", "blss_thinfilm_latex_source.zip"]
 status = "public_repo_sanitized"
 limitations = [
@@ -45,8 +45,8 @@ status = "repository_tracked_public_repo_file"
 
 [[files]]
 path = "Cargo.toml"
-bytes = 757
-sha256 = "f3c00949e3dfbec1e36c806d8226947a708158a128674b3971567e83a5de0dd3"
+bytes = 753
+sha256 = "0ed998bc47c682d39a741dfba7d22477b7de49a3cddbf0a227abdb685b4e6926"
 source = "AeroCodex governed repository file"
 status = "repository_tracked_public_repo_file"
 
@@ -486,8 +486,8 @@ status = "repository_tracked_public_repo_file"
 
 [[files]]
 path = "data-governance/DATA_REGISTRY.yaml"
-bytes = 65884
-sha256 = "2c0bd9d81db94017d8b0c322d1950ee52eea15c82fc67ece384b815beb9def34"
+bytes = 65944
+sha256 = "6501f822cd8e035b181af97630b99593e795bbc482a91e894430379aa70bc004"
 source = "AeroCodex governed repository file"
 status = "repository_tracked_public_repo_file"
 
@@ -1025,8 +1025,8 @@ status = "repository_tracked_public_repo_file"
 
 [[files]]
 path = "docs/index.md"
-bytes = 12036
-sha256 = "a21a0de8f72c342e6879b14310224d6c6d6f5bd691a7bac679c391f8555a268d"
+bytes = 11880
+sha256 = "2c34e21e2d62c764ee2e6a496092eb1284cde0ebb136496bbc8ddb3dd5634528"
 source = "AeroCodex governed repository file"
 status = "repository_tracked_public_repo_file"
 
@@ -1263,8 +1263,8 @@ status = "repository_tracked_public_repo_file"
 
 [[files]]
 path = "docs/roadmap/milestones.md"
-bytes = 4224
-sha256 = "bc4b44eef827bee03fca7363b09a1b72025c12260d4d2b4bf25780fb405c0938"
+bytes = 4144
+sha256 = "43028772235206e89fa13de1a2e51b02be1690b125a5b872c6a7fe8bc8fca7e2"
 source = "AeroCodex governed repository file"
 status = "repository_tracked_public_repo_file"
 
@@ -1641,15 +1641,15 @@ status = "repository_tracked_public_repo_file"
 
 [[files]]
 path = "formula-vault/contracts/m00_vector_algebra_contract.yaml"
-bytes = 22447
-sha256 = "ac851bc92bc04a32e148211d664aedaeb7c77721d804333c2119670577d0a5ed"
+bytes = 22451
+sha256 = "483e4ab0a6c35649fe393af404dcd123588a211bd2c9006fe5ec0e5360914221"
 source = "AeroCodex governed repository file"
 status = "repository_tracked_public_repo_file"
 
 [[files]]
 path = "formula-vault/contracts/m00_wrap2pi_endpoint_contract.yaml"
-bytes = 22800
-sha256 = "6b2d9ab2f8cf10055f60c84613e158da700d8ffbd5488c5dc2a1f38cfd4f089c"
+bytes = 22802
+sha256 = "111ffa942c079b9f534ffb77735802eb4f340108242ae3ed8712b45c0692b085"
 source = "AeroCodex governed repository file"
 status = "repository_tracked_public_repo_file"
 
@@ -1683,8 +1683,8 @@ status = "repository_tracked_public_repo_file"
 
 [[files]]
 path = "formula-vault/manifests/m00_angle_unit_conversions_manifest.yaml"
-bytes = 7627
-sha256 = "dd6733e3c3bc52df51b02242afe6806da5fb99be451096a49e391f423ed23338"
+bytes = 7629
+sha256 = "30bdbabedbbc1cec5d610e98ada81047de42dba9016d2921e050aa644ded5020"
 source = "AeroCodex governed repository file"
 status = "repository_tracked_public_repo_file"
 
@@ -2915,15 +2915,15 @@ status = "repository_tracked_public_repo_file"
 
 [[files]]
 path = "validation/status_vocabulary.md"
-bytes = 3009
-sha256 = "482722179e54429d0c1df95fa262499421d17abe0ff295e828a677694c4084dd"
+bytes = 3041
+sha256 = "04f258556668ff0391751d64ceaaea25feae5fbfbb7c2614e2ce379b6c9051dc"
 source = "AeroCodex governed repository file"
 status = "repository_tracked_public_repo_file"
 
 [[files]]
 path = "validation/status_vocabulary.yaml"
-bytes = 1241
-sha256 = "3b76fed5d35e3d025ed85ff909f4570090e1be8cc999343047a871ecdfe95165"
+bytes = 1275
+sha256 = "1e7e0861093b1e70e86e248b5fbdfa614031534b8729d6a6c19c042ebb73c2c6"
 source = "AeroCodex governed repository file"
 status = "repository_tracked_public_repo_file"
 
@@ -2936,7 +2936,7 @@ status = "repository_tracked_public_repo_file"
 
 [[files]]
 path = "xtask/src/main.rs"
-bytes = 102572
-sha256 = "a872c0c8bdfa91069a1db1542a72f3524c71b860cad8df2d2209034dc5dd38b7"
+bytes = 102854
+sha256 = "175d071ab053a9b8161c5137ec0ed9594ecb72bda517c90d2c1cb3d91328fe93"
 source = "AeroCodex governed repository file"
 status = "repository_tracked_public_repo_file"
