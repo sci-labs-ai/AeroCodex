@@ -1,0 +1,18 @@
+code,meaning,typical_class,required_user_facing_behavior
+formula_not_found,Formula ID does not exist in the registry.,lookup failure,Report the requested ID; do not guess or auto-select another formula.
+deprecated_formula_id,A legacy formula ID was used and mapped to a canonical ID.,alias warning/error,Show the canonical ID and include alias metadata in JSON.
+missing_input,A required input was not provided.,input validation,Name the missing input and the formula ID.
+duplicate_input,The same input was supplied more than once.,input validation,Name the duplicated input and reject the run.
+unknown_input,An input flag does not match the formula schema.,input validation,Name the unknown input and reject the run.
+invalid_number,A scalar input could not be parsed as a number.,input validation,Name the input and preserve the non-secret supplied token only when safe for diagnostics.
+non_finite_input,A scalar input parsed to NaN or infinity and was rejected.,input validation,Name the input and reject the run.
+unsupported_input_type,"The formula requires a vector, array, struct, or other input type not supported by the current CLI parser.",parser capability,Explain that the formula is not runnable through the current public alpha CLI parser.
+domain_constraint_failed,One or more declared formula-domain constraints failed.,formula domain,Name the failed constraint when available; do not execute the runtime symbol after the gate fails.
+execution_blocked_by_status,The formula is below the normal execution threshold.,status gate,State that normal execution requires implementation_verified; inventory visibility is not execution permission.
+preliminary_flag_required,The formula is equation_traceable and requires explicit preliminary execution mode.,status gate,Tell the user to opt into --preliminary only when that mode is available and documented.
+m07_candidate_blocked,The formula is an M07 candidate and is visible but non-executable.,quarantine gate,State that M07 candidates remain blocked until promoted family by family.
+registry_stale,Generated registry artifacts differ from source manifests or sidecars.,generation/check gate,Fail closed and require registry regeneration/check repair.
+schema_validation_failed,"A registry, sidecar, or promotion packet failed schema validation.",schema gate,Include the schema file and failing artifact path when safe.
+runtime_symbol_missing,A manifest or registry entry references a missing Rust runtime symbol.,implementation linkage,Fail closed; do not silently fall back to another symbol.
+test_vector_failed,A formula implementation failed an expected value or tolerance check.,validation gate,Fail the promotion or check; do not promote validation status.
+internal_error,Unexpected internal error. This should be treated as a bug.,internal failure,Return a stable error envelope without leaking secrets or stack internals.

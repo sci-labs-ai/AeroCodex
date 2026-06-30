@@ -1,0 +1,243 @@
+{
+  "$id": "https://aerocodex.local/schemas/formula_registry.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AeroCodex Formula Registry",
+  "description": "LOCK-004 registry contract for research-readiness formula inventory, status gates, and generated-registry checks.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "aerocodex.formula_registry.v1"
+    },
+    "generator_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generated_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_hash": {
+      "type": "string",
+      "pattern": "^(sha256:)?[a-fA-F0-9]{64}$"
+    },
+    "formula_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "non_claims": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "formulas": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/formula"
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "generator_version",
+    "generated_by",
+    "source_hash",
+    "formula_count",
+    "non_claims",
+    "formulas"
+  ],
+  "$defs": {
+    "formula": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "formula_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(\\.[a-z0-9_]+)+$"
+        },
+        "legacy_formula_id": {
+          "type": ["string", "null"]
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": ["string", "null"]
+        },
+        "family": {
+          "type": "string",
+          "minLength": 1
+        },
+        "batch_id": {
+          "type": ["string", "null"]
+        },
+        "status": {
+          "enum": [
+            "research_required",
+            "equation_traceable",
+            "implementation_verified",
+            "reference_validated"
+          ]
+        },
+        "quarantine_state": {
+          "enum": [
+            "none",
+            "m07_candidate_blocked",
+            "missing_metadata_blocked",
+            "below_execution_threshold",
+            "deprecated_alias"
+          ]
+        },
+        "execution_policy": {
+          "enum": [
+            "blocked",
+            "preliminary_flag_required",
+            "normal_research",
+            "publication_supporting"
+          ]
+        },
+        "source_trace": {
+          "type": ["object", "null"]
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "units": {
+          "type": ["object", "array", "null"]
+        },
+        "domain_constraints": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "implementation_path": {
+          "type": ["object", "string", "null"]
+        },
+        "runtime_symbol": {
+          "type": ["string", "null"]
+        },
+        "test_vectors": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "formula_id",
+        "legacy_formula_id",
+        "aliases",
+        "name",
+        "summary",
+        "family",
+        "batch_id",
+        "status",
+        "quarantine_state",
+        "execution_policy",
+        "source_trace",
+        "inputs",
+        "outputs",
+        "units",
+        "domain_constraints",
+        "implementation_path",
+        "runtime_symbol",
+        "test_vectors",
+        "warnings"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {"const": "research_required"}
+            },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "execution_policy": {"const": "blocked"}
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {"const": "equation_traceable"}
+            },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "execution_policy": {"const": "preliminary_flag_required"}
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {"const": "implementation_verified"}
+            },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "execution_policy": {"const": "normal_research"}
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {"const": "reference_validated"}
+            },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "execution_policy": {"const": "publication_supporting"}
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "quarantine_state": {"const": "m07_candidate_blocked"}
+            },
+            "required": ["quarantine_state"]
+          },
+          "then": {
+            "properties": {
+              "execution_policy": {"const": "blocked"}
+            }
+          }
+        }
+      ]
+    }
+  }
+}
