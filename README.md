@@ -30,6 +30,8 @@ AeroCodex is **not** certified, flight-ready, mission-ready, habitat-safe, medic
 
 Negative statements such as “not certified” and “does not currently provide certified flight software” are intentional safety disclaimers. They must not be weakened, removed, or misread as positive readiness assertions.
 
+The enforced public wording guardrails live in `docs/assurance/public_wording_guardrails.md` and are checked by `cargo run -p xtask -- verify --all`.
+
 ## Pure Rust policy
 
 The core repository is intentionally pure Rust. It does not include C/C++/Fortran source, BLAS/LAPACK native linkage, CEA/REFPROP/CoolProp/Cantera wrappers, non-Rust scripting or numerical-runtime dependencies, `bindgen`, `cc`, `cmake`, `pkg-config`, `vcpkg`, native binary blobs, generated binaries, or a committed root `Cargo.lock`.

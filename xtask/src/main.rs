@@ -181,6 +181,28 @@ const FORBIDDEN_DEPENDENCY_TOKENS: &[&str] = &[
     "julia",
 ];
 
+const APPROVED_PUBLIC_WORDING: &str = "AeroCodex is intended to become professional-grade, traceable aerospace research software suitable for academic, laboratory, and agency evaluation. It is not certified for flight, mission operations, habitat safety, medical/life-support decisions, or regulatory approval.";
+
+const PUBLIC_WORDING_GUARDRAILS_PATH: &str = "docs/assurance/public_wording_guardrails.md";
+
+const REQUIRED_PUBLIC_FORBIDDEN_CLAIM_PHRASES: &[&str] = &[
+    "nasa-ready",
+    "flight-ready",
+    "mission-ready",
+    "certified for flight",
+    "operationally approved",
+    "habitat-safe",
+    "medical/life-support certified",
+    "regulatory-approved",
+];
+
+const PUBLIC_WORDING_SCAN_PATHS: &[&str] = &[
+    "README.md",
+    "docs",
+    "formula-vault/README.md",
+    "validation/README.md",
+];
+
 const FORBIDDEN_READINESS_MARKERS: &[&str] = &[
     "certified: true",
     "flight_ready: true",
@@ -190,6 +212,102 @@ const FORBIDDEN_READINESS_MARKERS: &[&str] = &[
     "status: certified",
     "status: flight_ready",
     "status: mission_ready",
+    "nasa-ready",
+    "nasa_ready",
+    "nasa ready",
+    "nasa-approved",
+    "nasa_approved",
+    "nasa approved",
+    "flight-ready",
+    "flight_ready",
+    "flight ready",
+    "flight-readiness",
+    "flight readiness",
+    "flight-certified",
+    "flight certified",
+    "mission-ready",
+    "mission_ready",
+    "mission ready",
+    "mission-readiness",
+    "mission readiness",
+    "mission-certified",
+    "mission certified",
+    "certified for flight",
+    "operationally approved",
+    "operationally_approved",
+    "approved for operations",
+    "approved_for_operations",
+    "operational approval",
+    "habitat-safe",
+    "habitat_safe",
+    "habitat safe",
+    "habitat-safety approved",
+    "habitat safety approved",
+    "habitat-safety certified",
+    "habitat safety certified",
+    "medical/life-support certified",
+    "medical life-support certified",
+    "medical life support certified",
+    "life-support-certified",
+    "life_support_certified",
+    "life support certified",
+    "medical-use approved",
+    "medical use approved",
+    "medical approval",
+    "regulatory-approved",
+    "regulatory_approved",
+    "regulatory approved",
+    "regulatory approval",
+    "regulated-use approved",
+    "regulated_use_approved",
+    "regulated use approved",
+    "regulated-use approval",
+    "regulated use approval",
+];
+
+const READINESS_NONCLAIM_CUES: &[&str] = &[
+    " not ",
+    " no ",
+    " never ",
+    " without ",
+    " does not ",
+    " doesn t ",
+    " do not ",
+    " must not ",
+    " should not ",
+    " cannot ",
+    " can not ",
+    " forbidden ",
+    " disallowed ",
+    " prohibited ",
+    " block ",
+    " blocks ",
+    " blocked ",
+    " guardrail ",
+    " guardrails ",
+    " avoid ",
+    " avoids ",
+    " avoiding ",
+    " not allowed ",
+    " stop if ",
+    " negative statement ",
+    " negative statements ",
+    " caveat ",
+    " caveats ",
+    " non claim ",
+    " non claims ",
+    " nonclaim ",
+    " misread as ",
+    " misread ",
+    " imply ",
+    " implies ",
+    " implied ",
+    " treats ",
+    " treated ",
+    " allowed phrase ",
+    " allowed phrases ",
+    " future claim ",
+    " future claims ",
 ];
 
 const REQUIRED_DATA_REGISTRY_FIELDS: &[&str] = &[
@@ -649,6 +767,83 @@ fn verify_beta1(root: &Path) -> Result<(), String> {
     Ok(())
 }
 
+fn verify_public_wording_guardrails(root: &Path) -> Result<(), String> {
+    let guardrails_path = root.join(PUBLIC_WORDING_GUARDRAILS_PATH);
+    if !guardrails_path.is_file() {
+        return Err(format!(
+            "missing public wording guardrails: {}",
+            guardrails_path.display()
+        ));
+    }
+
+    let guardrails = fs::read_to_string(&guardrails_path)
+        .map_err(|error| format!("{}: {error}", guardrails_path.display()))?;
+    if !guardrails.contains(APPROVED_PUBLIC_WORDING) {
+        return Err(format!(
+            "{} missing approved public wording",
+            guardrails_path.display()
+        ));
+    }
+    for phrase in REQUIRED_PUBLIC_FORBIDDEN_CLAIM_PHRASES {
+        if !guardrails.to_ascii_lowercase().contains(phrase) {
+            return Err(format!(
+                "{} missing forbidden public-claim phrase `{phrase}`",
+                guardrails_path.display()
+            ));
+        }
+    }
+
+    let readme_path = root.join("README.md");
+    let readme = fs::read_to_string(&readme_path)
+        .map_err(|error| format!("{}: {error}", readme_path.display()))?;
+    if !readme.contains(APPROVED_PUBLIC_WORDING) {
+        return Err(format!(
+            "{} missing approved public wording",
+            readme_path.display()
+        ));
+    }
+
+    let mut scanned_files = 0usize;
+    for relative in PUBLIC_WORDING_SCAN_PATHS {
+        let path = root.join(relative);
+        if path.is_file() {
+            if is_public_wording_scan_file(&path) {
+                scan_public_wording_file(&path)?;
+                scanned_files += 1;
+            }
+        } else if path.is_dir() {
+            visit_files(&path, &mut |candidate| {
+                if is_public_wording_scan_file(candidate) {
+                    scan_public_wording_file(candidate)?;
+                    scanned_files += 1;
+                }
+                Ok(())
+            })?;
+        } else {
+            return Err(format!(
+                "missing public wording scan path: {}",
+                path.display()
+            ));
+        }
+    }
+
+    println!(
+        "verified public wording guardrails: approved_wording=present; scanned_files={scanned_files}"
+    );
+    Ok(())
+}
+
+fn is_public_wording_scan_file(path: &Path) -> bool {
+    path.extension()
+        .and_then(|extension| extension.to_str())
+        .is_some_and(|extension| extension == "md" || extension == "txt")
+}
+
+fn scan_public_wording_file(path: &Path) -> Result<(), String> {
+    let text = fs::read_to_string(path).map_err(|error| format!("{}: {error}", path.display()))?;
+    verify_no_forbidden_readiness_markers(path, &text)
+}
+
 fn repo_root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .parent()
@@ -663,6 +858,7 @@ fn verify_all() -> Result<(), String> {
     verify_cards(&root, Some(&source_ids))?;
     verify_data_registry(&root)?;
     verify_status_vocabulary(&root)?;
+    verify_public_wording_guardrails(&root)?;
     verify_formula_vault(&root)?;
     verify_equation_inventory(&root)?;
     verify_equation_batch_scaffold(&root)?;
@@ -2253,16 +2449,171 @@ fn verify_required_top_level_fields(
 }
 
 fn verify_no_forbidden_readiness_markers(path: &Path, text: &str) -> Result<(), String> {
-    let lowered = text.to_ascii_lowercase();
-    for marker in FORBIDDEN_READINESS_MARKERS {
-        if lowered.contains(marker) {
-            return Err(format!(
-                "{} contains forbidden readiness marker `{marker}`",
-                path.display()
-            ));
-        }
+    if let Some((line_number, marker)) = forbidden_readiness_claim_marker(text) {
+        return Err(format!(
+            "{} line {} contains forbidden readiness marker `{marker}`",
+            path.display(),
+            line_number
+        ));
     }
     Ok(())
+}
+
+fn forbidden_readiness_claim_marker(text: &str) -> Option<(usize, &'static str)> {
+    let mut nonclaim_context_indent: Option<usize> = None;
+    let mut nonclaim_markdown_section = false;
+    let mut wrapped_nonclaim_context_remaining = 0usize;
+    for (line_index, line) in text.lines().enumerate() {
+        let trimmed = line.trim();
+        let indent = line.len().saturating_sub(line.trim_start().len());
+        let in_wrapped_nonclaim_context = wrapped_nonclaim_context_remaining > 0;
+        wrapped_nonclaim_context_remaining = wrapped_nonclaim_context_remaining.saturating_sub(1);
+        if trimmed.starts_with('#') {
+            nonclaim_markdown_section = is_nonclaim_context_heading(trimmed);
+            nonclaim_context_indent = None;
+        } else if !trimmed.is_empty()
+            && nonclaim_context_indent.is_some_and(|context_indent| indent <= context_indent)
+        {
+            nonclaim_context_indent = None;
+        }
+        if is_nonclaim_context_heading(trimmed) {
+            if trimmed.starts_with('#') {
+                nonclaim_markdown_section = true;
+            } else {
+                nonclaim_context_indent = Some(indent);
+            }
+        }
+
+        let normalized_line = normalize_readiness_text(line);
+        for marker in FORBIDDEN_READINESS_MARKERS {
+            let normalized_marker = normalize_readiness_text(marker);
+            let mut search_start = 0usize;
+            while let Some(relative_index) =
+                normalized_line[search_start..].find(&normalized_marker)
+            {
+                let marker_index = search_start + relative_index;
+                let in_nonclaim_context = nonclaim_markdown_section
+                    || nonclaim_context_indent.is_some()
+                    || in_wrapped_nonclaim_context;
+                if is_normalized_phrase_boundary(
+                    &normalized_line,
+                    marker_index,
+                    normalized_marker.len(),
+                ) && !in_nonclaim_context
+                    && !is_allowed_readiness_nonclaim_context(&normalized_line, marker_index)
+                {
+                    return Some((line_index + 1, marker));
+                }
+                search_start = marker_index + 1;
+            }
+        }
+        if starts_wrapped_readiness_nonclaim_context(&normalized_line, line) {
+            wrapped_nonclaim_context_remaining = 1;
+        }
+    }
+    None
+}
+
+fn is_nonclaim_context_heading(trimmed_line: &str) -> bool {
+    let normalized_heading = normalize_readiness_text(trimmed_line.trim_end_matches(':'));
+    matches!(
+        normalized_heading.as_str(),
+        "allowed non claim phrases"
+            | "allowed phrases"
+            | "blocked use now"
+            | "excluded cases"
+            | "exclusions"
+            | "explicit non scope"
+            | "forbidden positive claim markers"
+            | "limits"
+            | "limitations"
+            | "non claim phrases"
+            | "non claims"
+            | "non scope"
+    )
+}
+
+fn is_normalized_phrase_boundary(line: &str, start: usize, length: usize) -> bool {
+    let bytes = line.as_bytes();
+    let end = start + length;
+    let before_ok = start == 0 || bytes[start - 1] == b' ';
+    let after_ok = end == bytes.len() || bytes[end] == b' ';
+    before_ok && after_ok
+}
+
+fn normalize_readiness_text(text: &str) -> String {
+    let mut normalized = String::with_capacity(text.len());
+    let mut previous_was_space = true;
+    for character in text.chars() {
+        let mapped = if character.is_ascii_alphanumeric() {
+            character.to_ascii_lowercase()
+        } else {
+            ' '
+        };
+        if mapped == ' ' {
+            if !previous_was_space {
+                normalized.push(' ');
+                previous_was_space = true;
+            }
+        } else {
+            normalized.push(mapped);
+            previous_was_space = false;
+        }
+    }
+    normalized.trim().to_string()
+}
+
+fn is_allowed_readiness_nonclaim_context(normalized_line: &str, marker_index: usize) -> bool {
+    let prefix = &normalized_line[..marker_index];
+    let suffix = &normalized_line[marker_index..];
+    let padded_prefix = format!(" {prefix} ");
+    let padded_suffix = format!(" {suffix} ");
+    if padded_prefix.contains(" keep ")
+        && (padded_suffix.contains(" caveat ") || padded_suffix.contains(" caveats "))
+    {
+        return true;
+    }
+    normalized_text_has_nonclaim_cue(prefix)
+}
+
+fn normalized_text_has_nonclaim_cue(normalized_text: &str) -> bool {
+    let padded_text = format!(" {normalized_text} ");
+    READINESS_NONCLAIM_CUES
+        .iter()
+        .any(|cue| padded_text.contains(cue))
+}
+
+fn starts_wrapped_readiness_nonclaim_context(normalized_line: &str, raw_line: &str) -> bool {
+    let allows_wrapped_phrase = raw_line.trim_end().ends_with(',')
+        || [
+            " flight",
+            " mission",
+            " operational",
+            " regulated",
+            " regulated use",
+        ]
+        .iter()
+        .any(|suffix| normalized_line.ends_with(suffix));
+    if !allows_wrapped_phrase {
+        return false;
+    }
+    let padded_line = format!(" {normalized_line} ");
+    let fixed_cues = [
+        " does not establish ",
+        " does not imply ",
+        " does not provide ",
+        " does not currently provide ",
+        " not certified ",
+        " no certification ",
+        " no external source parity claim ",
+    ];
+    if fixed_cues.iter().any(|cue| padded_line.contains(cue)) {
+        return true;
+    }
+    padded_line.contains(" adds no ")
+        && [" parity ", " certification ", " claim ", " approval "]
+            .iter()
+            .any(|cue| padded_line.contains(cue))
 }
 
 fn require_top_level_value<'a>(path: &Path, text: &'a str, field: &str) -> Result<&'a str, String> {
@@ -2490,6 +2841,42 @@ mod tests {
         assert!(!is_valid_dotted_id("LifeSupport.closure"));
         assert!(!is_valid_dotted_id("life_support..closure"));
         assert!(!is_valid_dotted_id("life-support.closure"));
+    }
+
+    #[test]
+    fn forbidden_readiness_claim_examples_fail() {
+        for claim in [
+            "AeroCodex is NASA-ready for public use.",
+            "status: flight_ready\n",
+            "This module is operationally approved.",
+            "The package is medical/life-support certified.",
+            "Engineering note says this is a release,\nflight readiness achieved.",
+        ] {
+            assert!(
+                forbidden_readiness_claim_marker(claim).is_some(),
+                "forbidden readiness claim should fail: {claim}"
+            );
+        }
+    }
+
+    #[test]
+    fn forbidden_readiness_approved_nonclaim_passes() {
+        for disclaimer in [
+            APPROVED_PUBLIC_WORDING,
+            "AeroCodex is not certified, flight-ready, mission-ready, habitat-safe, medical, operational, or regulated-use approved.",
+            "Forbidden marker: NASA-ready must not be used as a public readiness claim.",
+            "Any future claim of certified, flight-ready, mission-ready, or operationally suitable behavior must be backed by a separate assurance process.",
+            "## Blocked use now\n- claiming habitat safety, medical suitability, operational readiness, certification, or regulated-use approval;",
+            "# This linkage does not establish Scilab parity, certification,\n# flight readiness, mission readiness, operational approval, or regulated-use approval.",
+            "# This linkage adds no external parity, certification,\n# flight-readiness, mission-readiness, operational, or regulated-use claim.",
+            "# This linkage adds no Scilab parity, certification, flight\n# readiness, mission readiness, operational approval, or regulated-use approval.",
+        ] {
+            assert_eq!(
+                forbidden_readiness_claim_marker(disclaimer),
+                None,
+                "approved non-claim wording should pass: {disclaimer}"
+            );
+        }
     }
 
     fn minimal_data_registry_entry(id: &str) -> String {
