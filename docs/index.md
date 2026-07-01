@@ -4,6 +4,7 @@ AeroCodex Phase 0.001 establishes a pure-Rust workspace for source-traceable aer
 
 Start with:
 
+- [research readiness decision packet](roadmap/research_readiness_agent_decision_packet.md)
 - [Stage 4 master plan](roadmap/stage4_master_plan.md)
 - [Stage 5 master plan](roadmap/stage5_master_plan.md)
 - [Stage 5 deployment queue](roadmap/stage5_deployment_queue.md)

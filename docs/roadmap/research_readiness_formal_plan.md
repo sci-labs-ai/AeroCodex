@@ -1,6 +1,8 @@
 # Research Readiness Formal Plan v0.7.2
 
-Source of truth: `AeroCodex_Research_Readiness_Master_Execution_Plan_v0_7_2.md` from the v0.7.2 research-readiness planning package.
+Source of truth: `AeroCodex_Research_Readiness_Master_Execution_Plan_v0_7_2.md` from the v0.7.2 research-readiness planning package. The v0.7.2 master plan is the controlling master plan for this queue and supersedes earlier ambiguous planning assumptions.
+
+Decision authority: the [research readiness decision packet](research_readiness_agent_decision_packet.md) records the durable agent posture, safety wording, status-gate model, and sequencing rules for future research-readiness work.
 
 AeroCodex is professional research/preliminary-design software. It is not flight-certified, mission-certified, habitat-safety-certified, life-support-certified, NASA-approved, or regulatory-approved software.
 
