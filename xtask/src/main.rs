@@ -516,6 +516,7 @@ fn main() {
             let root = repo_root();
             verify_beta1(&root)
         }
+        ["equation-batch", "plan", rest @ ..] => run_equation_batch_plan(rest),
         ["dependency-policy"] => dependency_policy(),
         ["help"] | ["--help"] | ["-h"] => {
             print_usage();
@@ -533,9 +534,21 @@ fn main() {
     }
 }
 
+fn run_equation_batch_plan(args: &[&str]) -> Result<(), String> {
+    let root = repo_root();
+    let options = equation_batch::plan::PlanOptions::parse_args(args)?;
+    let report = equation_batch::plan::plan_equation_batches(&root, &options)?;
+    if options.json {
+        print!("{}", equation_batch::plan::render_json(&report));
+    } else {
+        print!("{}", equation_batch::plan::render_human(&report));
+    }
+    Ok(())
+}
+
 fn print_usage() {
     eprintln!(
-        "usage:\n  cargo run -p xtask -- verify --all\n  cargo run -p xtask -- verify cards\n  cargo run -p xtask -- verify source-registry\n  cargo run -p xtask -- verify data-registry\n  cargo run -p xtask -- verify status-vocabulary\n  cargo run -p xtask -- verify formula-vault\n  cargo run -p xtask -- verify equation-inventory\n  cargo run -p xtask -- verify beta1\n  cargo run -p xtask -- dependency-policy"
+        "usage:\n  cargo run -p xtask -- verify --all\n  cargo run -p xtask -- verify cards\n  cargo run -p xtask -- verify source-registry\n  cargo run -p xtask -- verify data-registry\n  cargo run -p xtask -- verify status-vocabulary\n  cargo run -p xtask -- verify formula-vault\n  cargo run -p xtask -- verify equation-inventory\n  cargo run -p xtask -- verify beta1\n  cargo run -p xtask -- equation-batch plan --manifest equation-batches/m00-canonical-units.tsv [--json]\n  cargo run -p xtask -- equation-batch plan --all-manifests [--json]\n  cargo run -p xtask -- dependency-policy"
     );
 }
 
