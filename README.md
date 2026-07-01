@@ -12,17 +12,9 @@ Research-readiness planning authority: the v0.7.2 [research readiness decision p
 
 ## Current governed state
 
-AeroCodex currently records a closed external M07 metadata-accounting state in the governed inventory:
+AeroCodex currently records a closed external M07 metadata-accounting state in the governed inventory. The current readiness count source of truth is `docs/roadmap/research_readiness_counts.md`, which separates inventory visibility, runtime implementation, CLI accessibility, validation status, execution readiness, and M07 quarantine.
 
-| Inventory item | Current count | Status |
-|---|---:|---|
-| External M07 resolution manifests | 35 | Closed metadata/accounting set |
-| External M07 rows with terminal dispositions | 1323 | `research_required`; blocked; evidence-only metadata |
-| External M07 backlog rows | 0 | No remaining external M07 backlog rows in the governed inventory |
-| Executable research equations | 152 | Existing public Rust research/preliminary-design kernels |
-| Metadata-only formula-vault candidates | 27 | Linked to governed runtimes; no unresolved candidate formula IDs |
-
-This closure does **not** claim M07/Scilab parity, certification, flight readiness, mission readiness, operational approval, medical approval, or regulated-use approval.
+That count source explicitly keeps M07 terminal rows quarantined and states that the 1,323 M07 rows are not 1,323 usable equations. This closure does **not** claim M07/Scilab parity, certification, flight readiness, mission readiness, operational approval, medical approval, or regulated-use approval.
 
 ## Safety and certification caveat
 
