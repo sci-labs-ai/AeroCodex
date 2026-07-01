@@ -1,0 +1,56 @@
+# LOCK-005 formula sidecar template.
+# Locked M00 Slice A IDs for this first runnable slice:
+# - m00.angle.deg_to_rad
+# - m00.angle.rad_to_deg
+# Sidecars enrich metadata only; they cannot promote status.
+# Status changes require an auditable promotion packet.
+
+schema_version: aerocodex.formula_sidecar.v1
+formula_id: m00.angle.deg_to_rad
+legacy_formula_id: formula_vault.m00.angle.deg2rad
+name: Degrees to radians
+family: m00.angle
+slice: A
+inputs:
+  - name: degrees
+    type: f64
+    unit: deg
+    required: true
+    domain:
+      finite: true
+outputs:
+  - name: angle_radians
+    type: f64
+    unit: rad
+units:
+  input: deg
+  output: rad
+domain_constraints:
+  - id: finite_input
+    expression: is_finite(degrees)
+    severity: error
+cli_aliases:
+  - --degrees
+examples:
+  - formula_id: m00.angle.deg_to_rad
+    command: aerocodex formula run m00.angle.deg_to_rad --degrees 180
+    expected:
+      angle_radians: 3.141592653589793
+  - formula_id: m00.angle.rad_to_deg
+    command: aerocodex formula run m00.angle.rad_to_deg --radians 3.141592653589793
+    expected:
+      angle_degrees: 180.0
+source_refs:
+  - id: m00_angle_identity_public_math
+    locator: public mathematical identity; cite precise source before promotion
+metadata_contract:
+  sidecars_enrich_metadata_only: true
+  status_promotion_allowed: false
+  status_changes_require_promotion_packet: true
+validation_notes:
+  - Sidecars enrich metadata only; they cannot promote status.
+  - This template does not make any formula executable.
+  - Normal execution still requires implementation_verified through an accepted promotion packet.
+warnings:
+  - Research/preliminary-design software. Not certified for operational use.
+  - M07-derived records remain visible blocked candidates until separately promoted.

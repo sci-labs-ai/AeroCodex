@@ -1,0 +1,48 @@
+# LOCK-005 formula promotion packet template.
+# Promotion packets are required to change status and must be auditable.
+# Sidecars alone cannot promote status.
+
+schema_version: aerocodex.promotion_packet.v1
+formula_id: m00.angle.deg_to_rad
+previous_status: equation_traceable
+requested_status: implementation_verified
+promotion_intent:
+  reason: Promote one locked Slice A formula after source, implementation, and tests are reviewed.
+  scope: M00 Slice A only
+  non_claims:
+    - not certified operational aerospace software
+    - not flight-ready
+    - not mission-ready
+    - not habitat-safe
+    - not life-support-certified
+traceability_review:
+  reviewer: maintainer
+  date: YYYY-MM-DD
+  source_identity_confirmed: false
+  variables_units_confirmed: false
+  assumptions_confirmed: false
+  precise_source_locator: TBD
+source_licensing_review:
+  checklist: docs/assurance/source_licensing_checklist.md
+  public_citable_legal_source_confirmed: false
+  no_wholesale_copying_confirmed: false
+  no_proprietary_standard_text_confirmed: false
+implementation_review:
+  reviewer: maintainer
+  date: YYYY-MM-DD
+  runtime_symbol: TBD
+  implementation_matches_formula: false
+  tests_passed: false
+evidence:
+  source_refs: []
+  tests: []
+  commands: []
+audit_trail:
+  packet_author: maintainer
+  created_at_utc: YYYY-MM-DDTHH:MM:SSZ
+  reviewed_by: []
+  status_change_record: pending
+approval:
+  approved_by: null
+  approved_status: null
+  notes: Promotion packets are required to change status and must be auditable.

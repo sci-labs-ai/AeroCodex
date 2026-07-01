@@ -1,0 +1,81 @@
+{
+  "$id": "https://aerocodex.local/schemas/formula_promotion_packet.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AeroCodex Formula Promotion Packet",
+  "description": "LOCK-005 auditable packet schema. Promotion packets are required to change formula validation status.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "aerocodex.promotion_packet.v1"
+    },
+    "formula_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(\\.[a-z0-9_]+)+$"
+    },
+    "previous_status": {
+      "$ref": "#/$defs/formula_status"
+    },
+    "requested_status": {
+      "$ref": "#/$defs/formula_status"
+    },
+    "promotion_intent": {
+      "type": "object"
+    },
+    "traceability_review": {
+      "type": "object"
+    },
+    "source_licensing_review": {
+      "type": "object"
+    },
+    "implementation_review": {
+      "type": "object"
+    },
+    "evidence": {
+      "type": "object"
+    },
+    "audit_trail": {
+      "type": "object",
+      "description": "Required audit trail for every requested status change.",
+      "properties": {
+        "packet_author": { "type": "string" },
+        "created_at_utc": { "type": "string" },
+        "reviewed_by": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "status_change_record": { "type": "string" }
+      },
+      "required": ["packet_author", "created_at_utc", "reviewed_by", "status_change_record"],
+      "additionalProperties": true
+    },
+    "approval": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "formula_id",
+    "previous_status",
+    "requested_status",
+    "promotion_intent",
+    "traceability_review",
+    "source_licensing_review",
+    "implementation_review",
+    "evidence",
+    "audit_trail",
+    "approval"
+  ],
+  "$defs": {
+    "formula_status": {
+      "type": "string",
+      "enum": [
+        "research_required",
+        "equation_traceable",
+        "implementation_verified",
+        "reference_validated",
+        "experiment_validated"
+      ]
+    }
+  }
+}

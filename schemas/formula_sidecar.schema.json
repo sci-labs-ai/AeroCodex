@@ -1,0 +1,107 @@
+{
+  "$id": "https://aerocodex.local/schemas/formula_sidecar.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AeroCodex Formula Sidecar",
+  "description": "LOCK-005 metadata-only sidecar schema. Sidecars enrich metadata only and cannot promote validation status.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "aerocodex.formula_sidecar.v1"
+    },
+    "formula_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(\\.[a-z0-9_]+)+$"
+    },
+    "legacy_formula_id": {
+      "type": ["string", "null"]
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "family": {
+      "type": "string",
+      "minLength": 1
+    },
+    "slice": {
+      "type": "string",
+      "enum": ["A", "B", "C", "D"]
+    },
+    "inputs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/io_field" }
+    },
+    "outputs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/io_field" }
+    },
+    "units": {
+      "type": ["object", "array", "null"]
+    },
+    "domain_constraints": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "cli_aliases": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "examples": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "source_refs": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "metadata_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sidecars_enrich_metadata_only": { "const": true },
+        "status_promotion_allowed": { "const": false },
+        "status_changes_require_promotion_packet": { "const": true }
+      },
+      "required": [
+        "sidecars_enrich_metadata_only",
+        "status_promotion_allowed",
+        "status_changes_require_promotion_packet"
+      ]
+    },
+    "validation_notes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "required": [
+    "schema_version",
+    "formula_id",
+    "legacy_formula_id",
+    "name",
+    "family",
+    "slice",
+    "inputs",
+    "outputs",
+    "metadata_contract",
+    "warnings"
+  ],
+  "$defs": {
+    "io_field": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "unit": { "type": ["string", "null"] },
+        "required": { "type": "boolean" },
+        "domain": { "type": "object" }
+      },
+      "required": ["name", "type"]
+    }
+  }
+}
