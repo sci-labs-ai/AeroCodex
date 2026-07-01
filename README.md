@@ -8,6 +8,8 @@
 
 AeroCodex is a Phase 0.001 Rust workspace for research, education, verification-oriented development, and preliminary design. The human roadmap phase is `Phase 0.001`; Cargo-compatible package versions remain `0.0.1` during this phase. Do not use `0.001` as a Cargo package version.
 
+Research-readiness planning authority: the v0.7.2 [research readiness decision packet](docs/roadmap/research_readiness_agent_decision_packet.md) states that AeroCodex is intended to become professional-grade, traceable aerospace research software suitable for academic, laboratory, and agency evaluation. It is not certified for flight, mission operations, habitat safety, medical/life-support decisions, or regulatory approval.
+
 ## Current governed state
 
 AeroCodex currently records a closed external M07 metadata-accounting state in the governed inventory:
