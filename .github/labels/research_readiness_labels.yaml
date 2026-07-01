@@ -1,0 +1,94 @@
+labels:
+  - name: research-readiness
+    color: "1D76DB"
+    description: "Research-readiness queue governance and implementation work."
+  - name: agent-task
+    color: "7057FF"
+    description: "Task suitable for assignment to an implementation or documentation agent."
+  - name: planning-contract
+    color: "5319E7"
+    description: "Planning authority, contract, or sequencing rule for the research-readiness queue."
+  - name: equation-batch
+    color: "006B75"
+    description: "Equation-batch manifest, parser, verifier, or static-report work."
+  - name: formula-registry
+    color: "0052CC"
+    description: "Formula registry schema, generator, fixture, or API boundary work."
+  - name: cli
+    color: "0E8A16"
+    description: "Command-line interface behavior, JSON output, or user-facing CLI contract."
+  - name: status-gates
+    color: "D93F0B"
+    description: "Formula status-gate policy, blocking, or preliminary-mode behavior."
+  - name: m00
+    color: "BFD4F2"
+    description: "M00 inventory, metadata, or explicitly scoped M00 Slice A work."
+  - name: m07-quarantine
+    color: "FBCA04"
+    description: "M07 candidate visibility, quarantine, blocked status, or later family-promotion work."
+  - name: docs
+    color: "0075CA"
+    description: "Documentation-only or roadmap/readiness planning work."
+  - name: ci
+    color: "5319E7"
+    description: "GitHub Actions, verification gates, or CI policy work."
+  - name: rust-api
+    color: "5319E7"
+    description: "Rust library API, SDK boundary, or semver/stability work."
+  - name: generated-artifacts
+    color: "C2E0C6"
+    description: "Generated registries, schemas, golden outputs, checksums, or deterministic artifacts."
+  - name: good-first-agent-task
+    color: "7057FF"
+    description: "Small, well-bounded task suitable for a first agent assignment."
+  - name: serialized
+    color: "B60205"
+    description: "Must be sequenced with dependencies or conflicting task zones before parallel work."
+  - name: parallel-safe
+    color: "0E8A16"
+    description: "Safe to run in parallel when the dependency/conflict matrix and file scopes allow it."
+  - name: P0
+    color: "B60205"
+    description: "Priority 0: critical contract, dependency, or enabling task."
+  - name: P1
+    color: "D93F0B"
+    description: "Priority 1: important queue, implementation, or release-readiness task."
+  - name: P2
+    color: "FBCA04"
+    description: "Priority 2: polish, documentation, or follow-up task."
+  - name: wave-00
+    color: "EDEDED"
+    description: "Execution Wave 00: contract hardening and queue governance."
+  - name: wave-01
+    color: "EDEDED"
+    description: "Execution Wave 01: equation-batch parser and static reports."
+  - name: wave-02
+    color: "EDEDED"
+    description: "Execution Wave 02: probe, verifier, and CI work."
+  - name: wave-03
+    color: "EDEDED"
+    description: "Execution Wave 03: registry schemas, alias policy, generators, and agent check script."
+  - name: wave-04
+    color: "EDEDED"
+    description: "Execution Wave 04: CLI shell, JSON, gates, and status report."
+  - name: wave-05
+    color: "EDEDED"
+    description: "Execution Wave 05: execution after gates."
+  - name: wave-06
+    color: "EDEDED"
+    description: "Execution Wave 06: M00 Slice A promotion and first normal execution."
+  - name: wave-07
+    color: "EDEDED"
+    description: "Execution Wave 07: runtime inventory."
+  - name: wave-08
+    color: "EDEDED"
+    description: "Execution Wave 08: M07 quarantine."
+  - name: wave-09
+    color: "EDEDED"
+    description: "Execution Wave 09: A4 first-family promotion."
+  - name: wave-10
+    color: "EDEDED"
+    description: "Execution Wave 10: public alpha and release operations."
+  - name: wave-11
+    color: "EDEDED"
+    description: "Execution Wave 11: Rust library API."

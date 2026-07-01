@@ -43,3 +43,4 @@ The v0.7.2 lockdown sequence starts with Execution Wave 00 contract hardening be
 - `docs/roadmap/research_readiness_queue_order.md` lists the v0.7.2 queue in merge-order form while preserving the one-task-one-PR rule.
 - `docs/roadmap/research_readiness_dependency_conflict_matrix.md` defines serialized zones, critical ordering constraints, and safe-parallel-work boundaries.
 - `docs/roadmap/research_readiness_counts.md` is the RR-004 source of truth for readiness counts and their non-claim meanings.
+- `docs/roadmap/reviewer_checklists_v0_7_2.md` defines RR-056 review checklists for general, contract/docs, generated-artifact, and formula-promotion PRs.
