@@ -723,7 +723,10 @@ fn has_windows_absolute_prefix(value: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use std::{fs, path::PathBuf};
+    use std::{
+        fs,
+        path::{Path, PathBuf},
+    };
 
     use super::{plan_equation_batches, render_json, PlanOptions};
 
@@ -770,7 +773,7 @@ mod tests {
         root
     }
 
-    fn write_file(root: &PathBuf, relative: &str, contents: &str) {
+    fn write_file(root: &Path, relative: &str, contents: &str) {
         let path = root.join(relative);
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent).expect("create parent");
