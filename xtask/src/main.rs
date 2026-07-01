@@ -1,5 +1,7 @@
 #![forbid(unsafe_code)]
 
+mod equation_batch;
+
 use std::{
     collections::{BTreeMap, BTreeSet},
     env, fs,
@@ -549,7 +551,6 @@ fn verify_equation_batch_scaffold(root: &Path) -> Result<(), String> {
         }
     }
 
-    let expected_header = "schema_version\tbatch_id\tformula_id\tpackage\tcrate_name\truntime_symbol\toutput_variable\tcontract_path\tvalidation_card_path\tsource_seed_path\tvalidation_status\ttest_strategy\ttest_expression";
     let batch_dir = root.join("equation-batches");
     let entries =
         fs::read_dir(&batch_dir).map_err(|error| format!("{}: {error}", batch_dir.display()))?;
@@ -564,81 +565,38 @@ fn verify_equation_batch_scaffold(root: &Path) -> Result<(), String> {
         manifest_count += 1;
         let text =
             fs::read_to_string(&path).map_err(|error| format!("{}: {error}", path.display()))?;
-        let mut lines = text.lines().filter(|line| !line.trim().is_empty());
-        let header = lines
-            .next()
-            .ok_or_else(|| format!("{} is empty", path.display()))?;
-        if header != expected_header {
-            return Err(format!(
-                "{} has an unsupported equation-batch header",
-                path.display()
-            ));
-        }
-        let mut local_rows = 0usize;
-        for (index, line) in lines.enumerate() {
-            let fields: Vec<&str> = line.split('\t').collect();
-            let line_no = index + 2;
-            if fields.len() != 13 {
-                return Err(format!(
-                    "{} line {} has {} fields; expected 13",
-                    path.display(),
-                    line_no,
-                    fields.len()
-                ));
-            }
-            if fields[0] != "aerocodex.equation_batch.v1" {
-                return Err(format!(
-                    "{} line {} has unsupported schema",
-                    path.display(),
-                    line_no
-                ));
-            }
-            if fields[10] != "research_required" {
+        let manifest = equation_batch::manifest::parse_equation_batch_manifest(&path, &text)?;
+        for row in &manifest.rows {
+            if row.validation_status != "research_required" {
                 return Err(format!(
                     "{} line {} validation_status must remain research_required",
                     path.display(),
-                    line_no
+                    row.line_number
                 ));
             }
             for (field_name, value) in [
-                ("contract_path", fields[7]),
-                ("validation_card_path", fields[8]),
-                ("source_seed_path", fields[9]),
+                ("contract_path", row.contract_path.as_str()),
+                ("validation_card_path", row.validation_card_path.as_str()),
+                ("source_seed_path", row.source_seed_path.as_str()),
             ] {
-                let relative = Path::new(value);
-                if relative.is_absolute()
-                    || relative
-                        .components()
-                        .any(|component| matches!(component, std::path::Component::ParentDir))
-                {
-                    return Err(format!(
-                        "{} line {} {field_name} must be a repository-relative path without '..'",
-                        path.display(),
-                        line_no
-                    ));
-                }
-                if !root.join(relative).is_file() {
+                if !root.join(value).is_file() {
                     return Err(format!(
                         "{} line {} {field_name} does not exist: {value}",
                         path.display(),
-                        line_no
+                        row.line_number
                     ));
                 }
             }
-            local_rows += 1;
         }
-        if local_rows == 0 {
-            return Err(format!("{} has no equation rows", path.display()));
-        }
-        if local_rows > 40 {
+        if manifest.row_count > 40 {
             return Err(format!(
                 "{} exceeds the public equation-batch row limit: {} > 40",
                 path.display(),
-                local_rows
+                manifest.row_count
             ));
         }
         row_count = row_count
-            .checked_add(local_rows)
+            .checked_add(manifest.row_count)
             .ok_or_else(|| "equation-batch row count overflow".to_string())?;
     }
     if manifest_count == 0 {
