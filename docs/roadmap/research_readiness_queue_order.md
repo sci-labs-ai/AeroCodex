@@ -36,4 +36,4 @@ Agents must not treat a wave as permission to implement the whole wave. Start on
 
 ## Handoff evidence rule
 
-Every task handoff should report the task ID, changed files, commands run, grep/test results, files intentionally not touched, and whether validation statuses, M07 files, equation manifests, or runtime code changed.
+Every task handoff should report the task ID, changed files, commands run, grep/test results, files intentionally not touched, and whether validation statuses, M07 files, equation manifests, or runtime code changed. Reviewers should apply `docs/roadmap/reviewer_checklists_v0_7_2.md` before accepting queue work.
