@@ -1,0 +1,15 @@
+{
+  "schema_version": "aerocodex.equation_batch.plan.placeholder.v1",
+  "fixture_intent": "RR-055 reserved golden placeholder for the future RR-006 equation-batch plan command.",
+  "source_fixture": "tests/fixtures/equation_batch/manifest_valid_minimal.tsv",
+  "reserved_for_tasks": [
+    "RR-006"
+  ],
+  "command_status": "not_implemented",
+  "contains_execution_evidence": false,
+  "contains_probe_generation": false,
+  "notes": [
+    "This placeholder is deterministic and contains no wall-clock timestamp.",
+    "It does not implement equation-batch planning, probing, verification, execution, or validation-status promotion."
+  ]
+}

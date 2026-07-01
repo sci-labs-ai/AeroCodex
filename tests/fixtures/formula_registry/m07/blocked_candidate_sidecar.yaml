@@ -1,0 +1,26 @@
+# RR-055 M07 blocked-candidate sidecar fixture.
+# Fixture only: M07 is visible as blocked/non-executable inventory, not authority.
+schema_version: aerocodex.formula_sidecar.v1
+formula_id: m07.candidate.blocked_placeholder
+legacy_formula_id: null
+name: Blocked M07 candidate placeholder
+family: m07.candidate
+slice: A
+inputs: []
+outputs: []
+units: null
+domain_constraints: []
+cli_aliases: []
+examples: []
+source_refs:
+  - id: m07_blocked_fixture_only
+    locator: fixture-only placeholder; not an authoritative M07 source and not execution evidence
+metadata_contract:
+  sidecars_enrich_metadata_only: true
+  status_promotion_allowed: false
+  status_changes_require_promotion_packet: true
+validation_notes:
+  - m07_candidate_blocked fixture: visible but non-executable.
+  - This fixture does not imply M07 authority, family promotion, execution readiness, or validation-status promotion.
+warnings:
+  - m07_candidate_blocked: blocked and non-executable until a later explicit family-promotion task supplies evidence.

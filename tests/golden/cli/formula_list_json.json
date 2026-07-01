@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "command": "formula_list",
+  "placeholder": true,
+  "reserved_for_tasks": [
+    "RR-020"
+  ],
+  "source_fixture": "tests/golden/formula_registry/formula_registry_m00_slice_a.json",
+  "contains_execution_evidence": false,
+  "formulas": [
+    {
+      "formula_id": "m00.angle.deg_to_rad",
+      "status": "research_required",
+      "execution_policy": "blocked"
+    },
+    {
+      "formula_id": "m00.angle.rad_to_deg",
+      "status": "research_required",
+      "execution_policy": "blocked"
+    },
+    {
+      "formula_id": "m07.candidate.blocked_placeholder",
+      "status": "research_required",
+      "execution_policy": "blocked",
+      "quarantine_state": "m07_candidate_blocked"
+    }
+  ],
+  "warnings": [
+    "RR-055 golden placeholder only; CLI formula list command is not implemented here."
+  ],
+  "error": null
+}

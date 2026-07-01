@@ -1,0 +1,8 @@
+AeroCodex formula inventory (RR-055 golden placeholder)
+
+ID                                 Status             Execution policy  Summary
+m00.angle.deg_to_rad                research_required  blocked           Fixture metadata only; not executable in this snapshot
+m00.angle.rad_to_deg                research_required  blocked           Fixture metadata only; not executable in this snapshot
+m07.candidate.blocked_placeholder   research_required  blocked           m07_candidate_blocked; non-executable fixture inventory
+
+Notice: RR-055 reserves the output path only. CLI list output is not implemented here.

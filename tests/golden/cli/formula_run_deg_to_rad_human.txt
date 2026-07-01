@@ -1,0 +1,8 @@
+Formula: m00.angle.deg_to_rad
+Status: research_required
+Execution policy: blocked
+
+Error: execution_blocked_by_status
+RR-055 reserves the formula-run golden path only. Normal execution is not implemented here and remains blocked until later status-gate, dispatch, and promotion tasks.
+
+Notice: No formula execution evidence is contained in this placeholder.

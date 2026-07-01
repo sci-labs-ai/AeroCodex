@@ -1,0 +1,115 @@
+{
+  "schema_version": "aerocodex.formula_registry.v1",
+  "generator_version": "rr-055-fixture-placeholder-v1",
+  "generated_by": "RR-055 fixture placeholder; registry generator not implemented in this task.",
+  "source_hash": "sha256:f82b195e4d35293c06142c91627a8795f355ff17789cf2b1a44f01e22ff7b813",
+  "formula_count": 2,
+  "non_claims": [
+    "Golden placeholder only; no generated registry artifact was produced.",
+    "No formula execution evidence, validation-status promotion, or operational aerospace approval is claimed."
+  ],
+  "formulas": [
+    {
+      "formula_id": "m00.angle.deg_to_rad",
+      "legacy_formula_id": "formula_vault.m00.angle.deg2rad",
+      "aliases": [
+        "formula_vault.m00.angle.deg2rad"
+      ],
+      "name": "Degrees to radians",
+      "summary": "RR-055 fixture placeholder; metadata is visible but normal execution is not executable until a later promotion/status-gate task allows it.",
+      "family": "m00.angle",
+      "batch_id": "m00-slice-a-fixture",
+      "status": "research_required",
+      "quarantine_state": "below_execution_threshold",
+      "execution_policy": "blocked",
+      "source_trace": {
+        "manifest_path": "tests/fixtures/equation_batch/manifest_m00_slice_a.tsv",
+        "sidecar_path": "tests/fixtures/formula_registry/m00/deg_to_rad_sidecar.yaml"
+      },
+      "inputs": [
+        {
+          "name": "degrees",
+          "type": "f64",
+          "unit": "deg",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "angle_radians",
+          "type": "f64",
+          "unit": "rad"
+        }
+      ],
+      "units": {
+        "input": "deg",
+        "output": "rad"
+      },
+      "domain_constraints": [
+        {
+          "id": "finite_input",
+          "expression": "is_finite(degrees)"
+        }
+      ],
+      "implementation_path": null,
+      "runtime_symbol": "m00_degrees_to_radians",
+      "test_vectors": [],
+      "warnings": [
+        "RR-055 golden placeholder; contains no generator or formula execution evidence.",
+        "Normal execution requires implementation_verified and is currently blocked.",
+        "Research/preliminary-design fixture only; no operational aerospace approval is claimed."
+      ]
+    },
+    {
+      "formula_id": "m00.angle.rad_to_deg",
+      "legacy_formula_id": "formula_vault.m00.angle.rad2deg",
+      "aliases": [
+        "formula_vault.m00.angle.rad2deg"
+      ],
+      "name": "Radians to degrees",
+      "summary": "RR-055 fixture placeholder; metadata is visible but normal execution is not executable until a later promotion/status-gate task allows it.",
+      "family": "m00.angle",
+      "batch_id": "m00-slice-a-fixture",
+      "status": "research_required",
+      "quarantine_state": "below_execution_threshold",
+      "execution_policy": "blocked",
+      "source_trace": {
+        "manifest_path": "tests/fixtures/equation_batch/manifest_m00_slice_a.tsv",
+        "sidecar_path": "tests/fixtures/formula_registry/m00/rad_to_deg_sidecar.yaml"
+      },
+      "inputs": [
+        {
+          "name": "radians",
+          "type": "f64",
+          "unit": "rad",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "angle_degrees",
+          "type": "f64",
+          "unit": "deg"
+        }
+      ],
+      "units": {
+        "input": "rad",
+        "output": "deg"
+      },
+      "domain_constraints": [
+        {
+          "id": "finite_input",
+          "expression": "is_finite(radians)"
+        }
+      ],
+      "implementation_path": null,
+      "runtime_symbol": "m00_radians_to_degrees",
+      "test_vectors": [],
+      "warnings": [
+        "RR-055 golden placeholder; contains no generator or formula execution evidence.",
+        "Normal execution requires implementation_verified and is currently blocked.",
+        "Research/preliminary-design fixture only; no operational aerospace approval is claimed."
+      ]
+    }
+  ]
+}

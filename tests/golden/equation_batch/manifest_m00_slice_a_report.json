@@ -1,0 +1,16 @@
+{
+  "schema_version": "aerocodex.equation_batch.report.placeholder.v1",
+  "fixture_intent": "RR-055 reserved golden placeholder for the future RR-008 deterministic equation-batch report artifact.",
+  "source_fixture": "tests/fixtures/equation_batch/manifest_m00_slice_a.tsv",
+  "reserved_for_tasks": [
+    "RR-008"
+  ],
+  "command_status": "not_implemented",
+  "contains_execution_evidence": false,
+  "contains_probe_generation": false,
+  "reported_row_count_placeholder": 2,
+  "notes": [
+    "This placeholder names M00 Slice A fixture rows only.",
+    "It does not execute formulas, generate probes, refresh generated registry artifacts, or promote validation status."
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "ok": false,
+  "command": "formula_run",
+  "placeholder": true,
+  "reserved_for_tasks": [
+    "RR-023",
+    "RR-031"
+  ],
+  "formula_id": "m00.angle.deg_to_rad",
+  "canonical_formula_id": "m00.angle.deg_to_rad",
+  "alias_used": null,
+  "status": "research_required",
+  "execution_policy": "blocked",
+  "quarantine_state": "below_execution_threshold",
+  "inputs": {
+    "degrees": {
+      "value": 180.0,
+      "unit": "deg"
+    }
+  },
+  "outputs": {},
+  "traceability": null,
+  "contains_execution_evidence": false,
+  "warnings": [
+    "RR-055 golden placeholder only; normal formula execution is not implemented here."
+  ],
+  "error": {
+    "code": "execution_blocked_by_status",
+    "message": "Formula is research_required in this fixture and is not executable in normal mode."
+  }
+}

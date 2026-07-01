@@ -1,0 +1,22 @@
+{
+  "ok": false,
+  "command": "formula_run",
+  "placeholder": true,
+  "formula_id": "m07.candidate.blocked_placeholder",
+  "canonical_formula_id": "m07.candidate.blocked_placeholder",
+  "alias_used": null,
+  "status": "research_required",
+  "execution_policy": "blocked",
+  "quarantine_state": "m07_candidate_blocked",
+  "inputs": {},
+  "outputs": {},
+  "traceability": null,
+  "contains_execution_evidence": false,
+  "warnings": [
+    "m07_candidate_blocked: visible but blocked and non-executable fixture inventory."
+  ],
+  "error": {
+    "code": "m07_candidate_blocked",
+    "message": "Formula is an M07 candidate fixture and is non-executable until explicit family promotion supplies evidence."
+  }
+}

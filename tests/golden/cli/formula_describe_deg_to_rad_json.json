@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "command": "formula_describe",
+  "placeholder": true,
+  "formula_id": "m00.angle.deg_to_rad",
+  "canonical_formula_id": "m00.angle.deg_to_rad",
+  "alias_used": null,
+  "status": "research_required",
+  "execution_policy": "blocked",
+  "quarantine_state": "below_execution_threshold",
+  "source_trace": {
+    "manifest_path": "tests/fixtures/equation_batch/manifest_m00_slice_a.tsv",
+    "sidecar_path": "tests/fixtures/formula_registry/m00/deg_to_rad_sidecar.yaml"
+  },
+  "contains_execution_evidence": false,
+  "warnings": [
+    "RR-055 describe snapshot placeholder; not executable in this snapshot."
+  ],
+  "error": null
+}

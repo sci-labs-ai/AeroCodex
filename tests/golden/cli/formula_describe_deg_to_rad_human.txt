@@ -1,0 +1,17 @@
+Formula: m00.angle.deg_to_rad
+Name: Degrees to radians
+Status: research_required
+Execution policy: blocked
+Quarantine state: below_execution_threshold
+
+Inputs:
+  --degrees <number>    angle in degrees
+
+Outputs:
+  angle_radians         angle in radians
+
+Traceability:
+  Fixture manifest: tests/fixtures/equation_batch/manifest_m00_slice_a.tsv
+  Fixture sidecar: tests/fixtures/formula_registry/m00/deg_to_rad_sidecar.yaml
+
+Notice: RR-055 golden placeholder only; this formula is not executable in this snapshot.

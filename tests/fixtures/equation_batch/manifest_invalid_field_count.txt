@@ -1,0 +1,3 @@
+schema_version	batch_id	formula_id	package	crate_name	runtime_symbol	output_variable	contract_path	validation_card_path	source_seed_path	validation_status	test_strategy	test_expression
+aerocodex.equation_batch.v1	fixture-invalid-field-count
+# RR-055 raw invalid-field-count fixture. Stored as .txt so the top-level *.tsv acceptance check can require every TSV fixture to keep the canonical header and 13 fields.

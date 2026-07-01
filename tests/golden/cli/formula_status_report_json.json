@@ -1,0 +1,28 @@
+{
+  "ok": true,
+  "command": "formula_status_report",
+  "placeholder": true,
+  "reserved_for_tasks": [
+    "RR-026"
+  ],
+  "contains_execution_evidence": false,
+  "source_fixture": "tests/golden/formula_registry/formula_registry_with_m07_blocked_candidate.json",
+  "counts": {
+    "total_fixture_formulas": 3,
+    "by_status": {
+      "research_required": 3
+    },
+    "by_execution_policy": {
+      "blocked": 3
+    },
+    "by_quarantine_state": {
+      "below_execution_threshold": 2,
+      "m07_candidate_blocked": 1
+    }
+  },
+  "warnings": [
+    "RR-055 status-report golden placeholder only.",
+    "blocked/non-executable fixtures do not imply validation promotion or runtime execution."
+  ],
+  "error": null
+}

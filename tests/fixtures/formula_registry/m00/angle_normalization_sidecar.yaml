@@ -1,0 +1,23 @@
+# RR-055 formula-ID normalization fixture for M00 Slice A sidecars.
+# This fixture records canonical IDs and aliases only; it is not a promotion packet.
+schema_version: aerocodex.formula_sidecar_normalization_fixture.v1
+fixture_name: m00_angle_normalization_sidecar
+canonical_formula_ids:
+  - m00.angle.deg_to_rad
+  - m00.angle.rad_to_deg
+normalization_cases:
+  - input_formula_id: formula_vault.m00.angle.deg2rad
+    canonical_formula_id: m00.angle.deg_to_rad
+    fixture_sidecar: tests/fixtures/formula_registry/m00/deg_to_rad_sidecar.yaml
+  - input_formula_id: formula_vault.m00.angle.rad2deg
+    canonical_formula_id: m00.angle.rad_to_deg
+    fixture_sidecar: tests/fixtures/formula_registry/m00/rad_to_deg_sidecar.yaml
+metadata_contract:
+  sidecars_enrich_metadata_only: true
+  status_promotion_allowed: false
+  status_changes_require_promotion_packet: true
+validation_notes:
+  - Normalization fixtures do not make formulas executable.
+  - Canonical Slice A IDs remain m00.angle.deg_to_rad and m00.angle.rad_to_deg.
+warnings:
+  - Fixture-only metadata; no validation status is promoted by this file.

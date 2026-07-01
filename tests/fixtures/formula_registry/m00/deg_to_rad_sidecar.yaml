@@ -1,0 +1,45 @@
+# RR-055 M00 Slice A sidecar fixture.
+# Fixture only: sidecars enrich metadata and cannot promote validation status.
+schema_version: aerocodex.formula_sidecar.v1
+formula_id: m00.angle.deg_to_rad
+legacy_formula_id: formula_vault.m00.angle.deg2rad
+name: Degrees to radians
+family: m00.angle
+slice: A
+inputs:
+  - name: degrees
+    type: f64
+    unit: deg
+    required: true
+    domain:
+      finite: true
+outputs:
+  - name: angle_radians
+    type: f64
+    unit: rad
+units:
+  input: deg
+  output: rad
+domain_constraints:
+  - id: finite_input
+    expression: is_finite(degrees)
+    severity: error
+cli_aliases:
+  - --degrees
+examples:
+  - formula_id: m00.angle.deg_to_rad
+    command: aerocodex formula run m00.angle.deg_to_rad --degrees 180
+    expected:
+      angle_radians: 3.141592653589793
+source_refs:
+  - id: m00_angle_identity_fixture
+    locator: public angle-unit identity fixture; cite precise source before promotion
+metadata_contract:
+  sidecars_enrich_metadata_only: true
+  status_promotion_allowed: false
+  status_changes_require_promotion_packet: true
+validation_notes:
+  - RR-055 fixture only; this sidecar does not make any formula executable.
+  - Normal execution remains blocked until a later accepted promotion/status-gate task allows it.
+warnings:
+  - Research/preliminary-design metadata fixture; no operational aerospace approval is claimed.

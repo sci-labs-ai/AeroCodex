@@ -1,0 +1,2 @@
+bad_header_for_rr055_parser_fixture
+# RR-055 raw invalid-header fixture. Stored as .txt so the top-level *.tsv acceptance check can require every TSV fixture to keep the canonical header and 13 fields.
