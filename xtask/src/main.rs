@@ -517,6 +517,7 @@ fn main() {
             verify_beta1(&root)
         }
         ["equation-batch", "plan", rest @ ..] => run_equation_batch_plan(rest),
+        ["equation-batch", "report", rest @ ..] => run_equation_batch_report(rest),
         ["dependency-policy"] => dependency_policy(),
         ["help"] | ["--help"] | ["-h"] => {
             print_usage();
@@ -544,6 +545,12 @@ fn run_equation_batch_plan(args: &[&str]) -> Result<(), String> {
         print!("{}", equation_batch::plan::render_human(&report));
     }
     Ok(())
+}
+
+fn run_equation_batch_report(args: &[&str]) -> Result<(), String> {
+    let root = repo_root();
+    let options = equation_batch::report::ReportOptions::parse_args(args)?;
+    equation_batch::report::run_report_command(&root, &options)
 }
 
 fn print_usage() {

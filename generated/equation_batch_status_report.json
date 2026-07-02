@@ -1,0 +1,3838 @@
+{
+  "ok": true,
+  "command": "equation-batch report",
+  "schema_version": "aerocodex.equation_batch.status_report.v1",
+  "generated_by": "xtask equation-batch report",
+  "manifest_count": 8,
+  "row_count": 152,
+  "counts_by_status": {"research_required": 152},
+  "counts_by_family": {"aerodynamics": 6, "astrodynamics": 23, "atmosphere": 5, "flight_dynamics": 5, "gasdyn": 17, "heat_transfer": 4, "life_support": 50, "m00": 27, "propulsion": 5, "structures": 4, "thermo": 6},
+  "counts_by_batch": {"a4-atmosphere-thermo-gasdynamics": 28, "a5-aerodynamics-flight-structures": 15, "a6-propulsion-heat-transfer": 9, "a7-astrodynamics-orekit-foundation": 23, "a8-life-support-biosim-foundation": 40, "a9-life-support-thinfilm-pde-rom": 10, "m00-angle-vector": 17, "m00-canonical-units": 10},
+  "counts_by_test_strategy": {"exact": 48, "invariant": 11, "tolerance": 93},
+  "counts_by_static_symbol_status": {"ok": 152},
+  "counts_by_static_path_status": {"ok": 152},
+  "counts_by_static_package_status": {"ok": 152},
+  "counts_by_static_crate_status": {"ok": 152},
+  "counts_by_static_runtime_source_root_status": {"ok": 152},
+  "execution_eligible_count": 0,
+  "metadata_complete_count": 152,
+  "blocked_execution_count": 152,
+  "missing_metadata_path_count": 0,
+  "static_warning_count": 0,
+  "manifests": [
+    {
+      "path": "equation-batches/a4-atmosphere-thermo-gasdynamics.tsv",
+      "batch_id": "a4-atmosphere-thermo-gasdynamics",
+      "row_count": 28,
+      "counts_by_status": {"research_required": 28},
+      "counts_by_family": {"atmosphere": 5, "gasdyn": 17, "thermo": 6},
+      "counts_by_test_strategy": {"exact": 4, "invariant": 3, "tolerance": 21},
+      "counts_by_static_symbol_status": {"ok": 28},
+      "counts_by_static_path_status": {"ok": 28},
+      "counts_by_static_package_status": {"ok": 28},
+      "counts_by_static_crate_status": {"ok": 28},
+      "counts_by_static_runtime_source_root_status": {"ok": 28},
+      "execution_eligible_count": 0,
+      "metadata_complete_count": 28,
+      "blocked_execution_count": 28,
+      "missing_metadata_path_count": 0,
+      "static_warning_count": 0,
+      "rows": [
+        {
+          "formula_id": "formula_vault.atmosphere.perfect_gas.speed_of_sound",
+          "family": "atmosphere",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.atmosphere.standard.troposphere.density",
+          "family": "atmosphere",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.atmosphere.standard.troposphere.pressure",
+          "family": "atmosphere",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.atmosphere.standard.troposphere.state",
+          "family": "atmosphere",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "invariant",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.atmosphere.standard.troposphere.temperature",
+          "family": "atmosphere",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.gasdyn.isentropic.area_mach_ratio",
+          "family": "gasdyn",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.gasdyn.isentropic.density_ratio",
+          "family": "gasdyn",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.gasdyn.isentropic.mass_flow_parameter",
+          "family": "gasdyn",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.gasdyn.isentropic.pressure_ratio",
+          "family": "gasdyn",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.gasdyn.isentropic.temperature_ratio",
+          "family": "gasdyn",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.gasdyn.mach_angle.mu",
+          "family": "gasdyn",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.gasdyn.normal_shock.density_ratio_rho2_rho1",
+          "family": "gasdyn",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.gasdyn.normal_shock.mach2",
+          "family": "gasdyn",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.gasdyn.normal_shock.pressure_ratio_p2_p1",
+          "family": "gasdyn",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.gasdyn.normal_shock.temperature_ratio_t2_t1",
+          "family": "gasdyn",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.gasdyn.normal_shock.total_pressure_ratio_p02_p01",
+          "family": "gasdyn",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.gasdyn.oblique_shock.beta",
+          "family": "gasdyn",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "invariant",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.gasdyn.oblique_shock.downstream_mach",
+          "family": "gasdyn",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.gasdyn.oblique_shock.normal_mach1",
+          "family": "gasdyn",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "invariant",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.gasdyn.oblique_shock.theta_beta_mach_residual",
+          "family": "gasdyn",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.gasdyn.prandtl_meyer.inverse_mach",
+          "family": "gasdyn",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.gasdyn.prandtl_meyer.nu",
+          "family": "gasdyn",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.thermo.perfect_gas.cp_from_gamma_r",
+          "family": "thermo",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.thermo.perfect_gas.cv_from_gamma_r",
+          "family": "thermo",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.thermo.perfect_gas.density",
+          "family": "thermo",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.thermo.perfect_gas.gamma_from_cp_cv",
+          "family": "thermo",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.thermo.perfect_gas.specific_gas_constant_from_molar_mass",
+          "family": "thermo",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.thermo.perfect_gas.speed_of_sound",
+          "family": "thermo",
+          "batch_id": "a4-atmosphere-thermo-gasdynamics",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        }
+      ]
+    },
+    {
+      "path": "equation-batches/a5-aerodynamics-flight-structures.tsv",
+      "batch_id": "a5-aerodynamics-flight-structures",
+      "row_count": 15,
+      "counts_by_status": {"research_required": 15},
+      "counts_by_family": {"aerodynamics": 6, "flight_dynamics": 5, "structures": 4},
+      "counts_by_test_strategy": {"tolerance": 15},
+      "counts_by_static_symbol_status": {"ok": 15},
+      "counts_by_static_path_status": {"ok": 15},
+      "counts_by_static_package_status": {"ok": 15},
+      "counts_by_static_crate_status": {"ok": 15},
+      "counts_by_static_runtime_source_root_status": {"ok": 15},
+      "execution_eligible_count": 0,
+      "metadata_complete_count": 15,
+      "blocked_execution_count": 15,
+      "missing_metadata_path_count": 0,
+      "static_warning_count": 0,
+      "rows": [
+        {
+          "formula_id": "formula_vault.aerodynamics.coefficients.drag_coefficient",
+          "family": "aerodynamics",
+          "batch_id": "a5-aerodynamics-flight-structures",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.aerodynamics.coefficients.lift_coefficient",
+          "family": "aerodynamics",
+          "batch_id": "a5-aerodynamics-flight-structures",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.aerodynamics.drag.induced_drag_coefficient",
+          "family": "aerodynamics",
+          "batch_id": "a5-aerodynamics-flight-structures",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.aerodynamics.forces.drag",
+          "family": "aerodynamics",
+          "batch_id": "a5-aerodynamics-flight-structures",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.aerodynamics.forces.dynamic_pressure",
+          "family": "aerodynamics",
+          "batch_id": "a5-aerodynamics-flight-structures",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.aerodynamics.forces.lift",
+          "family": "aerodynamics",
+          "batch_id": "a5-aerodynamics-flight-structures",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.flight_dynamics.performance.specific_excess_power",
+          "family": "flight_dynamics",
+          "batch_id": "a5-aerodynamics-flight-structures",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.flight_dynamics.performance.stall_speed",
+          "family": "flight_dynamics",
+          "batch_id": "a5-aerodynamics-flight-structures",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.flight_dynamics.turn.load_factor_level_turn",
+          "family": "flight_dynamics",
+          "batch_id": "a5-aerodynamics-flight-structures",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.flight_dynamics.turn.turn_radius",
+          "family": "flight_dynamics",
+          "batch_id": "a5-aerodynamics-flight-structures",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.flight_dynamics.turn.turn_rate",
+          "family": "flight_dynamics",
+          "batch_id": "a5-aerodynamics-flight-structures",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.structures.beam.cantilever_tip_deflection_end_load",
+          "family": "structures",
+          "batch_id": "a5-aerodynamics-flight-structures",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.structures.stability.euler_column_buckling_load",
+          "family": "structures",
+          "batch_id": "a5-aerodynamics-flight-structures",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.structures.stress.axial",
+          "family": "structures",
+          "batch_id": "a5-aerodynamics-flight-structures",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.structures.stress.bending",
+          "family": "structures",
+          "batch_id": "a5-aerodynamics-flight-structures",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        }
+      ]
+    },
+    {
+      "path": "equation-batches/a6-propulsion-heat-transfer.tsv",
+      "batch_id": "a6-propulsion-heat-transfer",
+      "row_count": 9,
+      "counts_by_status": {"research_required": 9},
+      "counts_by_family": {"heat_transfer": 4, "propulsion": 5},
+      "counts_by_test_strategy": {"tolerance": 9},
+      "counts_by_static_symbol_status": {"ok": 9},
+      "counts_by_static_path_status": {"ok": 9},
+      "counts_by_static_package_status": {"ok": 9},
+      "counts_by_static_crate_status": {"ok": 9},
+      "counts_by_static_runtime_source_root_status": {"ok": 9},
+      "execution_eligible_count": 0,
+      "metadata_complete_count": 9,
+      "blocked_execution_count": 9,
+      "missing_metadata_path_count": 0,
+      "static_warning_count": 0,
+      "rows": [
+        {
+          "formula_id": "formula_vault.heat_transfer.conduction.heat_rate",
+          "family": "heat_transfer",
+          "batch_id": "a6-propulsion-heat-transfer",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.heat_transfer.conduction.thermal_resistance",
+          "family": "heat_transfer",
+          "batch_id": "a6-propulsion-heat-transfer",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.heat_transfer.convection.convective_heat_flux",
+          "family": "heat_transfer",
+          "batch_id": "a6-propulsion-heat-transfer",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.heat_transfer.radiation.stefan_boltzmann_radiative_flux",
+          "family": "heat_transfer",
+          "batch_id": "a6-propulsion-heat-transfer",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.propulsion.nozzle.choked_mass_flux_per_area",
+          "family": "propulsion",
+          "batch_id": "a6-propulsion-heat-transfer",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.propulsion.nozzle.ideal_thrust",
+          "family": "propulsion",
+          "batch_id": "a6-propulsion-heat-transfer",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.propulsion.rocket.mass_ratio_from_delta_v",
+          "family": "propulsion",
+          "batch_id": "a6-propulsion-heat-transfer",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.propulsion.rocket.specific_impulse_from_effective_exhaust_velocity",
+          "family": "propulsion",
+          "batch_id": "a6-propulsion-heat-transfer",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.propulsion.rocket.tsiolkovsky_delta_v",
+          "family": "propulsion",
+          "batch_id": "a6-propulsion-heat-transfer",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        }
+      ]
+    },
+    {
+      "path": "equation-batches/a7-astrodynamics-orekit-foundation.tsv",
+      "batch_id": "a7-astrodynamics-orekit-foundation",
+      "row_count": 23,
+      "counts_by_status": {"research_required": 23},
+      "counts_by_family": {"astrodynamics": 23},
+      "counts_by_test_strategy": {"exact": 2, "invariant": 5, "tolerance": 16},
+      "counts_by_static_symbol_status": {"ok": 23},
+      "counts_by_static_path_status": {"ok": 23},
+      "counts_by_static_package_status": {"ok": 23},
+      "counts_by_static_crate_status": {"ok": 23},
+      "counts_by_static_runtime_source_root_status": {"ok": 23},
+      "execution_eligible_count": 0,
+      "metadata_complete_count": 23,
+      "blocked_execution_count": 23,
+      "missing_metadata_path_count": 0,
+      "static_warning_count": 0,
+      "rows": [
+        {
+          "formula_id": "formula_vault.astrodynamics.celestial.sphere_of_influence_radius",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "invariant",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.elements.argument_of_periapsis",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.elements.eccentricity_vector",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.elements.inclination",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.elements.node_vector",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.elements.raan",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.elements.semimajor_axis_from_state",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.elements.specific_angular_momentum",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.elements.specific_orbital_energy_from_state",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.elements.true_anomaly",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.kepler.mean_anomaly_advance",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.kepler.mean_motion",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.kepler.radius_from_semimajor_eccentric_anomaly",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.kepler.true_anomaly_from_eccentric_anomaly",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.transfer.hohmann.delta_v1",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "invariant",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.transfer.hohmann.delta_v2",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "invariant",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.transfer.hohmann.total_delta_v",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "invariant",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.transfer.hohmann.transfer_time",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "invariant",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.two_body.circular_orbit_speed",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.two_body.escape_velocity",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.two_body.orbital_period_circular",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.two_body.specific_orbital_energy",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.astrodynamics.two_body.vis_viva_speed",
+          "family": "astrodynamics",
+          "batch_id": "a7-astrodynamics-orekit-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        }
+      ]
+    },
+    {
+      "path": "equation-batches/a8-life-support-biosim-foundation.tsv",
+      "batch_id": "a8-life-support-biosim-foundation",
+      "row_count": 40,
+      "counts_by_status": {"research_required": 40},
+      "counts_by_family": {"life_support": 40},
+      "counts_by_test_strategy": {"exact": 20, "invariant": 2, "tolerance": 18},
+      "counts_by_static_symbol_status": {"ok": 40},
+      "counts_by_static_path_status": {"ok": 40},
+      "counts_by_static_package_status": {"ok": 40},
+      "counts_by_static_crate_status": {"ok": 40},
+      "counts_by_static_runtime_source_root_status": {"ok": 40},
+      "execution_eligible_count": 0,
+      "metadata_complete_count": 40,
+      "blocked_execution_count": 40,
+      "missing_metadata_path_count": 0,
+      "static_warning_count": 0,
+      "rows": [
+        {
+          "formula_id": "formula_vault.life_support.bioregenerative.buffer_residence_time",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.bioregenerative.carbon_dioxide_balance",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.bioregenerative.closure_fraction",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.bioregenerative.crew_daily_requirement",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.bioregenerative.net_daily_balance",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.bioregenerative.oxygen_balance",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.bioregenerative.required_production_area",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.bioregenerative.water_recovery_balance",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.algal_biofilm.areal_productivity",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.algal_biofilm.growth_rate",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.algal_biofilm.light_profile",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.algal_biofilm.light_uniform",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.c3.biofilm_solids_rate",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.c3.biofilm_thickness_rate",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.c3.fick_biofilm_flux",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.c3.nitrification_fluxes",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.c3.nitrifier_rates",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "invariant",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.c3.oxygen_transfer",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.c3.spherical_diffusion_rate",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.c3.spherical_diffusion_rhs_uniform",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.c3.tank_biofilm_rate",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.control.oxygen_fraction_error",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.generic_compartment.derivative",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.generic_compartment.stoichiometric_state_derivative",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.integration.oxygen_production_connected",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.integration.oxygen_production_disconnected",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.pbr.carbonate_species",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "invariant",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.pbr.cylindrical_two_flux_irradiance_ratio",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.pbr.eps_fraction",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.pbr.flat_two_flux_irradiance_ratio",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.pbr.geometric_correction",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.pbr.limnospira_biomass_rate",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.pbr.limnospira_oxygen_rate",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.pbr.limnospira_tic_rate",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.pbr.tank_series_rate",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.stoichiometry.element_balance_residual",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.stoichiometry.loop_balance_residual",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.system.closure_metric",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.system.element_inventory_balance",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.system.equivalent_system_mass",
+          "family": "life_support",
+          "batch_id": "a8-life-support-biosim-foundation",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        }
+      ]
+    },
+    {
+      "path": "equation-batches/a9-life-support-thinfilm-pde-rom.tsv",
+      "batch_id": "a9-life-support-thinfilm-pde-rom",
+      "row_count": 10,
+      "counts_by_status": {"research_required": 10},
+      "counts_by_family": {"life_support": 10},
+      "counts_by_test_strategy": {"exact": 8, "tolerance": 2},
+      "counts_by_static_symbol_status": {"ok": 10},
+      "counts_by_static_path_status": {"ok": 10},
+      "counts_by_static_package_status": {"ok": 10},
+      "counts_by_static_crate_status": {"ok": 10},
+      "counts_by_static_runtime_source_root_status": {"ok": 10},
+      "execution_eligible_count": 0,
+      "metadata_complete_count": 10,
+      "blocked_execution_count": 10,
+      "missing_metadata_path_count": 0,
+      "static_warning_count": 0,
+      "rows": [
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.algal_biofilm.carbon_boundary_flux",
+          "family": "life_support",
+          "batch_id": "a9-life-support-thinfilm-pde-rom",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.algal_biofilm.dissolved_species_rate",
+          "family": "life_support",
+          "batch_id": "a9-life-support-thinfilm-pde-rom",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.algal_biofilm.harvest_reset_thickness",
+          "family": "life_support",
+          "batch_id": "a9-life-support-thinfilm-pde-rom",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.algal_biofilm.light_2d",
+          "family": "life_support",
+          "batch_id": "a9-life-support-thinfilm-pde-rom",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.algal_biofilm.mixture_closure_residual",
+          "family": "life_support",
+          "batch_id": "a9-life-support-thinfilm-pde-rom",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.algal_biofilm.mixture_component_rate",
+          "family": "life_support",
+          "batch_id": "a9-life-support-thinfilm-pde-rom",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.algal_biofilm.nitrate_boundary_residual",
+          "family": "life_support",
+          "batch_id": "a9-life-support-thinfilm-pde-rom",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.rom.habitat_coupled_derivative",
+          "family": "life_support",
+          "batch_id": "a9-life-support-thinfilm-pde-rom",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.rom.linear_service",
+          "family": "life_support",
+          "batch_id": "a9-life-support-thinfilm-pde-rom",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.life_support.thinfilm.rom.service_vector",
+          "family": "life_support",
+          "batch_id": "a9-life-support-thinfilm-pde-rom",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        }
+      ]
+    },
+    {
+      "path": "equation-batches/m00-angle-vector.tsv",
+      "batch_id": "m00-angle-vector",
+      "row_count": 17,
+      "counts_by_status": {"research_required": 17},
+      "counts_by_family": {"m00": 17},
+      "counts_by_test_strategy": {"exact": 10, "invariant": 1, "tolerance": 6},
+      "counts_by_static_symbol_status": {"ok": 17},
+      "counts_by_static_path_status": {"ok": 17},
+      "counts_by_static_package_status": {"ok": 17},
+      "counts_by_static_crate_status": {"ok": 17},
+      "counts_by_static_runtime_source_root_status": {"ok": 17},
+      "execution_eligible_count": 0,
+      "metadata_complete_count": 17,
+      "blocked_execution_count": 17,
+      "missing_metadata_path_count": 0,
+      "static_warning_count": 0,
+      "rows": [
+        {
+          "formula_id": "formula_vault.m00.angle.deg2rad",
+          "family": "m00",
+          "batch_id": "m00-angle-vector",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.angle.rad2deg",
+          "family": "m00",
+          "batch_id": "m00-angle-vector",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.angle.wrap2pi",
+          "family": "m00",
+          "batch_id": "m00-angle-vector",
+          "validation_status": "research_required",
+          "test_strategy": "invariant",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.vector.angle",
+          "family": "m00",
+          "batch_id": "m00-angle-vector",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.vector.cross",
+          "family": "m00",
+          "batch_id": "m00-angle-vector",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.vector.distance",
+          "family": "m00",
+          "batch_id": "m00-angle-vector",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.vector.dot",
+          "family": "m00",
+          "batch_id": "m00-angle-vector",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.vector.is_collinear",
+          "family": "m00",
+          "batch_id": "m00-angle-vector",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.vector.is_coplanar",
+          "family": "m00",
+          "batch_id": "m00-angle-vector",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.vector.norm",
+          "family": "m00",
+          "batch_id": "m00-angle-vector",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.vector.projection",
+          "family": "m00",
+          "batch_id": "m00-angle-vector",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.vector.scalar_triple",
+          "family": "m00",
+          "batch_id": "m00-angle-vector",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.vector.tangent_from_dr_ds",
+          "family": "m00",
+          "batch_id": "m00-angle-vector",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.vector.unit",
+          "family": "m00",
+          "batch_id": "m00-angle-vector",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.vector.vector_triple",
+          "family": "m00",
+          "batch_id": "m00-angle-vector",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.vector.vector_triple_bac_cab",
+          "family": "m00",
+          "batch_id": "m00-angle-vector",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.vector.velocity_from_arc_rate",
+          "family": "m00",
+          "batch_id": "m00-angle-vector",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        }
+      ]
+    },
+    {
+      "path": "equation-batches/m00-canonical-units.tsv",
+      "batch_id": "m00-canonical-units",
+      "row_count": 10,
+      "counts_by_status": {"research_required": 10},
+      "counts_by_family": {"m00": 10},
+      "counts_by_test_strategy": {"exact": 4, "tolerance": 6},
+      "counts_by_static_symbol_status": {"ok": 10},
+      "counts_by_static_path_status": {"ok": 10},
+      "counts_by_static_package_status": {"ok": 10},
+      "counts_by_static_crate_status": {"ok": 10},
+      "counts_by_static_runtime_source_root_status": {"ok": 10},
+      "execution_eligible_count": 0,
+      "metadata_complete_count": 10,
+      "blocked_execution_count": 10,
+      "missing_metadata_path_count": 0,
+      "static_warning_count": 0,
+      "rows": [
+        {
+          "formula_id": "formula_vault.m00.canonical.distance_from_canonical",
+          "family": "m00",
+          "batch_id": "m00-canonical-units",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.canonical.distance_to_canonical",
+          "family": "m00",
+          "batch_id": "m00-canonical-units",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.canonical.mu_from_units",
+          "family": "m00",
+          "batch_id": "m00-canonical-units",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.canonical.speed_from_canonical",
+          "family": "m00",
+          "batch_id": "m00-canonical-units",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.canonical.speed_to_canonical",
+          "family": "m00",
+          "batch_id": "m00-canonical-units",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.canonical.speed_unit_from_du_tu",
+          "family": "m00",
+          "batch_id": "m00-canonical-units",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.canonical.speed_unit_from_mu_du",
+          "family": "m00",
+          "batch_id": "m00-canonical-units",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.canonical.time_from_canonical",
+          "family": "m00",
+          "batch_id": "m00-canonical-units",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.canonical.time_to_canonical",
+          "family": "m00",
+          "batch_id": "m00-canonical-units",
+          "validation_status": "research_required",
+          "test_strategy": "exact",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        },
+        {
+          "formula_id": "formula_vault.m00.canonical.time_unit_from_mu_du",
+          "family": "m00",
+          "batch_id": "m00-canonical-units",
+          "validation_status": "research_required",
+          "test_strategy": "tolerance",
+          "metadata_complete": true,
+          "execution_eligible": false,
+          "execution_readiness": "blocked_by_validation_status",
+          "blocked_execution": true,
+          "static_checks": {
+            "path_status": "ok",
+            "contract_path": "ok",
+            "validation_card_path": "ok",
+            "source_seed_path": "ok",
+            "runtime_source_root": "ok",
+            "package_status": "ok",
+            "crate_status": "ok",
+            "symbol_status": "ok",
+            "static_warnings": []
+          },
+          "missing_paths": [
+          ]
+        }
+      ]
+    }
+  ],
+  "missing_metadata_paths": [
+  ],
+  "static_warnings": [
+  ],
+  "non_claims": ["AeroCodex is research and preliminary-design software, not certified operational aerospace software.", "This report is inventory/status evidence only; it does not validate, certify, or make any equation publication-ready.", "This report is not certified for flight, mission operations, habitat safety, medical/life-support decisions, or regulatory approval.", "Blocked or research_required formulas remain non-executable through the normal CLI and library paths.", "Static path, package, crate, and symbol checks are textual readiness indicators, not runtime execution or probe compilation evidence.", "M07 rows are excluded unless they are present in equation-batches/*.tsv; M07 quarantine reporting belongs to separate tasks.", "The report does not evaluate manifest test expressions, compile runtime code, generate probes, generate registries, or promote validation status."],
+  "safety_notice": "AeroCodex equation-batch status reporting is deterministic inventory evidence for research and preliminary-design review only; it is not certified for flight, mission operations, habitat safety, medical/life-support decisions, or regulatory approval, and it does not make formulas executable or promote validation status."
+}
