@@ -4,6 +4,8 @@ Source of truth: `AeroCodex_Research_Readiness_Master_Execution_Plan_v0_7_2.md`,
 
 This contract fixes the registry layers, Formula Registry v1 schema fields, enum strings, and generated artifact paths before parser, registry generator, CLI, status-gate, and runtime implementation tasks rely on them. It is a contract only: it does not generate the registry, make formulas runnable, promote formula status, or modify runtime artifacts.
 
+RR-018 formula identity authority: `docs/assurance/formula_id_policy.md` defines canonical readable IDs, legacy `formula_vault.*` aliases, alias migration/deprecation rules, and future CLI alias behavior before RR-015 registry generation normalizes IDs.
+
 ## Registry layering
 
 ```text
@@ -69,6 +71,14 @@ Path-family contract:
 ## Required formula fields
 
 Every Formula Registry v1 formula entry must include the RR-013 required fields below. The current merged schema also preserves the existing compatibility fields `aliases` and `summary`; they do not authorize alias rewrites or execution.
+
+Formula identity field semantics from RR-018:
+
+- `formula_id` is the canonical readable ID.
+- `legacy_formula_id` preserves the primary legacy `formula_vault.*` alias when a row is sourced from legacy manifests or sidecars; it may be null only when no governed legacy alias exists.
+- `aliases` lists additional governed compatibility spellings, including legacy aliases when needed, and must be deterministic.
+- `canonical_formula_id` and `alias_used` are future CLI/JSON response fields, not independent registry-entry identity fields in this v1 formula object unless a later schema task explicitly adds them. They should report the resolved canonical formula and the exact requested alias after lookup.
+- Alias resolution must occur before execution status gates so errors and warnings can cite both the canonical identity and any alias used, but alias resolution must not bypass status gates.
 
 - `formula_id`
 - `legacy_formula_id`

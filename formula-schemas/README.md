@@ -18,6 +18,12 @@ formula-schemas/m00/angle/deg_to_rad.yaml
 
 The path should mirror the canonical `formula_id` after the family prefix. For `m00.angle.deg_to_rad`, the expected sidecar path is `formula-schemas/m00/angle/deg_to_rad.yaml`.
 
+## Formula identity policy
+
+RR-018 formula identity policy lives at `docs/assurance/formula_id_policy.md`. Sidecars should use the canonical readable ID in `formula_id`, such as `m00.angle.deg_to_rad` or `m00.angle.rad_to_deg`, and should record the primary legacy `formula_vault.*` spelling in `legacy_formula_id` when one exists.
+
+`legacy_formula_id` and any `cli_aliases` are traceability and migration metadata only. They must not bypass status gates, must not promote validation status, and do not make formulas executable. Later registry generation must preserve governed aliases deterministically and fail closed on ambiguous alias conflicts.
+
 ## What sidecars may contain
 
 A sidecar may provide structured metadata for later registry enrichment:
