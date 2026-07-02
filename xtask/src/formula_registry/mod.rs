@@ -454,8 +454,8 @@ fn normalize_formula_id(raw: &str, alias_policy: &AliasPolicy) -> String {
     if let Some(canonical) = alias_policy.canonical_by_alias.get(raw) {
         return canonical.clone();
     }
-    if raw.starts_with("formula_vault.") {
-        return normalize_formula_vault_remainder(&raw["formula_vault.".len()..]);
+    if let Some(remainder) = raw.strip_prefix("formula_vault.") {
+        return normalize_formula_vault_remainder(remainder);
     }
     raw.to_string()
 }
