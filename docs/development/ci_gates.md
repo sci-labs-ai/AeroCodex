@@ -20,6 +20,22 @@ cargo run -p xtask -- verify --all
 - `cargo doc --no-deps` builds local documentation without third-party dependency docs.
 - `cargo run -p xtask -- verify --all` runs the repository governance and verification checks.
 
+## Equation-batch verify-all probe gate
+
+RR-011 adds a local/CI-friendly command contract for checking every existing equation-batch manifest without changing validation status or committed generated artifacts:
+
+```bash
+cargo run -p xtask -- equation-batch verify \
+  --all-manifests \
+  --output-dir /tmp/acx-equation-batch-probes \
+  --json \
+  --check
+```
+
+Expected runtime depends on Cargo cache state because the command generates one temporary probe crate per `equation-batches/*.tsv` manifest and runs `cargo test` inside each generated probe. Output is deterministic in manifest-path order and returns nonzero if any manifest parse, generation, compile, cargo, or generated-test check fails. The probe output directory must be outside the repository and is safe to refresh only when it is empty or marked as AeroCodex-generated probe output.
+
+This is not a formula status-promotion gate by itself. It does not edit equation-batch TSVs, validation cards, validation status files, generated registries, product CLI code, runtime formula code, M07 materials, or GitHub Actions workflow files.
+
 ## Future placeholders
 
 - Future registry generation/check placeholder: when deterministic formula-registry generation lands, CI should verify the generated registry is reproducible and checked in only from governed inputs.
