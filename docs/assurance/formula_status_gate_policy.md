@@ -59,6 +59,12 @@ Fail-closed errors should use the canonical public error-code catalog:
 - `m07_candidate_blocked` for M07 quarantine attempts;
 - `registry_stale`, `schema_validation_failed`, `runtime_symbol_missing`, or `test_vector_failed` for corresponding infrastructure gates.
 
+## Registry schema alignment
+
+Formula Registry v1 records status-gate decisions with the JSON fields `"status"`, `"execution_policy"`, and `"quarantine_state"`. The canonical `"execution_policy"` values are exactly `"blocked"`, `"preliminary_flag_required"`, `"normal_research"`, and `"publication_supporting"`. The canonical `"quarantine_state"` values are exactly `"none"`, `"m07_candidate_blocked"`, `"missing_metadata_blocked"`, `"below_execution_threshold"`, and `"deprecated_alias"`.
+
+Schema validation is not formula validation, and registry inclusion is not execution readiness. `research_required` does not mean validated. M07 candidates remain blocked unless later promoted through explicit family-promotion tasks. Checked-in generated registries must not include wall-clock timestamps, and `source_hash` is deterministic build-input evidence, not a certification claim.
+
 ## Non-promotion rule
 
-This policy is a contract. It does not change any validation status, formula manifest, equation batch, M07 quarantine state, runtime implementation, or generated registry artifact.
+This policy is a contract. It does not change any validation status, formula manifest, equation batch, M07 quarantine state, runtime implementation, or generated registry artifact. It keeps AeroCodex not certified as operational aerospace software.
