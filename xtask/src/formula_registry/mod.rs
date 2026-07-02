@@ -1,3 +1,5 @@
+pub mod rust;
+
 use std::{
     collections::{BTreeMap, BTreeSet},
     fmt::Write as _,
