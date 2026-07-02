@@ -519,6 +519,7 @@ fn main() {
         ["equation-batch", "plan", rest @ ..] => run_equation_batch_plan(rest),
         ["equation-batch", "report", rest @ ..] => run_equation_batch_report(rest),
         ["equation-batch", "generate", rest @ ..] => run_equation_batch_generate(rest),
+        ["equation-batch", "verify", rest @ ..] => run_equation_batch_verify(rest),
         ["dependency-policy"] => dependency_policy(),
         ["help"] | ["--help"] | ["-h"] => {
             print_usage();
@@ -560,9 +561,15 @@ fn run_equation_batch_generate(args: &[&str]) -> Result<(), String> {
     equation_batch::generate::run_generate_command(&root, &options)
 }
 
+fn run_equation_batch_verify(args: &[&str]) -> Result<(), String> {
+    let root = repo_root();
+    let options = equation_batch::verify::VerifyOptions::parse_args(args)?;
+    equation_batch::verify::run_verify_command(&root, &options)
+}
+
 fn print_usage() {
     eprintln!(
-        "usage:\n  cargo run -p xtask -- verify --all\n  cargo run -p xtask -- verify cards\n  cargo run -p xtask -- verify source-registry\n  cargo run -p xtask -- verify data-registry\n  cargo run -p xtask -- verify status-vocabulary\n  cargo run -p xtask -- verify formula-vault\n  cargo run -p xtask -- verify equation-inventory\n  cargo run -p xtask -- verify beta1\n  cargo run -p xtask -- equation-batch plan --manifest equation-batches/m00-canonical-units.tsv [--json]\n  cargo run -p xtask -- equation-batch plan --all-manifests [--json]\n  cargo run -p xtask -- equation-batch report --all-manifests --out generated/equation_batch_status_report.json [--check]\n  cargo run -p xtask -- equation-batch generate --manifest equation-batches/m00-canonical-units.tsv --output-dir /tmp/acx-m00-probe [--json]\n  cargo run -p xtask -- dependency-policy"
+        "usage:\n  cargo run -p xtask -- verify --all\n  cargo run -p xtask -- verify cards\n  cargo run -p xtask -- verify source-registry\n  cargo run -p xtask -- verify data-registry\n  cargo run -p xtask -- verify status-vocabulary\n  cargo run -p xtask -- verify formula-vault\n  cargo run -p xtask -- verify equation-inventory\n  cargo run -p xtask -- verify beta1\n  cargo run -p xtask -- equation-batch plan --manifest equation-batches/m00-canonical-units.tsv [--json]\n  cargo run -p xtask -- equation-batch plan --all-manifests [--json]\n  cargo run -p xtask -- equation-batch report --all-manifests --out generated/equation_batch_status_report.json [--check]\n  cargo run -p xtask -- equation-batch generate --manifest equation-batches/m00-canonical-units.tsv --output-dir /tmp/acx-m00-probe [--json]\n  cargo run -p xtask -- equation-batch verify --manifest equation-batches/m00-canonical-units.tsv --output-dir /tmp/acx-m00-probe [--json] [--keep-output]\n  cargo run -p xtask -- dependency-policy"
     );
 }
 

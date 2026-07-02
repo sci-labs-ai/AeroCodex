@@ -14,7 +14,7 @@ use super::{
 
 pub const PROBE_SCHEMA_VERSION: &str = "aerocodex.equation_batch.probe_manifest_summary.v1";
 const GENERATED_BY: &str = "xtask equation-batch generate";
-const MARKER_FILE: &str = ".aerocodex-equation-batch-probe";
+pub const MARKER_FILE: &str = ".aerocodex-equation-batch-probe";
 const REPO_LINK_DIR: &str = ".aerocodex-repo";
 const RUST_CHECK_FILE: &str = "src/lib.rs";
 const SUMMARY_FILE: &str = "manifest_summary.json";
@@ -114,6 +114,7 @@ impl GenerateOptions {
 pub struct GenerateResult {
     pub output_dir: PathBuf,
     pub source_manifest: String,
+    pub source_manifest_hash: String,
     pub row_count: usize,
     pub packages: Vec<String>,
     pub generated_files: Vec<String>,
@@ -200,6 +201,7 @@ pub fn generate_probe_crate(
     Ok(GenerateResult {
         output_dir,
         source_manifest,
+        source_manifest_hash,
         row_count: manifest.row_count,
         packages: dependencies
             .iter()
@@ -253,7 +255,7 @@ fn normalize_manifest_argument(root: &Path, path: &Path) -> Result<PathBuf, Stri
     Ok(relative)
 }
 
-fn resolve_output_dir(root: &Path, output_dir: &Path) -> Result<PathBuf, String> {
+pub(crate) fn resolve_output_dir(root: &Path, output_dir: &Path) -> Result<PathBuf, String> {
     let absolute_output = if output_dir.is_absolute() {
         output_dir.to_path_buf()
     } else {
