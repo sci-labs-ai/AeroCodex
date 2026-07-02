@@ -2,7 +2,8 @@
   "$id": "https://aerocodex.local/schemas/formula_registry.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "AeroCodex Formula Registry",
-  "description": "LOCK-004 registry contract for research-readiness formula inventory, status gates, and generated-registry checks.",
+  "description": "RR-013 Formula Registry v1 contract for research-readiness formula inventory, status gates, and generated-registry checks.",
+  "$comment": "Schema validation is not formula validation; registry inclusion is not execution readiness; research_required does not mean validated; M07 candidates remain blocked unless later promoted through explicit tasks; checked-in generated registries must not include wall-clock timestamps; source_hash is deterministic build-input evidence, not a certification claim.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -48,6 +49,112 @@
     "formula_count",
     "non_claims",
     "formulas"
+  ],
+  "examples": [
+    {
+      "schema_version": "aerocodex.formula_registry.v1",
+      "generator_version": "xtask-formula-registry-v1",
+      "generated_by": "cargo run -p xtask -- formula-registry generate",
+      "source_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "formula_count": 2,
+      "non_claims": [
+        "Schema validation is not formula validation.",
+        "Registry inclusion is not execution readiness.",
+        "Research/preliminary-design software; not certified as operational aerospace software.",
+        "source_hash is deterministic build-input evidence, not a certification claim."
+      ],
+      "formulas": [
+        {
+          "formula_id": "m00.angle.deg_to_rad",
+          "legacy_formula_id": "formula_vault.m00.angle.deg2rad",
+          "aliases": [
+            "formula_vault.m00.angle.deg2rad"
+          ],
+          "name": "Degrees to radians",
+          "summary": "Converts a finite angle in degrees to radians.",
+          "family": "m00.angle",
+          "batch_id": "m00-angle-vector",
+          "status": "implementation_verified",
+          "quarantine_state": "none",
+          "execution_policy": "normal_research",
+          "source_trace": {
+            "contract_path": "formula-vault/contracts/m00_angle.yaml",
+            "validation_card_path": "validation/cards/m00_angle_deg_to_rad.yaml",
+            "source_seed_path": "formula-vault/source-seeds/m00_angle.md"
+          },
+          "inputs": [
+            {
+              "name": "degrees",
+              "type": "f64",
+              "unit": "deg",
+              "required": true
+            }
+          ],
+          "outputs": [
+            {
+              "name": "radians",
+              "type": "f64",
+              "unit": "rad"
+            }
+          ],
+          "units": {
+            "input": "deg",
+            "output": "rad"
+          },
+          "domain_constraints": [
+            {
+              "name": "finite_input",
+              "description": "Input must be finite."
+            }
+          ],
+          "implementation_path": {
+            "package": "aero-codex-core",
+            "crate_name": "aero_codex_core",
+            "path": "crates/aero-codex-core/src/units.rs"
+          },
+          "runtime_symbol": "aero_codex_core::units::deg_to_rad",
+          "test_vectors": [
+            {
+              "id": "deg_to_rad_180",
+              "inputs": {
+                "degrees": 180.0
+              },
+              "expected": {
+                "radians": 3.141592653589793
+              },
+              "abs_tol": 1e-12
+            }
+          ],
+          "warnings": [
+            "Normal research execution still requires registry freshness, domain checks, and test-vector gates."
+          ]
+        },
+        {
+          "formula_id": "m07.candidate.some_formula",
+          "legacy_formula_id": null,
+          "aliases": [],
+          "name": "M07 blocked candidate formula",
+          "summary": "Visible inventory-only M07 candidate; not executable.",
+          "family": "m07.candidate",
+          "batch_id": null,
+          "status": "research_required",
+          "quarantine_state": "m07_candidate_blocked",
+          "execution_policy": "blocked",
+          "source_trace": null,
+          "inputs": [],
+          "outputs": [],
+          "units": null,
+          "domain_constraints": [],
+          "implementation_path": null,
+          "runtime_symbol": null,
+          "test_vectors": [],
+          "warnings": [
+            "research_required does not mean validated.",
+            "M07 candidates remain blocked unless later promoted through explicit tasks."
+          ]
+        }
+      ]
+    }
   ],
   "$defs": {
     "formula": {
