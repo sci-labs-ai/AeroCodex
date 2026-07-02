@@ -1,0 +1,32 @@
+name: Research Readiness Diagnostics
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  equation-batch-verify-all-diagnostic:
+    name: equation-batch verify-all (diagnostic, non-required)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: equation-batch verify-all diagnostic
+        run: |
+          rm -rf /tmp/acx-equation-batch-probes
+          set +e
+          cargo run -p xtask -- equation-batch verify \
+            --all-manifests \
+            --output-dir /tmp/acx-equation-batch-probes \
+            --json \
+            --check \
+            > /tmp/equation_batch_verify_all.json
+          verify_all_rc=$?
+          set -e
+          echo "verify_all_rc=${verify_all_rc}"
+          python3 -m json.tool /tmp/equation_batch_verify_all.json >/dev/null
+          exit "${verify_all_rc}"

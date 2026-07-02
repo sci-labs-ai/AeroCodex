@@ -7,22 +7,31 @@ on:
 
 jobs:
   check:
+    name: Baseline Rust and equation-batch gates
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
-      - name: Check formatting
-        run: cargo fmt --all -- --check
-      - name: Check workspace
+      - name: cargo fmt --check
+        run: cargo fmt --check
+      - name: cargo check --workspace --all-targets --all-features
         run: cargo check --workspace --all-targets --all-features
-      - name: Run Clippy
-        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
-      - name: Run tests
-        run: cargo test --workspace --all-targets --all-features
-      - name: Run governance checks
+      - name: cargo clippy --all-targets --all-features -- -D warnings
+        run: cargo clippy --all-targets --all-features -- -D warnings
+      - name: cargo test --all
+        run: cargo test --all
+      - name: cargo doc --no-deps
+        run: cargo doc --no-deps
+      - name: cargo run -p xtask -- verify --all
         run: cargo run -p xtask -- verify --all
+      - name: equation-batch plan JSON check
+        run: |
+          cargo run -p xtask -- equation-batch plan --all-manifests --json > /tmp/equation_batch_plan.json
+          python3 -m json.tool /tmp/equation_batch_plan.json >/dev/null
+      - name: equation-batch status report check
+        run: cargo run -p xtask -- equation-batch report --all-manifests --out generated/equation_batch_status_report.json --check
       - name: Run dependency policy
         run: cargo run -p xtask -- dependency-policy
       - name: Run Beta 1 CLI self-check
