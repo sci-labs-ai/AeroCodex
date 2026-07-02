@@ -750,7 +750,7 @@ fn has_windows_absolute_prefix(value: &str) -> bool {
     bytes.len() >= 2 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':'
 }
 
-fn sha256_hex(bytes: &[u8]) -> String {
+pub(crate) fn sha256_hex(bytes: &[u8]) -> String {
     let digest = sha256_digest(bytes);
     let mut out = String::with_capacity(64);
     for byte in digest {
