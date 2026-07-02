@@ -10,6 +10,7 @@ cargo clippy --all-targets --all-features -- -D warnings
 cargo test --all
 cargo doc --no-deps
 cargo run -p xtask -- verify --all
+cargo run -p xtask -- formula-registry check
 ```
 
 ## Blocking GitHub Actions gate
@@ -26,6 +27,7 @@ cargo run -p xtask -- verify --all
 cargo run -p xtask -- equation-batch plan --all-manifests --json > /tmp/equation_batch_plan.json
 python3 -m json.tool /tmp/equation_batch_plan.json >/dev/null
 cargo run -p xtask -- equation-batch report --all-manifests --out generated/equation_batch_status_report.json --check
+cargo run -p xtask -- formula-registry check
 cargo run -p xtask -- dependency-policy
 cargo run -p aero-codex-cli -- self-check --json
 ```
@@ -41,6 +43,7 @@ The `python3 -m json.tool` calls are JSON syntax checks using the standard Pytho
 - `cargo run -p xtask -- verify --all` runs the repository governance and verification checks.
 - `cargo run -p xtask -- equation-batch plan --all-manifests --json` checks that every current equation-batch manifest is still readable by the planning/reporting infrastructure and emits parseable JSON.
 - `cargo run -p xtask -- equation-batch report --all-manifests --out generated/equation_batch_status_report.json --check` verifies that the checked-in equation-batch status report remains deterministic and current.
+- `cargo run -p xtask -- formula-registry check` verifies that checked-in formula registry artifacts remain deterministic and current: `generated/formula_registry.json`, `generated/formula_registry.sha256`, and `generated/rust/formula_registry.rs`. This is a software consistency gate, not formula validation, status promotion, certification, or formula execution.
 
 ## Equation-batch verify-all diagnostic gate
 
@@ -73,7 +76,7 @@ Expected runtime depends on Cargo cache state because the command generates one 
 
 This is not a formula status-promotion gate by itself. It does not edit equation-batch TSVs, validation cards, validation status files, generated registries, product CLI code, runtime formula code, M07 materials, or formula status. It does not claim that all manifests are certified, flight-ready, mission-ready, operational, or validated. Maintainers can make the verify-all job blocking only after the command is expected to pass for every current manifest and the cost is acceptable for every PR.
 
-## Future placeholders
+## Additional gate notes
 
-- Future registry generation/check placeholder: when deterministic formula-registry generation lands, CI should verify the generated registry is reproducible and checked in only from governed inputs.
+- Registry consistency gate: `cargo run -p xtask -- formula-registry check` verifies the generated formula registry artifacts are reproducible and checked in only from governed inputs.
 - Future formula status/gating check placeholder: when formula execution and status gates expand, CI should verify that normal execution remains blocked unless the formula status and mode permit it.
