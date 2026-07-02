@@ -2,7 +2,8 @@
   "$id": "https://aerocodex.local/schemas/formula_sidecar.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "AeroCodex Formula Sidecar",
-  "description": "LOCK-005 metadata-only sidecar schema. Sidecars enrich metadata only and cannot promote validation status.",
+  "description": "LOCK-005/RR-014 metadata-only sidecar schema. Sidecars enrich metadata only and cannot promote validation status or authorize formula execution.",
+  "$comment": "Formula sidecars supplement TSV manifests. They do not replace source traceability, do not replace validation cards, do not validate equations, do not raise validation status, and do not make formulas executable. Status and execution eligibility remain controlled by registry generation rules, status gates, and validation evidence.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -40,28 +41,36 @@
       "type": ["object", "array", "null"]
     },
     "domain_constraints": {
+      "description": "Metadata-only domain constraints used by later registry tooling; these constraints do not execute formulas or promote validation status by themselves.",
       "type": "array",
-      "items": { "type": "object" }
+      "items": { "$ref": "#/$defs/domain_constraint" }
     },
     "cli_aliases": {
+      "description": "CLI or legacy aliases that a later registry generator may expose after normal status gates are satisfied.",
       "type": "array",
       "items": { "type": "string" }
     },
     "examples": {
+      "description": "Illustrative describe/run examples for documentation or future registry enrichment; examples are not execution authorization.",
       "type": "array",
-      "items": { "type": "object" }
+      "items": { "$ref": "#/$defs/example" }
     },
     "source_refs": {
       "type": "array",
       "items": { "type": "object" }
     },
     "metadata_contract": {
+      "description": "Machine-readable non-promotion and non-execution posture for this metadata sidecar.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "sidecars_enrich_metadata_only": { "const": true },
         "status_promotion_allowed": { "const": false },
-        "status_changes_require_promotion_packet": { "const": true }
+        "status_changes_require_promotion_packet": { "const": true },
+        "execution_authorization_allowed": { "const": false },
+        "validation_status_authority": { "const": "registry_generation_rules_and_validation_evidence" },
+        "source_traceability_replacement_allowed": { "const": false },
+        "validation_card_replacement_allowed": { "const": false }
       },
       "required": [
         "sidecars_enrich_metadata_only",
@@ -102,6 +111,30 @@
         "domain": { "type": "object" }
       },
       "required": ["name", "type"]
+    },
+    "domain_constraint": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "id": { "type": "string" },
+        "field": { "type": "string" },
+        "expression": { "type": "string" },
+        "finite": { "type": "boolean" },
+        "severity": { "enum": ["info", "warning", "error"] },
+        "notes": { "type": "string" }
+      }
+    },
+    "example": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "id": { "type": "string" },
+        "mode": { "type": "string" },
+        "command": { "type": "string" },
+        "inputs": { "type": "object" },
+        "expected_outputs": { "type": "object" },
+        "notes": { "type": "string" }
+      }
     }
   }
 }

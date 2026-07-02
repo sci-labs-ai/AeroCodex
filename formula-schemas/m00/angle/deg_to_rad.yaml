@@ -1,0 +1,67 @@
+schema_version: aerocodex.formula_sidecar.v1
+formula_id: m00.angle.deg_to_rad
+legacy_formula_id: formula_vault.m00.angle.deg2rad
+name: Degrees to radians
+family: m00.angle
+slice: A
+inputs:
+  - name: degrees
+    type: f64
+    unit: deg
+    required: true
+    domain:
+      finite: true
+outputs:
+  - name: angle_radians
+    type: f64
+    unit: rad
+units:
+  input_unit: deg
+  output_unit: rad
+  conversion_note: angle_radians = degrees * pi / 180
+domain_constraints:
+  - id: finite_degrees
+    field: degrees
+    finite: true
+    expression: is_finite(degrees)
+    severity: error
+    notes: Input angle must be finite before any later runtime implementation may evaluate the conversion.
+cli_aliases:
+  - --degrees
+examples:
+  - id: future_describe_example
+    mode: future_schema_example_only
+    command: aerocodex formula describe m00.angle.deg_to_rad --json
+    inputs:
+      degrees: 180.0
+    expected_outputs:
+      angle_radians: 3.141592653589793
+    notes: Illustrative future describe metadata example; this sidecar does not implement CLI describe behavior.
+  - id: future_run_example
+    mode: future_schema_example_only
+    command: aerocodex formula run m00.angle.deg_to_rad --degrees 180
+    inputs:
+      degrees: 180.0
+    expected_outputs:
+      angle_radians: 3.141592653589793
+    notes: Future schema example only; this sidecar is not current execution authorization.
+source_refs:
+  - id: existing_manifest_traceability
+    locator: Existing TSV manifest, validation card, and source records remain authoritative traceability inputs.
+metadata_contract:
+  sidecars_enrich_metadata_only: true
+  status_promotion_allowed: false
+  status_changes_require_promotion_packet: true
+  execution_authorization_allowed: false
+  validation_status_authority: registry_generation_rules_and_validation_evidence
+  source_traceability_replacement_allowed: false
+  validation_card_replacement_allowed: false
+validation_notes:
+  - Sidecars supplement existing TSV manifests and do not replace traceability.
+  - Sidecars do not replace validation cards or validation evidence.
+  - This sidecar cannot raise validation status and does not make formulas executable.
+  - Status comes from registry generation rules and validation evidence.
+warnings:
+  - Research/preliminary-design metadata only; not certification or operational-readiness evidence.
+  - The examples are future-facing schema examples and are not current normal-execution claims.
+  - M07 candidates remain blocked unless explicitly promoted by later governed tasks.
