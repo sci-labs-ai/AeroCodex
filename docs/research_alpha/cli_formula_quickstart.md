@@ -49,7 +49,11 @@ cargo run -p aero-codex-cli -- describe \
   formula_vault.m00.canonical.distance_to_canonical --json
 ```
 
-Both forms resolve to the same canonical formula ID. Legacy JSON output records `alias_used` and `migration_command` for traceability.
+Both forms resolve to the same canonical formula ID. Legacy JSON output records `alias_used`, `canonical_formula_id`, and `migration_command` for traceability.
+
+RR-021 backs `formula describe` from the generated Formula Registry. Human output includes `formula_id`, `legacy_formula_id`, `family`, `status`, `execution_policy`, `quarantine_state`, `inputs`, `outputs`, `units`, `domain_constraints`, `implementation_path`, `contract_path`, `validation_card_path`, `source_seed_path`, and `warnings`. JSON output keeps the registry fields and adds `ok` plus `command`; legacy ID requests also include `alias_used` and `canonical_formula_id`.
+
+Missing formula IDs fail closed with `formula_not_found`; JSON mode returns `ok=false` and exits nonzero.
 
 The namespace can also describe checked-in registry rows that are not executable through the Beta 1 CLI surface:
 
