@@ -46,31 +46,117 @@ fn version_json_exposes_bounded_release_identity() {
     assert!(text.contains("\"build_target\":"));
     assert!(text.contains("\"build_profile\":"));
     assert!(text.contains("\"supported_formula_count\":10"));
+    assert!(text.contains("\"registry_formula_count\":152"));
     assert!(text.contains("\"validation_status\":\"research_required\""));
     assert!(text.contains("\"safety_notice\":"));
 }
 
 #[test]
 fn formula_catalog_is_bounded_and_labeled() {
-    let output = run(&["formulas", "--json"]);
+    let output = run(&["formula", "list", "--json"]);
     assert!(output.status.success(), "{}", stderr(&output));
     let text = stdout(&output);
+    assert!(text.contains("\"command\":\"formula list\""));
     assert!(text.contains("\"count\":10"));
     assert!(text.contains("\"validation_status\":\"research_required\""));
     assert!(text.contains("\"safety_notice\":"));
 }
 
 #[test]
+fn legacy_formula_catalog_json_is_marked_as_deprecated_alias() {
+    let output = run(&["formulas", "--json"]);
+    assert!(output.status.success(), "{}", stderr(&output));
+    let text = stdout(&output);
+    assert!(text.contains("\"command\":\"formulas\""));
+    assert!(text.contains("\"deprecated_alias\":true"));
+    assert!(text.contains("\"migration_command\":\"aerocodex formula list\""));
+    assert!(text.contains("\"validation_status\":\"research_required\""));
+    assert!(text.contains("\"safety_notice\":"));
+}
+
+#[test]
+fn formula_namespace_describes_checked_in_registry_formula_id() {
+    let output = run(&[
+        "formula",
+        "describe",
+        "aerodynamics.coefficients.drag_coefficient",
+        "--json",
+    ]);
+    assert!(output.status.success(), "{}", stderr(&output));
+    let text = stdout(&output);
+    assert!(text.contains("\"command\":\"formula describe\""));
+    assert!(text.contains("\"formula_id\":\"aerodynamics.coefficients.drag_coefficient\""));
+    assert!(text.contains("\"status\":\"research_required\""));
+    assert!(text.contains("\"execution_policy\":\"blocked\""));
+    assert!(text.contains("\"safety_notice\":"));
+}
+
+#[test]
+fn legacy_describe_json_preserves_alias_traceability() {
+    let output = run(&[
+        "describe",
+        "formula_vault.m00.canonical.distance_to_canonical",
+        "--json",
+    ]);
+    assert!(output.status.success(), "{}", stderr(&output));
+    let text = stdout(&output);
+    assert!(text.contains("\"command\":\"describe\""));
+    assert!(text.contains("\"deprecated_alias\":true"));
+    assert!(text.contains("\"canonical_formula_id\":\"m00.canonical.distance_to_canonical\""));
+    assert!(text.contains("\"alias_used\":\"formula_vault.m00.canonical.distance_to_canonical\""));
+    assert!(text.contains("\"migration_command\":\"aerocodex formula describe <formula-id>\""));
+}
+
+#[test]
+fn formula_help_prioritizes_namespace_and_lists_legacy_aliases() {
+    let output = run(&["--help"]);
+    assert!(output.status.success(), "{}", stderr(&output));
+    let text = stdout(&output);
+    let namespace = text
+        .find("aerocodex formula list [--json]")
+        .expect("formula namespace should be documented");
+    let legacy = text
+        .find("legacy aliases")
+        .expect("legacy aliases should be documented");
+    assert!(
+        namespace < legacy,
+        "help should show formula namespace first"
+    );
+    assert!(text.contains("aerocodex formula describe <formula-id> [--json]"));
+    assert!(text.contains("aerocodex formula run <formula-id> name=value ... [--json]"));
+}
+
+#[test]
+fn formula_run_for_non_executable_registry_row_fails_closed() {
+    let output = run(&[
+        "formula",
+        "run",
+        "aerodynamics.coefficients.drag_coefficient",
+        "--json",
+    ]);
+    assert_eq!(output.status.code(), Some(4));
+    let text = stderr(&output);
+    assert!(text.contains("\"code\":\"execution_blocked_by_status\""));
+    assert!(text.contains("\"execution_policy\":\"blocked\""));
+    assert!(text.contains("\"safety_notice\":"));
+}
+
+#[test]
 fn formula_run_emits_deterministic_machine_readable_result() {
     let output = run(&[
+        "formula",
         "run",
-        "formula_vault.m00.canonical.distance_to_canonical",
+        "m00.canonical.distance_to_canonical",
         "distance=-42",
         "distance_unit=7",
         "--json",
     ]);
     assert!(output.status.success(), "{}", stderr(&output));
     let text = stdout(&output);
+    assert!(text.contains("\"command\":\"formula run\""));
+    assert!(text.contains("\"canonical_formula_id\":\"m00.canonical.distance_to_canonical\""));
+    assert!(text
+        .contains("\"legacy_formula_id\":\"formula_vault.m00.canonical.distance_to_canonical\""));
     assert!(text.contains("\"output_variable\":\"canonical_distance\""));
     assert!(text.contains("\"value\":-6"));
 }
