@@ -119,7 +119,41 @@ fn formula_namespace_describes_checked_in_registry_formula_id() {
     assert!(text.contains("\"formula_id\":\"aerodynamics.coefficients.drag_coefficient\""));
     assert!(text.contains("\"status\":\"research_required\""));
     assert!(text.contains("\"execution_policy\":\"blocked\""));
+    assert!(text.contains("\"family\":\"aerodynamics.coefficients\""));
+    assert!(text.contains("\"source_trace\":{"));
+    assert!(text.contains("\"contract_path\":"));
+    assert!(text.contains("\"validation_card_path\":"));
+    assert!(text.contains("\"source_seed_path\":"));
+    assert!(text.contains("\"domain_constraints\":"));
+    assert!(text.contains("\"implementation_path\":"));
+    assert!(text.contains("\"warnings\":"));
     assert!(text.contains("\"safety_notice\":"));
+}
+
+#[test]
+fn formula_describe_human_output_includes_traceability_fields() {
+    let output = run(&["formula", "describe", "m00.canonical.time_unit_from_mu_du"]);
+    assert!(output.status.success(), "{}", stderr(&output));
+    let text = stdout(&output);
+    for term in [
+        "formula_id=",
+        "legacy_formula_id=",
+        "family=",
+        "status=",
+        "execution_policy=",
+        "quarantine_state=",
+        "inputs=",
+        "outputs=",
+        "units=",
+        "domain_constraints=",
+        "implementation_path=",
+        "contract_path=",
+        "validation_card_path=",
+        "source_seed_path=",
+        "warnings=",
+    ] {
+        assert!(text.contains(term), "missing `{term}` in:\n{text}");
+    }
 }
 
 #[test]
@@ -136,6 +170,25 @@ fn legacy_describe_json_preserves_alias_traceability() {
     assert!(text.contains("\"canonical_formula_id\":\"m00.canonical.distance_to_canonical\""));
     assert!(text.contains("\"alias_used\":\"formula_vault.m00.canonical.distance_to_canonical\""));
     assert!(text.contains("\"migration_command\":\"aerocodex formula describe <formula-id>\""));
+    for key in [
+        "\"legacy_formula_id\":",
+        "\"family\":",
+        "\"status\":",
+        "\"execution_policy\":",
+        "\"quarantine_state\":",
+        "\"inputs\":",
+        "\"outputs\":",
+        "\"units\":",
+        "\"domain_constraints\":",
+        "\"implementation_path\":",
+        "\"source_trace\":",
+        "\"contract_path\":",
+        "\"validation_card_path\":",
+        "\"source_seed_path\":",
+        "\"warnings\":",
+    ] {
+        assert!(text.contains(key), "missing `{key}` in {text}");
+    }
 }
 
 #[test]
@@ -210,10 +263,11 @@ fn invalid_scale_has_stable_error_code_and_exit_status() {
 
 #[test]
 fn unknown_formula_has_distinct_exit_status() {
-    let output = run(&["describe", "formula_vault.m00.canonical.unknown", "--json"]);
+    let output = run(&["formula", "describe", "no.such.formula", "--json"]);
     assert_eq!(output.status.code(), Some(3));
     let text = stderr(&output);
-    assert!(text.contains("\"code\":\"unknown_formula\""));
+    assert!(text.contains("\"ok\":false"));
+    assert!(text.contains("\"code\":\"formula_not_found\""));
 }
 
 #[test]

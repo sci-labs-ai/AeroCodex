@@ -189,7 +189,7 @@ impl AppError {
     fn code(&self) -> &'static str {
         match self {
             Self::Usage(_) => "usage_error",
-            Self::UnknownFormula(_) => "unknown_formula",
+            Self::UnknownFormula(_) => "formula_not_found",
             Self::InvalidAssignment(_) => "invalid_assignment",
             Self::DuplicateInput(_) => "duplicate_input",
             Self::InvalidNumber { .. } => "invalid_number",
@@ -703,6 +703,153 @@ fn append_string_array(output: &mut String, values: &[&str]) {
     output.push(']');
 }
 
+fn formula_registry_json_object(formula_id: &str) -> Option<&'static str> {
+    let pattern = format!("\"formula_id\": \"{formula_id}\"");
+    let formula_id_position = GENERATED_FORMULA_REGISTRY_JSON.find(&pattern)?;
+    let object_start = GENERATED_FORMULA_REGISTRY_JSON[..formula_id_position].rfind('{')?;
+    let mut depth = 0usize;
+    let mut in_string = false;
+    let mut escaped = false;
+
+    for (offset, character) in GENERATED_FORMULA_REGISTRY_JSON[object_start..].char_indices() {
+        if in_string {
+            if escaped {
+                escaped = false;
+            } else if character == '\\' {
+                escaped = true;
+            } else if character == '"' {
+                in_string = false;
+            }
+            continue;
+        }
+
+        match character {
+            '"' => in_string = true,
+            '{' => depth += 1,
+            '}' => {
+                depth = depth.saturating_sub(1);
+                if depth == 0 {
+                    let object_end = object_start + offset + character.len_utf8();
+                    return Some(&GENERATED_FORMULA_REGISTRY_JSON[object_start..object_end]);
+                }
+            }
+            _ => {}
+        }
+    }
+
+    None
+}
+
+fn json_field_value_slice<'a>(object: &'a str, field: &str) -> Option<&'a str> {
+    let pattern = format!("\"{field}\":");
+    let position = object.find(&pattern)? + pattern.len();
+    let mut value_start = position;
+    while let Some(character) = object[value_start..].chars().next() {
+        if character.is_whitespace() {
+            value_start += character.len_utf8();
+        } else {
+            break;
+        }
+    }
+
+    let mut depth = 0usize;
+    let mut in_string = false;
+    let mut escaped = false;
+    let mut seen_value_start = false;
+
+    for (offset, character) in object[value_start..].char_indices() {
+        if in_string {
+            if escaped {
+                escaped = false;
+            } else if character == '\\' {
+                escaped = true;
+            } else if character == '"' {
+                in_string = false;
+                if depth == 0 {
+                    let end = value_start + offset + character.len_utf8();
+                    return Some(object[value_start..end].trim());
+                }
+            }
+            continue;
+        }
+
+        match character {
+            '"' => {
+                in_string = true;
+                seen_value_start = true;
+            }
+            '[' | '{' => {
+                depth += 1;
+                seen_value_start = true;
+            }
+            ']' | '}' => {
+                if depth == 0 {
+                    return Some(object[value_start..value_start + offset].trim());
+                }
+                depth -= 1;
+                if depth == 0 {
+                    let end = value_start + offset + character.len_utf8();
+                    return Some(object[value_start..end].trim());
+                }
+            }
+            ',' if depth == 0 && seen_value_start => {
+                return Some(object[value_start..value_start + offset].trim());
+            }
+            other if !other.is_whitespace() => seen_value_start = true,
+            _ => {}
+        }
+    }
+
+    let value = object[value_start..].trim().trim_end_matches('}').trim();
+    (!value.is_empty()).then_some(value)
+}
+
+fn json_string_field_value<'a>(object: &'a str, field: &str) -> Option<&'a str> {
+    let value = json_field_value_slice(object, field)?;
+    value
+        .strip_prefix('"')
+        .and_then(|inner| inner.strip_suffix('"'))
+}
+
+fn append_formula_json_body(output: &mut String, object: &str) {
+    let body = object
+        .trim()
+        .strip_prefix('{')
+        .and_then(|value| value.strip_suffix('}'))
+        .expect("generated formula JSON object must have braces");
+    let mut compact = String::new();
+    let mut in_string = false;
+    let mut escaped = false;
+
+    for character in body.chars() {
+        if in_string {
+            compact.push(character);
+            if escaped {
+                escaped = false;
+            } else if character == '\\' {
+                escaped = true;
+            } else if character == '"' {
+                in_string = false;
+            }
+            continue;
+        }
+
+        match character {
+            '"' => {
+                compact.push(character);
+                in_string = true;
+            }
+            character if character.is_whitespace() => {}
+            character => compact.push(character),
+        }
+    }
+
+    if !compact.is_empty() {
+        output.push(',');
+        output.push_str(&compact);
+    }
+}
+
 fn registry_json_string_field(field: &str) -> &'static str {
     let pattern = format!("\"{field}\": \"");
     let start = GENERATED_FORMULA_REGISTRY_JSON
@@ -956,38 +1103,75 @@ fn output_formula_list(json: bool, context: CommandContext, filters: &FormulaLis
 }
 
 fn output_formula_description(resolved: &ResolvedFormula, json: bool, context: CommandContext) {
+    let registry_object = formula_registry_json_object(resolved.formula_id());
+
     if json {
         let mut output = String::from("{\"ok\":true,\"command\":");
         push_json_string(&mut output, context.command());
         append_context_json_fields(&mut output, context);
-        output.push_str(",\"formula_id\":");
-        push_json_string(&mut output, resolved.formula_id());
         output.push_str(",\"canonical_formula_id\":");
         push_json_string(&mut output, resolved.formula_id());
         output.push_str(",\"requested_formula_id\":");
         push_json_string(&mut output, &resolved.requested_id);
         output.push_str(",\"alias_used\":");
         push_optional_json_string(&mut output, resolved.alias_used.as_deref());
-        output.push_str(",\"legacy_formula_id\":");
-        push_optional_json_string(&mut output, resolved.legacy_formula_id());
-        output.push_str(",\"name\":");
-        push_optional_json_string(&mut output, resolved.name());
-        output.push_str(",\"runtime_symbol\":");
-        push_optional_json_string(&mut output, resolved.runtime_symbol());
-        output.push_str(",\"output_variable\":");
-        push_optional_json_string(&mut output, resolved.output_variable());
-        output.push_str(",\"output_names\":");
-        append_string_array(&mut output, resolved.output_names());
-        output.push_str(",\"summary\":");
-        push_optional_json_string(&mut output, resolved.summary());
-        output.push_str(",\"inputs\":");
-        append_string_array(&mut output, resolved.inputs());
-        output.push_str(",\"status\":");
-        push_json_string(&mut output, resolved.status());
-        output.push_str(",\"execution_policy\":");
-        push_optional_json_string(&mut output, resolved.execution_policy());
-        output.push_str(",\"quarantine_state\":");
-        push_optional_json_string(&mut output, resolved.quarantine_state());
+        output.push_str(",\"contract_path\":");
+        push_optional_json_string(
+            &mut output,
+            resolved
+                .registry_entry
+                .and_then(|entry| entry.contract_path),
+        );
+        output.push_str(",\"validation_card_path\":");
+        push_optional_json_string(
+            &mut output,
+            resolved
+                .registry_entry
+                .and_then(|entry| entry.validation_card_path),
+        );
+        output.push_str(",\"source_seed_path\":");
+        push_optional_json_string(
+            &mut output,
+            resolved
+                .registry_entry
+                .and_then(|entry| entry.source_seed_path),
+        );
+
+        if let Some(object) = registry_object {
+            append_formula_json_body(&mut output, object);
+        } else {
+            output.push_str(",\"formula_id\":");
+            push_json_string(&mut output, resolved.formula_id());
+            output.push_str(",\"legacy_formula_id\":");
+            push_optional_json_string(&mut output, resolved.legacy_formula_id());
+            output.push_str(",\"name\":");
+            push_optional_json_string(&mut output, resolved.name());
+            output.push_str(",\"runtime_symbol\":");
+            push_optional_json_string(&mut output, resolved.runtime_symbol());
+            output.push_str(",\"output_variable\":");
+            push_optional_json_string(&mut output, resolved.output_variable());
+            output.push_str(",\"outputs\":");
+            append_string_array(&mut output, resolved.output_names());
+            output.push_str(",\"summary\":");
+            push_optional_json_string(&mut output, resolved.summary());
+            output.push_str(",\"inputs\":");
+            append_string_array(&mut output, resolved.inputs());
+            output.push_str(",\"status\":");
+            push_json_string(&mut output, resolved.status());
+            output.push_str(",\"execution_policy\":");
+            push_optional_json_string(&mut output, resolved.execution_policy());
+            output.push_str(",\"quarantine_state\":");
+            push_optional_json_string(&mut output, resolved.quarantine_state());
+            output.push_str(",\"domain_constraints\":[]");
+            output.push_str(",\"implementation_path\":null");
+            output.push_str(",\"units\":null");
+            output.push_str(",\"warnings\":[]");
+        }
+
+        output.push_str(",\"registry_schema_version\":");
+        push_json_string(&mut output, registry_schema_version());
+        output.push_str(",\"source_hash\":");
+        push_json_string(&mut output, registry_source_hash());
         output.push_str(",\"validation_status\":");
         push_json_string(&mut output, validation_status());
         output.push_str(",\"safety_notice\":");
@@ -1006,11 +1190,110 @@ fn output_formula_description(resolved: &ResolvedFormula, json: bool, context: C
         if let Some(alias_used) = resolved.alias_used.as_deref() {
             println!("alias_used={alias_used}");
         }
-        if let Some(legacy_formula_id) = resolved.legacy_formula_id() {
-            println!("legacy_formula_id={legacy_formula_id}");
-        }
+        println!(
+            "legacy_formula_id={}",
+            resolved.legacy_formula_id().unwrap_or("null")
+        );
         if let Some(name) = resolved.name() {
             println!("name={name}");
+        }
+        if let Some(entry) = resolved.registry_entry {
+            println!("family={}", entry.family);
+        }
+        println!("status={}", resolved.status());
+        println!(
+            "execution_policy={}",
+            resolved.execution_policy().unwrap_or("blocked")
+        );
+        println!(
+            "quarantine_state={}",
+            resolved
+                .quarantine_state()
+                .unwrap_or("below_execution_threshold")
+        );
+        if let Some(object) = registry_object {
+            println!(
+                "inputs={}",
+                json_field_value_slice(object, "inputs").unwrap_or("[]")
+            );
+            println!(
+                "outputs={}",
+                json_field_value_slice(object, "outputs").unwrap_or("[]")
+            );
+            println!(
+                "units={}",
+                json_field_value_slice(object, "units").unwrap_or("null")
+            );
+            println!(
+                "domain_constraints={}",
+                json_field_value_slice(object, "domain_constraints").unwrap_or("[]")
+            );
+            println!(
+                "implementation_path={}",
+                json_field_value_slice(object, "implementation_path").unwrap_or("null")
+            );
+            let source_trace = json_field_value_slice(object, "source_trace");
+            println!(
+                "contract_path={}",
+                source_trace
+                    .and_then(|trace| json_string_field_value(trace, "contract_path"))
+                    .or_else(|| resolved
+                        .registry_entry
+                        .and_then(|entry| entry.contract_path))
+                    .unwrap_or("null")
+            );
+            println!(
+                "validation_card_path={}",
+                source_trace
+                    .and_then(|trace| json_string_field_value(trace, "validation_card_path"))
+                    .or_else(|| {
+                        resolved
+                            .registry_entry
+                            .and_then(|entry| entry.validation_card_path)
+                    })
+                    .unwrap_or("null")
+            );
+            println!(
+                "source_seed_path={}",
+                source_trace
+                    .and_then(|trace| json_string_field_value(trace, "source_seed_path"))
+                    .or_else(|| resolved
+                        .registry_entry
+                        .and_then(|entry| entry.source_seed_path))
+                    .unwrap_or("null")
+            );
+            println!(
+                "warnings={}",
+                json_field_value_slice(object, "warnings").unwrap_or("[]")
+            );
+        } else {
+            println!("inputs={}", resolved.inputs().join(","));
+            println!("outputs={}", resolved.output_names().join(","));
+            println!("units=null");
+            println!("domain_constraints=[]");
+            println!("implementation_path=null");
+            println!(
+                "contract_path={}",
+                resolved
+                    .registry_entry
+                    .and_then(|entry| entry.contract_path)
+                    .unwrap_or("null")
+            );
+            println!(
+                "validation_card_path={}",
+                resolved
+                    .registry_entry
+                    .and_then(|entry| entry.validation_card_path)
+                    .unwrap_or("null")
+            );
+            println!(
+                "source_seed_path={}",
+                resolved
+                    .registry_entry
+                    .and_then(|entry| entry.source_seed_path)
+                    .unwrap_or("null")
+            );
+            println!("warnings=[]");
         }
         if let Some(runtime_symbol) = resolved.runtime_symbol() {
             println!("runtime_symbol={runtime_symbol}");
@@ -1018,19 +1301,10 @@ fn output_formula_description(resolved: &ResolvedFormula, json: bool, context: C
         if let Some(output_variable) = resolved.output_variable() {
             println!("output_variable={output_variable}");
         }
-        if !resolved.output_names().is_empty() {
-            println!("output_names={}", resolved.output_names().join(","));
-        }
-        println!("inputs={}", resolved.inputs().join(","));
-        if let Some(summary) = resolved.summary() {
+        if let Some(summary) = resolved.summary().or_else(|| {
+            registry_object.and_then(|object| json_string_field_value(object, "summary"))
+        }) {
             println!("summary={summary}");
-        }
-        println!("status={}", resolved.status());
-        if let Some(execution_policy) = resolved.execution_policy() {
-            println!("execution_policy={execution_policy}");
-        }
-        if let Some(quarantine_state) = resolved.quarantine_state() {
-            println!("quarantine_state={quarantine_state}");
         }
         println!("validation_status={}", validation_status());
         println!("safety_notice={}", safety_notice());
