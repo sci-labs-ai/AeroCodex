@@ -19,6 +19,10 @@ use std::{
     process::ExitCode,
 };
 
+#[path = "../../../generated/rust/formula_registry.rs"]
+#[allow(clippy::manual_contains)]
+mod generated_formula_registry;
+
 fn release_channel() -> &'static str {
     "beta1-concept"
 }
@@ -163,6 +167,11 @@ enum AppError {
         formula_id: &'static str,
         input: String,
     },
+    ExecutionBlockedByStatus {
+        formula_id: String,
+        status: &'static str,
+        execution_policy: &'static str,
+    },
     Equation {
         formula_id: &'static str,
         source: AeroError,
@@ -182,6 +191,7 @@ impl AppError {
             Self::InvalidNumber { .. } => "invalid_number",
             Self::MissingInput { .. } => "missing_input",
             Self::UnexpectedInput { .. } => "unexpected_input",
+            Self::ExecutionBlockedByStatus { .. } => "execution_blocked_by_status",
             Self::Equation { source, .. } => source.code(),
             Self::SelfCheckFailed { .. } => "self_check_failed",
         }
@@ -196,7 +206,7 @@ impl AppError {
             | Self::MissingInput { .. }
             | Self::UnexpectedInput { .. } => 2,
             Self::UnknownFormula(_) => 3,
-            Self::Equation { .. } => 4,
+            Self::Equation { .. } | Self::ExecutionBlockedByStatus { .. } => 4,
             Self::SelfCheckFailed { .. } => 5,
         }
     }
@@ -228,6 +238,14 @@ impl fmt::Display for AppError {
                     "formula `{formula_id}` does not accept input `{input}`"
                 )
             }
+            Self::ExecutionBlockedByStatus {
+                formula_id,
+                status,
+                execution_policy,
+            } => write!(
+                formatter,
+                "formula `{formula_id}` execution is blocked by status `{status}` with execution_policy `{execution_policy}`"
+            ),
             Self::Equation { formula_id, source } => {
                 write!(formatter, "formula `{formula_id}` failed: {source}")
             }
@@ -267,6 +285,152 @@ struct SelfCheckReport {
 
 fn formula_spec(formula_id: &str) -> Option<&'static FormulaSpec> {
     formula_specs().iter().find(|spec| spec.id == formula_id)
+}
+
+#[derive(Debug, Clone, Copy)]
+enum CommandContext {
+    Namespace {
+        command: &'static str,
+    },
+    LegacyAlias {
+        command: &'static str,
+        migration_command: &'static str,
+    },
+}
+
+impl CommandContext {
+    fn command(self) -> &'static str {
+        match self {
+            Self::Namespace { command } | Self::LegacyAlias { command, .. } => command,
+        }
+    }
+
+    fn deprecated_alias(self) -> bool {
+        matches!(self, Self::LegacyAlias { .. })
+    }
+
+    fn migration_command(self) -> Option<&'static str> {
+        match self {
+            Self::Namespace { .. } => None,
+            Self::LegacyAlias {
+                migration_command, ..
+            } => Some(migration_command),
+        }
+    }
+}
+
+#[derive(Debug)]
+struct ResolvedFormula {
+    requested_id: String,
+    registry_entry: Option<&'static generated_formula_registry::FormulaRegistryEntry>,
+    spec: Option<&'static FormulaSpec>,
+    alias_used: Option<String>,
+}
+
+impl ResolvedFormula {
+    fn formula_id(&self) -> &'static str {
+        self.registry_entry
+            .map(|entry| entry.formula_id)
+            .or_else(|| self.spec.map(|spec| spec.id))
+            .expect("resolved formula always carries registry entry or executable spec")
+    }
+
+    fn legacy_formula_id(&self) -> Option<&'static str> {
+        self.registry_entry
+            .and_then(|entry| entry.legacy_formula_id)
+            .or_else(|| self.spec.map(|spec| spec.id))
+    }
+
+    fn status(&self) -> &'static str {
+        self.registry_entry
+            .map(|entry| entry.status)
+            .unwrap_or_else(validation_status)
+    }
+
+    fn execution_policy(&self) -> Option<&'static str> {
+        self.registry_entry.map(|entry| entry.execution_policy)
+    }
+
+    fn quarantine_state(&self) -> Option<&'static str> {
+        self.registry_entry.map(|entry| entry.quarantine_state)
+    }
+
+    fn name(&self) -> Option<&'static str> {
+        self.registry_entry.map(|entry| entry.name)
+    }
+
+    fn runtime_symbol(&self) -> Option<&'static str> {
+        self.spec
+            .map(|spec| spec.runtime_symbol)
+            .or_else(|| self.registry_entry.and_then(|entry| entry.runtime_symbol))
+    }
+
+    fn output_variable(&self) -> Option<&'static str> {
+        self.spec
+            .map(|spec| spec.output_variable)
+            .or_else(|| self.registry_entry.and_then(|entry| entry.output_variable))
+    }
+
+    fn inputs(&self) -> &'static [&'static str] {
+        self.spec
+            .map(|spec| spec.inputs)
+            .or_else(|| self.registry_entry.map(|entry| entry.input_names))
+            .unwrap_or(&[])
+    }
+
+    fn output_names(&self) -> &'static [&'static str] {
+        self.registry_entry
+            .map(|entry| entry.output_names)
+            .unwrap_or(&[])
+    }
+
+    fn summary(&self) -> Option<&'static str> {
+        self.spec.map(|spec| spec.summary)
+    }
+}
+
+fn registry_entry_for_spec(
+    spec: &FormulaSpec,
+) -> Option<&'static generated_formula_registry::FormulaRegistryEntry> {
+    generated_formula_registry::find_by_alias(spec.id)
+        .or_else(|| generated_formula_registry::find_by_formula_id(spec.id))
+}
+
+fn formula_spec_for_registry_entry(
+    entry: &'static generated_formula_registry::FormulaRegistryEntry,
+) -> Option<&'static FormulaSpec> {
+    entry
+        .legacy_formula_id
+        .and_then(formula_spec)
+        .or_else(|| entry.aliases.iter().find_map(|alias| formula_spec(alias)))
+        .or_else(|| formula_spec(entry.formula_id))
+}
+
+fn resolve_formula(formula_id: &str) -> Option<ResolvedFormula> {
+    if let Some(entry) = generated_formula_registry::find_by_formula_id(formula_id) {
+        return Some(ResolvedFormula {
+            requested_id: formula_id.to_string(),
+            registry_entry: Some(entry),
+            spec: formula_spec_for_registry_entry(entry),
+            alias_used: None,
+        });
+    }
+
+    if let Some(entry) = generated_formula_registry::find_by_alias(formula_id) {
+        return Some(ResolvedFormula {
+            requested_id: formula_id.to_string(),
+            registry_entry: Some(entry),
+            spec: formula_spec_for_registry_entry(entry),
+            alias_used: Some(formula_id.to_string()),
+        });
+    }
+
+    formula_spec(formula_id).map(|spec| ResolvedFormula {
+        requested_id: formula_id.to_string(),
+        registry_entry: registry_entry_for_spec(spec),
+        spec: Some(spec),
+        alias_used: None,
+    })
 }
 
 fn required_input(
@@ -420,6 +584,37 @@ fn push_json_string(output: &mut String, value: &str) {
     output.push('"');
 }
 
+fn push_optional_json_string(output: &mut String, value: Option<&str>) {
+    if let Some(value) = value {
+        push_json_string(output, value);
+    } else {
+        output.push_str("null");
+    }
+}
+
+fn append_context_json_fields(output: &mut String, context: CommandContext) {
+    if context.deprecated_alias() {
+        output.push_str(",\"deprecated_alias\":true,\"migration_command\":");
+        push_json_string(
+            output,
+            context
+                .migration_command()
+                .expect("legacy aliases always carry a migration command"),
+        );
+    }
+}
+
+fn append_string_array(output: &mut String, values: &[&str]) {
+    output.push('[');
+    for (index, value) in values.iter().enumerate() {
+        if index > 0 {
+            output.push(',');
+        }
+        push_json_string(output, value);
+    }
+    output.push(']');
+}
+
 fn json_error(error: &AppError) -> String {
     let mut output = String::from("{\"ok\":false,\"error\":{\"code\":");
     push_json_string(&mut output, error.code());
@@ -427,6 +622,19 @@ fn json_error(error: &AppError) -> String {
     push_json_string(&mut output, &error.to_string());
     output.push_str("},\"release_channel\":");
     push_json_string(&mut output, release_channel());
+    if let AppError::ExecutionBlockedByStatus {
+        formula_id,
+        status,
+        execution_policy,
+    } = error
+    {
+        output.push_str(",\"formula_id\":");
+        push_json_string(&mut output, formula_id);
+        output.push_str(",\"status\":");
+        push_json_string(&mut output, status);
+        output.push_str(",\"execution_policy\":");
+        push_json_string(&mut output, execution_policy);
+    }
     output.push_str(",\"validation_status\":");
     push_json_string(&mut output, validation_status());
     output.push_str(",\"safety_notice\":");
@@ -449,8 +657,9 @@ fn output_version(json: bool) {
         push_json_string(&mut output, build_profile());
         write!(
             output,
-            ",\"supported_formula_count\":{},\"validation_status\":",
-            supported_formula_count()
+            ",\"supported_formula_count\":{},\"registry_formula_count\":{},\"validation_status\":",
+            supported_formula_count(),
+            generated_formula_registry::FORMULA_COUNT
         )
         .expect("writing to String cannot fail");
         push_json_string(&mut output, validation_status());
@@ -465,49 +674,79 @@ fn output_version(json: bool) {
         println!("build_target={}", build_target());
         println!("build_profile={}", build_profile());
         println!("supported_formula_count={}", supported_formula_count());
+        println!(
+            "registry_formula_count={}",
+            generated_formula_registry::FORMULA_COUNT
+        );
         println!("validation_status={}", validation_status());
         println!("safety_notice={}", safety_notice());
     }
 }
 
-fn output_formula_list(json: bool) {
+fn output_formula_list(json: bool, context: CommandContext) {
     if json {
-        let mut output = format!(
-            "{{\"ok\":true,\"command\":\"formulas\",\"count\":{},\"validation_status\":",
+        let mut output = String::from("{\"ok\":true,\"command\":");
+        push_json_string(&mut output, context.command());
+        append_context_json_fields(&mut output, context);
+        write!(
+            output,
+            ",\"count\":{},\"validation_status\":",
             supported_formula_count()
-        );
+        )
+        .expect("writing to String cannot fail");
         push_json_string(&mut output, validation_status());
         output.push_str(",\"formulas\":[");
         for (index, spec) in formula_specs().iter().enumerate() {
             if index > 0 {
                 output.push(',');
             }
+            let registry_entry = registry_entry_for_spec(spec);
             output.push_str("{\"formula_id\":");
-            push_json_string(&mut output, spec.id);
+            push_json_string(
+                &mut output,
+                registry_entry
+                    .map(|entry| entry.formula_id)
+                    .unwrap_or(spec.id),
+            );
+            output.push_str(",\"legacy_formula_id\":");
+            push_optional_json_string(
+                &mut output,
+                registry_entry
+                    .and_then(|entry| entry.legacy_formula_id)
+                    .or(Some(spec.id)),
+            );
             output.push_str(",\"runtime_symbol\":");
             push_json_string(&mut output, spec.runtime_symbol);
             output.push_str(",\"output_variable\":");
             push_json_string(&mut output, spec.output_variable);
-            output.push_str(",\"inputs\":[");
-            for (input_index, input) in spec.inputs.iter().enumerate() {
-                if input_index > 0 {
-                    output.push(',');
-                }
-                push_json_string(&mut output, input);
-            }
-            output.push_str("]}");
+            output.push_str(",\"inputs\":");
+            append_string_array(&mut output, spec.inputs);
+            output.push('}');
         }
         output.push_str("],\"safety_notice\":");
         push_json_string(&mut output, safety_notice());
         output.push_str("}\n");
         print!("{output}");
     } else {
+        println!("command={}", context.command());
+        if let Some(migration_command) = context.migration_command() {
+            println!("deprecated_alias=true");
+            println!("migration_command={migration_command}");
+        }
         println!("validation_status={}", validation_status());
         println!("safety_notice={}", safety_notice());
         for spec in formula_specs() {
+            let registry_entry = registry_entry_for_spec(spec);
+            let formula_id = registry_entry
+                .map(|entry| entry.formula_id)
+                .unwrap_or(spec.id);
+            let legacy_formula_id = registry_entry
+                .and_then(|entry| entry.legacy_formula_id)
+                .unwrap_or(spec.id);
             println!(
-                "{}\t{}\t{}\t{}",
-                spec.id,
+                "{}\tlegacy_alias={}\t{}\t{}\t{}",
+                formula_id,
+                legacy_formula_id,
                 spec.runtime_symbol,
                 spec.output_variable,
                 spec.inputs.join(",")
@@ -516,44 +755,108 @@ fn output_formula_list(json: bool) {
     }
 }
 
-fn output_formula_description(spec: &FormulaSpec, json: bool) {
+fn output_formula_description(resolved: &ResolvedFormula, json: bool, context: CommandContext) {
     if json {
-        let mut output = String::from("{\"ok\":true,\"command\":\"describe\",\"formula_id\":");
-        push_json_string(&mut output, spec.id);
+        let mut output = String::from("{\"ok\":true,\"command\":");
+        push_json_string(&mut output, context.command());
+        append_context_json_fields(&mut output, context);
+        output.push_str(",\"formula_id\":");
+        push_json_string(&mut output, resolved.formula_id());
+        output.push_str(",\"canonical_formula_id\":");
+        push_json_string(&mut output, resolved.formula_id());
+        output.push_str(",\"requested_formula_id\":");
+        push_json_string(&mut output, &resolved.requested_id);
+        output.push_str(",\"alias_used\":");
+        push_optional_json_string(&mut output, resolved.alias_used.as_deref());
+        output.push_str(",\"legacy_formula_id\":");
+        push_optional_json_string(&mut output, resolved.legacy_formula_id());
+        output.push_str(",\"name\":");
+        push_optional_json_string(&mut output, resolved.name());
         output.push_str(",\"runtime_symbol\":");
-        push_json_string(&mut output, spec.runtime_symbol);
+        push_optional_json_string(&mut output, resolved.runtime_symbol());
         output.push_str(",\"output_variable\":");
-        push_json_string(&mut output, spec.output_variable);
+        push_optional_json_string(&mut output, resolved.output_variable());
+        output.push_str(",\"output_names\":");
+        append_string_array(&mut output, resolved.output_names());
         output.push_str(",\"summary\":");
-        push_json_string(&mut output, spec.summary);
-        output.push_str(",\"inputs\":[");
-        for (index, input) in spec.inputs.iter().enumerate() {
-            if index > 0 {
-                output.push(',');
-            }
-            push_json_string(&mut output, input);
-        }
-        output.push_str("],\"validation_status\":");
+        push_optional_json_string(&mut output, resolved.summary());
+        output.push_str(",\"inputs\":");
+        append_string_array(&mut output, resolved.inputs());
+        output.push_str(",\"status\":");
+        push_json_string(&mut output, resolved.status());
+        output.push_str(",\"execution_policy\":");
+        push_optional_json_string(&mut output, resolved.execution_policy());
+        output.push_str(",\"quarantine_state\":");
+        push_optional_json_string(&mut output, resolved.quarantine_state());
+        output.push_str(",\"validation_status\":");
         push_json_string(&mut output, validation_status());
         output.push_str(",\"safety_notice\":");
         push_json_string(&mut output, safety_notice());
         output.push_str("}\n");
         print!("{output}");
     } else {
-        println!("formula_id={}", spec.id);
-        println!("runtime_symbol={}", spec.runtime_symbol);
-        println!("output_variable={}", spec.output_variable);
-        println!("inputs={}", spec.inputs.join(","));
-        println!("summary={}", spec.summary);
+        println!("command={}", context.command());
+        if let Some(migration_command) = context.migration_command() {
+            println!("deprecated_alias=true");
+            println!("migration_command={migration_command}");
+        }
+        println!("formula_id={}", resolved.formula_id());
+        println!("canonical_formula_id={}", resolved.formula_id());
+        println!("requested_formula_id={}", resolved.requested_id);
+        if let Some(alias_used) = resolved.alias_used.as_deref() {
+            println!("alias_used={alias_used}");
+        }
+        if let Some(legacy_formula_id) = resolved.legacy_formula_id() {
+            println!("legacy_formula_id={legacy_formula_id}");
+        }
+        if let Some(name) = resolved.name() {
+            println!("name={name}");
+        }
+        if let Some(runtime_symbol) = resolved.runtime_symbol() {
+            println!("runtime_symbol={runtime_symbol}");
+        }
+        if let Some(output_variable) = resolved.output_variable() {
+            println!("output_variable={output_variable}");
+        }
+        if !resolved.output_names().is_empty() {
+            println!("output_names={}", resolved.output_names().join(","));
+        }
+        println!("inputs={}", resolved.inputs().join(","));
+        if let Some(summary) = resolved.summary() {
+            println!("summary={summary}");
+        }
+        println!("status={}", resolved.status());
+        if let Some(execution_policy) = resolved.execution_policy() {
+            println!("execution_policy={execution_policy}");
+        }
+        if let Some(quarantine_state) = resolved.quarantine_state() {
+            println!("quarantine_state={quarantine_state}");
+        }
         println!("validation_status={}", validation_status());
         println!("safety_notice={}", safety_notice());
     }
 }
 
-fn output_evaluation(result: &EvaluationResult, json: bool) {
+fn output_evaluation(
+    result: &EvaluationResult,
+    resolved: &ResolvedFormula,
+    json: bool,
+    context: CommandContext,
+) {
     if json {
-        let mut output = String::from("{\"ok\":true,\"command\":\"run\",\"formula_id\":");
-        push_json_string(&mut output, result.spec.id);
+        let mut output = String::from("{\"ok\":true,\"command\":");
+        push_json_string(&mut output, context.command());
+        append_context_json_fields(&mut output, context);
+        output.push_str(",\"formula_id\":");
+        push_json_string(&mut output, resolved.formula_id());
+        output.push_str(",\"canonical_formula_id\":");
+        push_json_string(&mut output, resolved.formula_id());
+        output.push_str(",\"requested_formula_id\":");
+        push_json_string(&mut output, &resolved.requested_id);
+        output.push_str(",\"alias_used\":");
+        push_optional_json_string(&mut output, resolved.alias_used.as_deref());
+        output.push_str(",\"legacy_formula_id\":");
+        push_optional_json_string(&mut output, resolved.legacy_formula_id());
         output.push_str(",\"runtime_symbol\":");
         push_json_string(&mut output, result.spec.runtime_symbol);
         output.push_str(",\"output_variable\":");
@@ -566,7 +869,20 @@ fn output_evaluation(result: &EvaluationResult, json: bool) {
         output.push_str("}\n");
         print!("{output}");
     } else {
-        println!("formula_id={}", result.spec.id);
+        println!("command={}", context.command());
+        if let Some(migration_command) = context.migration_command() {
+            println!("deprecated_alias=true");
+            println!("migration_command={migration_command}");
+        }
+        println!("formula_id={}", resolved.formula_id());
+        println!("canonical_formula_id={}", resolved.formula_id());
+        println!("requested_formula_id={}", resolved.requested_id);
+        if let Some(alias_used) = resolved.alias_used.as_deref() {
+            println!("alias_used={alias_used}");
+        }
+        if let Some(legacy_formula_id) = resolved.legacy_formula_id() {
+            println!("legacy_formula_id={legacy_formula_id}");
+        }
         println!("runtime_symbol={}", result.spec.runtime_symbol);
         println!("{}={}", result.spec.output_variable, result.value);
         println!("validation_status={}", validation_status());
@@ -823,14 +1139,110 @@ fn output_self_check(report: &SelfCheckReport, json: bool) {
 fn print_help() {
     println!(
         "AeroCodex Beta 1 concept CLI\n\n\
-usage:\n  aerocodex version [--json]\n  aerocodex formulas [--json]\n  aerocodex describe <formula-id> [--json]\n  aerocodex run <formula-id> name=value ... [--json]\n  aerocodex self-check [--json]\n\n\
-The Beta 1 concept exposes exactly ten governed M00 canonical-unit formulas.\n\
+usage:\n  aerocodex formula list [--json]\n  aerocodex formula describe <formula-id> [--json]\n  aerocodex formula run <formula-id> name=value ... [--json]\n  aerocodex version [--json]\n  aerocodex self-check [--json]\n\n\
+legacy aliases:\n  aerocodex formulas [--json]        -> aerocodex formula list\n  aerocodex describe <formula-id> [--json]\n                                      -> aerocodex formula describe <formula-id>\n  aerocodex run <formula-id> name=value ... [--json]\n                                      -> aerocodex formula run <formula-id> name=value ...\n\n\
+`--json` may appear before or after the command/subcommand.\n\n\
+The Beta 1 concept exposes exactly ten governed M00 canonical-unit executable concept formulas. The checked-in Formula Registry may also describe inventory-only formulas; registry inclusion is not formula validation, status promotion, certification, execution approval, readiness approval, or regulatory approval.\n\
 Validation status: {}.\n\
-Exit codes: 0 success, 2 usage/input-shape error, 3 unknown formula, 4 equation/domain/numerical error, 5 self-check failure.\n\
+Exit codes: 0 success, 2 usage/input-shape error, 3 unknown formula, 4 equation/domain/numerical/status-gate error, 5 self-check failure.\n\
 Safety: {}.",
         validation_status(),
         safety_notice()
     );
+}
+
+fn execute_describe(formula_id: &str, json: bool, context: CommandContext) -> Result<(), AppError> {
+    let resolved = resolve_formula(formula_id)
+        .ok_or_else(|| AppError::UnknownFormula(formula_id.to_string()))?;
+    output_formula_description(&resolved, json, context);
+    Ok(())
+}
+
+fn execute_run(
+    formula_id: &str,
+    input_arguments: &[String],
+    json: bool,
+    context: CommandContext,
+) -> Result<(), AppError> {
+    let resolved = resolve_formula(formula_id)
+        .ok_or_else(|| AppError::UnknownFormula(formula_id.to_string()))?;
+    let Some(spec) = resolved.spec else {
+        return Err(AppError::ExecutionBlockedByStatus {
+            formula_id: resolved.formula_id().to_string(),
+            status: resolved.status(),
+            execution_policy: resolved.execution_policy().unwrap_or("blocked"),
+        });
+    };
+    let inputs = parse_assignments(input_arguments)?;
+    let result = evaluate_formula(spec.id, &inputs)?;
+    output_evaluation(&result, &resolved, json, context);
+    Ok(())
+}
+
+fn execute_formula_namespace(arguments: &[String], json: bool) -> Result<(), AppError> {
+    let Some(subcommand) = arguments.first().map(String::as_str) else {
+        return Err(AppError::Usage(
+            "formula requires a subcommand: list, describe, or run".to_string(),
+        ));
+    };
+
+    match subcommand {
+        "help" | "--help" | "-h" => {
+            if arguments.len() != 1 {
+                return Err(AppError::Usage(
+                    "formula help does not accept positional arguments".to_string(),
+                ));
+            }
+            print_help();
+            Ok(())
+        }
+        "list" => {
+            if arguments.len() != 1 {
+                return Err(AppError::Usage(
+                    "formula list does not accept positional arguments".to_string(),
+                ));
+            }
+            output_formula_list(
+                json,
+                CommandContext::Namespace {
+                    command: "formula list",
+                },
+            );
+            Ok(())
+        }
+        "describe" => {
+            if arguments.len() != 2 {
+                return Err(AppError::Usage(
+                    "formula describe requires exactly one formula id".to_string(),
+                ));
+            }
+            execute_describe(
+                &arguments[1],
+                json,
+                CommandContext::Namespace {
+                    command: "formula describe",
+                },
+            )
+        }
+        "run" => {
+            if arguments.len() < 2 {
+                return Err(AppError::Usage(
+                    "formula run requires a formula id followed by name=value inputs".to_string(),
+                ));
+            }
+            execute_run(
+                &arguments[1],
+                &arguments[2..],
+                json,
+                CommandContext::Namespace {
+                    command: "formula run",
+                },
+            )
+        }
+        other => Err(AppError::Usage(format!(
+            "unknown formula subcommand `{other}`"
+        ))),
+    }
 }
 
 fn execute(raw_arguments: &[String]) -> Result<(), AppError> {
@@ -860,13 +1272,20 @@ fn execute(raw_arguments: &[String]) -> Result<(), AppError> {
             output_version(json);
             Ok(())
         }
+        "formula" => execute_formula_namespace(&arguments[1..], json),
         "formulas" => {
             if arguments.len() != 1 {
                 return Err(AppError::Usage(
                     "formulas does not accept positional arguments".to_string(),
                 ));
             }
-            output_formula_list(json);
+            output_formula_list(
+                json,
+                CommandContext::LegacyAlias {
+                    command: "formulas",
+                    migration_command: "aerocodex formula list",
+                },
+            );
             Ok(())
         }
         "describe" => {
@@ -875,10 +1294,14 @@ fn execute(raw_arguments: &[String]) -> Result<(), AppError> {
                     "describe requires exactly one formula id".to_string(),
                 ));
             }
-            let spec = formula_spec(&arguments[1])
-                .ok_or_else(|| AppError::UnknownFormula(arguments[1].clone()))?;
-            output_formula_description(spec, json);
-            Ok(())
+            execute_describe(
+                &arguments[1],
+                json,
+                CommandContext::LegacyAlias {
+                    command: "describe",
+                    migration_command: "aerocodex formula describe <formula-id>",
+                },
+            )
         }
         "run" => {
             if arguments.len() < 2 {
@@ -886,10 +1309,15 @@ fn execute(raw_arguments: &[String]) -> Result<(), AppError> {
                     "run requires a formula id followed by name=value inputs".to_string(),
                 ));
             }
-            let inputs = parse_assignments(&arguments[2..])?;
-            let result = evaluate_formula(&arguments[1], &inputs)?;
-            output_evaluation(&result, json);
-            Ok(())
+            execute_run(
+                &arguments[1],
+                &arguments[2..],
+                json,
+                CommandContext::LegacyAlias {
+                    command: "run",
+                    migration_command: "aerocodex formula run <formula-id> name=value ...",
+                },
+            )
         }
         "self-check" => {
             if arguments.len() != 1 {

@@ -9,31 +9,36 @@ It is not certified, flight-ready, mission-ready, operational, medical, habitat-
 ```bash
 cargo run -p aero-codex-cli -- version
 cargo run -p aero-codex-cli -- version --json
-cargo run -p aero-codex-cli -- formulas
+cargo run -p aero-codex-cli -- formula list
+cargo run -p aero-codex-cli -- formula list --json
 ```
+
+The older `formulas` alias remains available during the migration window and reports `deprecated_alias=true` in JSON output. Prefer `aerocodex formula list` for new scripts.
 
 ## Describe a formula
 
 ```bash
-cargo run -p aero-codex-cli -- describe \
-  formula_vault.m00.canonical.distance_to_canonical --json
+cargo run -p aero-codex-cli -- formula describe \
+  m00.canonical.distance_to_canonical --json
 ```
 
-## Run a signed conversion
+The legacy `describe formula_vault.m00.canonical.distance_to_canonical --json` form is still accepted and reports the canonical formula ID plus `alias_used`/`deprecated_alias` migration fields.
+
+## Run a bounded conversion
 
 ```bash
-cargo run -p aero-codex-cli -- run \
-  formula_vault.m00.canonical.distance_to_canonical \
+cargo run -p aero-codex-cli -- formula run \
+  m00.canonical.distance_to_canonical \
   distance=-42 distance_unit=7 --json
 ```
 
 The expected output contains:
 
 ```json
-{"ok":true,"command":"run","formula_id":"formula_vault.m00.canonical.distance_to_canonical","runtime_symbol":"m00_distance_to_canonical","output_variable":"canonical_distance","value":-6,"validation_status":"research_required"}
+{"ok":true,"command":"formula run","formula_id":"m00.canonical.distance_to_canonical","canonical_formula_id":"m00.canonical.distance_to_canonical","requested_formula_id":"m00.canonical.distance_to_canonical","alias_used":null,"legacy_formula_id":"formula_vault.m00.canonical.distance_to_canonical","runtime_symbol":"m00_distance_to_canonical","output_variable":"canonical_distance","value":-6,"validation_status":"research_required"}
 ```
 
-The real output also includes the safety notice.
+The real output also includes the safety notice. The legacy `run formula_vault.m00.canonical.distance_to_canonical ... --json` form remains available during the migration window and reports `deprecated_alias=true` plus a migration command.
 
 ## Run the bounded self-check
 
@@ -50,14 +55,14 @@ A clean run reports `"passed":14` and `"failed":0`. The checks cover all ten for
 | 0 | Command succeeded. |
 | 2 | Usage, assignment, number parsing, missing-input, or unexpected-input error. |
 | 3 | Unknown formula ID. |
-| 4 | Existing AeroCodex equation rejected the input or produced a checked numerical failure. |
+| 4 | Existing AeroCodex equation rejected the input, produced a checked numerical failure, or the formula is present in the registry but not executable through the Beta 1 CLI surface. |
 | 5 | Built-in self-check found one or more failures. |
 
 ## Machine-readable error example
 
 ```bash
-cargo run -p aero-codex-cli -- run \
-  formula_vault.m00.canonical.distance_to_canonical \
+cargo run -p aero-codex-cli -- formula run \
+  m00.canonical.distance_to_canonical \
   distance=1 distance_unit=0 --json
 ```
 
