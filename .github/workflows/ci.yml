@@ -32,6 +32,8 @@ jobs:
           python3 -m json.tool /tmp/equation_batch_plan.json >/dev/null
       - name: equation-batch status report check
         run: cargo run -p xtask -- equation-batch report --all-manifests --out generated/equation_batch_status_report.json --check
+      - name: formula-registry consistency check
+        run: cargo run -p xtask -- formula-registry check
       - name: Run dependency policy
         run: cargo run -p xtask -- dependency-policy
       - name: Run Beta 1 CLI self-check

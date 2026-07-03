@@ -98,7 +98,7 @@ struct RustFormulaEntry {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-enum JsonValue {
+pub(crate) enum JsonValue {
     Null,
     Bool,
     Number(String),
@@ -125,6 +125,15 @@ pub fn run_generate_rust_command(root: &Path, options: &GenerateRustOptions) -> 
         REGISTRY_SHA256_PATH
     );
     Ok(())
+}
+
+pub(crate) fn render_registry_module_from_json_text(json: &str) -> Result<String, String> {
+    let registry = parse_registry_json(json)?;
+    Ok(render_rust_registry(&registry))
+}
+
+pub(crate) fn parse_json_value(json: &str) -> Result<JsonValue, String> {
+    JsonParser::new(json).parse()
 }
 
 fn require_approved_output_path(out: &Path) -> Result<(), String> {
