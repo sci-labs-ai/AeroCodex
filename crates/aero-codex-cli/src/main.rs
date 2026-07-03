@@ -16,12 +16,16 @@ use std::{
     collections::BTreeMap,
     env,
     fmt::{self, Write as _},
+    io::{self, Write as IoWrite},
     process::ExitCode,
 };
 
 #[path = "../../../generated/rust/formula_registry.rs"]
 #[allow(clippy::manual_contains)]
 mod generated_formula_registry;
+
+const GENERATED_FORMULA_REGISTRY_JSON: &str =
+    include_str!("../../../generated/formula_registry.json");
 
 fn release_channel() -> &'static str {
     "beta1-concept"
@@ -317,6 +321,90 @@ impl CommandContext {
             } => Some(migration_command),
         }
     }
+}
+
+#[derive(Debug, Default)]
+struct FormulaListFilters {
+    family: Option<String>,
+    status: Option<String>,
+    executable: bool,
+}
+
+impl FormulaListFilters {
+    fn matches(&self, entry: &generated_formula_registry::FormulaRegistryEntry) -> bool {
+        if let Some(family) = self.family.as_deref() {
+            let root_family = registry_family(entry);
+            if entry.family != family && root_family != family {
+                return false;
+            }
+        }
+        if let Some(status) = self.status.as_deref() {
+            if entry.status != status {
+                return false;
+            }
+        }
+        if self.executable
+            && !matches!(
+                entry.execution_policy,
+                "normal_research" | "publication_supporting"
+            )
+        {
+            return false;
+        }
+        true
+    }
+}
+
+fn parse_formula_list_filters(arguments: &[String]) -> Result<FormulaListFilters, AppError> {
+    let mut filters = FormulaListFilters::default();
+    let mut index = 0;
+    while index < arguments.len() {
+        match arguments[index].as_str() {
+            "--family" => {
+                index += 1;
+                let Some(value) = arguments.get(index) else {
+                    return Err(AppError::Usage(
+                        "formula list option `--family` requires a value".to_string(),
+                    ));
+                };
+                if value.starts_with('-') {
+                    return Err(AppError::Usage(
+                        "formula list option `--family` requires a family value".to_string(),
+                    ));
+                }
+                filters.family = Some(value.clone());
+            }
+            "--status" => {
+                index += 1;
+                let Some(value) = arguments.get(index) else {
+                    return Err(AppError::Usage(
+                        "formula list option `--status` requires a value".to_string(),
+                    ));
+                };
+                if value.starts_with('-') {
+                    return Err(AppError::Usage(
+                        "formula list option `--status` requires a status value".to_string(),
+                    ));
+                }
+                filters.status = Some(value.clone());
+            }
+            "--executable" => {
+                filters.executable = true;
+            }
+            other if other.starts_with('-') => {
+                return Err(AppError::Usage(format!(
+                    "unknown formula list option `{other}`"
+                )));
+            }
+            other => {
+                return Err(AppError::Usage(format!(
+                    "formula list does not accept positional argument `{other}`"
+                )));
+            }
+        }
+        index += 1;
+    }
+    Ok(filters)
 }
 
 #[derive(Debug)]
@@ -615,6 +703,67 @@ fn append_string_array(output: &mut String, values: &[&str]) {
     output.push(']');
 }
 
+fn registry_json_string_field(field: &str) -> &'static str {
+    let pattern = format!("\"{field}\": \"");
+    let start = GENERATED_FORMULA_REGISTRY_JSON
+        .find(&pattern)
+        .expect("checked-in generated registry JSON must expose required top-level field")
+        + pattern.len();
+    let end = GENERATED_FORMULA_REGISTRY_JSON[start..]
+        .find('"')
+        .expect("checked-in generated registry JSON field must be a string");
+    &GENERATED_FORMULA_REGISTRY_JSON[start..start + end]
+}
+
+fn registry_schema_version() -> &'static str {
+    registry_json_string_field("schema_version")
+}
+
+fn registry_source_hash() -> &'static str {
+    registry_json_string_field("source_hash")
+}
+
+fn registry_family(entry: &generated_formula_registry::FormulaRegistryEntry) -> &'static str {
+    entry
+        .family
+        .split_once('.')
+        .map(|(root, _)| root)
+        .unwrap_or(entry.family)
+}
+
+fn registry_output(
+    entry: &generated_formula_registry::FormulaRegistryEntry,
+) -> Option<&'static str> {
+    entry
+        .output_variable
+        .or_else(|| entry.output_names.first().copied())
+}
+
+fn registry_runtime_label(
+    entry: &generated_formula_registry::FormulaRegistryEntry,
+) -> Option<&'static str> {
+    entry.runtime_symbol.or(entry.implementation_path)
+}
+
+fn append_formula_list_filters_json(output: &mut String, filters: &FormulaListFilters) {
+    output.push_str(",\"filters\":{\"family\":");
+    push_optional_json_string(output, filters.family.as_deref());
+    output.push_str(",\"status\":");
+    push_optional_json_string(output, filters.status.as_deref());
+    write!(output, ",\"executable\":{}", filters.executable)
+        .expect("writing to String cannot fail");
+    output.push('}');
+}
+
+fn write_stdout(output: &str) {
+    let mut stdout = io::stdout().lock();
+    if let Err(error) = stdout.write_all(output.as_bytes()) {
+        if error.kind() != io::ErrorKind::BrokenPipe {
+            panic!("failed writing to stdout: {error}");
+        }
+    }
+}
+
 fn json_error(error: &AppError) -> String {
     let mut output = String::from("{\"ok\":false,\"error\":{\"code\":");
     push_json_string(&mut output, error.code());
@@ -683,75 +832,126 @@ fn output_version(json: bool) {
     }
 }
 
-fn output_formula_list(json: bool, context: CommandContext) {
+fn output_formula_list(json: bool, context: CommandContext, filters: &FormulaListFilters) {
+    let entries: Vec<&generated_formula_registry::FormulaRegistryEntry> =
+        generated_formula_registry::FORMULA_REGISTRY
+            .iter()
+            .filter(|entry| filters.matches(entry))
+            .collect();
+
     if json {
         let mut output = String::from("{\"ok\":true,\"command\":");
         push_json_string(&mut output, context.command());
         append_context_json_fields(&mut output, context);
         write!(
             output,
-            ",\"count\":{},\"validation_status\":",
-            supported_formula_count()
+            ",\"count\":{},\"registry_formula_count\":{},\"registry_schema_version\":",
+            entries.len(),
+            generated_formula_registry::FORMULA_COUNT
         )
         .expect("writing to String cannot fail");
+        push_json_string(&mut output, registry_schema_version());
+        output.push_str(",\"source_hash\":");
+        push_json_string(&mut output, registry_source_hash());
+        append_formula_list_filters_json(&mut output, filters);
+        output.push_str(",\"validation_status\":");
         push_json_string(&mut output, validation_status());
         output.push_str(",\"formulas\":[");
-        for (index, spec) in formula_specs().iter().enumerate() {
+        for (index, entry) in entries.iter().enumerate() {
             if index > 0 {
                 output.push(',');
             }
-            let registry_entry = registry_entry_for_spec(spec);
             output.push_str("{\"formula_id\":");
-            push_json_string(
-                &mut output,
-                registry_entry
-                    .map(|entry| entry.formula_id)
-                    .unwrap_or(spec.id),
-            );
+            push_json_string(&mut output, entry.formula_id);
             output.push_str(",\"legacy_formula_id\":");
-            push_optional_json_string(
-                &mut output,
-                registry_entry
-                    .and_then(|entry| entry.legacy_formula_id)
-                    .or(Some(spec.id)),
-            );
-            output.push_str(",\"runtime_symbol\":");
-            push_json_string(&mut output, spec.runtime_symbol);
+            push_optional_json_string(&mut output, entry.legacy_formula_id);
+            output.push_str(",\"aliases\":");
+            append_string_array(&mut output, entry.aliases);
+            output.push_str(",\"name\":");
+            push_json_string(&mut output, entry.name);
+            output.push_str(",\"status\":");
+            push_json_string(&mut output, entry.status);
+            output.push_str(",\"execution_policy\":");
+            push_json_string(&mut output, entry.execution_policy);
+            output.push_str(",\"quarantine_state\":");
+            push_json_string(&mut output, entry.quarantine_state);
+            output.push_str(",\"family\":");
+            push_json_string(&mut output, registry_family(entry));
+            output.push_str(",\"registry_family\":");
+            push_json_string(&mut output, entry.family);
+            output.push_str(",\"batch_id\":");
+            push_optional_json_string(&mut output, entry.batch_id);
+            output.push_str(",\"output\":");
+            push_optional_json_string(&mut output, registry_output(entry));
             output.push_str(",\"output_variable\":");
-            push_json_string(&mut output, spec.output_variable);
+            push_optional_json_string(&mut output, entry.output_variable);
+            output.push_str(",\"outputs\":");
+            append_string_array(&mut output, entry.output_names);
+            output.push_str(",\"runtime_symbol\":");
+            push_optional_json_string(&mut output, entry.runtime_symbol);
+            output.push_str(",\"implementation_path\":");
+            push_optional_json_string(&mut output, entry.implementation_path);
+            output.push_str(",\"runtime_label\":");
+            push_optional_json_string(&mut output, registry_runtime_label(entry));
             output.push_str(",\"inputs\":");
-            append_string_array(&mut output, spec.inputs);
+            append_string_array(&mut output, entry.input_names);
             output.push('}');
         }
         output.push_str("],\"safety_notice\":");
         push_json_string(&mut output, safety_notice());
         output.push_str("}\n");
-        print!("{output}");
+        write_stdout(&output);
     } else {
-        println!("command={}", context.command());
+        let mut output = String::new();
+        writeln!(output, "command={}", context.command()).expect("writing to String cannot fail");
         if let Some(migration_command) = context.migration_command() {
-            println!("deprecated_alias=true");
-            println!("migration_command={migration_command}");
+            output.push_str("deprecated_alias=true\n");
+            writeln!(output, "migration_command={migration_command}")
+                .expect("writing to String cannot fail");
         }
-        println!("validation_status={}", validation_status());
-        println!("safety_notice={}", safety_notice());
-        for spec in formula_specs() {
-            let registry_entry = registry_entry_for_spec(spec);
-            let formula_id = registry_entry
-                .map(|entry| entry.formula_id)
-                .unwrap_or(spec.id);
-            let legacy_formula_id = registry_entry
-                .and_then(|entry| entry.legacy_formula_id)
-                .unwrap_or(spec.id);
-            println!(
-                "{}\tlegacy_alias={}\t{}\t{}\t{}",
-                formula_id,
-                legacy_formula_id,
-                spec.runtime_symbol,
-                spec.output_variable,
-                spec.inputs.join(",")
-            );
+        writeln!(output, "count={}", entries.len()).expect("writing to String cannot fail");
+        writeln!(
+            output,
+            "registry_formula_count={}",
+            generated_formula_registry::FORMULA_COUNT
+        )
+        .expect("writing to String cannot fail");
+        writeln!(
+            output,
+            "registry_schema_version={}",
+            registry_schema_version()
+        )
+        .expect("writing to String cannot fail");
+        writeln!(output, "source_hash={}", registry_source_hash())
+            .expect("writing to String cannot fail");
+        if let Some(family) = filters.family.as_deref() {
+            writeln!(output, "filter_family={family}").expect("writing to String cannot fail");
         }
+        if let Some(status) = filters.status.as_deref() {
+            writeln!(output, "filter_status={status}").expect("writing to String cannot fail");
+        }
+        if filters.executable {
+            output.push_str("filter_executable=true\n");
+        }
+        writeln!(output, "validation_status={}", validation_status())
+            .expect("writing to String cannot fail");
+        writeln!(output, "safety_notice={}", safety_notice())
+            .expect("writing to String cannot fail");
+        output.push_str("formula_id\tstatus\texecution_policy\tfamily\toutput\truntime\n");
+        for entry in entries {
+            writeln!(
+                output,
+                "{}\t{}\t{}\t{}\t{}\t{}",
+                entry.formula_id,
+                entry.status,
+                entry.execution_policy,
+                registry_family(entry),
+                registry_output(entry).unwrap_or("-"),
+                registry_runtime_label(entry).unwrap_or("-")
+            )
+            .expect("writing to String cannot fail");
+        }
+        write_stdout(&output);
     }
 }
 
@@ -1139,7 +1339,7 @@ fn output_self_check(report: &SelfCheckReport, json: bool) {
 fn print_help() {
     println!(
         "AeroCodex Beta 1 concept CLI\n\n\
-usage:\n  aerocodex formula list [--json]\n  aerocodex formula describe <formula-id> [--json]\n  aerocodex formula run <formula-id> name=value ... [--json]\n  aerocodex version [--json]\n  aerocodex self-check [--json]\n\n\
+usage:\n  aerocodex formula list [--family <family>] [--status <status>] [--executable] [--json]\n  aerocodex formula describe <formula-id> [--json]\n  aerocodex formula run <formula-id> name=value ... [--json]\n  aerocodex version [--json]\n  aerocodex self-check [--json]\n\n\
 legacy aliases:\n  aerocodex formulas [--json]        -> aerocodex formula list\n  aerocodex describe <formula-id> [--json]\n                                      -> aerocodex formula describe <formula-id>\n  aerocodex run <formula-id> name=value ... [--json]\n                                      -> aerocodex formula run <formula-id> name=value ...\n\n\
 `--json` may appear before or after the command/subcommand.\n\n\
 The Beta 1 concept exposes exactly ten governed M00 canonical-unit executable concept formulas. The checked-in Formula Registry may also describe inventory-only formulas; registry inclusion is not formula validation, status promotion, certification, execution approval, readiness approval, or regulatory approval.\n\
@@ -1197,16 +1397,13 @@ fn execute_formula_namespace(arguments: &[String], json: bool) -> Result<(), App
             Ok(())
         }
         "list" => {
-            if arguments.len() != 1 {
-                return Err(AppError::Usage(
-                    "formula list does not accept positional arguments".to_string(),
-                ));
-            }
+            let filters = parse_formula_list_filters(&arguments[1..])?;
             output_formula_list(
                 json,
                 CommandContext::Namespace {
-                    command: "formula list",
+                    command: "formula_list",
                 },
+                &filters,
             );
             Ok(())
         }
@@ -1274,17 +1471,14 @@ fn execute(raw_arguments: &[String]) -> Result<(), AppError> {
         }
         "formula" => execute_formula_namespace(&arguments[1..], json),
         "formulas" => {
-            if arguments.len() != 1 {
-                return Err(AppError::Usage(
-                    "formulas does not accept positional arguments".to_string(),
-                ));
-            }
+            let filters = parse_formula_list_filters(&arguments[1..])?;
             output_formula_list(
                 json,
                 CommandContext::LegacyAlias {
                     command: "formulas",
                     migration_command: "aerocodex formula list",
                 },
+                &filters,
             );
             Ok(())
         }
