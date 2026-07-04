@@ -35,6 +35,35 @@ fn stderr(output: &Output) -> String {
     String::from_utf8(output.stderr.clone()).expect("stderr should be valid text")
 }
 
+fn assert_json_semantics_with_python(text: &str, script: &str) {
+    let mut parser = Command::new("python3")
+        .arg("-c")
+        .arg(script)
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .expect("python3 should be available for CLI JSON semantic checks");
+    {
+        use std::io::Write as _;
+        parser
+            .stdin
+            .as_mut()
+            .expect("parser stdin should be open")
+            .write_all(text.as_bytes())
+            .expect("JSON text should be writable to parser stdin");
+    }
+    let parsed = parser
+        .wait_with_output()
+        .expect("python3 JSON semantic parser should exit");
+    assert!(
+        parsed.status.success(),
+        "JSON semantic check failed; stdout={} stderr={} json={text}",
+        String::from_utf8_lossy(&parsed.stdout),
+        String::from_utf8_lossy(&parsed.stderr)
+    );
+}
+
 fn assert_success_json_envelope(text: &str, command: &str) {
     assert!(
         text.starts_with("{\"ok\":true"),
@@ -245,6 +274,91 @@ fn legacy_describe_json_preserves_alias_traceability() {
 }
 
 #[test]
+fn formula_status_report_human_is_registry_backed_and_honest() {
+    let output = run(&["formula", "status-report"]);
+    assert!(output.status.success(), "{}", stderr(&output));
+    let text = stdout(&output);
+    for term in [
+        "Formula status report",
+        "command=formula status-report",
+        "registry_formula_count=152",
+        "total_formula_count=152",
+        "status.research_required=152",
+        "execution_policy.blocked=152",
+        "blocked_formula_count=152",
+        "preliminary_only_formula_count=0",
+        "executable_formula_count=0",
+        "m07_candidate_count=0",
+        "promotion_candidate_count=0",
+        "by_family.life=50",
+        "safety_notice=",
+    ] {
+        assert!(text.contains(term), "missing `{term}` in:\n{text}");
+    }
+}
+
+#[test]
+fn formula_status_report_json_includes_consistent_registry_counts() {
+    let output = run(&["formula", "status-report", "--json"]);
+    assert!(output.status.success(), "{}", stderr(&output));
+    let text = stdout(&output);
+    assert_success_json_envelope(&text, "formula status-report");
+    assert_json_semantics_with_python(
+        &text,
+        r#"
+import json, sys
+report = json.load(sys.stdin)
+assert report["ok"] is True
+assert report["command"] == "formula status-report"
+assert report["error"] is None
+assert isinstance(report["warnings"], list)
+assert report["registry_schema_version"] == "aerocodex.formula_registry.v1"
+assert report["registry_formula_count"] == 152
+assert report["total_formula_count"] == 152
+assert report["inventory_formula_count"] == 152
+assert report["total_formula_count"] == sum(report["counts_by_status"].values())
+assert report["total_formula_count"] == sum(report["counts_by_execution_policy"].values())
+assert report["execution_policy_bucket_total"] == report["total_formula_count"]
+assert report["counts_by_status"] == {"research_required": 152}
+assert report["counts_by_execution_policy"] == {"blocked": 152}
+assert report["blocked_formula_count"] == 152
+assert report["normal_executable_count"] == 0
+assert report["executable_formula_count"] == 0
+assert report["preliminary_only_formula_count"] == 0
+assert report["m07_candidate_count"] == 0
+assert report["promotion_candidate_count"] == 0
+for category in ["blocked_formulas", "normal_executable_formulas", "preliminary_only_formulas", "m07_candidates", "promotion_candidates"]:
+    assert category in report["categories"]
+assert report["categories"]["blocked_formulas"]["count"] == 152
+assert report["categories"]["m07_candidates"]["count"] == 0
+assert report["categories"]["promotion_candidates"]["count"] == 0
+assert report["by_family"]["life"] == 50
+assert "safety_notice" in report and report["safety_notice"]
+"#,
+    );
+    for term in [
+        "\"registry_schema_version\":\"aerocodex.formula_registry.v1\"",
+        "\"source_hash\":\"sha256:b5a16a99f20a0bea420b6c3842894c316e958a8934b34556bfef2e1799586c3e\"",
+        "\"registry_formula_count\":152",
+        "\"total_formula_count\":152",
+        "\"counts_by_status\":{\"research_required\":152}",
+        "\"counts_by_execution_policy\":{\"blocked\":152}",
+        "\"blocked_formula_count\":152",
+        "\"preliminary_only_formula_count\":0",
+        "\"executable_formula_count\":0",
+        "\"m07_candidate_count\":0",
+        "\"promotion_candidate_count\":0",
+        "\"by_family\":{",
+        "\"life\":50",
+        "\"categories\":{",
+        "\"m07_candidates\":{\"count\":0",
+        "\"promotion_candidates\":{\"count\":0",
+    ] {
+        assert!(text.contains(term), "missing `{term}` in {text}");
+    }
+}
+
+#[test]
 fn formula_help_prioritizes_namespace_and_lists_legacy_aliases() {
     let output = run(&["--help"]);
     assert!(output.status.success(), "{}", stderr(&output));
@@ -260,6 +374,7 @@ fn formula_help_prioritizes_namespace_and_lists_legacy_aliases() {
         "help should show formula namespace first"
     );
     assert!(text.contains("aerocodex formula describe <formula-id> [--json]"));
+    assert!(text.contains("aerocodex formula status-report [--json]"));
     assert!(
         text.contains("aerocodex formula run <formula-id> [--preliminary] name=value ... [--json]")
     );

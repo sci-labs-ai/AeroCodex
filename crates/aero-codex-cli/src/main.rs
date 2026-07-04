@@ -814,6 +814,7 @@ fn json_command_for_arguments(arguments: &[String]) -> Option<&'static str> {
     match (arguments.next()?, arguments.next()) {
         ("formula", Some("list")) => Some("formula_list"),
         ("formula", Some("describe")) => Some("formula describe"),
+        ("formula", Some("status-report")) => Some("formula status-report"),
         ("formula", Some("run")) => Some("formula run"),
         ("formulas", _) => Some("formulas"),
         ("describe", _) => Some("describe"),
@@ -1090,6 +1091,304 @@ fn append_formula_list_filters_json(output: &mut String, filters: &FormulaListFi
     write!(output, ",\"executable\":{}", filters.executable)
         .expect("writing to String cannot fail");
     output.push('}');
+}
+
+#[derive(Debug)]
+struct FormulaStatusReport {
+    total_formula_count: usize,
+    counts_by_status: BTreeMap<&'static str, usize>,
+    counts_by_execution_policy: BTreeMap<&'static str, usize>,
+    counts_by_family: BTreeMap<&'static str, usize>,
+    normal_executable_count: usize,
+    preliminary_only_formula_count: usize,
+    blocked_formula_count: usize,
+    m07_candidate_count: usize,
+    promotion_candidate_count: usize,
+}
+
+impl FormulaStatusReport {
+    fn from_registry() -> Self {
+        let mut report = Self {
+            total_formula_count: generated_formula_registry::FORMULA_REGISTRY.len(),
+            counts_by_status: BTreeMap::new(),
+            counts_by_execution_policy: BTreeMap::new(),
+            counts_by_family: BTreeMap::new(),
+            normal_executable_count: 0,
+            preliminary_only_formula_count: 0,
+            blocked_formula_count: 0,
+            m07_candidate_count: 0,
+            promotion_candidate_count: 0,
+        };
+
+        for entry in generated_formula_registry::FORMULA_REGISTRY {
+            *report.counts_by_status.entry(entry.status).or_insert(0) += 1;
+            *report
+                .counts_by_execution_policy
+                .entry(entry.execution_policy)
+                .or_insert(0) += 1;
+            *report
+                .counts_by_family
+                .entry(registry_family(entry))
+                .or_insert(0) += 1;
+
+            match entry.execution_policy {
+                "normal_research" | "publication_supporting" => {
+                    report.normal_executable_count += 1;
+                }
+                "preliminary_flag_required" => {
+                    report.preliminary_only_formula_count += 1;
+                }
+                _ => {
+                    report.blocked_formula_count += 1;
+                }
+            }
+
+            if is_m07_candidate(entry) {
+                report.m07_candidate_count += 1;
+            }
+            if is_promotion_candidate(entry) {
+                report.promotion_candidate_count += 1;
+            }
+        }
+
+        report
+    }
+
+    fn execution_policy_bucket_total(&self) -> usize {
+        self.counts_by_execution_policy.values().sum()
+    }
+}
+
+fn is_m07_candidate(entry: &generated_formula_registry::FormulaRegistryEntry) -> bool {
+    entry.formula_id.starts_with("m07.")
+        || entry.family == "m07"
+        || entry.family.starts_with("m07.")
+        || matches!(entry.legacy_formula_id, Some(id) if id.starts_with("formula_vault.m07."))
+        || matches!(entry.source_formula_id, Some(id) if id.starts_with("formula_vault.m07."))
+}
+
+fn is_promotion_candidate(entry: &generated_formula_registry::FormulaRegistryEntry) -> bool {
+    !is_m07_candidate(entry)
+        && matches!(entry.execution_policy, "preliminary_flag_required")
+        && matches!(entry.status, "equation_traceable")
+}
+
+fn append_count_map(output: &mut String, counts: &BTreeMap<&'static str, usize>) {
+    output.push('{');
+    for (index, (key, count)) in counts.iter().enumerate() {
+        if index > 0 {
+            output.push(',');
+        }
+        push_json_string(output, key);
+        write!(output, ":{count}").expect("writing to String cannot fail");
+    }
+    output.push('}');
+}
+
+fn append_formula_id_examples<F>(output: &mut String, mut predicate: F)
+where
+    F: FnMut(&generated_formula_registry::FormulaRegistryEntry) -> bool,
+{
+    output.push('[');
+    let mut written = 0usize;
+    for entry in generated_formula_registry::FORMULA_REGISTRY {
+        if !predicate(entry) {
+            continue;
+        }
+        if written > 0 {
+            output.push(',');
+        }
+        push_json_string(output, entry.formula_id);
+        written += 1;
+        if written == 5 {
+            break;
+        }
+    }
+    output.push(']');
+}
+
+fn append_status_report_categories_json(output: &mut String, report: &FormulaStatusReport) {
+    output.push_str(",\"categories\":{");
+    write!(
+        output,
+        "\"blocked_formulas\":{{\"count\":{},\"examples\":",
+        report.blocked_formula_count
+    )
+    .expect("writing to String cannot fail");
+    append_formula_id_examples(output, |entry| entry.execution_policy == "blocked");
+    write!(
+        output,
+        "}},\"normal_executable_formulas\":{{\"count\":{},\"examples\":",
+        report.normal_executable_count
+    )
+    .expect("writing to String cannot fail");
+    append_formula_id_examples(output, |entry| {
+        matches!(
+            entry.execution_policy,
+            "normal_research" | "publication_supporting"
+        )
+    });
+    write!(
+        output,
+        "}},\"preliminary_only_formulas\":{{\"count\":{},\"examples\":",
+        report.preliminary_only_formula_count
+    )
+    .expect("writing to String cannot fail");
+    append_formula_id_examples(output, |entry| {
+        entry.execution_policy == "preliminary_flag_required"
+    });
+    write!(
+        output,
+        "}},\"m07_candidates\":{{\"count\":{},\"examples\":",
+        report.m07_candidate_count
+    )
+    .expect("writing to String cannot fail");
+    append_formula_id_examples(output, is_m07_candidate);
+    write!(
+        output,
+        "}},\"promotion_candidates\":{{\"count\":{},\"definition\":",
+        report.promotion_candidate_count
+    )
+    .expect("writing to String cannot fail");
+    push_json_string(
+        output,
+        "non-M07 equation_traceable formulas with preliminary_flag_required execution policy",
+    );
+    output.push_str(",\"examples\":");
+    append_formula_id_examples(output, is_promotion_candidate);
+    output.push_str("}}");
+}
+
+fn output_formula_status_report(json: bool) {
+    let report = FormulaStatusReport::from_registry();
+
+    if json {
+        let mut output = String::from("{\"ok\":true,\"command\":\"formula status-report\"");
+        write!(
+            output,
+            ",\"registry_formula_count\":{},\"total_formula_count\":{},\"inventory_formula_count\":{}",
+            generated_formula_registry::FORMULA_COUNT,
+            report.total_formula_count,
+            report.total_formula_count
+        )
+        .expect("writing to String cannot fail");
+        output.push_str(",\"counts_by_status\":");
+        append_count_map(&mut output, &report.counts_by_status);
+        output.push_str(",\"counts_by_execution_policy\":");
+        append_count_map(&mut output, &report.counts_by_execution_policy);
+        output.push_str(",\"by_family\":");
+        append_count_map(&mut output, &report.counts_by_family);
+        write!(
+            output,
+            ",\"execution_policy_bucket_total\":{},\"normal_executable_count\":{},\"executable_formula_count\":{},\"preliminary_only_formula_count\":{},\"blocked_formula_count\":{},\"m07_candidate_count\":{},\"promotion_candidate_count\":{}",
+            report.execution_policy_bucket_total(),
+            report.normal_executable_count,
+            report.normal_executable_count,
+            report.preliminary_only_formula_count,
+            report.blocked_formula_count,
+            report.m07_candidate_count,
+            report.promotion_candidate_count
+        )
+        .expect("writing to String cannot fail");
+        output.push_str(",\"registry_schema_version\":");
+        push_json_string(&mut output, registry_schema_version());
+        output.push_str(",\"source_hash\":");
+        push_json_string(&mut output, registry_source_hash());
+        output.push_str(",\"validation_status\":");
+        push_json_string(&mut output, validation_status());
+        append_status_report_categories_json(&mut output, &report);
+        output.push_str(",\"warnings\":");
+        append_default_json_warnings(&mut output);
+        output.push_str(",\"safety_notice\":");
+        push_json_string(&mut output, safety_notice());
+        output.push_str(",\"error\":null}\n");
+        write_stdout(&output);
+    } else {
+        let mut output = String::new();
+        output.push_str("Formula status report\n");
+        output.push_str("command=formula status-report\n");
+        writeln!(
+            output,
+            "registry_formula_count={}",
+            generated_formula_registry::FORMULA_COUNT
+        )
+        .expect("writing to String cannot fail");
+        writeln!(output, "total_formula_count={}", report.total_formula_count)
+            .expect("writing to String cannot fail");
+        writeln!(
+            output,
+            "inventory_formula_count={}",
+            report.total_formula_count
+        )
+        .expect("writing to String cannot fail");
+        writeln!(
+            output,
+            "normal_executable_count={}",
+            report.normal_executable_count
+        )
+        .expect("writing to String cannot fail");
+        writeln!(
+            output,
+            "executable_formula_count={}",
+            report.normal_executable_count
+        )
+        .expect("writing to String cannot fail");
+        writeln!(
+            output,
+            "preliminary_only_formula_count={}",
+            report.preliminary_only_formula_count
+        )
+        .expect("writing to String cannot fail");
+        writeln!(
+            output,
+            "blocked_formula_count={}",
+            report.blocked_formula_count
+        )
+        .expect("writing to String cannot fail");
+        writeln!(output, "m07_candidate_count={}", report.m07_candidate_count)
+            .expect("writing to String cannot fail");
+        writeln!(
+            output,
+            "promotion_candidate_count={}",
+            report.promotion_candidate_count
+        )
+        .expect("writing to String cannot fail");
+        writeln!(
+            output,
+            "execution_policy_bucket_total={}",
+            report.execution_policy_bucket_total()
+        )
+        .expect("writing to String cannot fail");
+        output.push_str("counts_by_status:\n");
+        for (status, count) in &report.counts_by_status {
+            writeln!(output, "status.{status}={count}").expect("writing to String cannot fail");
+        }
+        output.push_str("counts_by_execution_policy:\n");
+        for (policy, count) in &report.counts_by_execution_policy {
+            writeln!(output, "execution_policy.{policy}={count}")
+                .expect("writing to String cannot fail");
+        }
+        output.push_str("by_family:\n");
+        for (family, count) in &report.counts_by_family {
+            writeln!(output, "by_family.{family}={count}").expect("writing to String cannot fail");
+        }
+        writeln!(
+            output,
+            "registry_schema_version={}",
+            registry_schema_version()
+        )
+        .expect("writing to String cannot fail");
+        writeln!(output, "source_hash={}", registry_source_hash())
+            .expect("writing to String cannot fail");
+        writeln!(output, "validation_status={}", validation_status())
+            .expect("writing to String cannot fail");
+        output.push_str(
+            "status_note=blocked formulas are honest inventory entries, not command errors\n",
+        );
+        writeln!(output, "safety_notice={}", safety_notice())
+            .expect("writing to String cannot fail");
+        write_stdout(&output);
+    }
 }
 
 fn write_stdout(output: &str) {
@@ -1850,7 +2149,7 @@ fn output_self_check(report: &SelfCheckReport, json: bool) {
 fn print_help() {
     println!(
         "AeroCodex Beta 1 concept CLI\n\n\
-usage:\n  aerocodex formula list [--family <family>] [--status <status>] [--executable] [--json]\n  aerocodex formula describe <formula-id> [--json]\n  aerocodex formula run <formula-id> [--preliminary] name=value ... [--json]\n  aerocodex version [--json]\n  aerocodex self-check [--json]\n\n\
+usage:\n  aerocodex formula list [--family <family>] [--status <status>] [--executable] [--json]\n  aerocodex formula describe <formula-id> [--json]\n  aerocodex formula status-report [--json]\n  aerocodex formula run <formula-id> [--preliminary] name=value ... [--json]\n  aerocodex version [--json]\n  aerocodex self-check [--json]\n\n\
 legacy aliases:\n  aerocodex formulas [--json]        -> aerocodex formula list\n  aerocodex describe <formula-id> [--json]\n                                      -> aerocodex formula describe <formula-id>\n  aerocodex run <formula-id> [--preliminary] name=value ... [--json]\n                                      -> aerocodex formula run <formula-id> [--preliminary] name=value ...\n\n\
 `--json` may appear before or after the command/subcommand.\n\n\
 The Beta 1 concept includes ten governed M00 canonical-unit implemented concept formulas behind the RR-025 status gate. The checked-in Formula Registry may also describe inventory-only formulas; registry inclusion is not formula validation, status promotion, certification, execution approval, readiness approval, or regulatory approval.\n\
@@ -1897,7 +2196,7 @@ fn execute_run(
 fn execute_formula_namespace(arguments: &[String], json: bool) -> Result<(), AppError> {
     let Some(subcommand) = arguments.first().map(String::as_str) else {
         return Err(AppError::Usage(
-            "formula requires a subcommand: list, describe, or run".to_string(),
+            "formula requires a subcommand: list, describe, status-report, or run".to_string(),
         ));
     };
 
@@ -1920,6 +2219,15 @@ fn execute_formula_namespace(arguments: &[String], json: bool) -> Result<(), App
                 },
                 &filters,
             );
+            Ok(())
+        }
+        "status-report" => {
+            if arguments.len() != 1 {
+                return Err(AppError::Usage(
+                    "formula status-report does not accept positional arguments".to_string(),
+                ));
+            }
+            output_formula_status_report(json);
             Ok(())
         }
         "describe" => {

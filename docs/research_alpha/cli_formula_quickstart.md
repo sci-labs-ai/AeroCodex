@@ -5,6 +5,7 @@ The RR-019 CLI namespace is:
 ```bash
 aerocodex formula list [--json]
 aerocodex formula describe <formula-id> [--json]
+aerocodex formula status-report [--json]
 aerocodex formula run <formula-id> [--preliminary] name=value ... [--json]
 ```
 
@@ -32,6 +33,20 @@ Legacy compatibility smoke:
 ```bash
 cargo run -p aero-codex-cli -- formulas --json
 ```
+
+## Formula status report
+
+RR-026 adds a read-only registry-backed status report for humans and agents:
+
+```bash
+cargo run -p aero-codex-cli -- formula status-report
+cargo run -p aero-codex-cli -- formula status-report --json > /tmp/status_report.json
+python3 -m json.tool /tmp/status_report.json >/dev/null
+```
+
+The report summarizes the checked-in Formula Registry inventory without executing formulas or changing statuses. Human and JSON output include the total registry formula count, counts by status, counts by execution policy, by-family counts, normal executable count, preliminary-only count, blocked count, M07 candidate count, promotion candidate count, registry schema version, source hash, validation status, warnings, and the safety notice.
+
+Blocked formulas are honest inventory entries rather than command errors. If the current registry has zero M07 candidates, zero promotion candidates, or zero default executable formulas, the report prints zero counts instead of fabricating examples or promoting rows.
 
 ## Describe formulas
 
