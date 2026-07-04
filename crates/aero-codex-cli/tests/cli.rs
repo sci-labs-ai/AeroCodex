@@ -260,11 +260,40 @@ fn formula_help_prioritizes_namespace_and_lists_legacy_aliases() {
         "help should show formula namespace first"
     );
     assert!(text.contains("aerocodex formula describe <formula-id> [--json]"));
-    assert!(text.contains("aerocodex formula run <formula-id> name=value ... [--json]"));
+    assert!(
+        text.contains("aerocodex formula run <formula-id> [--preliminary] name=value ... [--json]")
+    );
+}
+
+fn assert_execution_gate_blocked_json(
+    text: &str,
+    command: &str,
+    formula_id: &str,
+    code: &str,
+    status: &str,
+    execution_policy: &str,
+) {
+    assert_error_json_envelope(text, command, code);
+    assert!(
+        text.contains(&format!("\"formula_id\":\"{formula_id}\"")),
+        "missing gated formula id `{formula_id}` in {text}"
+    );
+    assert!(
+        text.contains(&format!("\"status\":\"{status}\"")),
+        "missing status `{status}` in {text}"
+    );
+    assert!(
+        text.contains(&format!("\"execution_policy\":\"{execution_policy}\"")),
+        "missing execution_policy `{execution_policy}` in {text}"
+    );
+    assert!(
+        !text.contains("\"error\":null"),
+        "blocked execution must not emit error=null: {text}"
+    );
 }
 
 #[test]
-fn formula_run_for_non_executable_registry_row_fails_closed() {
+fn execution_gate_blocks_research_required_registry_row_json() {
     let output = run(&[
         "formula",
         "run",
@@ -273,14 +302,18 @@ fn formula_run_for_non_executable_registry_row_fails_closed() {
     ]);
     assert_eq!(output.status.code(), Some(4));
     let text = stderr(&output);
-    assert_error_json_envelope(&text, "formula run", "execution_blocked_by_status");
-    assert!(text.contains("\"code\":\"execution_blocked_by_status\""));
-    assert!(text.contains("\"execution_policy\":\"blocked\""));
-    assert!(text.contains("\"safety_notice\":"));
+    assert_execution_gate_blocked_json(
+        &text,
+        "formula run",
+        "aerodynamics.coefficients.drag_coefficient",
+        "execution_blocked_by_status",
+        "research_required",
+        "blocked",
+    );
 }
 
 #[test]
-fn formula_run_emits_deterministic_machine_readable_result() {
+fn execution_gate_blocks_registry_backed_m00_default_run_before_dispatch() {
     let output = run(&[
         "formula",
         "run",
@@ -289,19 +322,24 @@ fn formula_run_emits_deterministic_machine_readable_result() {
         "distance_unit=7",
         "--json",
     ]);
-    assert!(output.status.success(), "{}", stderr(&output));
-    let text = stdout(&output);
-    assert_success_json_envelope(&text, "formula run");
-    assert!(text.contains("\"command\":\"formula run\""));
-    assert!(text.contains("\"canonical_formula_id\":\"m00.canonical.distance_to_canonical\""));
-    assert!(text
-        .contains("\"legacy_formula_id\":\"formula_vault.m00.canonical.distance_to_canonical\""));
-    assert!(text.contains("\"output_variable\":\"canonical_distance\""));
-    assert!(text.contains("\"value\":-6"));
+    assert_eq!(output.status.code(), Some(4));
+    let text = stderr(&output);
+    assert_execution_gate_blocked_json(
+        &text,
+        "formula run",
+        "m00.canonical.distance_to_canonical",
+        "execution_blocked_by_status",
+        "research_required",
+        "blocked",
+    );
+    assert!(
+        !text.contains("\"value\":"),
+        "status gate must run before dispatch: {text}"
+    );
 }
 
 #[test]
-fn invalid_scale_has_stable_error_code_and_exit_status() {
+fn execution_gate_blocks_legacy_alias_through_same_policy() {
     let output = run(&[
         "run",
         "formula_vault.m00.canonical.distance_to_canonical",
@@ -311,10 +349,68 @@ fn invalid_scale_has_stable_error_code_and_exit_status() {
     ]);
     assert_eq!(output.status.code(), Some(4));
     let text = stderr(&output);
-    assert_error_json_envelope(&text, "run", "non_positive_input");
-    assert!(text.contains("\"code\":\"non_positive_input\""));
-    assert!(text.contains("\"validation_status\":\"research_required\""));
-    assert!(text.contains("\"safety_notice\":"));
+    assert_execution_gate_blocked_json(
+        &text,
+        "run",
+        "m00.canonical.distance_to_canonical",
+        "execution_blocked_by_status",
+        "research_required",
+        "blocked",
+    );
+    assert!(text.contains("\"code\":\"execution_blocked_by_status\""));
+    assert!(
+        !text.contains("non_positive_input"),
+        "status gate must run before equation/domain dispatch: {text}"
+    );
+}
+
+#[test]
+fn execution_gate_blocks_task_card_angle_before_flag_parser() {
+    let output = run(&[
+        "formula",
+        "run",
+        "m00.angle.deg_to_rad",
+        "--degrees",
+        "180",
+        "--json",
+    ]);
+    assert_eq!(output.status.code(), Some(4));
+    let text = stderr(&output);
+    assert_execution_gate_blocked_json(
+        &text,
+        "formula run",
+        "m00.angle.deg_to_rad",
+        "execution_blocked_by_status",
+        "research_required",
+        "blocked",
+    );
+    assert!(
+        !text.contains("invalid_assignment") && !text.contains("usage_error"),
+        "RR-025 gate must fire before unsupported RR-022/RR-023 parser or dispatch paths: {text}"
+    );
+}
+
+#[test]
+fn execution_gate_preliminary_flag_does_not_bypass_research_required() {
+    let output = run(&[
+        "formula",
+        "run",
+        "m00.canonical.distance_to_canonical",
+        "--preliminary",
+        "distance=-42",
+        "distance_unit=7",
+        "--json",
+    ]);
+    assert_eq!(output.status.code(), Some(4));
+    let text = stderr(&output);
+    assert_execution_gate_blocked_json(
+        &text,
+        "formula run",
+        "m00.canonical.distance_to_canonical",
+        "execution_blocked_by_status",
+        "research_required",
+        "blocked",
+    );
 }
 
 #[test]

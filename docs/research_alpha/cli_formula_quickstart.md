@@ -5,7 +5,7 @@ The RR-019 CLI namespace is:
 ```bash
 aerocodex formula list [--json]
 aerocodex formula describe <formula-id> [--json]
-aerocodex formula run <formula-id> name=value ... [--json]
+aerocodex formula run <formula-id> [--preliminary] name=value ... [--json]
 ```
 
 Use this namespace for new scripts. The older Beta 1 aliases remain available for compatibility:
@@ -13,7 +13,7 @@ Use this namespace for new scripts. The older Beta 1 aliases remain available fo
 ```bash
 aerocodex formulas [--json]
 aerocodex describe <formula-id> [--json]
-aerocodex run <formula-id> name=value ... [--json]
+aerocodex run <formula-id> [--preliminary] name=value ... [--json]
 ```
 
 When a legacy alias emits successful JSON, it includes `deprecated_alias=true` and a `migration_command` field. The alias behavior is intentionally migration-only; it does not promote formula status and does not certify or approve formula execution.
@@ -25,7 +25,7 @@ cargo run -p aero-codex-cli -- formula list
 cargo run -p aero-codex-cli -- formula list --json
 ```
 
-The list command reports the ten bounded Beta 1 executable concept formulas and includes `validation_status=research_required` plus the safety notice. JSON output uses canonical Formula Registry IDs while preserving the legacy ID in `legacy_formula_id`.
+The list command reports the registry-backed formula inventory, including the bounded M00 concept entries, and includes `validation_status=research_required` plus the safety notice. JSON output uses canonical Formula Registry IDs while preserving the legacy ID in `legacy_formula_id`; list output is inventory metadata and does not make a row executable.
 
 Legacy compatibility smoke:
 
@@ -66,15 +66,27 @@ Such descriptions are inventory/status metadata only. Registry inclusion is not 
 
 ## Run formulas
 
-Use the namespaced form for executable Beta 1 formulas:
+`formula run` is now guarded by the RR-025 public-alpha execution status gate. The gate runs after formula ID resolution and before normal input parsing or runtime dispatch.
+
+Default public-alpha execution requires a registry status of `implementation_verified` or `reference_validated`. The current checked-in registry snapshot remains lower-status inventory: formulas are listable and describable, but `research_required` rows fail closed with `execution_blocked_by_status` and do not run through the public-alpha CLI.
+
+A representative blocked run:
 
 ```bash
 cargo run -p aero-codex-cli -- formula run \
-  m00.canonical.distance_to_canonical \
-  distance=-42 distance_unit=7 --json
+  aerodynamics.coefficients.drag_coefficient --json
 ```
 
-The legacy run alias remains accepted during migration:
+The task-card smoke command also remains blocked by the status gate before any unsupported flag-style parser or M00 angle dispatch is added:
+
+```bash
+cargo run -p aero-codex-cli -- formula run \
+  m00.angle.deg_to_rad --degrees 180 --json
+```
+
+`equation_traceable` rows, when present, require `--preliminary` to pass the RR-025 status gate. Passing that gate does not create RR-022 flag-style input parsing or RR-023 runtime dispatch; unsupported parser or dispatch paths still fail separately. `research_required` rows remain blocked even with `--preliminary`, and M07 candidates remain blocked until a later governed promotion task.
+
+The legacy run alias remains accepted during migration, but it routes through the same gate and cannot bypass status policy:
 
 ```bash
 cargo run -p aero-codex-cli -- run \
@@ -82,7 +94,7 @@ cargo run -p aero-codex-cli -- run \
   distance=-42 distance_unit=7 --json
 ```
 
-Rows that are present in the Formula Registry but do not map to the bounded executable Beta 1 surface fail closed for `formula run` with `execution_blocked_by_status` rather than dispatching placeholder or future work.
+Rows that are present in the Formula Registry but below the execution threshold fail closed for `formula run` with a stable JSON error envelope rather than dispatching placeholder or future work.
 
 ## Safety and status posture
 
