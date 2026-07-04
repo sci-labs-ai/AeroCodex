@@ -122,7 +122,7 @@ fn version_json_exposes_bounded_release_identity() {
     assert!(text.contains("\"build_commit\":"));
     assert!(text.contains("\"build_target\":"));
     assert!(text.contains("\"build_profile\":"));
-    assert!(text.contains("\"supported_formula_count\":10"));
+    assert!(text.contains("\"supported_formula_count\":12"));
     assert!(text.contains("\"registry_formula_count\":152"));
     assert!(text.contains("\"validation_status\":\"research_required\""));
     assert!(text.contains("\"safety_notice\":"));
@@ -589,6 +589,56 @@ fn formula_run_invalid_flag_number_fails_closed_with_json_error() {
     let text = stderr(&output);
     assert_error_json_envelope(&text, "formula run", "invalid_number");
     assert!(text.contains("input `degrees` has invalid f64 value `not-a-number`"));
+}
+
+#[test]
+fn rr023_m00_angle_run_accepts_preliminary_flag_but_preserves_status_gate() {
+    let output = run(&[
+        "formula",
+        "run",
+        "m00.angle.deg_to_rad",
+        "--degrees",
+        "180",
+        "--preliminary",
+        "--json",
+    ]);
+    assert_eq!(output.status.code(), Some(4));
+    let text = stderr(&output);
+    assert_execution_gate_blocked_json(
+        &text,
+        "formula run",
+        "m00.angle.deg_to_rad",
+        "execution_blocked_by_status",
+        "research_required",
+        "blocked",
+    );
+    assert!(
+        !text.contains("\"value\":"),
+        "RR-023 dispatch must stay behind the existing RR-025 status gate while M00 angle rows remain research_required: {text}"
+    );
+}
+
+#[test]
+fn rr023_m00_angle_legacy_alias_is_mapped_to_readable_registry_id() {
+    let output = run(&[
+        "formula",
+        "run",
+        "formula_vault.m00.angle.rad2deg",
+        "--radians",
+        "3.141592653589793",
+        "--preliminary",
+        "--json",
+    ]);
+    assert_eq!(output.status.code(), Some(4));
+    let text = stderr(&output);
+    assert_execution_gate_blocked_json(
+        &text,
+        "formula run",
+        "m00.angle.rad_to_deg",
+        "execution_blocked_by_status",
+        "research_required",
+        "blocked",
+    );
 }
 
 #[test]

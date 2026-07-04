@@ -1,15 +1,16 @@
 #![forbid(unsafe_code)]
 //! User-facing AeroCodex Beta 1 concept command-line interface.
 //!
-//! This binary exposes a deliberately bounded, machine-readable vertical slice
-//! of the already governed M00 canonical-unit conversion family. It is research
+//! This binary exposes deliberately bounded, machine-readable vertical slices
+//! of the already governed M00 canonical-unit and angle-conversion families. It is research
 //! and preliminary-design software, not operational or certified software.
 
 use aero_codex_astrodynamics::{
     m00_canonical_mu_from_units, m00_canonical_speed_unit_from_du_tu,
     m00_canonical_speed_unit_from_mu_du, m00_canonical_time_unit_from_mu_du,
-    m00_distance_from_canonical, m00_distance_to_canonical, m00_speed_from_canonical,
-    m00_speed_to_canonical, m00_time_from_canonical, m00_time_to_canonical,
+    m00_degrees_to_radians, m00_distance_from_canonical, m00_distance_to_canonical,
+    m00_radians_to_degrees, m00_speed_from_canonical, m00_speed_to_canonical,
+    m00_time_from_canonical, m00_time_to_canonical,
 };
 use aero_codex_core::AeroError;
 use std::{
@@ -139,6 +140,20 @@ fn formula_specs() -> &'static [FormulaSpec] {
             output_variable: "speed",
             inputs: &["canonical_speed", "distance_unit", "time_unit"],
             summary: "speed = canonical_speed * DU / TU",
+        },
+        FormulaSpec {
+            id: "formula_vault.m00.angle.deg2rad",
+            runtime_symbol: "m00_degrees_to_radians",
+            output_variable: "angle_radians",
+            inputs: &["degrees"],
+            summary: "angle_radians = degrees * pi / 180",
+        },
+        FormulaSpec {
+            id: "formula_vault.m00.angle.rad2deg",
+            runtime_symbol: "m00_radians_to_degrees",
+            output_variable: "angle_degrees",
+            inputs: &["radians"],
+            summary: "angle_degrees = radians * 180 / pi",
         },
     ]
 }
@@ -770,6 +785,12 @@ fn evaluate_formula(
             required_input(spec, inputs, "distance_unit")?,
             required_input(spec, inputs, "time_unit")?,
         ),
+        "formula_vault.m00.angle.deg2rad" => {
+            m00_degrees_to_radians(required_input(spec, inputs, "degrees")?)
+        }
+        "formula_vault.m00.angle.rad2deg" => {
+            m00_radians_to_degrees(required_input(spec, inputs, "radians")?)
+        }
         _ => return Err(AppError::UnknownFormula(formula_id.to_string())),
     }
     .map_err(|source| AppError::Equation {
@@ -2271,7 +2292,7 @@ fn print_help() {
 usage:\n  aerocodex formula list [--family <family>] [--status <status>] [--executable] [--json]\n  aerocodex formula describe <formula-id> [--json]\n  aerocodex formula status-report [--json]\n  aerocodex formula run <formula-id> [--preliminary] [--input-name <value> ...] [--json]\n  aerocodex version [--json]\n  aerocodex self-check [--json]\n\n\
 legacy aliases:\n  aerocodex formulas [--json]        -> aerocodex formula list\n  aerocodex describe <formula-id> [--json]\n                                      -> aerocodex formula describe <formula-id>\n  aerocodex run <formula-id> [--preliminary] name=value ... [--json]\n                                      -> aerocodex formula run <formula-id> [--preliminary] --input-name <value> ...\n\n\
 `--json` may appear before or after the command/subcommand. Formula run accepts RR-022 flag-style scalar inputs such as `--degrees 180`; legacy name=value assignments remain compatibility syntax.\n\n\
-The Beta 1 concept includes ten governed M00 canonical-unit implemented concept formulas behind the RR-025 status gate. The checked-in Formula Registry may also describe inventory-only formulas; registry inclusion is not formula validation, status promotion, certification, execution approval, readiness approval, or regulatory approval.\n\
+The Beta 1 concept includes ten governed M00 canonical-unit implemented concept formulas plus two RR-023 M00 angle conversion dispatch specs behind the RR-025 status gate. The checked-in Formula Registry may also describe inventory-only formulas; registry inclusion is not formula validation, status promotion, certification, execution approval, readiness approval, or regulatory approval.\n\
 Validation status: {}.\n\
 Exit codes: 0 success, 2 usage/input-shape error, 3 unknown formula, 4 equation/domain/numerical/status-gate error, 5 self-check failure.\n\
 Safety: {}.",
@@ -2601,6 +2622,61 @@ mod tests {
         assert!(vector
             .to_string()
             .contains("vector inputs are not yet supported by CLI run"));
+    }
+
+    #[test]
+    fn rr023_m00_angle_dispatch_matches_contract_vectors() {
+        let deg_to_rad = evaluate_formula(
+            "formula_vault.m00.angle.deg2rad",
+            &map_inputs(&[("degrees", 180.0)]),
+        )
+        .expect("RR-023 degrees-to-radians dispatch should be wired");
+        assert!((deg_to_rad.value - std::f64::consts::PI).abs() <= 1.0e-15);
+        assert_eq!(deg_to_rad.spec.output_variable, "angle_radians");
+
+        let rad_to_deg = evaluate_formula(
+            "formula_vault.m00.angle.rad2deg",
+            &map_inputs(&[("radians", std::f64::consts::PI)]),
+        )
+        .expect("RR-023 radians-to-degrees dispatch should be wired");
+        assert!((rad_to_deg.value - 180.0).abs() <= 1.0e-12);
+        assert_eq!(rad_to_deg.spec.output_variable, "angle_degrees");
+    }
+
+    #[test]
+    fn rr023_m00_angle_registry_ids_resolve_to_dispatch_specs_without_status_promotion() {
+        let deg_to_rad = resolve_formula("m00.angle.deg_to_rad")
+            .expect("readable M00 angle registry id should resolve");
+        assert_eq!(deg_to_rad.formula_id(), "m00.angle.deg_to_rad");
+        assert_eq!(deg_to_rad.status(), "research_required");
+        assert_eq!(deg_to_rad.execution_policy(), Some("blocked"));
+        assert_eq!(deg_to_rad.inputs(), &["degrees"]);
+        assert_eq!(
+            deg_to_rad
+                .spec
+                .expect("registry row should map to bounded CLI dispatch spec")
+                .id,
+            "formula_vault.m00.angle.deg2rad"
+        );
+        let gate = execution_gate_error(&deg_to_rad, true)
+            .expect("research_required M00 angle row must remain status-gated");
+        assert_eq!(gate.code(), "execution_blocked_by_status");
+
+        let rad_to_deg = resolve_formula("formula_vault.m00.angle.rad2deg")
+            .expect("legacy M00 angle formula-vault id should resolve");
+        assert_eq!(rad_to_deg.formula_id(), "m00.angle.rad_to_deg");
+        assert_eq!(
+            rad_to_deg.alias_used.as_deref(),
+            Some("formula_vault.m00.angle.rad2deg")
+        );
+        assert_eq!(rad_to_deg.inputs(), &["radians"]);
+        assert_eq!(
+            rad_to_deg
+                .spec
+                .expect("legacy alias should map to bounded CLI dispatch spec")
+                .id,
+            "formula_vault.m00.angle.rad2deg"
+        );
     }
 
     #[test]
