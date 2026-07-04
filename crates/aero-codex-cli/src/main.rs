@@ -153,6 +153,27 @@ struct EvaluationResult {
     value: f64,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum InputSyntax {
+    FlagStyle,
+    LegacyAssignment,
+}
+
+impl InputSyntax {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::FlagStyle => "flag_style",
+            Self::LegacyAssignment => "legacy_assignment",
+        }
+    }
+}
+
+#[derive(Debug)]
+struct ParsedFormulaInputs {
+    inputs: BTreeMap<String, f64>,
+    syntax: InputSyntax,
+}
+
 #[derive(Debug)]
 enum AppError {
     Usage(String),
@@ -666,27 +687,35 @@ fn required_input(
     })
 }
 
-fn validate_input_shape(
-    spec: &'static FormulaSpec,
+fn validate_input_names(
+    formula_id: &'static str,
+    required_inputs: &'static [&'static str],
     inputs: &BTreeMap<String, f64>,
 ) -> Result<(), AppError> {
-    for &required in spec.inputs {
+    for &required in required_inputs {
         if !inputs.contains_key(required) {
             return Err(AppError::MissingInput {
-                formula_id: spec.id,
+                formula_id,
                 input: required,
             });
         }
     }
     for provided in inputs.keys() {
-        if !spec.inputs.contains(&provided.as_str()) {
+        if !required_inputs.contains(&provided.as_str()) {
             return Err(AppError::UnexpectedInput {
-                formula_id: spec.id,
+                formula_id,
                 input: provided.clone(),
             });
         }
     }
     Ok(())
+}
+
+fn validate_input_shape(
+    spec: &'static FormulaSpec,
+    inputs: &BTreeMap<String, f64>,
+) -> Result<(), AppError> {
+    validate_input_names(spec.id, spec.inputs, inputs)
 }
 
 fn evaluate_formula(
@@ -751,7 +780,22 @@ fn evaluate_formula(
     Ok(EvaluationResult { spec, value })
 }
 
-fn parse_assignments(values: &[String]) -> Result<BTreeMap<String, f64>, AppError> {
+fn parse_scalar_input(input: &str, raw_value: &str) -> Result<f64, AppError> {
+    if raw_value.starts_with('[') || raw_value.ends_with(']') || raw_value.contains(',') {
+        return Err(AppError::Usage(format!(
+            "vector inputs are not yet supported by CLI run; input `{input}` must be provided as a scalar f64"
+        )));
+    }
+
+    raw_value
+        .parse::<f64>()
+        .map_err(|_| AppError::InvalidNumber {
+            input: input.to_string(),
+            value: raw_value.to_string(),
+        })
+}
+
+fn parse_legacy_assignments(values: &[String]) -> Result<BTreeMap<String, f64>, AppError> {
     let mut inputs = BTreeMap::new();
     for assignment in values {
         let (name, raw_value) = assignment
@@ -760,17 +804,88 @@ fn parse_assignments(values: &[String]) -> Result<BTreeMap<String, f64>, AppErro
         if name.is_empty() || raw_value.is_empty() {
             return Err(AppError::InvalidAssignment(assignment.clone()));
         }
-        let value = raw_value
-            .parse::<f64>()
-            .map_err(|_| AppError::InvalidNumber {
-                input: name.to_string(),
-                value: raw_value.to_string(),
-            })?;
+        let value = parse_scalar_input(name, raw_value)?;
         if inputs.insert(name.to_string(), value).is_some() {
             return Err(AppError::DuplicateInput(name.to_string()));
         }
     }
     Ok(inputs)
+}
+
+fn parse_flag_style_inputs(
+    formula_id: &'static str,
+    required_inputs: &'static [&'static str],
+    values: &[String],
+) -> Result<BTreeMap<String, f64>, AppError> {
+    let mut inputs = BTreeMap::new();
+    let mut index = 0;
+    while index < values.len() {
+        let flag = &values[index];
+        let Some(input_name) = flag.strip_prefix("--") else {
+            return Err(AppError::InvalidAssignment(flag.clone()));
+        };
+        let Some(&required_input) = required_inputs
+            .iter()
+            .find(|&&candidate| candidate == input_name)
+        else {
+            return Err(AppError::UnexpectedInput {
+                formula_id,
+                input: input_name.to_string(),
+            });
+        };
+
+        index += 1;
+        let Some(raw_value) = values.get(index) else {
+            return Err(AppError::MissingInput {
+                formula_id,
+                input: required_input,
+            });
+        };
+        if raw_value.starts_with("--") {
+            return Err(AppError::MissingInput {
+                formula_id,
+                input: required_input,
+            });
+        }
+
+        let value = parse_scalar_input(required_input, raw_value)?;
+        if inputs.insert(required_input.to_string(), value).is_some() {
+            return Err(AppError::DuplicateInput(required_input.to_string()));
+        }
+        index += 1;
+    }
+    Ok(inputs)
+}
+
+fn parse_formula_inputs(
+    formula_id: &'static str,
+    required_inputs: &'static [&'static str],
+    values: &[String],
+) -> Result<ParsedFormulaInputs, AppError> {
+    let has_flag_style = values.iter().any(|value| value.starts_with("--"));
+    let has_legacy_assignments = values
+        .iter()
+        .any(|value| !value.starts_with("--") && value.contains('='));
+
+    if has_flag_style && has_legacy_assignments {
+        return Err(AppError::Usage(
+            "formula run input syntax must not mix flag-style inputs with legacy name=value assignments".to_string(),
+        ));
+    }
+
+    let (inputs, syntax) = if has_flag_style {
+        (
+            parse_flag_style_inputs(formula_id, required_inputs, values)?,
+            InputSyntax::FlagStyle,
+        )
+    } else {
+        (
+            parse_legacy_assignments(values)?,
+            InputSyntax::LegacyAssignment,
+        )
+    };
+    validate_input_names(formula_id, required_inputs, &inputs)?;
+    Ok(ParsedFormulaInputs { inputs, syntax })
 }
 
 fn remove_json_flag(arguments: &mut Vec<String>) -> Result<bool, AppError> {
@@ -1806,6 +1921,7 @@ fn output_evaluation(
     resolved: &ResolvedFormula,
     json: bool,
     context: CommandContext,
+    input_syntax: InputSyntax,
 ) {
     if json {
         let registry_object = formula_registry_json_object(resolved.formula_id());
@@ -1827,6 +1943,8 @@ fn output_evaluation(
         output.push_str(",\"output_variable\":");
         push_json_string(&mut output, result.spec.output_variable);
         write!(output, ",\"value\":{}", result.value).expect("writing to String cannot fail");
+        output.push_str(",\"input_syntax\":");
+        push_json_string(&mut output, input_syntax.as_str());
         output.push_str(",\"output\":");
         push_json_string(&mut output, result.spec.output_variable);
         output.push_str(",\"units\":");
@@ -1875,6 +1993,7 @@ fn output_evaluation(
             println!("legacy_formula_id={legacy_formula_id}");
         }
         println!("runtime_symbol={}", result.spec.runtime_symbol);
+        println!("input_syntax={}", input_syntax.as_str());
         println!("{}={}", result.spec.output_variable, result.value);
         println!("validation_status={}", validation_status());
         println!("safety_notice={}", safety_notice());
@@ -2149,9 +2268,9 @@ fn output_self_check(report: &SelfCheckReport, json: bool) {
 fn print_help() {
     println!(
         "AeroCodex Beta 1 concept CLI\n\n\
-usage:\n  aerocodex formula list [--family <family>] [--status <status>] [--executable] [--json]\n  aerocodex formula describe <formula-id> [--json]\n  aerocodex formula status-report [--json]\n  aerocodex formula run <formula-id> [--preliminary] name=value ... [--json]\n  aerocodex version [--json]\n  aerocodex self-check [--json]\n\n\
-legacy aliases:\n  aerocodex formulas [--json]        -> aerocodex formula list\n  aerocodex describe <formula-id> [--json]\n                                      -> aerocodex formula describe <formula-id>\n  aerocodex run <formula-id> [--preliminary] name=value ... [--json]\n                                      -> aerocodex formula run <formula-id> [--preliminary] name=value ...\n\n\
-`--json` may appear before or after the command/subcommand.\n\n\
+usage:\n  aerocodex formula list [--family <family>] [--status <status>] [--executable] [--json]\n  aerocodex formula describe <formula-id> [--json]\n  aerocodex formula status-report [--json]\n  aerocodex formula run <formula-id> [--preliminary] [--input-name <value> ...] [--json]\n  aerocodex version [--json]\n  aerocodex self-check [--json]\n\n\
+legacy aliases:\n  aerocodex formulas [--json]        -> aerocodex formula list\n  aerocodex describe <formula-id> [--json]\n                                      -> aerocodex formula describe <formula-id>\n  aerocodex run <formula-id> [--preliminary] name=value ... [--json]\n                                      -> aerocodex formula run <formula-id> [--preliminary] --input-name <value> ...\n\n\
+`--json` may appear before or after the command/subcommand. Formula run accepts RR-022 flag-style scalar inputs such as `--degrees 180`; legacy name=value assignments remain compatibility syntax.\n\n\
 The Beta 1 concept includes ten governed M00 canonical-unit implemented concept formulas behind the RR-025 status gate. The checked-in Formula Registry may also describe inventory-only formulas; registry inclusion is not formula validation, status promotion, certification, execution approval, readiness approval, or regulatory approval.\n\
 Validation status: {}.\n\
 Exit codes: 0 success, 2 usage/input-shape error, 3 unknown formula, 4 equation/domain/numerical/status-gate error, 5 self-check failure.\n\
@@ -2177,6 +2296,11 @@ fn execute_run(
     let resolved = resolve_formula(formula_id)
         .ok_or_else(|| AppError::UnknownFormula(formula_id.to_string()))?;
     let (preliminary, filtered_input_arguments) = remove_preliminary_flag(input_arguments)?;
+    let parsed_inputs = parse_formula_inputs(
+        resolved.formula_id(),
+        resolved.inputs(),
+        &filtered_input_arguments,
+    )?;
     if let Some(error) = execution_gate_error(&resolved, preliminary) {
         return Err(error);
     }
@@ -2187,9 +2311,8 @@ fn execute_run(
             execution_policy: execution_policy_for_status(resolved.status()),
         });
     };
-    let inputs = parse_assignments(&filtered_input_arguments)?;
-    let result = evaluate_formula(spec.id, &inputs)?;
-    output_evaluation(&result, &resolved, json, context);
+    let result = evaluate_formula(spec.id, &parsed_inputs.inputs)?;
+    output_evaluation(&result, &resolved, json, context, parsed_inputs.syntax);
     Ok(())
 }
 
@@ -2247,7 +2370,7 @@ fn execute_formula_namespace(arguments: &[String], json: bool) -> Result<(), App
         "run" => {
             if arguments.len() < 2 {
                 return Err(AppError::Usage(
-                    "formula run requires a formula id followed by name=value inputs".to_string(),
+                    "formula run requires a formula id followed by --input-name value or legacy name=value inputs".to_string(),
                 ));
             }
             execute_run(
@@ -2323,7 +2446,7 @@ fn execute(raw_arguments: &[String]) -> Result<(), AppError> {
         "run" => {
             if arguments.len() < 2 {
                 return Err(AppError::Usage(
-                    "run requires a formula id followed by name=value inputs".to_string(),
+                    "run requires a formula id followed by --input-name value or legacy name=value inputs".to_string(),
                 ));
             }
             execute_run(
@@ -2333,7 +2456,7 @@ fn execute(raw_arguments: &[String]) -> Result<(), AppError> {
                 CommandContext::LegacyAlias {
                     command: "run",
                     migration_command:
-                        "aerocodex formula run <formula-id> [--preliminary] name=value ...",
+                        "aerocodex formula run <formula-id> [--preliminary] --input-name value ...",
                 },
             )
         }
@@ -2430,6 +2553,54 @@ mod tests {
         )
         .expect_err("unexpected inputs must fail");
         assert_eq!(unexpected.code(), "unexpected_input");
+    }
+
+    #[test]
+    fn rr022_flag_style_parser_accepts_scalar_inputs_and_legacy_compatibility() {
+        let parsed = parse_formula_inputs(
+            "m00.angle.deg_to_rad",
+            &["degrees"],
+            &["--degrees".to_string(), "-180".to_string()],
+        )
+        .expect("flag-style scalar input should parse");
+        assert_eq!(parsed.syntax, InputSyntax::FlagStyle);
+        assert_eq!(parsed.inputs.get("degrees"), Some(&-180.0));
+
+        let legacy = parse_formula_inputs(
+            "formula_vault.m00.canonical.distance_to_canonical",
+            &["distance", "distance_unit"],
+            &["distance=-42".to_string(), "distance_unit=7".to_string()],
+        )
+        .expect("legacy name=value compatibility should parse");
+        assert_eq!(legacy.syntax, InputSyntax::LegacyAssignment);
+        assert_eq!(legacy.inputs.get("distance"), Some(&-42.0));
+        assert_eq!(legacy.inputs.get("distance_unit"), Some(&7.0));
+    }
+
+    #[test]
+    fn rr022_flag_style_parser_fails_closed_for_mixed_or_vector_inputs() {
+        let mixed = parse_formula_inputs(
+            "m00.angle.deg_to_rad",
+            &["degrees"],
+            &[
+                "--degrees".to_string(),
+                "180".to_string(),
+                "degrees=90".to_string(),
+            ],
+        )
+        .expect_err("mixed flag-style and legacy syntax must fail closed");
+        assert_eq!(mixed.code(), "usage_error");
+
+        let vector = parse_formula_inputs(
+            "m00.vector.norm",
+            &["v"],
+            &["--v".to_string(), "[1,2,3]".to_string()],
+        )
+        .expect_err("vector/array inputs are explicitly out of scope for RR-022");
+        assert_eq!(vector.code(), "usage_error");
+        assert!(vector
+            .to_string()
+            .contains("vector inputs are not yet supported by CLI run"));
     }
 
     #[test]
