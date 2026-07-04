@@ -6,7 +6,7 @@ The RR-019 CLI namespace is:
 aerocodex formula list [--json]
 aerocodex formula describe <formula-id> [--json]
 aerocodex formula status-report [--json]
-aerocodex formula run <formula-id> [--preliminary] name=value ... [--json]
+aerocodex formula run <formula-id> [--preliminary] --input-name value ... [--json]
 ```
 
 Use this namespace for new scripts. The older Beta 1 aliases remain available for compatibility:
@@ -81,7 +81,9 @@ Such descriptions are inventory/status metadata only. Registry inclusion is not 
 
 ## Run formulas
 
-`formula run` is now guarded by the RR-025 public-alpha execution status gate. The gate runs after formula ID resolution and before normal input parsing or runtime dispatch.
+`formula run` accepts RR-022 scalar flag-style inputs whose names come from the generated Formula Registry, for example `--degrees 180`. Negative scalar values such as `--degrees -180` are values, not flags. Duplicate, missing, unexpected, invalid-number, mixed-syntax, and vector/array-shaped inputs fail closed with stable error handling before any runtime dispatch. The legacy `name=value` assignment syntax remains available for migration compatibility; successful legacy JSON runs include `"input_syntax":"legacy_assignment"`.
+
+`formula run` is guarded by the RR-025 public-alpha execution status gate. The gate runs after formula ID resolution and scalar input parsing but before runtime dispatch.
 
 Default public-alpha execution requires a registry status of `implementation_verified` or `reference_validated`. The current checked-in registry snapshot remains lower-status inventory: formulas are listable and describable, but `research_required` rows fail closed with `execution_blocked_by_status` and do not run through the public-alpha CLI.
 
@@ -92,14 +94,14 @@ cargo run -p aero-codex-cli -- formula run \
   aerodynamics.coefficients.drag_coefficient --json
 ```
 
-The task-card smoke command also remains blocked by the status gate before any unsupported flag-style parser or M00 angle dispatch is added:
+The task-card smoke command also remains blocked by the status gate after the RR-022 parser accepts the scalar flag syntax and before RR-023/RR-031 execution dispatch is enabled:
 
 ```bash
 cargo run -p aero-codex-cli -- formula run \
   m00.angle.deg_to_rad --degrees 180 --json
 ```
 
-`equation_traceable` rows, when present, require `--preliminary` to pass the RR-025 status gate. Passing that gate does not create RR-022 flag-style input parsing or RR-023 runtime dispatch; unsupported parser or dispatch paths still fail separately. `research_required` rows remain blocked even with `--preliminary`, and M07 candidates remain blocked until a later governed promotion task.
+`equation_traceable` rows, when present, require `--preliminary` to pass the RR-025 status gate. Passing that gate does not create RR-023 runtime dispatch; unsupported dispatch paths still fail separately. `research_required` rows remain blocked even with `--preliminary`, and M07 candidates remain blocked until a later governed promotion task.
 
 The legacy run alias remains accepted during migration, but it routes through the same gate and cannot bypass status policy:
 

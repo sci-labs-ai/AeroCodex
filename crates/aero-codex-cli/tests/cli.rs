@@ -375,9 +375,10 @@ fn formula_help_prioritizes_namespace_and_lists_legacy_aliases() {
     );
     assert!(text.contains("aerocodex formula describe <formula-id> [--json]"));
     assert!(text.contains("aerocodex formula status-report [--json]"));
-    assert!(
-        text.contains("aerocodex formula run <formula-id> [--preliminary] name=value ... [--json]")
-    );
+    assert!(text.contains(
+        "aerocodex formula run <formula-id> [--preliminary] [--input-name <value> ...] [--json]"
+    ));
+    assert!(text.contains("legacy name=value assignments remain compatibility syntax"));
 }
 
 fn assert_execution_gate_blocked_json(
@@ -480,7 +481,7 @@ fn execution_gate_blocks_legacy_alias_through_same_policy() {
 }
 
 #[test]
-fn execution_gate_blocks_task_card_angle_before_flag_parser() {
+fn formula_run_flag_style_input_parses_and_then_respects_status_gate() {
     let output = run(&[
         "formula",
         "run",
@@ -501,8 +502,93 @@ fn execution_gate_blocks_task_card_angle_before_flag_parser() {
     );
     assert!(
         !text.contains("invalid_assignment") && !text.contains("usage_error"),
-        "RR-025 gate must fire before unsupported RR-022/RR-023 parser or dispatch paths: {text}"
+        "RR-022 flag-style parser must accept scalar flags before the RR-025 status gate blocks dispatch: {text}"
     );
+}
+
+#[test]
+fn formula_run_flag_style_negative_number_reaches_status_gate() {
+    let output = run(&[
+        "formula",
+        "run",
+        "m00.angle.deg_to_rad",
+        "--degrees",
+        "-180",
+        "--json",
+    ]);
+    assert_eq!(output.status.code(), Some(4));
+    let text = stderr(&output);
+    assert_execution_gate_blocked_json(
+        &text,
+        "formula run",
+        "m00.angle.deg_to_rad",
+        "execution_blocked_by_status",
+        "research_required",
+        "blocked",
+    );
+    assert!(
+        !text.contains("invalid_assignment") && !text.contains("usage_error"),
+        "negative scalar flag values must not be reinterpreted as flags: {text}"
+    );
+}
+
+#[test]
+fn formula_run_duplicate_flag_input_fails_closed_with_json_error() {
+    let output = run(&[
+        "formula",
+        "run",
+        "m00.angle.deg_to_rad",
+        "--degrees",
+        "180",
+        "--degrees",
+        "90",
+        "--json",
+    ]);
+    assert_eq!(output.status.code(), Some(2));
+    let text = stderr(&output);
+    assert_error_json_envelope(&text, "formula run", "duplicate_input");
+    assert!(text.contains("input `degrees` was provided more than once"));
+}
+
+#[test]
+fn formula_run_missing_flag_input_fails_closed_with_json_error() {
+    let output = run(&["formula", "run", "m00.angle.deg_to_rad", "--json"]);
+    assert_eq!(output.status.code(), Some(2));
+    let text = stderr(&output);
+    assert_error_json_envelope(&text, "formula run", "missing_input");
+    assert!(text.contains("requires input `degrees`"));
+}
+
+#[test]
+fn formula_run_unknown_flag_input_fails_closed_with_json_error() {
+    let output = run(&[
+        "formula",
+        "run",
+        "m00.angle.deg_to_rad",
+        "--radians",
+        "3.14159",
+        "--json",
+    ]);
+    assert_eq!(output.status.code(), Some(2));
+    let text = stderr(&output);
+    assert_error_json_envelope(&text, "formula run", "unexpected_input");
+    assert!(text.contains("does not accept input `radians`"));
+}
+
+#[test]
+fn formula_run_invalid_flag_number_fails_closed_with_json_error() {
+    let output = run(&[
+        "formula",
+        "run",
+        "m00.angle.deg_to_rad",
+        "--degrees",
+        "not-a-number",
+        "--json",
+    ]);
+    assert_eq!(output.status.code(), Some(2));
+    let text = stderr(&output);
+    assert_error_json_envelope(&text, "formula run", "invalid_number");
+    assert!(text.contains("input `degrees` has invalid f64 value `not-a-number`"));
 }
 
 #[test]
