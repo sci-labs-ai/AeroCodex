@@ -201,6 +201,37 @@ impl AppError {
         }
     }
 
+    fn formula_id(&self) -> Option<&str> {
+        match self {
+            Self::UnknownFormula(formula_id) => Some(formula_id.as_str()),
+            Self::MissingInput { formula_id, .. }
+            | Self::UnexpectedInput { formula_id, .. }
+            | Self::Equation { formula_id, .. } => Some(formula_id),
+            Self::ExecutionBlockedByStatus { formula_id, .. } => Some(formula_id.as_str()),
+            Self::Usage(_)
+            | Self::InvalidAssignment(_)
+            | Self::DuplicateInput(_)
+            | Self::InvalidNumber { .. }
+            | Self::SelfCheckFailed { .. } => None,
+        }
+    }
+
+    fn status(&self) -> Option<&str> {
+        match self {
+            Self::ExecutionBlockedByStatus { status, .. } => Some(status),
+            _ => None,
+        }
+    }
+
+    fn execution_policy(&self) -> Option<&str> {
+        match self {
+            Self::ExecutionBlockedByStatus {
+                execution_policy, ..
+            } => Some(execution_policy),
+            _ => None,
+        }
+    }
+
     fn exit_code(&self) -> u8 {
         match self {
             Self::Usage(_)
@@ -653,6 +684,24 @@ fn remove_json_flag(arguments: &mut Vec<String>) -> Result<bool, AppError> {
     Ok(count == 1)
 }
 
+fn json_command_for_arguments(arguments: &[String]) -> Option<&'static str> {
+    let mut arguments = arguments
+        .iter()
+        .map(String::as_str)
+        .filter(|argument| *argument != "--json");
+    match (arguments.next()?, arguments.next()) {
+        ("formula", Some("list")) => Some("formula_list"),
+        ("formula", Some("describe")) => Some("formula describe"),
+        ("formula", Some("run")) => Some("formula run"),
+        ("formulas", _) => Some("formulas"),
+        ("describe", _) => Some("describe"),
+        ("run", _) => Some("run"),
+        ("version" | "--version" | "-V", _) => Some("version"),
+        ("self-check", _) => Some("self-check"),
+        _ => None,
+    }
+}
+
 fn push_json_string(output: &mut String, value: &str) {
     output.push('"');
     for character in value.chars() {
@@ -701,6 +750,25 @@ fn append_string_array(output: &mut String, values: &[&str]) {
         push_json_string(output, value);
     }
     output.push(']');
+}
+
+fn append_default_json_warnings(output: &mut String) {
+    append_string_array(
+        output,
+        &[
+            "Research/preliminary-design JSON contract; status and registry fields are not certification or execution approval.",
+        ],
+    );
+}
+
+fn append_registry_warnings_or_default(output: &mut String, registry_object: Option<&str>) {
+    if let Some(warnings) =
+        registry_object.and_then(|object| json_field_value_slice(object, "warnings"))
+    {
+        output.push_str(warnings);
+    } else {
+        append_default_json_warnings(output);
+    }
 }
 
 fn formula_registry_json_object(formula_id: &str) -> Option<&'static str> {
@@ -911,26 +979,21 @@ fn write_stdout(output: &str) {
     }
 }
 
-fn json_error(error: &AppError) -> String {
-    let mut output = String::from("{\"ok\":false,\"error\":{\"code\":");
+fn json_error(error: &AppError, command: Option<&str>) -> String {
+    let mut output = String::from("{\"ok\":false,\"command\":");
+    push_optional_json_string(&mut output, command);
+    output.push_str(",\"formula_id\":");
+    push_optional_json_string(&mut output, error.formula_id());
+    output.push_str(",\"status\":");
+    push_optional_json_string(&mut output, error.status());
+    output.push_str(",\"execution_policy\":");
+    push_optional_json_string(&mut output, error.execution_policy());
+    output.push_str(",\"error\":{\"code\":");
     push_json_string(&mut output, error.code());
     output.push_str(",\"message\":");
     push_json_string(&mut output, &error.to_string());
     output.push_str("},\"release_channel\":");
     push_json_string(&mut output, release_channel());
-    if let AppError::ExecutionBlockedByStatus {
-        formula_id,
-        status,
-        execution_policy,
-    } = error
-    {
-        output.push_str(",\"formula_id\":");
-        push_json_string(&mut output, formula_id);
-        output.push_str(",\"status\":");
-        push_json_string(&mut output, status);
-        output.push_str(",\"execution_policy\":");
-        push_json_string(&mut output, execution_policy);
-    }
     output.push_str(",\"validation_status\":");
     push_json_string(&mut output, validation_status());
     output.push_str(",\"safety_notice\":");
@@ -953,15 +1016,19 @@ fn output_version(json: bool) {
         push_json_string(&mut output, build_profile());
         write!(
             output,
-            ",\"supported_formula_count\":{},\"registry_formula_count\":{},\"validation_status\":",
+            ",\"supported_formula_count\":{},\"registry_formula_count\":{},\"registry_schema_version\":",
             supported_formula_count(),
             generated_formula_registry::FORMULA_COUNT
         )
         .expect("writing to String cannot fail");
+        push_json_string(&mut output, registry_schema_version());
+        output.push_str(",\"validation_status\":");
         push_json_string(&mut output, validation_status());
+        output.push_str(",\"warnings\":");
+        append_default_json_warnings(&mut output);
         output.push_str(",\"safety_notice\":");
         push_json_string(&mut output, safety_notice());
-        output.push_str("}\n");
+        output.push_str(",\"error\":null}\n");
         print!("{output}");
     } else {
         println!("AeroCodex {}", package_version());
@@ -1044,9 +1111,11 @@ fn output_formula_list(json: bool, context: CommandContext, filters: &FormulaLis
             append_string_array(&mut output, entry.input_names);
             output.push('}');
         }
-        output.push_str("],\"safety_notice\":");
+        output.push_str("],\"warnings\":");
+        append_default_json_warnings(&mut output);
+        output.push_str(",\"safety_notice\":");
         push_json_string(&mut output, safety_notice());
-        output.push_str("}\n");
+        output.push_str(",\"error\":null}\n");
         write_stdout(&output);
     } else {
         let mut output = String::new();
@@ -1176,7 +1245,7 @@ fn output_formula_description(resolved: &ResolvedFormula, json: bool, context: C
         push_json_string(&mut output, validation_status());
         output.push_str(",\"safety_notice\":");
         push_json_string(&mut output, safety_notice());
-        output.push_str("}\n");
+        output.push_str(",\"error\":null}\n");
         print!("{output}");
     } else {
         println!("command={}", context.command());
@@ -1318,6 +1387,7 @@ fn output_evaluation(
     context: CommandContext,
 ) {
     if json {
+        let registry_object = formula_registry_json_object(resolved.formula_id());
         let mut output = String::from("{\"ok\":true,\"command\":");
         push_json_string(&mut output, context.command());
         append_context_json_fields(&mut output, context);
@@ -1336,11 +1406,37 @@ fn output_evaluation(
         output.push_str(",\"output_variable\":");
         push_json_string(&mut output, result.spec.output_variable);
         write!(output, ",\"value\":{}", result.value).expect("writing to String cannot fail");
+        output.push_str(",\"output\":");
+        push_json_string(&mut output, result.spec.output_variable);
+        output.push_str(",\"units\":");
+        output.push_str(
+            registry_object
+                .and_then(|object| json_field_value_slice(object, "units"))
+                .unwrap_or("null"),
+        );
+        output.push_str(",\"status\":");
+        push_json_string(&mut output, resolved.status());
+        output.push_str(",\"execution_policy\":");
+        push_optional_json_string(&mut output, resolved.execution_policy());
+        output.push_str(",\"quarantine_state\":");
+        push_optional_json_string(&mut output, resolved.quarantine_state());
+        output.push_str(",\"source_trace\":");
+        output.push_str(
+            registry_object
+                .and_then(|object| json_field_value_slice(object, "source_trace"))
+                .unwrap_or("null"),
+        );
+        output.push_str(",\"registry_schema_version\":");
+        push_json_string(&mut output, registry_schema_version());
+        output.push_str(",\"source_hash\":");
+        push_json_string(&mut output, registry_source_hash());
         output.push_str(",\"validation_status\":");
         push_json_string(&mut output, validation_status());
+        output.push_str(",\"warnings\":");
+        append_registry_warnings_or_default(&mut output, registry_object);
         output.push_str(",\"safety_notice\":");
         push_json_string(&mut output, safety_notice());
-        output.push_str("}\n");
+        output.push_str(",\"error\":null}\n");
         print!("{output}");
     } else {
         println!("command={}", context.command());
@@ -1559,40 +1655,59 @@ fn run_self_check() -> SelfCheckReport {
     }
 }
 
+fn self_check_json(report: &SelfCheckReport) -> String {
+    let mut output = format!(
+        "{{\"ok\":{},\"command\":\"self-check\",\"release_channel\":",
+        report.failed == 0
+    );
+    push_json_string(&mut output, release_channel());
+    write!(
+        output,
+        ",\"supported_formula_count\":{},\"passed\":{},\"failed\":{},\"checks\":[",
+        supported_formula_count(),
+        report.passed,
+        report.failed
+    )
+    .expect("writing to String cannot fail");
+    for (index, check) in report.checks.iter().enumerate() {
+        if index > 0 {
+            output.push(',');
+        }
+        output.push_str("{\"name\":");
+        push_json_string(&mut output, check.name);
+        output.push_str(",\"formula_id\":");
+        push_json_string(&mut output, check.formula_id);
+        write!(output, ",\"passed\":{}", check.passed).expect("writing to String cannot fail");
+        output.push_str(",\"detail\":");
+        push_json_string(&mut output, &check.detail);
+        output.push('}');
+    }
+    output.push_str("],\"registry_schema_version\":");
+    push_json_string(&mut output, registry_schema_version());
+    output.push_str(",\"validation_status\":");
+    push_json_string(&mut output, validation_status());
+    output.push_str(",\"warnings\":");
+    append_default_json_warnings(&mut output);
+    output.push_str(",\"safety_notice\":");
+    push_json_string(&mut output, safety_notice());
+    if report.failed == 0 {
+        output.push_str(",\"error\":null}\n");
+    } else {
+        let error = AppError::SelfCheckFailed {
+            failed: report.failed,
+        };
+        output.push_str(",\"error\":{\"code\":");
+        push_json_string(&mut output, error.code());
+        output.push_str(",\"message\":");
+        push_json_string(&mut output, &error.to_string());
+        output.push_str("}}\n");
+    }
+    output
+}
+
 fn output_self_check(report: &SelfCheckReport, json: bool) {
     if json {
-        let mut output = format!(
-            "{{\"ok\":{},\"command\":\"self-check\",\"release_channel\":",
-            report.failed == 0
-        );
-        push_json_string(&mut output, release_channel());
-        write!(
-            output,
-            ",\"supported_formula_count\":{},\"passed\":{},\"failed\":{},\"checks\":[",
-            supported_formula_count(),
-            report.passed,
-            report.failed
-        )
-        .expect("writing to String cannot fail");
-        for (index, check) in report.checks.iter().enumerate() {
-            if index > 0 {
-                output.push(',');
-            }
-            output.push_str("{\"name\":");
-            push_json_string(&mut output, check.name);
-            output.push_str(",\"formula_id\":");
-            push_json_string(&mut output, check.formula_id);
-            write!(output, ",\"passed\":{}", check.passed).expect("writing to String cannot fail");
-            output.push_str(",\"detail\":");
-            push_json_string(&mut output, &check.detail);
-            output.push('}');
-        }
-        output.push_str("],\"validation_status\":");
-        push_json_string(&mut output, validation_status());
-        output.push_str(",\"safety_notice\":");
-        push_json_string(&mut output, safety_notice());
-        output.push_str("}\n");
-        print!("{output}");
+        print!("{}", self_check_json(report));
     } else {
         println!("release_channel={}", release_channel());
         println!("supported_formula_count={}", supported_formula_count());
@@ -1810,12 +1925,13 @@ fn execute(raw_arguments: &[String]) -> Result<(), AppError> {
 fn main() -> ExitCode {
     let arguments: Vec<String> = env::args().skip(1).collect();
     let json_requested = arguments.iter().any(|argument| argument == "--json");
+    let json_command = json_command_for_arguments(&arguments);
     match execute(&arguments) {
         Ok(()) => ExitCode::from(0),
         Err(error) => {
             if !matches!(error, AppError::SelfCheckFailed { .. }) {
                 if json_requested {
-                    eprint!("{}", json_error(&error));
+                    eprint!("{}", json_error(&error, json_command));
                 } else {
                     eprintln!("aerocodex error [{}]: {error}", error.code());
                     eprintln!("validation_status={}", validation_status());
@@ -1887,5 +2003,65 @@ mod tests {
         assert_eq!(report.failed, 0);
         assert_eq!(report.passed, 14);
         assert_eq!(report.checks.len(), 14);
+    }
+
+    #[test]
+    fn self_check_failure_json_has_error_envelope() {
+        let report = SelfCheckReport {
+            checks: vec![SelfCheckResult {
+                name: "forced_failure_for_json_envelope_regression",
+                formula_id: "formula_vault.m00.canonical.distance_to_canonical",
+                passed: false,
+                detail: "forced failure for RR-024 self-check envelope regression".to_string(),
+            }],
+            passed: 0,
+            failed: 1,
+        };
+
+        let text = self_check_json(&report);
+        let mut parser = std::process::Command::new("python3")
+            .arg("-c")
+            .arg("import json, sys; json.load(sys.stdin)")
+            .stdin(std::process::Stdio::piped())
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::piped())
+            .spawn()
+            .expect("python3 should be available for RR-024 JSON syntax regression checks");
+        {
+            use std::io::Write as _;
+            parser
+                .stdin
+                .as_mut()
+                .expect("parser stdin should be open")
+                .write_all(text.as_bytes())
+                .expect("self-check JSON should be writable to parser stdin");
+        }
+        let parsed = parser
+            .wait_with_output()
+            .expect("python3 JSON parser should exit");
+        assert!(
+            parsed.status.success(),
+            "self-check failure JSON must parse; stdout={} stderr={} json={text}",
+            String::from_utf8_lossy(&parsed.stdout),
+            String::from_utf8_lossy(&parsed.stderr)
+        );
+        assert!(
+            text.starts_with("{\"ok\":false"),
+            "self-check failure must be an ok=false envelope: {text}"
+        );
+        assert!(text.contains("\"command\":\"self-check\""));
+        assert!(text.contains("\"registry_schema_version\":\"aerocodex.formula_registry.v1\""));
+        assert!(text.contains("\"warnings\":"));
+        assert!(text.contains("\"safety_notice\":"));
+        assert!(
+            text.contains("\"error\":{\"code\":\"self_check_failed\",\"message\":\"Beta 1 self-check reported 1 failing checks\"}"),
+            "self-check failure must populate error.code and error.message: {text}"
+        );
+        assert!(
+            !text.contains("\"error\":null"),
+            "self-check failure must not emit error=null: {text}"
+        );
+        assert_eq!(text.matches("\"ok\":false").count(), 1);
+        assert_eq!(text.matches("\"error\":{").count(), 1);
     }
 }

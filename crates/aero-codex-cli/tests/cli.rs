@@ -35,11 +35,59 @@ fn stderr(output: &Output) -> String {
     String::from_utf8(output.stderr.clone()).expect("stderr should be valid text")
 }
 
+fn assert_success_json_envelope(text: &str, command: &str) {
+    assert!(
+        text.starts_with("{\"ok\":true"),
+        "missing ok=true envelope in {text}"
+    );
+    assert!(
+        text.contains(&format!("\"command\":\"{command}\"")),
+        "missing command `{command}` in {text}"
+    );
+    assert!(
+        text.contains("\"safety_notice\":"),
+        "missing safety_notice in {text}"
+    );
+    assert!(
+        text.contains("\"registry_schema_version\":"),
+        "missing registry_schema_version in {text}"
+    );
+    assert!(text.contains("\"warnings\":"), "missing warnings in {text}");
+    assert!(
+        text.contains("\"error\":null"),
+        "missing error=null in {text}"
+    );
+}
+
+fn assert_error_json_envelope(text: &str, command: &str, code: &str) {
+    assert!(
+        text.starts_with("{\"ok\":false"),
+        "missing ok=false envelope in {text}"
+    );
+    assert!(
+        text.contains(&format!("\"command\":\"{command}\"")),
+        "missing command `{command}` in {text}"
+    );
+    assert!(
+        text.contains(&format!("\"code\":\"{code}\"")),
+        "missing error code `{code}` in {text}"
+    );
+    assert!(
+        text.contains("\"message\":"),
+        "missing error.message in {text}"
+    );
+    assert!(
+        text.contains("\"safety_notice\":"),
+        "missing safety_notice in {text}"
+    );
+}
+
 #[test]
 fn version_json_exposes_bounded_release_identity() {
     let output = run(&["version", "--json"]);
     assert!(output.status.success(), "{}", stderr(&output));
     let text = stdout(&output);
+    assert_success_json_envelope(&text, "version");
     assert!(text.contains("\"package_version\":\"0.0.1\""));
     assert!(text.contains("\"release_channel\":\"beta1-concept\""));
     assert!(text.contains("\"build_commit\":"));
@@ -56,6 +104,7 @@ fn formula_catalog_is_registry_backed_and_labeled() {
     let output = run(&["formula", "list", "--json"]);
     assert!(output.status.success(), "{}", stderr(&output));
     let text = stdout(&output);
+    assert_success_json_envelope(&text, "formula_list");
     assert!(text.contains("\"command\":\"formula_list\""));
     assert!(text.contains("\"count\":152"));
     assert!(text.contains("\"registry_formula_count\":152"));
@@ -77,6 +126,7 @@ fn formula_catalog_family_filter_is_registry_backed() {
     let output = run(&["formula", "list", "--family", "m00", "--json"]);
     assert!(output.status.success(), "{}", stderr(&output));
     let text = stdout(&output);
+    assert_success_json_envelope(&text, "formula_list");
     assert!(text.contains("\"command\":\"formula_list\""));
     assert!(text.contains("\"filters\":{\"family\":\"m00\""));
     assert!(text.contains("\"formula_id\":\"m00.canonical.distance_to_canonical\""));
@@ -96,6 +146,7 @@ fn legacy_formula_catalog_json_is_marked_as_deprecated_alias() {
     let output = run(&["formulas", "--json"]);
     assert!(output.status.success(), "{}", stderr(&output));
     let text = stdout(&output);
+    assert_success_json_envelope(&text, "formulas");
     assert!(text.contains("\"command\":\"formulas\""));
     assert!(text.contains("\"count\":152"));
     assert!(text.contains("\"deprecated_alias\":true"));
@@ -115,6 +166,7 @@ fn formula_namespace_describes_checked_in_registry_formula_id() {
     ]);
     assert!(output.status.success(), "{}", stderr(&output));
     let text = stdout(&output);
+    assert_success_json_envelope(&text, "formula describe");
     assert!(text.contains("\"command\":\"formula describe\""));
     assert!(text.contains("\"formula_id\":\"aerodynamics.coefficients.drag_coefficient\""));
     assert!(text.contains("\"status\":\"research_required\""));
@@ -165,6 +217,7 @@ fn legacy_describe_json_preserves_alias_traceability() {
     ]);
     assert!(output.status.success(), "{}", stderr(&output));
     let text = stdout(&output);
+    assert_success_json_envelope(&text, "describe");
     assert!(text.contains("\"command\":\"describe\""));
     assert!(text.contains("\"deprecated_alias\":true"));
     assert!(text.contains("\"canonical_formula_id\":\"m00.canonical.distance_to_canonical\""));
@@ -220,6 +273,7 @@ fn formula_run_for_non_executable_registry_row_fails_closed() {
     ]);
     assert_eq!(output.status.code(), Some(4));
     let text = stderr(&output);
+    assert_error_json_envelope(&text, "formula run", "execution_blocked_by_status");
     assert!(text.contains("\"code\":\"execution_blocked_by_status\""));
     assert!(text.contains("\"execution_policy\":\"blocked\""));
     assert!(text.contains("\"safety_notice\":"));
@@ -237,6 +291,7 @@ fn formula_run_emits_deterministic_machine_readable_result() {
     ]);
     assert!(output.status.success(), "{}", stderr(&output));
     let text = stdout(&output);
+    assert_success_json_envelope(&text, "formula run");
     assert!(text.contains("\"command\":\"formula run\""));
     assert!(text.contains("\"canonical_formula_id\":\"m00.canonical.distance_to_canonical\""));
     assert!(text
@@ -256,6 +311,7 @@ fn invalid_scale_has_stable_error_code_and_exit_status() {
     ]);
     assert_eq!(output.status.code(), Some(4));
     let text = stderr(&output);
+    assert_error_json_envelope(&text, "run", "non_positive_input");
     assert!(text.contains("\"code\":\"non_positive_input\""));
     assert!(text.contains("\"validation_status\":\"research_required\""));
     assert!(text.contains("\"safety_notice\":"));
@@ -266,6 +322,8 @@ fn unknown_formula_has_distinct_exit_status() {
     let output = run(&["formula", "describe", "no.such.formula", "--json"]);
     assert_eq!(output.status.code(), Some(3));
     let text = stderr(&output);
+    assert_error_json_envelope(&text, "formula describe", "formula_not_found");
+    assert!(text.contains("\"formula_id\":\"no.such.formula\""));
     assert!(text.contains("\"ok\":false"));
     assert!(text.contains("\"code\":\"formula_not_found\""));
 }
@@ -275,6 +333,7 @@ fn self_check_is_green_and_complete() {
     let output = run(&["self-check", "--json"]);
     assert!(output.status.success(), "{}", stderr(&output));
     let text = stdout(&output);
+    assert_success_json_envelope(&text, "self-check");
     assert!(text.contains("\"passed\":14"));
     assert!(text.contains("\"failed\":0"));
     assert!(text.contains("\"name\":\"overflow_is_rejected\""));
