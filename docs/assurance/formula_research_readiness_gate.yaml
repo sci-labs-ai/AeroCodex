@@ -1,0 +1,109 @@
+schema_version: aerocodex.formula_research_readiness_gate.v1
+task: RR-025
+title: Enforce formula execution status gates
+branch: cli/status-execution-gates
+scope: public_alpha_formula_run
+posture: fail_closed
+
+thresholds:
+  default_public_alpha_execution:
+    allowed_statuses:
+      - implementation_verified
+      - reference_validated
+    blocked_statuses:
+      - research_required
+      - equation_traceable
+    note: >-
+      Default formula execution is gated by registry status before normal input
+      parsing or runtime dispatch. Registry inventory remains listable and
+      describable without promoting status.
+  preliminary_execution:
+    equation_traceable:
+      requires_flag: --preliminary
+      gate_result: allowed_past_status_gate_only
+      note: >-
+        Passing the status gate does not create parser or runtime dispatch
+        support; unsupported formulas may still fail closed after the gate.
+    research_required:
+      gate_result: blocked
+      error_code: execution_blocked_by_status
+    m07_candidates:
+      gate_result: blocked
+      error_code: m07_candidate_blocked
+      note: M07 candidates remain blocked until a later governed promotion task.
+
+status_policy:
+  research_required:
+    execution_policy: blocked
+    default_run: blocked
+    preliminary_run: blocked
+    error_code: execution_blocked_by_status
+  equation_traceable:
+    execution_policy: preliminary_flag_required
+    default_run: blocked
+    default_error_code: preliminary_flag_required
+    preliminary_run: allowed_past_status_gate_only
+  implementation_verified:
+    execution_policy: normal_research
+    default_run: allowed_past_status_gate
+  reference_validated:
+    execution_policy: publication_supporting
+    default_run: allowed_past_status_gate
+  unknown_status:
+    execution_policy: blocked
+    default_run: blocked
+    error_code: execution_blocked_by_status
+
+m07_policy:
+  detection_fields:
+    - formula_id
+    - family
+    - legacy_formula_id
+  default_run: blocked
+  preliminary_run: blocked
+  error_code: m07_candidate_blocked
+  non_actions:
+    - no_m07_runtime_enablement
+    - no_m07_file_mode_changes
+    - no_formula_status_changes
+
+json_error_contract:
+  ok: false
+  command: formula run
+  required_fields:
+    - formula_id
+    - status
+    - execution_policy
+    - error.code
+    - error.message
+    - safety_notice
+  prohibited_shape:
+    - ok_false_with_error_null
+
+non_mutation_rules:
+  - do_not_modify_generated_registry_artifacts
+  - do_not_modify_validation_status_files
+  - do_not_modify_equation_batches
+  - do_not_modify_runtime_equation_implementations
+  - do_not_modify_formula_vault_files
+  - do_not_modify_cargo_toml
+  - do_not_commit_root_cargo_lock
+  - do_not_promote_formula_statuses
+
+downstream_ordering:
+  must_precede:
+    - RR-022
+    - RR-023
+    - RR-031
+    - any_normal_execution_path_expansion
+
+current_registry_observation:
+  source: generated/formula_registry.json
+  formula_count: 152
+  observed_statuses:
+    research_required: 152
+  observed_execution_policies:
+    blocked: 152
+  promoted_status_rows_present: false
+  equation_traceable_rows_present: false
+  m07_family_rows_present: false

@@ -176,6 +176,16 @@ enum AppError {
         status: &'static str,
         execution_policy: &'static str,
     },
+    PreliminaryFlagRequired {
+        formula_id: String,
+        status: &'static str,
+        execution_policy: &'static str,
+    },
+    M07CandidateBlocked {
+        formula_id: String,
+        status: &'static str,
+        execution_policy: &'static str,
+    },
     Equation {
         formula_id: &'static str,
         source: AeroError,
@@ -196,6 +206,8 @@ impl AppError {
             Self::MissingInput { .. } => "missing_input",
             Self::UnexpectedInput { .. } => "unexpected_input",
             Self::ExecutionBlockedByStatus { .. } => "execution_blocked_by_status",
+            Self::PreliminaryFlagRequired { .. } => "preliminary_flag_required",
+            Self::M07CandidateBlocked { .. } => "m07_candidate_blocked",
             Self::Equation { source, .. } => source.code(),
             Self::SelfCheckFailed { .. } => "self_check_failed",
         }
@@ -207,7 +219,9 @@ impl AppError {
             Self::MissingInput { formula_id, .. }
             | Self::UnexpectedInput { formula_id, .. }
             | Self::Equation { formula_id, .. } => Some(formula_id),
-            Self::ExecutionBlockedByStatus { formula_id, .. } => Some(formula_id.as_str()),
+            Self::ExecutionBlockedByStatus { formula_id, .. }
+            | Self::PreliminaryFlagRequired { formula_id, .. }
+            | Self::M07CandidateBlocked { formula_id, .. } => Some(formula_id.as_str()),
             Self::Usage(_)
             | Self::InvalidAssignment(_)
             | Self::DuplicateInput(_)
@@ -218,7 +232,9 @@ impl AppError {
 
     fn status(&self) -> Option<&str> {
         match self {
-            Self::ExecutionBlockedByStatus { status, .. } => Some(status),
+            Self::ExecutionBlockedByStatus { status, .. }
+            | Self::PreliminaryFlagRequired { status, .. }
+            | Self::M07CandidateBlocked { status, .. } => Some(status),
             _ => None,
         }
     }
@@ -226,6 +242,12 @@ impl AppError {
     fn execution_policy(&self) -> Option<&str> {
         match self {
             Self::ExecutionBlockedByStatus {
+                execution_policy, ..
+            }
+            | Self::PreliminaryFlagRequired {
+                execution_policy, ..
+            }
+            | Self::M07CandidateBlocked {
                 execution_policy, ..
             } => Some(execution_policy),
             _ => None,
@@ -241,7 +263,10 @@ impl AppError {
             | Self::MissingInput { .. }
             | Self::UnexpectedInput { .. } => 2,
             Self::UnknownFormula(_) => 3,
-            Self::Equation { .. } | Self::ExecutionBlockedByStatus { .. } => 4,
+            Self::Equation { .. }
+            | Self::ExecutionBlockedByStatus { .. }
+            | Self::PreliminaryFlagRequired { .. }
+            | Self::M07CandidateBlocked { .. } => 4,
             Self::SelfCheckFailed { .. } => 5,
         }
     }
@@ -280,6 +305,22 @@ impl fmt::Display for AppError {
             } => write!(
                 formatter,
                 "formula `{formula_id}` execution is blocked by status `{status}` with execution_policy `{execution_policy}`"
+            ),
+            Self::PreliminaryFlagRequired {
+                formula_id,
+                status,
+                execution_policy,
+            } => write!(
+                formatter,
+                "formula `{formula_id}` status `{status}` requires --preliminary before public-alpha execution; execution_policy `{execution_policy}`"
+            ),
+            Self::M07CandidateBlocked {
+                formula_id,
+                status,
+                execution_policy,
+            } => write!(
+                formatter,
+                "formula `{formula_id}` is an M07 candidate and remains blocked by public-alpha execution gates with status `{status}` and execution_policy `{execution_policy}`"
             ),
             Self::Equation { formula_id, source } => {
                 write!(formatter, "formula `{formula_id}` failed: {source}")
@@ -508,6 +549,68 @@ impl ResolvedFormula {
     }
 }
 
+fn execution_policy_for_status(status: &str) -> &'static str {
+    match status {
+        "research_required" => "blocked",
+        "equation_traceable" => "preliminary_flag_required",
+        "implementation_verified" => "normal_research",
+        "reference_validated" => "publication_supporting",
+        _ => "blocked",
+    }
+}
+
+fn is_m07_candidate_parts(
+    formula_id: &str,
+    family: Option<&str>,
+    legacy_formula_id: Option<&str>,
+) -> bool {
+    [Some(formula_id), family, legacy_formula_id]
+        .into_iter()
+        .flatten()
+        .any(|value| value.to_ascii_lowercase().contains("m07"))
+}
+
+fn execution_gate_error_for_parts(
+    formula_id: &str,
+    family: Option<&str>,
+    legacy_formula_id: Option<&str>,
+    status: &'static str,
+    preliminary: bool,
+) -> Option<AppError> {
+    if is_m07_candidate_parts(formula_id, family, legacy_formula_id) {
+        return Some(AppError::M07CandidateBlocked {
+            formula_id: formula_id.to_string(),
+            status,
+            execution_policy: "blocked",
+        });
+    }
+
+    match status {
+        "implementation_verified" | "reference_validated" => None,
+        "equation_traceable" if preliminary => None,
+        "equation_traceable" => Some(AppError::PreliminaryFlagRequired {
+            formula_id: formula_id.to_string(),
+            status,
+            execution_policy: execution_policy_for_status(status),
+        }),
+        _ => Some(AppError::ExecutionBlockedByStatus {
+            formula_id: formula_id.to_string(),
+            status,
+            execution_policy: execution_policy_for_status(status),
+        }),
+    }
+}
+
+fn execution_gate_error(resolved: &ResolvedFormula, preliminary: bool) -> Option<AppError> {
+    execution_gate_error_for_parts(
+        resolved.formula_id(),
+        resolved.registry_entry.map(|entry| entry.family),
+        resolved.legacy_formula_id(),
+        resolved.status(),
+        preliminary,
+    )
+}
+
 fn registry_entry_for_spec(
     spec: &FormulaSpec,
 ) -> Option<&'static generated_formula_registry::FormulaRegistryEntry> {
@@ -682,6 +785,25 @@ fn remove_json_flag(arguments: &mut Vec<String>) -> Result<bool, AppError> {
     }
     arguments.retain(|argument| argument != "--json");
     Ok(count == 1)
+}
+
+fn remove_preliminary_flag(arguments: &[String]) -> Result<(bool, Vec<String>), AppError> {
+    let count = arguments
+        .iter()
+        .filter(|argument| argument.as_str() == "--preliminary")
+        .count();
+    if count > 1 {
+        return Err(AppError::Usage(
+            "`--preliminary` may be supplied at most once for formula run".to_string(),
+        ));
+    }
+
+    let remaining = arguments
+        .iter()
+        .filter(|argument| argument.as_str() != "--preliminary")
+        .cloned()
+        .collect();
+    Ok((count == 1, remaining))
 }
 
 fn json_command_for_arguments(arguments: &[String]) -> Option<&'static str> {
@@ -1728,10 +1850,10 @@ fn output_self_check(report: &SelfCheckReport, json: bool) {
 fn print_help() {
     println!(
         "AeroCodex Beta 1 concept CLI\n\n\
-usage:\n  aerocodex formula list [--family <family>] [--status <status>] [--executable] [--json]\n  aerocodex formula describe <formula-id> [--json]\n  aerocodex formula run <formula-id> name=value ... [--json]\n  aerocodex version [--json]\n  aerocodex self-check [--json]\n\n\
-legacy aliases:\n  aerocodex formulas [--json]        -> aerocodex formula list\n  aerocodex describe <formula-id> [--json]\n                                      -> aerocodex formula describe <formula-id>\n  aerocodex run <formula-id> name=value ... [--json]\n                                      -> aerocodex formula run <formula-id> name=value ...\n\n\
+usage:\n  aerocodex formula list [--family <family>] [--status <status>] [--executable] [--json]\n  aerocodex formula describe <formula-id> [--json]\n  aerocodex formula run <formula-id> [--preliminary] name=value ... [--json]\n  aerocodex version [--json]\n  aerocodex self-check [--json]\n\n\
+legacy aliases:\n  aerocodex formulas [--json]        -> aerocodex formula list\n  aerocodex describe <formula-id> [--json]\n                                      -> aerocodex formula describe <formula-id>\n  aerocodex run <formula-id> [--preliminary] name=value ... [--json]\n                                      -> aerocodex formula run <formula-id> [--preliminary] name=value ...\n\n\
 `--json` may appear before or after the command/subcommand.\n\n\
-The Beta 1 concept exposes exactly ten governed M00 canonical-unit executable concept formulas. The checked-in Formula Registry may also describe inventory-only formulas; registry inclusion is not formula validation, status promotion, certification, execution approval, readiness approval, or regulatory approval.\n\
+The Beta 1 concept includes ten governed M00 canonical-unit implemented concept formulas behind the RR-025 status gate. The checked-in Formula Registry may also describe inventory-only formulas; registry inclusion is not formula validation, status promotion, certification, execution approval, readiness approval, or regulatory approval.\n\
 Validation status: {}.\n\
 Exit codes: 0 success, 2 usage/input-shape error, 3 unknown formula, 4 equation/domain/numerical/status-gate error, 5 self-check failure.\n\
 Safety: {}.",
@@ -1755,14 +1877,18 @@ fn execute_run(
 ) -> Result<(), AppError> {
     let resolved = resolve_formula(formula_id)
         .ok_or_else(|| AppError::UnknownFormula(formula_id.to_string()))?;
+    let (preliminary, filtered_input_arguments) = remove_preliminary_flag(input_arguments)?;
+    if let Some(error) = execution_gate_error(&resolved, preliminary) {
+        return Err(error);
+    }
     let Some(spec) = resolved.spec else {
         return Err(AppError::ExecutionBlockedByStatus {
             formula_id: resolved.formula_id().to_string(),
             status: resolved.status(),
-            execution_policy: resolved.execution_policy().unwrap_or("blocked"),
+            execution_policy: execution_policy_for_status(resolved.status()),
         });
     };
-    let inputs = parse_assignments(input_arguments)?;
+    let inputs = parse_assignments(&filtered_input_arguments)?;
     let result = evaluate_formula(spec.id, &inputs)?;
     output_evaluation(&result, &resolved, json, context);
     Ok(())
@@ -1898,7 +2024,8 @@ fn execute(raw_arguments: &[String]) -> Result<(), AppError> {
                 json,
                 CommandContext::LegacyAlias {
                     command: "run",
-                    migration_command: "aerocodex formula run <formula-id> name=value ...",
+                    migration_command:
+                        "aerocodex formula run <formula-id> [--preliminary] name=value ...",
                 },
             )
         }
@@ -2063,5 +2190,77 @@ mod tests {
         );
         assert_eq!(text.matches("\"ok\":false").count(), 1);
         assert_eq!(text.matches("\"error\":{").count(), 1);
+    }
+
+    #[test]
+    fn execution_gate_status_policy_fixture_mapping_matches_rr025() {
+        assert_eq!(execution_policy_for_status("research_required"), "blocked");
+        assert_eq!(
+            execution_policy_for_status("equation_traceable"),
+            "preliminary_flag_required"
+        );
+        assert_eq!(
+            execution_policy_for_status("implementation_verified"),
+            "normal_research"
+        );
+        assert_eq!(
+            execution_policy_for_status("reference_validated"),
+            "publication_supporting"
+        );
+
+        let research = execution_gate_error_for_parts(
+            "fixture.research_required",
+            None,
+            None,
+            "research_required",
+            false,
+        )
+        .expect("research_required must be blocked");
+        assert_eq!(research.code(), "execution_blocked_by_status");
+
+        let preliminary_required = execution_gate_error_for_parts(
+            "fixture.equation_traceable",
+            None,
+            None,
+            "equation_traceable",
+            false,
+        )
+        .expect("equation_traceable requires --preliminary by default");
+        assert_eq!(preliminary_required.code(), "preliminary_flag_required");
+        assert!(execution_gate_error_for_parts(
+            "fixture.equation_traceable",
+            None,
+            None,
+            "equation_traceable",
+            true,
+        )
+        .is_none());
+
+        assert!(execution_gate_error_for_parts(
+            "fixture.implementation_verified",
+            None,
+            None,
+            "implementation_verified",
+            false,
+        )
+        .is_none());
+        assert!(execution_gate_error_for_parts(
+            "fixture.reference_validated",
+            None,
+            None,
+            "reference_validated",
+            false,
+        )
+        .is_none());
+
+        let m07 = execution_gate_error_for_parts(
+            "m07.fixture.candidate",
+            Some("m07.fixture"),
+            Some("formula_vault.m07.fixture.candidate"),
+            "implementation_verified",
+            true,
+        )
+        .expect("M07 candidates must stay blocked even with --preliminary");
+        assert_eq!(m07.code(), "m07_candidate_blocked");
     }
 }
