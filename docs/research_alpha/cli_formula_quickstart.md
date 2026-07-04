@@ -94,14 +94,14 @@ cargo run -p aero-codex-cli -- formula run \
   aerodynamics.coefficients.drag_coefficient --json
 ```
 
-The task-card smoke command also remains blocked by the status gate after the RR-022 parser accepts the scalar flag syntax and before RR-023/RR-031 execution dispatch is enabled:
+The task-card smoke command remains blocked by the status gate after the RR-022 parser accepts the scalar flag syntax. RR-023 wires the bounded M00 angle dispatch path for future promoted rows, but current `research_required` registry rows still do not execute through the public-alpha CLI:
 
 ```bash
 cargo run -p aero-codex-cli -- formula run \
-  m00.angle.deg_to_rad --degrees 180 --json
+  m00.angle.deg_to_rad --degrees 180 --preliminary --json
 ```
 
-`equation_traceable` rows, when present, require `--preliminary` to pass the RR-025 status gate. Passing that gate does not create RR-023 runtime dispatch; unsupported dispatch paths still fail separately. `research_required` rows remain blocked even with `--preliminary`, and M07 candidates remain blocked until a later governed promotion task.
+When M00 angle rows are later promoted through governed status work, the wired dispatch uses `m00_degrees_to_radians` and `m00_radians_to_degrees` and reports `angle_radians` / `angle_degrees` with registry traceability. `equation_traceable` rows, when present, require `--preliminary` to pass the RR-025 status gate. `research_required` rows remain blocked even with `--preliminary`, and M07 candidates remain blocked until a later governed promotion task.
 
 The legacy run alias remains accepted during migration, but it routes through the same gate and cannot bypass status policy:
 
@@ -118,4 +118,5 @@ Rows that are present in the Formula Registry but below the execution threshold 
 - `validation_status` remains `research_required`.
 - The CLI is research/preliminary-design software only.
 - RR-019 introduces command namespace and alias routing only.
-- RR-019 does not change formula statuses, generated registry artifacts, runtime formula implementations, GitHub workflows, validation cards, equation batches, M07 quarantine/status data, or regulatory/safety claims.
+- RR-023 wires only bounded M00 angle dispatch specs and keeps them behind RR-025 status gates while the registry rows remain `research_required`.
+- RR-019/RR-023 do not change formula statuses, generated registry artifacts, runtime formula implementations, GitHub workflows, validation cards, equation batches, M07 quarantine/status data, or regulatory/safety claims.
