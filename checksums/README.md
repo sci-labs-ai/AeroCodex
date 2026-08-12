@@ -1,6 +1,6 @@
 # Repository checksum policy
 
-`checksums/SHA256SUMS` is the governing repository checksum manifest. Its paths must be the exact set of governed files: no missing files, extra entries, duplicates, alternate spellings, or excluded paths are accepted. Paths use canonical repository-relative forward slashes and lowercase SHA-256 digests followed by two spaces.
+`checksums/SHA256SUMS` is the governing repository checksum manifest. Its paths must be the exact set of governed files: no missing files, extra entries, duplicates, alternate spellings, or excluded paths are accepted. Paths use canonical repository-relative forward slashes and lowercase SHA-256 digests followed by two spaces. Because the manifest is UTF-8 text, AeroCodex currently requires every governed repository filename and every component of its relative path to be valid UTF-8 on every supported platform. Discovery uses native paths and fails before generation or verification if that requirement is violated; invalid Unix bytes or invalid Windows UTF-16 are diagnosed with deterministic escaped units and are never omitted, replaced, or compared through a lossy alias.
 
 Governed content includes regular files, generated files, and symbolic links. Every digest covers a versioned binary identity frame containing an object-type marker, an unsigned 64-bit payload length, and the payload. The marker makes a regular file and a symbolic link with otherwise identical bytes unambiguously different; length framing prevents ambiguous concatenation.
 
@@ -22,6 +22,12 @@ Run the blocking, cross-platform verifier from the repository root:
 cargo run -p xtask -- verify-checksums
 ```
 
-The verifier rejects malformed hashes, unsafe or noncanonical paths, excluded entries, duplicate paths, missing or changed files, and either side of a checksum/governed-file set difference. A checksum update is permitted only after the affected file has been reviewed and the reason is recorded in the applicable change or release status document. The verifier does not rewrite the manifest.
+To render a reviewed candidate manifest to standard output, use:
+
+```bash
+cargo run -p xtask -- generate-checksums
+```
+
+The generator and verifier share the same native-path discovery and fail-closed UTF-8 policy. The verifier rejects malformed hashes, unsafe or noncanonical paths, excluded entries, duplicate paths, missing or changed files, and either side of a checksum/governed-file set difference. A checksum update is permitted only after the affected file has been reviewed and the reason is recorded in the applicable change or release status document. The verifier does not rewrite the manifest, and the generator does not install its output automatically.
 
 The legacy `sha256sum -c checksums/SHA256SUMS` procedure is not governing because it neither applies the identity frame nor the text policy, is unavailable in standard PowerShell, and hashes checkout-specific line endings. It is not a substitute for the Rust verifier.

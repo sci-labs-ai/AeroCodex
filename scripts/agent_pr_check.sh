@@ -248,7 +248,7 @@ info "command_shape=bash scripts/agent_pr_check.sh"
 info "local_only=yes"
 info "network_github_auth_pr_merge_branch_delete_behavior=none"
 
-for command_name in cargo git grep python3 sha256sum stat awk mktemp rm; do
+for command_name in cargo git grep python3 sha256sum stat awk mktemp mkdir ln readlink cp mv rm rmdir cmp; do
   require_command "${command_name}"
 done
 

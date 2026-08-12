@@ -1,6 +1,7 @@
 use std::{
     borrow::Cow,
     collections::BTreeSet,
+    ffi::OsStr,
     fs,
     path::{Component, Path},
 };
@@ -23,6 +24,13 @@ pub fn verify_checksums(root: &Path) -> Result<(), String> {
         "verified checksums: files={}; normalized_text_files={}; manifest={CHECKSUM_MANIFEST_PATH}",
         result.verified_files, result.normalized_text_files
     );
+    Ok(())
+}
+
+pub fn generate_checksums(root: &Path) -> Result<(), String> {
+    for entry in generate_checksum_entries(root)? {
+        println!("{}  {}", entry.digest, entry.path);
+    }
     Ok(())
 }
 
@@ -93,6 +101,13 @@ fn verify_entries(
     entries: &[ChecksumEntry],
     require_exact_coverage: bool,
 ) -> Result<VerificationResult, String> {
+    // Discover and validate the native governed path set before hashing any manifest entry.
+    // This makes an unrepresentable repository filename a fail-closed precondition rather
+    // than a path that can be omitted from, or aliased into, the UTF-8 manifest.
+    let governed = require_exact_coverage
+        .then(|| collect_governed_files(root))
+        .transpose()?
+        .map(|files| files.into_iter().collect::<BTreeSet<_>>());
     let mut failures = Vec::new();
     let mut verified_files = 0usize;
     let mut normalized_text_files = 0usize;
@@ -122,20 +137,14 @@ fn verify_entries(
         normalized_text_files += usize::from(normalized);
     }
 
-    if require_exact_coverage {
-        match collect_governed_files(root) {
-            Ok(files) => {
-                let governed: BTreeSet<String> = files.into_iter().collect();
-                for path in governed.difference(&listed) {
-                    failures.push(format!("governed file is absent from checksums: {path}"));
-                }
-                for path in listed.difference(&governed) {
-                    failures.push(format!(
-                        "checksum entry is not a governed repository file: {path}"
-                    ));
-                }
-            }
-            Err(error) => failures.push(error),
+    if let Some(governed) = governed {
+        for path in governed.difference(&listed) {
+            failures.push(format!("governed file is absent from checksums: {path}"));
+        }
+        for path in listed.difference(&governed) {
+            failures.push(format!(
+                "checksum entry is not a governed repository file: {path}"
+            ));
         }
     }
 
@@ -165,8 +174,14 @@ fn validate_manifest_path(path: &str, line_number: usize) -> Result<(), String> 
         || parsed
             .components()
             .any(|component| !matches!(component, Component::Normal(_)))
-        || path_string(parsed) != path
     {
+        return Err(format!(
+            "malformed checksum entry at line {line_number}: `{path}` is not a canonical repository-relative path"
+        ));
+    }
+    let canonical = governed_path_string(parsed)
+        .map_err(|error| format!("malformed checksum entry at line {line_number}: {error}"))?;
+    if canonical != path {
         return Err(format!(
             "malformed checksum entry at line {line_number}: `{path}` is not a canonical repository-relative path"
         ));
@@ -274,6 +289,22 @@ fn collect_governed_files(root: &Path) -> Result<Vec<String>, String> {
     Ok(files)
 }
 
+fn generate_checksum_entries(root: &Path) -> Result<Vec<ChecksumEntry>, String> {
+    let paths = collect_governed_files(root)?;
+    paths
+        .into_iter()
+        .map(|path| {
+            let repository_path = Path::new(&path);
+            let (identity, _) = checksummed_identity(&root.join(repository_path), repository_path)
+                .map_err(|error| format!("cannot read governed file {path}: {error}"))?;
+            Ok(ChecksumEntry {
+                digest: crate::equation_batch::generate::sha256_hex(&identity),
+                path,
+            })
+        })
+        .collect()
+}
+
 fn collect_governed_files_recursive(
     root: &Path,
     directory: &Path,
@@ -299,7 +330,7 @@ fn collect_governed_files_recursive(
         if file_type.is_dir() {
             collect_governed_files_recursive(root, &path, files)?;
         } else if file_type.is_file() || file_type.is_symlink() {
-            files.push(path_string(relative));
+            files.push(governed_path_string(relative)?);
         }
     }
     Ok(())
@@ -327,14 +358,60 @@ fn exclusion_reason(path: &Path) -> Option<&'static str> {
     None
 }
 
-fn path_string(path: &Path) -> String {
-    path.components()
-        .filter_map(|component| match component {
-            Component::Normal(value) => Some(value.to_string_lossy()),
-            _ => None,
-        })
+fn governed_path_string(path: &Path) -> Result<String, String> {
+    let mut components = Vec::new();
+    for component in path.components() {
+        let Component::Normal(value) = component else {
+            return Err(format!(
+                "governed repository path is not canonical: {}",
+                native_path_diagnostic(path.as_os_str())
+            ));
+        };
+        let value = value.to_str().ok_or_else(|| {
+            format!(
+                "governed repository path is not valid UTF-8: {}",
+                native_path_diagnostic(path.as_os_str())
+            )
+        })?;
+        components.push(value);
+    }
+    Ok(components.join("/"))
+}
+
+#[cfg(unix)]
+fn native_path_diagnostic(path: &OsStr) -> String {
+    use std::os::unix::ffi::OsStrExt;
+
+    format_hex_units(
+        "unix-bytes",
+        path.as_bytes().iter().copied().map(u32::from),
+        2,
+    )
+}
+
+#[cfg(windows)]
+fn native_path_diagnostic(path: &OsStr) -> String {
+    use std::os::windows::ffi::OsStrExt;
+
+    format_hex_units("windows-utf16", path.encode_wide().map(u32::from), 4)
+}
+
+#[cfg(not(any(unix, windows)))]
+fn native_path_diagnostic(path: &OsStr) -> String {
+    format_hex_units(
+        "encoded-bytes",
+        path.as_encoded_bytes().iter().copied().map(u32::from),
+        2,
+    )
+}
+
+fn format_hex_units(label: &str, units: impl IntoIterator<Item = u32>, width: usize) -> String {
+    let encoded = units
+        .into_iter()
+        .map(|unit| format!("{unit:0width$x}"))
         .collect::<Vec<_>>()
-        .join("/")
+        .join(" ");
+    format!("{label}=[{encoded}]")
 }
 
 #[cfg(test)]
@@ -418,6 +495,83 @@ mod tests {
         let entries = parse_checksum_manifest(&text).expect("valid checksum entry parses");
         assert_eq!(entries.len(), 1);
         assert_eq!(entries[0].path, "docs/a.txt");
+    }
+
+    #[test]
+    fn governed_path_conversion_accepts_ascii_and_unicode_utf8() {
+        assert_eq!(
+            governed_path_string(Path::new("docs/normal.txt")),
+            Ok("docs/normal.txt".to_string())
+        );
+        assert_eq!(
+            governed_path_string(Path::new("docs/aerodynamik-α.txt")),
+            Ok("docs/aerodynamik-α.txt".to_string())
+        );
+    }
+
+    #[test]
+    fn checksum_generation_accepts_ascii_and_unicode_utf8_filenames() {
+        let root = test_root("utf8-filenames");
+        fs::write(root.join("normal.txt"), b"normal\n").expect("write ASCII fixture");
+        fs::write(root.join("aerodynamik-α.txt"), b"unicode\n").expect("write Unicode fixture");
+        let entries = generate_checksum_entries(&root).expect("UTF-8 paths generate exactly");
+        assert_eq!(
+            entries
+                .iter()
+                .map(|entry| entry.path.as_str())
+                .collect::<Vec<_>>(),
+            vec!["aerodynamik-α.txt", "normal.txt"]
+        );
+        fs::remove_dir_all(root).expect("remove checksum test directory");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn invalid_utf8_governed_filename_fails_generation_and_verification_without_aliasing() {
+        use std::os::unix::ffi::OsStrExt;
+
+        let root = test_root("invalid-governed-path");
+        let invalid_name = OsStr::from_bytes(b"artifact-\xff.txt");
+        fs::write(root.join(invalid_name), b"raw-name\n").expect("write raw filename fixture");
+        fs::write(root.join("artifact-�.txt"), b"lossy-alias\n")
+            .expect("write replacement-character alias fixture");
+        let expected = concat!(
+            "governed repository path is not valid UTF-8: ",
+            "unix-bytes=[61 72 74 69 66 61 63 74 2d ff 2e 74 78 74]"
+        );
+
+        let generation_error = generate_checksum_entries(&root)
+            .expect_err("generation must not omit an invalid native filename");
+        assert_eq!(generation_error, expected);
+        assert_eq!(
+            generate_checksum_entries(&root)
+                .expect_err("diagnostic must be deterministic on repeated discovery"),
+            expected
+        );
+
+        let verification_error =
+            verify_entries(&root, &[entry("artifact-�.txt", b"lossy-alias\n")], true)
+                .expect_err("a valid replacement-character entry cannot alias the raw filename");
+        assert_eq!(verification_error, expected);
+        assert!(
+            !verification_error.contains("governed file is absent"),
+            "discovery must fail before a lossy set comparison can occur"
+        );
+        fs::remove_dir_all(root).expect("remove checksum test directory");
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn invalid_windows_utf16_path_has_deterministic_diagnostic() {
+        use std::{ffi::OsString, os::windows::ffi::OsStringExt};
+
+        let path = PathBuf::from(OsString::from_wide(&[0x0061, 0xd800, 0x0062]));
+        let expected = concat!(
+            "governed repository path is not valid UTF-8: ",
+            "windows-utf16=[0061 d800 0062]"
+        );
+        assert_eq!(governed_path_string(&path).unwrap_err(), expected);
+        assert_eq!(governed_path_string(&path).unwrap_err(), expected);
     }
 
     #[test]

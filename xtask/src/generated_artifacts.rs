@@ -133,10 +133,10 @@ fn repository_state(root: &Path) -> Result<RepositoryState, String> {
 }
 
 fn git_output(root: &Path, arguments: &[&str]) -> Result<Output, String> {
-    let safe_directory = format!(
-        "safe.directory={}",
-        root.to_string_lossy().replace('\\', "/")
-    );
+    let root = root.to_str().ok_or_else(|| {
+        format!("generated-artifact Git verification requires a UTF-8 repository root: {root:?}")
+    })?;
+    let safe_directory = format!("safe.directory={}", root.replace('\\', "/"));
     Command::new("git")
         .arg("--no-optional-locks")
         .arg("-c")

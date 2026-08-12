@@ -49,17 +49,18 @@ This repository normally does not keep a root `Cargo.lock` in the RR-054 baselin
 
 - a tracked, regular `Cargo.lock` is hashed, preserved, and required to remain byte-identical;
 - a preexisting untracked file, symlink, missing tracked path, or other ambiguous state is preserved and stops the run before Cargo commands;
-- when the path is absent and covered by the repository ignore policy, the script atomically creates a minimal transient lockfile and thereby establishes ownership before Cargo can update it;
-- after every step and again in the exit trap, an owned lock must remain a regular, ignored, untracked path; if any condition changes, cleanup preserves it and fails;
-- only a path atomically created and continuously owned by this invocation is removed. Failure and interruption paths run the same guarded cleanup.
+- when the path is absent and covered by the repository ignore policy, the script atomically creates a minimal transient lockfile, records its filesystem device/file identity, and creates a hard-link anchor in a script-private directory under the excluded `target/` tree;
+- the private hard link keeps that exact file instance alive, preventing deletion/recreation from recycling its identity; after every step and again in the exit trap, the root path and anchor must remain regular files with the recorded identity while the root path remains ignored and untracked;
+- cleanup first moves the verified root path to a private quarantine name and verifies its identity against the anchor again before deleting either private link. If the root path was recreated, atomically replaced, changed to a symlink/directory, became tracked/unignored, or cannot be identified, the current root path is preserved and cleanup fails;
+- only the exact anchored instance created by this invocation is removed. Normal success, command failure, `INT`, and `TERM` run the same quarantine-and-verify cleanup, including when the repository path contains spaces.
 
 Successful removal records the final SHA-256 and size and prints:
 
 ```text
-removed_owned_transient=yes sha256=<digest> size=<bytes>
+removed_owned_transient=yes identity=<device:file-id> quarantine_verified=yes sha256=<digest> size=<bytes>
 ```
 
-The focused harness at `scripts/tests/agent_pr_check_cargo_lock.sh` covers absent/owned, preexisting untracked, clean tracked, preexisting dirty tracked, tracked content modified during a run, command-failure, interruption, and repository paths containing spaces. Agents should not include a transient root `Cargo.lock` in an RR-054 handoff unless maintainers explicitly change repository policy.
+The focused harness at `scripts/tests/agent_pr_check_cargo_lock.sh` covers unchanged guard ownership, deletion/recreation, atomic rename-over, user-byte preservation, symlink and directory replacement, unavailable identity verification, normal/command-failure/`INT`/`TERM` cleanup, clean and dirty tracked paths, preexisting untracked paths, tracked modification, and repository paths containing spaces. A host that cannot create native symbolic links reports that case as an explicit skip; Ubuntu CI is expected to execute it. Agents should not include a transient root `Cargo.lock` in an RR-054 handoff unless maintainers explicitly change repository policy.
 
 ## Shellcheck
 

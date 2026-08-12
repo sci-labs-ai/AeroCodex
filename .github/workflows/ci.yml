@@ -16,6 +16,8 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+      - name: Cargo.lock file-instance replacement harness
+        run: bash scripts/tests/agent_pr_check_cargo_lock.sh
       - name: cargo fmt --check
         run: cargo fmt --all -- --check
       - name: cargo check --workspace --all-targets --all-features
