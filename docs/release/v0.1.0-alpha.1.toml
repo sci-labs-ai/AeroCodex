@@ -9,6 +9,7 @@ public_executable = false
 validation_record = "validation/equation_inventory.tsv"
 documentation = "docs/release/v0.1.0-alpha.1-status.md"
 registry_formula_count = 152
+cli_dispatch_metadata = "crates/aero-codex-cli/dispatch_metadata.tsv"
 cli_dispatch_formula_count = 12
 public_executable_formula_count = 0
 

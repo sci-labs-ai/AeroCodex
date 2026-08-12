@@ -2,12 +2,15 @@ use std::{
     collections::{BTreeMap, BTreeSet},
     fs,
     path::{Component, Path},
+    process::{Command, Output},
 };
 
 pub const RELEASE_MANIFEST_PATH: &str = "docs/release/v0.1.0-alpha.1.toml";
+pub const CLI_DISPATCH_METADATA_PATH: &str = "crates/aero-codex-cli/dispatch_metadata.tsv";
 const RELEASE_SCHEMA_VERSION: &str = "aerocodex.release_manifest.v1";
 const RELEASE_VERSION: &str = "0.1.0-alpha.1";
 const RELEASE_TIER: &str = "research_software_alpha";
+const CLI_DISPATCH_SCHEMA_VERSION: &str = "aerocodex.cli_dispatch.v1";
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ReleaseManifest {
@@ -22,6 +25,7 @@ pub struct ReleaseManifest {
     pub validation_record: String,
     pub documentation: String,
     pub registry_formula_count: usize,
+    pub cli_dispatch_metadata: String,
     pub cli_dispatch_formula_count: usize,
     pub public_executable_formula_count: usize,
     pub formulas: Vec<ReleaseFormula>,
@@ -36,6 +40,12 @@ pub struct ReleaseFormula {
     pub public_executable: bool,
     pub validation_record: String,
     pub documentation: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct CliDispatchFormula {
+    canonical_formula_id: String,
+    runtime_symbol: String,
 }
 
 pub fn verify_release_manifest(root: &Path) -> Result<(), String> {
@@ -62,6 +72,21 @@ pub fn verify_release_manifest(root: &Path) -> Result<(), String> {
             manifest.release_tier
         ));
     }
+
+    verify_pinned_base_commit(root, &manifest.base_commit)?;
+
+    if manifest.cli_dispatch_metadata != CLI_DISPATCH_METADATA_PATH {
+        return Err(format!(
+            "release manifest cli_dispatch_metadata must be `{CLI_DISPATCH_METADATA_PATH}`, found `{}`",
+            manifest.cli_dispatch_metadata
+        ));
+    }
+
+    let dispatch_path = root.join(&manifest.cli_dispatch_metadata);
+    let dispatch_text = fs::read_to_string(&dispatch_path)
+        .map_err(|error| format!("cannot read {CLI_DISPATCH_METADATA_PATH}: {error}"))?;
+    let dispatch = parse_cli_dispatch_metadata(&dispatch_text)?;
+    validate_dispatch_matches_manifest(&manifest, &dispatch)?;
 
     for reference in [
         manifest.validation_record.as_str(),
@@ -127,6 +152,202 @@ pub fn verify_release_manifest(root: &Path) -> Result<(), String> {
     Ok(())
 }
 
+fn parse_cli_dispatch_metadata(text: &str) -> Result<Vec<CliDispatchFormula>, String> {
+    const HEADER: &str = "schema_version\tcanonical_formula_id\tdispatch_formula_id\truntime_symbol\toutput_variable\tinputs\tsummary";
+    let mut lines = text.lines();
+    if lines.next() != Some(HEADER) {
+        return Err(format!(
+            "{CLI_DISPATCH_METADATA_PATH} has an invalid header"
+        ));
+    }
+
+    let mut formulas = Vec::new();
+    let mut canonical_ids = BTreeSet::new();
+    let mut dispatch_ids = BTreeSet::new();
+    let mut runtime_symbols = BTreeSet::new();
+    for (index, line) in lines.enumerate() {
+        let line_number = index + 2;
+        let fields: Vec<&str> = line.split('\t').collect();
+        if fields.len() != 7 {
+            return Err(format!(
+                "{CLI_DISPATCH_METADATA_PATH} line {line_number} has {} fields, expected 7",
+                fields.len()
+            ));
+        }
+        if fields.iter().any(|field| field.trim().is_empty()) {
+            return Err(format!(
+                "{CLI_DISPATCH_METADATA_PATH} line {line_number} contains an empty field"
+            ));
+        }
+        if fields[0] != CLI_DISPATCH_SCHEMA_VERSION {
+            return Err(format!(
+                "{CLI_DISPATCH_METADATA_PATH} line {line_number} has unsupported schema `{}`",
+                fields[0]
+            ));
+        }
+        if !canonical_ids.insert(fields[1].to_string()) {
+            return Err(format!(
+                "duplicate CLI dispatch canonical formula ID `{}`",
+                fields[1]
+            ));
+        }
+        if !dispatch_ids.insert(fields[2].to_string()) {
+            return Err(format!("duplicate CLI dispatch formula ID `{}`", fields[2]));
+        }
+        if !runtime_symbols.insert(fields[3].to_string()) {
+            return Err(format!(
+                "duplicate CLI dispatch runtime symbol `{}`",
+                fields[3]
+            ));
+        }
+        formulas.push(CliDispatchFormula {
+            canonical_formula_id: fields[1].to_string(),
+            runtime_symbol: fields[3].to_string(),
+        });
+    }
+    if formulas.is_empty() {
+        return Err(format!(
+            "{CLI_DISPATCH_METADATA_PATH} contains no formula records"
+        ));
+    }
+    Ok(formulas)
+}
+
+fn validate_dispatch_matches_manifest(
+    manifest: &ReleaseManifest,
+    dispatch: &[CliDispatchFormula],
+) -> Result<(), String> {
+    if manifest.cli_dispatch_formula_count != dispatch.len() {
+        return Err(format!(
+            "release manifest cli_dispatch_formula_count={} does not match CLI dispatch metadata count {}",
+            manifest.cli_dispatch_formula_count,
+            dispatch.len()
+        ));
+    }
+
+    let manifest_by_id: BTreeMap<&str, Option<&str>> = manifest
+        .formulas
+        .iter()
+        .map(|formula| {
+            (
+                formula.identifier.as_str(),
+                formula.runtime_symbol.as_deref(),
+            )
+        })
+        .collect();
+    let dispatch_by_id: BTreeMap<&str, &str> = dispatch
+        .iter()
+        .map(|formula| {
+            (
+                formula.canonical_formula_id.as_str(),
+                formula.runtime_symbol.as_str(),
+            )
+        })
+        .collect();
+
+    let missing: Vec<&str> = dispatch_by_id
+        .keys()
+        .copied()
+        .filter(|identifier| !manifest_by_id.contains_key(identifier))
+        .collect();
+    let extra: Vec<&str> = manifest_by_id
+        .keys()
+        .copied()
+        .filter(|identifier| !dispatch_by_id.contains_key(identifier))
+        .collect();
+    let mismatched: Vec<String> = manifest_by_id
+        .iter()
+        .filter_map(|(identifier, manifest_symbol)| {
+            dispatch_by_id.get(identifier).and_then(|dispatch_symbol| {
+                (*manifest_symbol != Some(*dispatch_symbol)).then(|| {
+                    format!(
+                        "{identifier}: manifest={:?}, dispatch={dispatch_symbol}",
+                        manifest_symbol
+                    )
+                })
+            })
+        })
+        .collect();
+
+    if missing.is_empty() && extra.is_empty() && mismatched.is_empty() {
+        Ok(())
+    } else {
+        Err(format!(
+            "release manifest does not exactly match CLI dispatch metadata: missing=[{}]; extra=[{}]; runtime_symbol_mismatches=[{}]",
+            missing.join(", "),
+            extra.join(", "),
+            mismatched.join(", ")
+        ))
+    }
+}
+
+fn git_output(root: &Path, arguments: &[&str]) -> Result<Output, String> {
+    let safe_directory = format!(
+        "safe.directory={}",
+        root.to_string_lossy().replace('\\', "/")
+    );
+    Command::new("git")
+        .arg("-c")
+        .arg(safe_directory)
+        .arg("-C")
+        .arg(root)
+        .args(arguments)
+        .output()
+        .map_err(|error| format!("cannot execute Git for release revision verification: {error}"))
+}
+
+fn git_error(output: &Output) -> String {
+    String::from_utf8_lossy(&output.stderr).trim().to_string()
+}
+
+fn verify_pinned_base_commit(root: &Path, base_commit: &str) -> Result<(), String> {
+    if base_commit.len() != 40
+        || !base_commit
+            .bytes()
+            .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+    {
+        return Err(format!(
+            "malformed pinned base revision `{base_commit}`: expected a 40-character lowercase Git object ID"
+        ));
+    }
+
+    let worktree = git_output(root, &["rev-parse", "--is-inside-work-tree"])?;
+    if !worktree.status.success() || String::from_utf8_lossy(&worktree.stdout).trim() != "true" {
+        return Err(format!(
+            "release revision verification requires Git metadata; source archives without .git cannot pass this gate ({})",
+            git_error(&worktree)
+        ));
+    }
+
+    let object_type = git_output(root, &["cat-file", "-t", base_commit])?;
+    if !object_type.status.success() {
+        return Err(format!(
+            "pinned base revision `{base_commit}` does not resolve to a Git object: {}",
+            git_error(&object_type)
+        ));
+    }
+    let object_type_name = String::from_utf8_lossy(&object_type.stdout)
+        .trim()
+        .to_string();
+    if object_type_name != "commit" {
+        return Err(format!(
+            "pinned base revision `{base_commit}` resolves to Git object type `{object_type_name}`, not a commit"
+        ));
+    }
+
+    let ancestor = git_output(root, &["merge-base", "--is-ancestor", base_commit, "HEAD"])?;
+    match ancestor.status.code() {
+        Some(0) => Ok(()),
+        Some(1) => Err(format!(
+            "pinned base commit `{base_commit}` is not an ancestor of the reviewed revision HEAD"
+        )),
+        _ => Err(format!(
+            "Git could not verify ancestry for pinned base commit `{base_commit}`: {}",
+            git_error(&ancestor)
+        )),
+    }
+}
+
 pub fn parse_release_manifest(text: &str) -> Result<ReleaseManifest, String> {
     let mut release = BTreeMap::new();
     let mut formula_tables = Vec::new();
@@ -184,6 +405,7 @@ pub fn parse_release_manifest(text: &str) -> Result<ReleaseManifest, String> {
         validation_record: required_string(&release, "validation_record", "release")?,
         documentation: required_string(&release, "documentation", "release")?,
         registry_formula_count: required_usize(&release, "registry_formula_count", "release")?,
+        cli_dispatch_metadata: required_string(&release, "cli_dispatch_metadata", "release")?,
         cli_dispatch_formula_count: required_usize(
             &release,
             "cli_dispatch_formula_count",
@@ -215,6 +437,7 @@ pub fn parse_release_manifest(text: &str) -> Result<ReleaseManifest, String> {
             "validation_record",
             "documentation",
             "registry_formula_count",
+            "cli_dispatch_metadata",
             "cli_dispatch_formula_count",
             "public_executable_formula_count",
         ],
@@ -263,9 +486,7 @@ fn validate_release_manifest(manifest: &ReleaseManifest) -> Result<(), String> {
             .bytes()
             .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
     {
-        return Err(
-            "release base_commit must be a 40-character lowercase Git object ID".to_string(),
-        );
+        return Err("malformed pinned base revision: release base_commit must be a 40-character lowercase Git object ID".to_string());
     }
     validate_policy_combination(
         "release",
@@ -303,6 +524,7 @@ fn validate_release_manifest(manifest: &ReleaseManifest) -> Result<(), String> {
     }
 
     let mut identifiers = BTreeSet::new();
+    let mut runtime_symbols = BTreeSet::new();
     for formula in &manifest.formulas {
         if !identifiers.insert(formula.identifier.as_str()) {
             return Err(format!(
@@ -322,6 +544,13 @@ fn validate_release_manifest(manifest: &ReleaseManifest) -> Result<(), String> {
                 "release formula `{}` has an empty runtime_symbol",
                 formula.identifier
             ));
+        }
+        if let Some(symbol) = formula.runtime_symbol.as_deref() {
+            if !runtime_symbols.insert(symbol) {
+                return Err(format!(
+                    "duplicate release formula runtime symbol `{symbol}`"
+                ));
+            }
         }
         validate_policy_combination(
             &format!("release formula `{}`", formula.identifier),
@@ -467,6 +696,12 @@ fn require_existing_repository_file(root: &Path, relative: &str) -> Result<(), S
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::{
+        path::PathBuf,
+        sync::atomic::{AtomicUsize, Ordering},
+    };
+
+    static TEST_COUNTER: AtomicUsize = AtomicUsize::new(0);
 
     fn manifest(formulas: &str) -> String {
         format!(
@@ -481,6 +716,7 @@ mod tests {
              validation_record = \"validation/equation_inventory.tsv\"\n\
              documentation = \"docs/release/v0.1.0-alpha.1-status.md\"\n\
              registry_formula_count = 152\n\
+             cli_dispatch_metadata = \"crates/aero-codex-cli/dispatch_metadata.tsv\"\n\
              cli_dispatch_formula_count = 1\n\
              public_executable_formula_count = 0\n\n\
              {formulas}"
@@ -498,6 +734,52 @@ mod tests {
              validation_record = \"validation/cards/fixture.yaml\"\n\
              documentation = \"docs/fixture.md\"\n"
         )
+    }
+
+    fn dispatch_metadata(rows: &[(&str, &str, &str)]) -> String {
+        let mut text = "schema_version\tcanonical_formula_id\tdispatch_formula_id\truntime_symbol\toutput_variable\tinputs\tsummary\n".to_string();
+        for (canonical_id, dispatch_id, runtime_symbol) in rows {
+            text.push_str(&format!(
+                "aerocodex.cli_dispatch.v1\t{canonical_id}\t{dispatch_id}\t{runtime_symbol}\toutput\tinput\tsummary\n"
+            ));
+        }
+        text
+    }
+
+    fn parsed_dispatch(rows: &[(&str, &str, &str)]) -> Vec<CliDispatchFormula> {
+        parse_cli_dispatch_metadata(&dispatch_metadata(rows)).expect("dispatch fixture parses")
+    }
+
+    fn git(root: &Path, arguments: &[&str]) -> String {
+        let output = git_output(root, arguments).expect("execute fixture Git command");
+        assert!(
+            output.status.success(),
+            "fixture Git command failed: {}",
+            git_error(&output)
+        );
+        String::from_utf8(output.stdout)
+            .expect("fixture Git output is UTF-8")
+            .trim()
+            .to_string()
+    }
+
+    fn git_root(name: &str) -> PathBuf {
+        let serial = TEST_COUNTER.fetch_add(1, Ordering::Relaxed);
+        let root = std::env::temp_dir().join(format!(
+            "aerocodex-release-manifest-{name}-{}-{serial}",
+            std::process::id()
+        ));
+        if root.exists() {
+            fs::remove_dir_all(&root).expect("remove stale release manifest fixture");
+        }
+        fs::create_dir_all(&root).expect("create release manifest fixture");
+        git(&root, &["init", "-b", "main"]);
+        git(&root, &["config", "user.email", "tests@example.invalid"]);
+        git(&root, &["config", "user.name", "AeroCodex Tests"]);
+        fs::write(root.join("fixture.txt"), b"base\n").expect("write base fixture");
+        git(&root, &["add", "."]);
+        git(&root, &["commit", "-m", "base"]);
+        root
     }
 
     #[test]
@@ -531,6 +813,138 @@ mod tests {
         );
         let error = parse_release_manifest(&text).expect_err("duplicates must fail");
         assert!(error.contains("duplicate release formula identifier"));
+    }
+
+    #[test]
+    fn duplicate_manifest_runtime_symbols_fail() {
+        let formulas = format!(
+            "{}{}",
+            blocked_formula("fixture.one"),
+            blocked_formula("fixture.two")
+        );
+        let text = manifest(&formulas).replace(
+            "cli_dispatch_formula_count = 1",
+            "cli_dispatch_formula_count = 2",
+        );
+        let error = parse_release_manifest(&text).expect_err("duplicate symbols must fail");
+        assert!(error.contains("duplicate release formula runtime symbol"));
+    }
+
+    #[test]
+    fn dispatch_metadata_rejects_duplicate_ids_and_symbols() {
+        for rows in [
+            vec![
+                ("fixture.one", "dispatch.one", "symbol_one"),
+                ("fixture.one", "dispatch.two", "symbol_two"),
+            ],
+            vec![
+                ("fixture.one", "dispatch.same", "symbol_one"),
+                ("fixture.two", "dispatch.same", "symbol_two"),
+            ],
+            vec![
+                ("fixture.one", "dispatch.one", "symbol_same"),
+                ("fixture.two", "dispatch.two", "symbol_same"),
+            ],
+        ] {
+            assert!(parse_cli_dispatch_metadata(&dispatch_metadata(&rows)).is_err());
+        }
+    }
+
+    #[test]
+    fn dispatch_comparison_rejects_replaced_missing_extra_and_wrong_symbol() {
+        let base = parse_release_manifest(&manifest(&blocked_formula("fixture.one")))
+            .expect("manifest fixture parses");
+
+        let replaced = validate_dispatch_matches_manifest(
+            &base,
+            &parsed_dispatch(&[("fixture.replaced", "dispatch.replaced", "fixture_symbol")]),
+        )
+        .expect_err("replaced dispatch-linked formula must fail");
+        assert!(replaced.contains("missing=[fixture.replaced]"));
+        assert!(replaced.contains("extra=[fixture.one]"));
+
+        let mut missing_manifest_formula = base.clone();
+        missing_manifest_formula.cli_dispatch_formula_count = 2;
+        let missing = validate_dispatch_matches_manifest(
+            &missing_manifest_formula,
+            &parsed_dispatch(&[
+                ("fixture.one", "dispatch.one", "fixture_symbol"),
+                ("fixture.two", "dispatch.two", "symbol_two"),
+            ]),
+        )
+        .expect_err("missing manifest formula must fail");
+        assert!(missing.contains("missing=[fixture.two]"));
+
+        let mut extra_manifest_formula = base.clone();
+        let mut extra = extra_manifest_formula.formulas[0].clone();
+        extra.identifier = "fixture.extra".to_string();
+        extra.runtime_symbol = Some("symbol_extra".to_string());
+        extra_manifest_formula.formulas.push(extra);
+        let extra_error = validate_dispatch_matches_manifest(
+            &extra_manifest_formula,
+            &parsed_dispatch(&[("fixture.one", "dispatch.one", "fixture_symbol")]),
+        )
+        .expect_err("extra manifest formula must fail");
+        assert!(extra_error.contains("extra=[fixture.extra]"));
+
+        let wrong_symbol = validate_dispatch_matches_manifest(
+            &base,
+            &parsed_dispatch(&[("fixture.one", "dispatch.one", "wrong_symbol")]),
+        )
+        .expect_err("wrong runtime symbol must fail");
+        assert!(wrong_symbol.contains("runtime_symbol_mismatches"));
+    }
+
+    #[test]
+    fn pinned_base_requires_existing_commit_ancestor() {
+        let root = git_root("objects");
+        let base = git(&root, &["rev-parse", "HEAD"]);
+        fs::write(root.join("fixture.txt"), b"head\n").expect("write head fixture");
+        git(&root, &["commit", "-am", "head"]);
+        verify_pinned_base_commit(&root, &base).expect("base commit is an ancestor of HEAD");
+
+        let nonexistent = "0000000000000000000000000000000000000000";
+        let error = verify_pinned_base_commit(&root, nonexistent)
+            .expect_err("nonexistent object must fail");
+        assert!(error.contains("does not resolve to a Git object"));
+
+        fs::write(root.join("blob.txt"), b"blob\n").expect("write blob fixture");
+        let blob = git(&root, &["hash-object", "-w", "blob.txt"]);
+        let error = verify_pinned_base_commit(&root, &blob).expect_err("blob must fail");
+        assert!(error.contains("not a commit"));
+        fs::remove_dir_all(root).expect("remove release manifest fixture");
+    }
+
+    #[test]
+    fn pinned_base_rejects_malformed_nonancestor_and_source_archive() {
+        let malformed = verify_pinned_base_commit(Path::new("."), "not-an-object-id")
+            .expect_err("malformed object ID must fail before Git access");
+        assert!(malformed.contains("malformed pinned base revision"));
+
+        let root = git_root("nonancestor");
+        git(&root, &["checkout", "-b", "side"]);
+        fs::write(root.join("side.txt"), b"side\n").expect("write side fixture");
+        git(&root, &["add", "."]);
+        git(&root, &["commit", "-m", "side"]);
+        let side = git(&root, &["rev-parse", "HEAD"]);
+        git(&root, &["checkout", "main"]);
+        fs::write(root.join("main.txt"), b"main\n").expect("write main fixture");
+        git(&root, &["add", "."]);
+        git(&root, &["commit", "-m", "main"]);
+        let error = verify_pinned_base_commit(&root, &side).expect_err("nonancestor must fail");
+        assert!(error.contains("is not an ancestor"));
+        fs::remove_dir_all(&root).expect("remove release manifest fixture");
+
+        let archive = std::env::temp_dir().join(format!(
+            "aerocodex-release-archive-{}-{}",
+            std::process::id(),
+            TEST_COUNTER.fetch_add(1, Ordering::Relaxed)
+        ));
+        fs::create_dir_all(&archive).expect("create source archive fixture");
+        let error = verify_pinned_base_commit(&archive, "1111111111111111111111111111111111111111")
+            .expect_err("source archive must fail");
+        assert!(error.contains("source archives without .git cannot pass"));
+        fs::remove_dir_all(archive).expect("remove source archive fixture");
     }
 
     #[test]

@@ -18,7 +18,7 @@ cargo run -p xtask -- formula-registry check
 
 ## Blocking GitHub Actions gate
 
-`.github/workflows/ci.yml` runs on `pull_request` and on `push` to `main` using Rust stable on Linux (`ubuntu-latest`). It keeps the repository cargo-first and runs the baseline gates plus lightweight equation-batch inventory/status checks:
+`.github/workflows/ci.yml` runs on `pull_request` and on `push` to `main` using Rust stable on Linux (`ubuntu-latest`). Checkout uses `fetch-depth: 0` because the release-manifest gate must resolve the pinned object and prove that it is a commit ancestor of `HEAD`. It keeps the repository cargo-first and runs the baseline gates plus lightweight equation-batch inventory/status checks:
 
 ```bash
 cargo fmt --all -- --check
@@ -45,10 +45,12 @@ The `python3 -m json.tool` calls are JSON syntax checks using the standard Pytho
 - `cargo test --all` runs the workspace test suite through Cargo.
 - `cargo doc --no-deps` builds local documentation without third-party dependency docs.
 - `cargo run -p xtask -- verify --all` runs the repository governance and verification checks.
-- `cargo run -p xtask -- verify-release-manifest` parses the release manifest, requires its metadata and references, rejects duplicate IDs or unsafe status/policy combinations, and cross-checks every release formula against the governed registry.
-- `cargo run -p xtask -- verify-checksums` verifies complete repository checksum coverage with platform-independent canonical text line endings. It fails on malformed entries, missing or changed files, duplicate paths, and governed files omitted from the checksum manifest.
+- `cargo run -p xtask -- verify-release-manifest` parses the release manifest, requires its metadata and references, rejects duplicate IDs, duplicate runtime symbols, and unsafe status/policy combinations, and requires exact formula-ID/runtime-symbol equality with the structured CLI dispatch metadata and the governed registry. The pinned base must resolve to a Git commit that is an ancestor of `HEAD`; malformed, missing, non-commit, and non-ancestor objects fail explicitly.
+- `cargo run -p xtask -- verify-checksums` requires exact set equality between the manifest and the documented governed files. It rejects malformed hashes, unsafe/noncanonical/duplicate/excluded paths, missing or changed content, and both missing and extra set members. CRLF normalization applies only to the explicit text-format allowlist; other content is byte-exact, and symbolic links are governed by their target text.
 - `cargo run -p xtask -- equation-batch plan --all-manifests --json` checks that every current equation-batch manifest is still readable by the planning/reporting infrastructure and emits parseable JSON.
-- `cargo run -p xtask -- verify-generated` runs the equation-batch status-report and formula-registry read-only checks, requires all governed generated files, and snapshots the repository before and after verification so unexpected file creation, removal, or modification fails the gate. This is a software consistency gate, not formula validation, status promotion, certification, or formula execution.
+- `cargo run -p xtask -- verify-generated` runs the equation-batch status-report and formula-registry read-only checks, requires all governed generated files, and compares the exact Git-aware state before and after. Tracked staged and unstaged content, executable modes, symlink targets, and nonignored untracked paths are covered; ignored `target/` output is not. A dirty baseline is permitted only when the action produces zero state delta, and the result reports whether that baseline was clean or dirty. This is a software consistency gate, not formula validation, status promotion, certification, or formula execution.
+
+The release-manifest and generated-artifact gates require a Git worktree with sufficient object history. Source archives without `.git` metadata intentionally cannot pass them; archive validation must run before metadata is removed or use a separately designed archive-attestation workflow.
 
 ## Equation-batch verify-all diagnostic gate
 
