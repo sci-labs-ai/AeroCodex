@@ -195,7 +195,7 @@ pub fn run_report_command(root: &Path, options: &ReportOptions) -> Result<(), St
                 out_path.display()
             )
         })?;
-        if existing != expected {
+        if crate::checksums::canonical_text(&existing) != expected {
             return Err(format!(
                 "equation-batch status report check failed; output is missing or stale: {}",
                 out_path.display()

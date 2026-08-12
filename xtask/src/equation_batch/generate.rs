@@ -371,7 +371,19 @@ fn create_directory_symlink(target: &Path, link: &Path) -> std::io::Result<()> {
 
 #[cfg(windows)]
 fn create_directory_symlink(target: &Path, link: &Path) -> std::io::Result<()> {
-    std::os::windows::fs::symlink_dir(target, link)
+    let output = std::process::Command::new("cmd")
+        .args(["/c", "mklink", "/J"])
+        .arg(link)
+        .arg(target)
+        .output()?;
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(std::io::Error::other(format!(
+            "failed to create directory junction: {}",
+            String::from_utf8_lossy(&output.stderr).trim()
+        )))
+    }
 }
 
 fn package_dependencies_for_manifest(
@@ -387,6 +399,25 @@ fn package_dependencies_for_manifest(
     }
 
     let workspace_packages = workspace_package_member_paths(root)?;
+    for (package, member_path) in &workspace_packages {
+        let member_manifest = root.join(member_path).join("Cargo.toml");
+        let member_text = fs::read_to_string(&member_manifest)
+            .map_err(|error| format!("{}: {error}", member_manifest.display()))?;
+        let crate_name = plan::parse_toml_string_assignment_in_section(&member_text, "lib", "name")
+            .unwrap_or_else(|| package.replace('-', "_"));
+        let reference = format!("{crate_name}::");
+        if manifest
+            .rows
+            .iter()
+            .any(|row| row.test_expression.contains(&reference))
+        {
+            referenced
+                .entry(package.clone())
+                .or_default()
+                .insert(crate_name);
+        }
+    }
+
     let mut dependencies = Vec::new();
     for (package, crate_names) in referenced {
         let member_path = workspace_packages.get(&package).ok_or_else(|| {
@@ -998,6 +1029,37 @@ mod tests {
         remove_dir_if_exists(&root);
     }
 
+    #[test]
+    fn test_expression_workspace_crates_become_direct_dependencies() {
+        let root = fake_repo_root("direct_test_expression_dependency");
+        let manifest = root.join("equation-batches/m00.tsv");
+        write_fake_repo(&root, &manifest);
+        let manifest_text = fs::read_to_string(&manifest).expect("read fixture manifest");
+        fs::write(
+            &manifest,
+            manifest_text.replace("\texact\ttrue\n", "\texact\taero_codex_core::fixture()\n"),
+        )
+        .expect("write direct dependency fixture");
+        let output_dir = fake_output_dir("direct_test_expression_dependency_probe");
+        remove_dir_if_exists(&output_dir);
+        let options = GenerateOptions {
+            manifest: PathBuf::from("equation-batches/m00.tsv"),
+            output_dir: output_dir.clone(),
+            json: false,
+        };
+
+        let result = generate_probe_crate(&root, &options).expect("probe generation succeeds");
+        assert_eq!(
+            result.packages,
+            vec!["aero-codex-astrodynamics", "aero-codex-core"]
+        );
+        let cargo_toml = fs::read_to_string(output_dir.join("Cargo.toml")).expect("Cargo.toml");
+        assert!(cargo_toml.contains("aero-codex-core = { path ="));
+
+        remove_dir_if_exists(&output_dir);
+        remove_dir_if_exists(&root);
+    }
+
     fn fake_repo_root(label: &str) -> PathBuf {
         let path = unique_temp_path(label);
         remove_dir_if_exists(&path);
@@ -1025,7 +1087,7 @@ mod tests {
         fs::create_dir_all(manifest.parent().expect("manifest parent")).expect("manifest dir");
         fs::write(
             root.join("Cargo.toml"),
-            "[workspace]\nmembers = [\n    \"crates/aero-codex-astrodynamics\",\n]\n",
+            "[workspace]\nmembers = [\n    \"crates/aero-codex-astrodynamics\",\n    \"crates/aero-codex-core\",\n]\n",
         )
         .expect("write workspace Cargo.toml");
         fs::write(
@@ -1035,6 +1097,18 @@ mod tests {
         .expect("write crate Cargo.toml");
         fs::write(root.join("crates/aero-codex-astrodynamics/src/lib.rs"), "")
             .expect("write lib.rs");
+        fs::create_dir_all(root.join("crates/aero-codex-core/src"))
+            .expect("create fake core crate src");
+        fs::write(
+            root.join("crates/aero-codex-core/Cargo.toml"),
+            "[package]\nname = \"aero-codex-core\"\nversion = \"0.0.0\"\nedition = \"2021\"\n[lib]\nname = \"aero_codex_core\"\npath = \"src/lib.rs\"\n",
+        )
+        .expect("write core crate Cargo.toml");
+        fs::write(
+            root.join("crates/aero-codex-core/src/lib.rs"),
+            "pub fn fixture() -> bool { true }\n",
+        )
+        .expect("write core lib.rs");
         fs::write(
             manifest,
             "schema_version\tbatch_id\tformula_id\tpackage\tcrate_name\truntime_symbol\toutput_variable\tcontract_path\tvalidation_card_path\tsource_seed_path\tvalidation_status\ttest_strategy\ttest_expression\n\

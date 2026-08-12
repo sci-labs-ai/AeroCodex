@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 cd "${REPO_ROOT}"
 
-TOTAL_STEPS=13
+TOTAL_STEPS=15
 CURRENT_STEP=0
 
 info() {
@@ -42,12 +42,6 @@ if ! command -v git >/dev/null 2>&1; then
   exit 127
 fi
 
-if ! command -v sha256sum >/dev/null 2>&1; then
-  info "ERROR: sha256sum was not found on the command search path"
-  info "Install GNU coreutils or use the PowerShell friend-test script on Windows."
-  exit 127
-fi
-
 if command -v rustc >/dev/null 2>&1; then
   info "rustc: $(rustc --version)"
 else
@@ -63,8 +57,8 @@ run_step "git status --short" \
   git status --short
 run_step "git diff --check" \
   git diff --check
-run_step "sha256sum -c checksums/SHA256SUMS" \
-  sha256sum -c checksums/SHA256SUMS
+run_step "cargo run -p xtask -- verify-checksums" \
+  cargo run -p xtask -- verify-checksums
 run_step "cargo fmt --all -- --check" \
   cargo fmt --all -- --check
 run_step "cargo check --workspace --all-targets --all-features" \
@@ -75,12 +69,16 @@ run_step "cargo test --workspace --all-targets --all-features" \
   cargo test --workspace --all-targets --all-features
 run_step "cargo run -p aero-codex-cli -- version --json" \
   cargo run -p aero-codex-cli -- version --json
-run_step "cargo run -p aero-codex-cli -- run canonical distance smoke" \
-  cargo run -p aero-codex-cli -- run formula_vault.m00.canonical.distance_to_canonical distance=-42 distance_unit=7 --json
+run_step "cargo run -p aero-codex-cli -- formula status-report --json" \
+  cargo run -p aero-codex-cli -- formula status-report --json
 run_step "cargo run -p aero-codex-cli -- self-check --json" \
   cargo run -p aero-codex-cli -- self-check --json
 run_step "cargo run -p xtask -- verify --all" \
   cargo run -p xtask -- verify --all
+run_step "cargo run -p xtask -- verify-release-manifest" \
+  cargo run -p xtask -- verify-release-manifest
+run_step "cargo run -p xtask -- verify-generated" \
+  cargo run -p xtask -- verify-generated
 run_step "cargo run -p xtask -- dependency-policy" \
   cargo run -p xtask -- dependency-policy
 run_shell_step "RUSTDOCFLAGS=\"-D warnings\" cargo doc --workspace --all-features --no-deps" \

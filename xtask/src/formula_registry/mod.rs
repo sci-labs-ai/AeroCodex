@@ -151,7 +151,7 @@ pub fn run_generate_command(root: &Path, options: &GenerateOptions) -> Result<()
                 out_path.display()
             )
         })?;
-        if existing != expected {
+        if crate::checksums::canonical_text(&existing) != expected {
             return Err(format!(
                 "formula registry check failed; output is missing or stale: {}",
                 out_path.display()
@@ -163,7 +163,7 @@ pub fn run_generate_command(root: &Path, options: &GenerateOptions) -> Result<()
                 sha_path.display()
             )
         })?;
-        if existing_sha != expected_sha {
+        if crate::checksums::canonical_text(&existing_sha) != expected_sha {
             return Err(format!(
                 "formula registry check failed; sha256 sidecar is missing or stale: {}",
                 sha_path.display()
@@ -878,6 +878,7 @@ fn source_hash(
     for relative in inputs {
         let text = fs::read_to_string(root.join(&relative))
             .map_err(|error| format!("{}: {error}", relative.display()))?;
+        let text = crate::checksums::canonical_text(&text);
         writeln!(&mut material, "path:{}", path_string(&relative)).expect("write to string");
         writeln!(&mut material, "len:{}", text.len()).expect("write to string");
         material.push_str(&text);

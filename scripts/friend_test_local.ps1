@@ -4,7 +4,7 @@ Set-StrictMode -Version Latest
 $RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $RepoRoot
 
-$script:TotalSteps = 13
+$script:TotalSteps = 15
 $script:CurrentStep = 0
 
 function Write-FriendTestInfo {
@@ -23,38 +23,6 @@ function Invoke-FriendTestStep {
     & $Command
     if ($LASTEXITCODE -ne $null -and $LASTEXITCODE -ne 0) {
         throw "Friend-test step failed with exit code ${LASTEXITCODE}: $Label"
-    }
-    $global:LASTEXITCODE = 0
-}
-
-function Invoke-Sha256ManifestCheck {
-    $Sha256Sum = Get-Command sha256sum -ErrorAction SilentlyContinue
-    if ($Sha256Sum) {
-        & $Sha256Sum.Source -c checksums/SHA256SUMS
-        return
-    }
-
-    Write-FriendTestInfo "sha256sum: using PowerShell Get-FileHash fallback"
-    $ManifestPath = Join-Path $RepoRoot "checksums/SHA256SUMS"
-    foreach ($Line in Get-Content $ManifestPath) {
-        if ([string]::IsNullOrWhiteSpace($Line)) {
-            continue
-        }
-        if ($Line -notmatch '^([a-fA-F0-9]{64})\s+\*?(.+)$') {
-            throw "Malformed checksum manifest line: $Line"
-        }
-        $Expected = $Matches[1].ToLowerInvariant()
-        $RelativePath = $Matches[2]
-        $NativeRelativePath = $RelativePath -replace '/', [System.IO.Path]::DirectorySeparatorChar
-        $FilePath = Join-Path $RepoRoot $NativeRelativePath
-        if (-not (Test-Path $FilePath)) {
-            throw "Checksum manifest path missing: $RelativePath"
-        }
-        $Actual = (Get-FileHash -Algorithm SHA256 -Path $FilePath).Hash.ToLowerInvariant()
-        if ($Actual -ne $Expected) {
-            throw "Checksum mismatch for ${RelativePath}: expected ${Expected}, actual ${Actual}"
-        }
-        Write-FriendTestInfo "${RelativePath}: OK"
     }
     $global:LASTEXITCODE = 0
 }
@@ -92,8 +60,8 @@ Invoke-FriendTestStep "git status --short" {
 Invoke-FriendTestStep "git diff --check" {
     git diff --check
 }
-Invoke-FriendTestStep "sha256sum -c checksums/SHA256SUMS" {
-    Invoke-Sha256ManifestCheck
+Invoke-FriendTestStep "cargo run -p xtask -- verify-checksums" {
+    cargo run -p xtask -- verify-checksums
 }
 Invoke-FriendTestStep "cargo fmt --all -- --check" {
     cargo fmt --all -- --check
@@ -110,14 +78,20 @@ Invoke-FriendTestStep "cargo test --workspace --all-targets --all-features" {
 Invoke-FriendTestStep "cargo run -p aero-codex-cli -- version --json" {
     cargo run -p aero-codex-cli -- version --json
 }
-Invoke-FriendTestStep "cargo run -p aero-codex-cli -- run canonical distance smoke" {
-    cargo run -p aero-codex-cli -- run formula_vault.m00.canonical.distance_to_canonical distance=-42 distance_unit=7 --json
+Invoke-FriendTestStep "cargo run -p aero-codex-cli -- formula status-report --json" {
+    cargo run -p aero-codex-cli -- formula status-report --json
 }
 Invoke-FriendTestStep "cargo run -p aero-codex-cli -- self-check --json" {
     cargo run -p aero-codex-cli -- self-check --json
 }
 Invoke-FriendTestStep "cargo run -p xtask -- verify --all" {
     cargo run -p xtask -- verify --all
+}
+Invoke-FriendTestStep "cargo run -p xtask -- verify-release-manifest" {
+    cargo run -p xtask -- verify-release-manifest
+}
+Invoke-FriendTestStep "cargo run -p xtask -- verify-generated" {
+    cargo run -p xtask -- verify-generated
 }
 Invoke-FriendTestStep "cargo run -p xtask -- dependency-policy" {
     cargo run -p xtask -- dependency-policy

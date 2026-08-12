@@ -20,7 +20,8 @@ Authoritative readiness count language lives in `docs/roadmap/research_readiness
 | Count summary | Current value | Dashboard meaning |
 |---|---:|---|
 | Governed equation-batch rows | 152 | Executable Rust/runtime equation rows from governed equation-batch manifests, still conservative `research_required` research/preliminary-design software. |
-| CLI-accessible legacy M00 canonical formulas | 10 | The current Beta 1 concept CLI exposes ten legacy M00 canonical formulas for bounded software testing. |
+| CLI dispatch-linked M00 formulas | 12 | Ten canonical-unit and two angle-conversion records resolve to bounded dispatch specs behind the status gate. |
+| Publicly executable formulas | 0 | All 152 registry rows remain `research_required` / `blocked`, so public formula execution fails closed. |
 | M00 formula-vault candidates | 27 | Formula-vault metadata/provenance candidate records; not 27 newly implemented or newly exposed formulas. |
 | Visible M07 terminal candidate rows | 1,323 | Visible M07 formula-vault resolution rows with terminal dispositions. The 1,323 M07 rows are not 1,323 usable equations. |
 | M07 execution backlog rows | 0 M07 execution backlog rows | No governed M07 source rows remain without a terminal disposition row; this does not unblock M07 execution. |
@@ -38,7 +39,7 @@ Do not use historical A11-A45 dashboard snapshots, old Stage 5 queue snapshots, 
 | Formula-vault and external-resolution metadata | `formula-vault/` and `cargo run -p xtask -- verify formula-vault` | research_required | Candidate and resolution records reuse, block, or account for existing concepts; they do not imply certification, source parity, or operational readiness. |
 | Dependency policy | `cargo run -p xtask -- dependency-policy` | research_required | Dependency hygiene is not physical validation or safety approval. |
 | Documentation build | `cargo doc --workspace --all-features --no-deps` | research_required | Documentation generation does not create validation evidence. |
-| Beta 1 concept CLI | `aerocodex` commands and `cargo run -p aero-codex-cli -- self-check --json` | research_required | The vertical slice exposes ten governed M00 canonical formulas for software testing only; it is not the full 1,000+ equation program or an operational release. |
+| Beta 1 concept CLI | `aerocodex` commands and `cargo run -p aero-codex-cli -- self-check --json` | research_required | Twelve M00 records have dispatch links and ten canonical-unit kernels are exercised by self-check, but zero formulas pass the public execution gate; this is not the full 1,000+ equation program or an operational release. |
 
 ## Known blocked public-facing items
 

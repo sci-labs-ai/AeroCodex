@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-TOTAL_STEPS=14
+TOTAL_STEPS=17
 CURRENT_STEP=0
 PRE_ROOT_CARGO_LOCK="absent"
 
@@ -22,14 +22,12 @@ print_command() {
 
 cleanup_cargo_lock() {
   if [[ "${PRE_ROOT_CARGO_LOCK}" == "absent" && -e Cargo.lock ]]; then
-    if git status --porcelain --untracked-files=all -- Cargo.lock | grep -q '^?? Cargo.lock$'; then
-      local sha
-      local size
-      sha="$(sha256sum Cargo.lock | awk '{print $1}')"
-      size="$(stat -c%s Cargo.lock)"
-      rm Cargo.lock
-      info "removed_generated_untracked_root_Cargo_lock=yes sha256=${sha} size=${size}"
-    fi
+    local sha
+    local size
+    sha="$(sha256sum Cargo.lock | awk '{print $1}')"
+    size="$(stat -c%s Cargo.lock)"
+    rm Cargo.lock
+    info "removed_generated_untracked_root_Cargo_lock=yes sha256=${sha} size=${size}"
   fi
 }
 
@@ -84,6 +82,12 @@ preflight_required_xtask_commands() {
   if ! grep -F '["dependency-policy"]' xtask/src/main.rs >/dev/null; then
     fail "stop condition: xtask dependency-policy command is not present yet"
   fi
+
+  for release_command in verify-checksums verify-release-manifest verify-generated; do
+    if ! grep -F "[\"${release_command}\"]" xtask/src/main.rs >/dev/null; then
+      fail "stop condition: xtask ${release_command} command is not present yet"
+    fi
+  done
 
   info "xtask_command_preflight=PASS"
 }
@@ -250,6 +254,9 @@ run_step "cargo clippy --all-targets --all-features -- -D warnings" cargo clippy
 run_step "cargo test --all" cargo test --all
 run_step "cargo doc --no-deps" cargo doc --no-deps
 run_step "cargo run -p xtask -- verify --all" cargo run -p xtask -- verify --all
+run_step "cargo run -p xtask -- verify-release-manifest" cargo run -p xtask -- verify-release-manifest
+run_step "cargo run -p xtask -- verify-checksums" cargo run -p xtask -- verify-checksums
+run_step "cargo run -p xtask -- verify-generated" cargo run -p xtask -- verify-generated
 run_shell_step "equation-batch plan JSON check" 'cargo run -p xtask -- equation-batch plan --all-manifests --json > /tmp/equation_batch_plan.json && python3 -m json.tool /tmp/equation_batch_plan.json >/dev/null'
 run_step "equation-batch status report check" cargo run -p xtask -- equation-batch report --all-manifests --out generated/equation_batch_status_report.json --check
 run_step "cargo run -p xtask -- formula-registry check" cargo run -p xtask -- formula-registry check

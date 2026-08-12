@@ -5,7 +5,9 @@ Describe the change and list the affected crates, docs, validation cards, data f
 ## Required CI-equivalent checks
 
 - [ ] `git diff --check`
-- [ ] `sha256sum -c checksums/SHA256SUMS`
+- [ ] `cargo run -p xtask -- verify-checksums`
+- [ ] `cargo run -p xtask -- verify-release-manifest`
+- [ ] `cargo run -p xtask -- verify-generated`
 - [ ] `cargo fmt --all -- --check`
 - [ ] `cargo check --workspace --all-targets --all-features`
 - [ ] `cargo clippy --workspace --all-targets --all-features -- -D warnings`

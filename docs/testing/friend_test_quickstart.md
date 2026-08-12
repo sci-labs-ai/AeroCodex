@@ -1,12 +1,12 @@
 # AeroCodex friend-test quickstart
 
-This friend-test runs the public Rust-only repository gate from a local checkout. It exercises formatting, build, Clippy, tests, governed metadata checks through `xtask`, dependency policy, documentation, and the Beta 1 CLI smoke path.
+This friend-test runs the public Rust-only repository gate from a local checkout. It exercises formatting, build, Clippy, tests, governed metadata checks through `xtask`, release-manifest/checksum/generated-artifact integrity, dependency policy, documentation, and the Beta 1 CLI inventory/status path.
 
 Passing this package does **not** prove physical validity, safety, certification, mission readiness, habitat safety, medical suitability, or regulated-use approval.
 
 ## Prerequisites
 
-Install the Rust toolchain with `cargo`, `rustc`, `rustfmt`, and `clippy` available on your command search path. The scripts also require `git`. The Bash script requires `sha256sum`; the PowerShell script can use either `sha256sum` or its built-in `Get-FileHash` fallback.
+Install the Rust toolchain with `cargo`, `rustc`, `rustfmt`, and `clippy` available on your command search path. The scripts also require `git`. Checksum verification is implemented by the cross-platform Rust `xtask` command and does not require GNU coreutils.
 
 ```bash
 cargo --version
@@ -35,15 +35,17 @@ The scripts run this sequence in order:
 ```bash
 git status --short
 git diff --check
-sha256sum -c checksums/SHA256SUMS
+cargo run -p xtask -- verify-checksums
 cargo fmt --all -- --check
 cargo check --workspace --all-targets --all-features
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo test --workspace --all-targets --all-features
 cargo run -p aero-codex-cli -- version --json
-cargo run -p aero-codex-cli -- run formula_vault.m00.canonical.distance_to_canonical distance=-42 distance_unit=7 --json
+cargo run -p aero-codex-cli -- formula status-report --json
 cargo run -p aero-codex-cli -- self-check --json
 cargo run -p xtask -- verify --all
+cargo run -p xtask -- verify-release-manifest
+cargo run -p xtask -- verify-generated
 cargo run -p xtask -- dependency-policy
 RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps
 ```

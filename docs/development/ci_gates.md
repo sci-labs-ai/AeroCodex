@@ -10,6 +10,9 @@ cargo clippy --all-targets --all-features -- -D warnings
 cargo test --all
 cargo doc --no-deps
 cargo run -p xtask -- verify --all
+cargo run -p xtask -- verify-release-manifest
+cargo run -p xtask -- verify-checksums
+cargo run -p xtask -- verify-generated
 cargo run -p xtask -- formula-registry check
 ```
 
@@ -18,16 +21,17 @@ cargo run -p xtask -- formula-registry check
 `.github/workflows/ci.yml` runs on `pull_request` and on `push` to `main` using Rust stable on Linux (`ubuntu-latest`). It keeps the repository cargo-first and runs the baseline gates plus lightweight equation-batch inventory/status checks:
 
 ```bash
-cargo fmt --check
+cargo fmt --all -- --check
 cargo check --workspace --all-targets --all-features
-cargo clippy --all-targets --all-features -- -D warnings
-cargo test --all
-cargo doc --no-deps
+cargo clippy --workspace --all-targets --all-features -- -D warnings
+cargo test --workspace --all-features
+cargo doc --workspace --all-features --no-deps
 cargo run -p xtask -- verify --all
+cargo run -p xtask -- verify-release-manifest
+cargo run -p xtask -- verify-checksums
 cargo run -p xtask -- equation-batch plan --all-manifests --json > /tmp/equation_batch_plan.json
 python3 -m json.tool /tmp/equation_batch_plan.json >/dev/null
-cargo run -p xtask -- equation-batch report --all-manifests --out generated/equation_batch_status_report.json --check
-cargo run -p xtask -- formula-registry check
+cargo run -p xtask -- verify-generated
 cargo run -p xtask -- dependency-policy
 cargo run -p aero-codex-cli -- self-check --json
 ```
@@ -41,9 +45,10 @@ The `python3 -m json.tool` calls are JSON syntax checks using the standard Pytho
 - `cargo test --all` runs the workspace test suite through Cargo.
 - `cargo doc --no-deps` builds local documentation without third-party dependency docs.
 - `cargo run -p xtask -- verify --all` runs the repository governance and verification checks.
+- `cargo run -p xtask -- verify-release-manifest` parses the release manifest, requires its metadata and references, rejects duplicate IDs or unsafe status/policy combinations, and cross-checks every release formula against the governed registry.
+- `cargo run -p xtask -- verify-checksums` verifies complete repository checksum coverage with platform-independent canonical text line endings. It fails on malformed entries, missing or changed files, duplicate paths, and governed files omitted from the checksum manifest.
 - `cargo run -p xtask -- equation-batch plan --all-manifests --json` checks that every current equation-batch manifest is still readable by the planning/reporting infrastructure and emits parseable JSON.
-- `cargo run -p xtask -- equation-batch report --all-manifests --out generated/equation_batch_status_report.json --check` verifies that the checked-in equation-batch status report remains deterministic and current.
-- `cargo run -p xtask -- formula-registry check` verifies that checked-in formula registry artifacts remain deterministic and current: `generated/formula_registry.json`, `generated/formula_registry.sha256`, and `generated/rust/formula_registry.rs`. This is a software consistency gate, not formula validation, status promotion, certification, or formula execution.
+- `cargo run -p xtask -- verify-generated` runs the equation-batch status-report and formula-registry read-only checks, requires all governed generated files, and snapshots the repository before and after verification so unexpected file creation, removal, or modification fails the gate. This is a software consistency gate, not formula validation, status promotion, certification, or formula execution.
 
 ## Equation-batch verify-all diagnostic gate
 
