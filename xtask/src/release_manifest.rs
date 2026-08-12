@@ -675,22 +675,79 @@ fn require_only_keys(
 
 fn require_existing_repository_file(root: &Path, relative: &str) -> Result<(), String> {
     let path = Path::new(relative);
-    if path.is_absolute()
-        || path.components().any(|component| {
-            !matches!(component, Component::Normal(_))
-                || matches!(component, Component::ParentDir | Component::RootDir)
-        })
+    if path.is_absolute() || has_windows_absolute_prefix(relative) {
+        return Err(format!(
+            "release manifest reference `{relative}` must not be an absolute path"
+        ));
+    }
+    if path
+        .components()
+        .any(|component| matches!(component, Component::ParentDir))
+    {
+        return Err(format!(
+            "release manifest reference `{relative}` must not traverse outside the repository"
+        ));
+    }
+    if relative.is_empty()
+        || relative.contains('\\')
+        || path
+            .components()
+            .any(|component| !matches!(component, Component::Normal(_)))
     {
         return Err(format!(
             "release manifest reference `{relative}` must be a normalized repository-relative path"
         ));
     }
-    if !root.join(path).is_file() {
+
+    let canonical_root = fs::canonicalize(root).map_err(|error| {
+        format!(
+            "cannot canonicalize repository root {}: {error}",
+            root.display()
+        )
+    })?;
+    let candidate = root.join(path);
+    let metadata = fs::symlink_metadata(&candidate).map_err(|error| {
+        if error.kind() == std::io::ErrorKind::NotFound {
+            format!("release manifest reference `{relative}` does not exist")
+        } else {
+            format!("cannot inspect release manifest reference `{relative}`: {error}")
+        }
+    })?;
+    if metadata.file_type().is_symlink() {
+        if fs::canonicalize(&candidate).is_ok_and(|resolved| !resolved.starts_with(&canonical_root))
+        {
+            return Err(format!(
+                "release manifest reference `{relative}` is a symbolic-link escape outside the repository"
+            ));
+        }
         return Err(format!(
-            "release manifest reference `{relative}` is missing or not a file"
+            "release manifest reference `{relative}` must not be a symbolic link"
+        ));
+    }
+    if !metadata.is_file() {
+        return Err(format!(
+            "release manifest reference `{relative}` is not a regular file"
+        ));
+    }
+    let canonical_candidate = fs::canonicalize(&candidate).map_err(|error| {
+        format!("cannot canonicalize release manifest reference `{relative}`: {error}")
+    })?;
+    if !canonical_candidate.starts_with(&canonical_root) {
+        return Err(format!(
+            "release manifest reference `{relative}` resolves outside the repository"
         ));
     }
     Ok(())
+}
+
+fn has_windows_absolute_prefix(path: &str) -> bool {
+    let bytes = path.as_bytes();
+    path.starts_with('/')
+        || path.starts_with('\\')
+        || (bytes.len() >= 3
+            && bytes[0].is_ascii_alphabetic()
+            && bytes[1] == b':'
+            && matches!(bytes[2], b'/' | b'\\'))
 }
 
 #[cfg(test)]
@@ -782,6 +839,44 @@ mod tests {
         root
     }
 
+    fn plain_root(name: &str) -> PathBuf {
+        let serial = TEST_COUNTER.fetch_add(1, Ordering::Relaxed);
+        let root = std::env::temp_dir().join(format!(
+            "aerocodex-release-reference-{name}-{}-{serial}",
+            std::process::id()
+        ));
+        if root.exists() {
+            fs::remove_dir_all(&root).expect("remove stale release reference fixture");
+        }
+        fs::create_dir_all(&root).expect("create release reference fixture");
+        root
+    }
+
+    #[cfg(unix)]
+    fn create_file_symlink(target: &Path, link: &Path) -> bool {
+        std::os::unix::fs::symlink(target, link).expect("create release reference symlink");
+        true
+    }
+
+    #[cfg(windows)]
+    fn create_file_symlink(target: &Path, link: &Path) -> bool {
+        use std::{io::ErrorKind, os::windows::fs::symlink_file};
+
+        match symlink_file(target, link) {
+            Ok(()) => true,
+            Err(error)
+                if matches!(
+                    error.kind(),
+                    ErrorKind::PermissionDenied | ErrorKind::Unsupported
+                ) || error.raw_os_error() == Some(1314) =>
+            {
+                eprintln!("skipping release symlink assertion: {error}");
+                false
+            }
+            Err(error) => panic!("create release reference symlink: {error}"),
+        }
+    }
+
     #[test]
     fn valid_manifest_parses_required_release_metadata() {
         let parsed = parse_release_manifest(&manifest(&blocked_formula("fixture.one")))
@@ -790,6 +885,57 @@ mod tests {
         assert_eq!(parsed.release_tier, "research_software_alpha");
         assert_eq!(parsed.formulas.len(), 1);
         assert!(!parsed.public_executable);
+    }
+
+    #[test]
+    fn repository_evidence_requires_normalized_contained_regular_files_without_git() {
+        let root = plain_root("containment");
+        fs::create_dir_all(root.join("docs")).expect("create evidence directory");
+        fs::write(root.join("docs/evidence.md"), b"evidence\n").expect("write evidence");
+        require_existing_repository_file(&root, "docs/evidence.md")
+            .expect("source-archive evidence does not require .git");
+
+        for (reference, expected) in [
+            ("", "normalized repository-relative"),
+            ("/absolute.md", "must not be an absolute"),
+            ("C:/absolute.md", "must not be an absolute"),
+            ("../outside.md", "must not traverse outside"),
+            ("docs/../evidence.md", "must not traverse outside"),
+            ("docs\\evidence.md", "normalized repository-relative"),
+            ("docs/missing.md", "does not exist"),
+            ("docs", "not a regular file"),
+        ] {
+            let error = require_existing_repository_file(&root, reference)
+                .expect_err("invalid evidence reference must fail");
+            assert!(error.contains(expected), "unexpected error: {error}");
+        }
+        fs::remove_dir_all(root).expect("remove release reference fixture");
+    }
+
+    #[cfg(any(unix, windows))]
+    #[test]
+    fn repository_evidence_rejects_symlinks_and_symlink_escapes() {
+        let root = plain_root("symlink-containment");
+        let outside = plain_root("outside");
+        fs::write(root.join("inside.md"), b"inside\n").expect("write inside evidence");
+        fs::write(outside.join("outside.md"), b"outside\n").expect("write outside evidence");
+
+        if !create_file_symlink(Path::new("inside.md"), &root.join("inside-link.md")) {
+            fs::remove_dir_all(root).expect("remove release reference fixture");
+            fs::remove_dir_all(outside).expect("remove outside fixture");
+            return;
+        }
+        let error = require_existing_repository_file(&root, "inside-link.md")
+            .expect_err("in-repository evidence symlink must fail");
+        assert!(error.contains("must not be a symbolic link"));
+
+        if create_file_symlink(&outside.join("outside.md"), &root.join("outside-link.md")) {
+            let error = require_existing_repository_file(&root, "outside-link.md")
+                .expect_err("outside evidence symlink must fail");
+            assert!(error.contains("symbolic-link escape outside the repository"));
+        }
+        fs::remove_dir_all(root).expect("remove release reference fixture");
+        fs::remove_dir_all(outside).expect("remove outside fixture");
     }
 
     #[test]

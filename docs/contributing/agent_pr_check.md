@@ -22,6 +22,9 @@ cargo clippy --all-targets --all-features -- -D warnings
 cargo test --all
 cargo doc --no-deps
 cargo run -p xtask -- verify --all
+cargo run -p xtask -- verify-release-manifest
+cargo run -p xtask -- verify-checksums
+cargo run -p xtask -- verify-generated
 cargo run -p xtask -- equation-batch plan --all-manifests --json
 python3 -m json.tool /tmp/equation_batch_plan.json >/dev/null
 cargo run -p xtask -- equation-batch report --all-manifests --out generated/equation_batch_status_report.json --check
@@ -42,22 +45,28 @@ The cargo commands are the repository's normal local build/test/doc/tooling chec
 
 ## Cargo.lock handling
 
-This repository normally does not keep a root `Cargo.lock` in the RR-054 baseline. Cargo commands may create a transient untracked root lockfile during local checks.
+This repository normally does not keep a root `Cargo.lock` in the RR-054 baseline. The handoff script classifies the path before any check and runs a dedicated ownership-guard harness. Its cleanup policy is fail-closed:
 
-The script records `pre_root_Cargo_lock=present` or `pre_root_Cargo_lock=absent` before running cargo commands. If the file was absent before the run and an untracked root `Cargo.lock` appears during cleanup, the script records its SHA-256 and size, removes it, and prints:
+- a tracked, regular `Cargo.lock` is hashed, preserved, and required to remain byte-identical;
+- a preexisting untracked file, symlink, missing tracked path, or other ambiguous state is preserved and stops the run before Cargo commands;
+- when the path is absent and covered by the repository ignore policy, the script atomically creates a minimal transient lockfile and thereby establishes ownership before Cargo can update it;
+- after every step and again in the exit trap, an owned lock must remain a regular, ignored, untracked path; if any condition changes, cleanup preserves it and fails;
+- only a path atomically created and continuously owned by this invocation is removed. Failure and interruption paths run the same guarded cleanup.
+
+Successful removal records the final SHA-256 and size and prints:
 
 ```text
-removed_generated_untracked_root_Cargo_lock=yes sha256=<digest> size=<bytes>
+removed_owned_transient=yes sha256=<digest> size=<bytes>
 ```
 
-If a root `Cargo.lock` already existed before the script started, the script leaves it alone. Agents should not include a transient root `Cargo.lock` in an RR-054 handoff unless maintainers explicitly change repository policy.
+The focused harness at `scripts/tests/agent_pr_check_cargo_lock.sh` covers absent/owned, preexisting untracked, clean tracked, preexisting dirty tracked, tracked content modified during a run, command-failure, interruption, and repository paths containing spaces. Agents should not include a transient root `Cargo.lock` in an RR-054 handoff unless maintainers explicitly change repository policy.
 
 ## Shellcheck
 
 Shellcheck is useful for reviewing this script when available, but it is not a hard dependency and is not installed by RR-054. Agents may run:
 
 ```bash
-shellcheck scripts/agent_pr_check.sh
+shellcheck scripts/agent_pr_check.sh scripts/lib/cargo_lock_guard.sh scripts/tests/agent_pr_check_cargo_lock.sh
 ```
 
 If shellcheck is absent, record the skip in the handoff notes, for example:

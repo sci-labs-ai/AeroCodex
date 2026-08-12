@@ -100,8 +100,8 @@ fn verify_entries(
 
     for entry in entries {
         let path = root.join(Path::new(&entry.path));
-        let bytes = match checksummed_bytes(&path) {
-            Ok(bytes) => bytes,
+        let (identity, normalized) = match checksummed_identity(&path, Path::new(&entry.path)) {
+            Ok(identity) => identity,
             Err(error) => {
                 failures.push(format!(
                     "cannot read checksummed file {}: {error}",
@@ -110,8 +110,7 @@ fn verify_entries(
                 continue;
             }
         };
-        let (canonical, normalized) = checksum_bytes_for_path(Path::new(&entry.path), &bytes);
-        let actual = crate::equation_batch::generate::sha256_hex(canonical.as_ref());
+        let actual = crate::equation_batch::generate::sha256_hex(&identity);
         if actual != entry.digest {
             failures.push(format!(
                 "changed checksummed file: {} (expected {}, actual {})",
@@ -185,24 +184,28 @@ fn has_windows_drive_prefix(path: &str) -> bool {
     bytes.len() >= 3 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':' && bytes[2] == b'/'
 }
 
-fn checksummed_bytes(path: &Path) -> Result<Vec<u8>, String> {
+fn checksummed_identity(path: &Path, repository_path: &Path) -> Result<(Vec<u8>, bool), String> {
     let metadata = fs::symlink_metadata(path).map_err(|error| error.to_string())?;
     if metadata.file_type().is_symlink() {
         let target = fs::read_link(path).map_err(|error| error.to_string())?;
-        return Ok(target.to_string_lossy().replace('\\', "/").into_bytes());
+        return Ok((
+            crate::fs_identity::symlink_identity(target.as_os_str()),
+            false,
+        ));
     }
     if !metadata.is_file() {
         return Err("path is neither a regular file nor a symbolic link".to_string());
     }
-    fs::read(path).map_err(|error| error.to_string())
-}
-
-fn checksum_bytes_for_path<'a>(path: &Path, bytes: &'a [u8]) -> (Cow<'a, [u8]>, bool) {
-    if is_intentional_text(path) {
-        canonical_checksum_bytes(bytes)
+    let bytes = fs::read(path).map_err(|error| error.to_string())?;
+    let (canonical, normalized) = if is_intentional_text(repository_path) {
+        canonical_checksum_bytes(&bytes)
     } else {
-        (Cow::Borrowed(bytes), false)
-    }
+        (Cow::Borrowed(bytes.as_slice()), false)
+    };
+    Ok((
+        crate::fs_identity::regular_file_identity(canonical.as_ref()),
+        normalized,
+    ))
 }
 
 fn is_intentional_text(path: &Path) -> bool {
@@ -338,6 +341,7 @@ fn path_string(path: &Path) -> String {
 mod tests {
     use super::*;
     use std::{
+        ffi::OsStr,
         path::PathBuf,
         sync::atomic::{AtomicUsize, Ordering},
     };
@@ -359,10 +363,52 @@ mod tests {
     }
 
     fn entry(path: &str, bytes: &[u8]) -> ChecksumEntry {
-        let (canonical, _) = checksum_bytes_for_path(Path::new(path), bytes);
+        let (canonical, _) = if is_intentional_text(Path::new(path)) {
+            canonical_checksum_bytes(bytes)
+        } else {
+            (Cow::Borrowed(bytes), false)
+        };
         ChecksumEntry {
-            digest: crate::equation_batch::generate::sha256_hex(canonical.as_ref()),
+            digest: crate::equation_batch::generate::sha256_hex(
+                &crate::fs_identity::regular_file_identity(canonical.as_ref()),
+            ),
             path: path.to_string(),
+        }
+    }
+
+    fn symlink_entry(path: &str, target: &OsStr) -> ChecksumEntry {
+        ChecksumEntry {
+            digest: crate::equation_batch::generate::sha256_hex(
+                &crate::fs_identity::symlink_identity(target),
+            ),
+            path: path.to_string(),
+        }
+    }
+
+    #[cfg(unix)]
+    fn create_file_symlink(target: &OsStr, link: &Path) -> bool {
+        use std::os::unix::fs::symlink;
+
+        symlink(target, link).expect("create checksum symlink fixture");
+        true
+    }
+
+    #[cfg(windows)]
+    fn create_file_symlink(target: &OsStr, link: &Path) -> bool {
+        use std::{io::ErrorKind, os::windows::fs::symlink_file};
+
+        match symlink_file(target, link) {
+            Ok(()) => true,
+            Err(error)
+                if matches!(
+                    error.kind(),
+                    ErrorKind::PermissionDenied | ErrorKind::Unsupported
+                ) || error.raw_os_error() == Some(1314) =>
+            {
+                eprintln!("skipping symlink filesystem assertion: {error}");
+                false
+            }
+            Err(error) => panic!("create checksum symlink fixture: {error}"),
         }
     }
 
@@ -474,6 +520,64 @@ mod tests {
         fs::write(root.join("target/debug/output"), b"generated").expect("write excluded output");
         verify_entries(&root, &[entry("kept.txt", b"kept\n")], true)
             .expect("documented excluded outputs must not be governed");
+        fs::remove_dir_all(root).expect("remove checksum test directory");
+    }
+
+    #[cfg(any(unix, windows))]
+    #[test]
+    fn symlinks_hash_the_unresolved_exact_target_and_not_file_contents() {
+        let root = test_root("symlink-targets");
+        fs::write(root.join("ordinary.txt"), b"ordinary\n").expect("write ordinary fixture");
+        let relative_target = OsStr::new("ordinary.txt");
+        if !create_file_symlink(relative_target, &root.join("relative-link")) {
+            fs::remove_dir_all(root).expect("remove checksum test directory");
+            return;
+        }
+        verify_entries(
+            &root,
+            &[symlink_entry("relative-link", relative_target)],
+            false,
+        )
+        .expect("relative link target is hashed without following it");
+        assert!(verify_entries(&root, &[entry("relative-link", b"ordinary\n")], false).is_err());
+        assert!(
+            verify_entries(
+                &root,
+                &[symlink_entry("relative-link", OsStr::new("./ordinary.txt"))],
+                false,
+            )
+            .is_err(),
+            "lexically different link targets must have different identities"
+        );
+
+        let absolute_target = root.join("ordinary.txt");
+        if create_file_symlink(absolute_target.as_os_str(), &root.join("absolute-link")) {
+            verify_entries(
+                &root,
+                &[symlink_entry("absolute-link", absolute_target.as_os_str())],
+                false,
+            )
+            .expect("absolute link target is hashed exactly");
+        }
+        fs::remove_dir_all(root).expect("remove checksum test directory");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn non_utf8_symlink_targets_are_hashed_byte_exact() {
+        use std::os::unix::ffi::OsStrExt;
+
+        let root = test_root("non-utf8-symlink");
+        let target = OsStr::from_bytes(b"target-\xff");
+        create_file_symlink(target, &root.join("link"));
+        verify_entries(&root, &[symlink_entry("link", target)], false)
+            .expect("non-UTF-8 link target is lossless");
+        assert!(verify_entries(
+            &root,
+            &[symlink_entry("link", OsStr::from_bytes(b"target-\xfe"))],
+            false,
+        )
+        .is_err());
         fs::remove_dir_all(root).expect("remove checksum test directory");
     }
 }

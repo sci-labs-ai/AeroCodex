@@ -11,6 +11,7 @@ const GOVERNED_GENERATED_FILES: &[&str] = &[
     "generated/formula_registry.sha256",
     "generated/rust/formula_registry.rs",
 ];
+const GENERATOR_OWNED_DIRECTORIES: &[&str] = &["generated"];
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct RepositoryState {
@@ -29,9 +30,12 @@ impl RepositoryState {
 
 pub fn verify_generated_artifacts(root: &Path) -> Result<(), String> {
     for relative in GOVERNED_GENERATED_FILES {
-        if !root.join(relative).is_file() {
+        let path = root.join(relative);
+        let is_regular_file = fs::symlink_metadata(&path)
+            .is_ok_and(|metadata| metadata.is_file() && !metadata.file_type().is_symlink());
+        if !is_regular_file {
             return Err(format!(
-                "required generated artifact is missing: {relative}"
+                "required generated artifact is missing or not a regular file: {relative}"
             ));
         }
     }
@@ -98,7 +102,7 @@ fn repository_state(root: &Path) -> Result<RepositoryState, String> {
             "status",
             "--porcelain=v1",
             "-z",
-            "--untracked-files=all",
+            "--untracked-files=no",
             "--ignored=no",
         ],
     )?;
@@ -117,14 +121,7 @@ fn repository_state(root: &Path) -> Result<RepositoryState, String> {
     )?;
     let untracked = successful_git_output(
         root,
-        &[
-            "-c",
-            "core.quotepath=false",
-            "ls-files",
-            "--others",
-            "--exclude-standard",
-            "-z",
-        ],
+        &["-c", "core.quotepath=false", "ls-files", "--others", "-z"],
     )?;
     let untracked_entries = snapshot_untracked(root, &untracked)?;
 
@@ -183,20 +180,30 @@ fn snapshot_untracked(root: &Path, output: &[u8]) -> Result<BTreeMap<String, Str
         {
             return Err(format!("Git reported unsafe untracked path `{relative}`"));
         }
+        if untracked_path_is_excluded(parsed) {
+            continue;
+        }
         let path = root.join(parsed);
         let metadata = fs::symlink_metadata(&path)
             .map_err(|error| format!("cannot inspect untracked path {relative}: {error}"))?;
         let value = if metadata.file_type().is_symlink() {
             let target = fs::read_link(&path)
                 .map_err(|error| format!("cannot read untracked symlink {relative}: {error}"))?;
-            format!("symlink:{}", target.to_string_lossy().replace('\\', "/"))
+            format!(
+                "identity:{}",
+                crate::equation_batch::generate::sha256_hex(&crate::fs_identity::symlink_identity(
+                    target.as_os_str()
+                ))
+            )
         } else if metadata.is_file() {
             let bytes = fs::read(&path)
                 .map_err(|error| format!("cannot read untracked file {relative}: {error}"))?;
             format!(
-                "file:{}:{}",
+                "identity:{}:{}",
                 file_mode(&metadata),
-                crate::equation_batch::generate::sha256_hex(&bytes)
+                crate::equation_batch::generate::sha256_hex(
+                    &crate::fs_identity::regular_file_identity(&bytes)
+                )
             )
         } else {
             return Err(format!(
@@ -206,6 +213,28 @@ fn snapshot_untracked(root: &Path, output: &[u8]) -> Result<BTreeMap<String, Str
         entries.insert(relative.replace('\\', "/"), value);
     }
     Ok(entries)
+}
+
+fn untracked_path_is_excluded(path: &Path) -> bool {
+    if GENERATOR_OWNED_DIRECTORIES
+        .iter()
+        .any(|directory| path.starts_with(directory))
+    {
+        return false;
+    }
+    if path == Path::new("Cargo.lock") {
+        return true;
+    }
+    if path.components().any(|component| {
+        matches!(component, Component::Normal(name) if name == ".git" || name == "target")
+    }) {
+        return true;
+    }
+    let name = path
+        .file_name()
+        .and_then(|value| value.to_str())
+        .unwrap_or("");
+    name == ".DS_Store" || name.ends_with(".tmp") || name.ends_with(".rs.bk")
 }
 
 #[cfg(unix)]
@@ -344,9 +373,75 @@ mod tests {
         verify_action_does_not_drift(&root, || {
             fs::create_dir_all(root.join("target/debug")).map_err(|error| error.to_string())?;
             fs::write(root.join("target/debug/output"), b"ignored")
+                .map_err(|error| error.to_string())?;
+            fs::write(root.join("scratch.tmp"), b"temporary").map_err(|error| error.to_string())?;
+            fs::write(root.join("scratch.rs.bk"), b"backup").map_err(|error| error.to_string())?;
+            fs::write(root.join(".DS_Store"), b"metadata").map_err(|error| error.to_string())
+        })
+        .expect("narrow build and transient exclusions must not count as repository drift");
+        fs::remove_dir_all(root).expect("remove generated drift fixture");
+    }
+
+    #[test]
+    fn generated_paths_bypass_repository_info_and_global_ignore_rules() {
+        for source in ["repository", "info", "global"] {
+            let root = test_root();
+            let pattern = "/generated/ignored.json\n";
+            match source {
+                "repository" => {
+                    fs::write(root.join(".gitignore"), format!("/target/\n{pattern}"))
+                        .expect("write repository ignore fixture");
+                    git(&root, &["add", ".gitignore"]);
+                    git(&root, &["commit", "-m", "add repository ignore"]);
+                }
+                "info" => fs::write(root.join(".git/info/exclude"), pattern)
+                    .expect("write info exclude fixture"),
+                "global" => {
+                    let excludes = root.join(".git/test-global-ignore");
+                    fs::write(&excludes, pattern).expect("write global ignore fixture");
+                    git(
+                        &root,
+                        &[
+                            "config",
+                            "core.excludesFile",
+                            excludes.to_str().expect("UTF-8 fixture path"),
+                        ],
+                    );
+                }
+                _ => unreachable!(),
+            }
+
+            let created = verify_action_does_not_drift(&root, || {
+                fs::write(root.join("generated/ignored.json"), b"created\n")
+                    .map_err(|error| error.to_string())
+            })
+            .expect_err("ignored generated creation must fail");
+            assert!(created.contains("created untracked path: generated/ignored.json"));
+            assert_eq!(
+                git(&root, &["check-ignore", "generated/ignored.json"]),
+                "generated/ignored.json",
+                "fixture must exercise the configured {source} ignore source"
+            );
+
+            let changed = verify_action_does_not_drift(&root, || {
+                fs::write(root.join("generated/ignored.json"), b"changed\n")
+                    .map_err(|error| error.to_string())
+            })
+            .expect_err("ignored generated modification must fail");
+            assert!(changed.contains("changed untracked path: generated/ignored.json"));
+            fs::remove_dir_all(root).expect("remove generated drift fixture");
+        }
+    }
+
+    #[test]
+    fn generator_owned_paths_do_not_receive_transient_filename_exclusions() {
+        let root = test_root();
+        let error = verify_action_does_not_drift(&root, || {
+            fs::write(root.join("generated/unexpected.tmp"), b"unexpected\n")
                 .map_err(|error| error.to_string())
         })
-        .expect("ignored build output must not count as repository drift");
+        .expect_err("new transient-looking file beneath generated must fail");
+        assert!(error.contains("created untracked path: generated/unexpected.tmp"));
         fs::remove_dir_all(root).expect("remove generated drift fixture");
     }
 
@@ -408,6 +503,37 @@ mod tests {
         })
         .expect_err("removed symlink drift must fail");
         assert!(removed_error.contains("symlink"));
+        fs::remove_dir_all(root).expect("remove generated drift fixture");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn untracked_symlink_state_is_lossless_and_detects_type_changes() {
+        use std::{ffi::OsStr, os::unix::ffi::OsStrExt, os::unix::fs::symlink};
+
+        let root = test_root();
+        let link = root.join("generated/untracked-link");
+        symlink(OsStr::from_bytes(b"target-\xff"), &link).expect("create non-UTF-8 link");
+
+        let retargeted = verify_action_does_not_drift(&root, || {
+            fs::remove_file(&link).map_err(|error| error.to_string())?;
+            symlink(OsStr::from_bytes(b"target-\xfe"), &link).map_err(|error| error.to_string())
+        })
+        .expect_err("non-UTF-8 symlink retarget must fail");
+        assert!(retargeted.contains("changed untracked path: generated/untracked-link"));
+
+        let replaced = verify_action_does_not_drift(&root, || {
+            fs::remove_file(&link).map_err(|error| error.to_string())?;
+            fs::write(&link, b"regular file\n").map_err(|error| error.to_string())
+        })
+        .expect_err("untracked link-to-file replacement must fail");
+        assert!(replaced.contains("changed untracked path: generated/untracked-link"));
+
+        let removed = verify_action_does_not_drift(&root, || {
+            fs::remove_file(&link).map_err(|error| error.to_string())
+        })
+        .expect_err("untracked file removal must fail");
+        assert!(removed.contains("removed untracked path: generated/untracked-link"));
         fs::remove_dir_all(root).expect("remove generated drift fixture");
     }
 

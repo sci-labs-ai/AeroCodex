@@ -3,6 +3,7 @@
 mod checksums;
 mod equation_batch;
 mod formula_registry;
+mod fs_identity;
 mod generated_artifacts;
 mod release_manifest;
 
