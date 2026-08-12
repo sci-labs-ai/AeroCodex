@@ -1,0 +1,13 @@
+schema_version	canonical_formula_id	dispatch_formula_id	runtime_symbol	output_variable	inputs	summary
+aerocodex.cli_dispatch.v1	m00.canonical.time_unit_from_mu_du	formula_vault.m00.canonical.time_unit_from_mu_du	m00_canonical_time_unit_from_mu_du	time_unit	mu,distance_unit	TU = sqrt(DU^3 / mu)
+aerocodex.cli_dispatch.v1	m00.canonical.speed_unit_from_du_tu	formula_vault.m00.canonical.speed_unit_from_du_tu	m00_canonical_speed_unit_from_du_tu	speed_unit	distance_unit,time_unit	speed_unit = DU / TU
+aerocodex.cli_dispatch.v1	m00.canonical.speed_unit_from_mu_du	formula_vault.m00.canonical.speed_unit_from_mu_du	m00_canonical_speed_unit_from_mu_du	speed_unit	mu,distance_unit	speed_unit = sqrt(mu / DU)
+aerocodex.cli_dispatch.v1	m00.canonical.mu_from_units	formula_vault.m00.canonical.mu_from_units	m00_canonical_mu_from_units	canonical_mu	mu,distance_unit,time_unit	canonical_mu = mu * TU^2 / DU^3
+aerocodex.cli_dispatch.v1	m00.canonical.distance_to_canonical	formula_vault.m00.canonical.distance_to_canonical	m00_distance_to_canonical	canonical_distance	distance,distance_unit	canonical_distance = distance / DU
+aerocodex.cli_dispatch.v1	m00.canonical.distance_from_canonical	formula_vault.m00.canonical.distance_from_canonical	m00_distance_from_canonical	distance	canonical_distance,distance_unit	distance = canonical_distance * DU
+aerocodex.cli_dispatch.v1	m00.canonical.time_to_canonical	formula_vault.m00.canonical.time_to_canonical	m00_time_to_canonical	canonical_time	time,time_unit	canonical_time = time / TU
+aerocodex.cli_dispatch.v1	m00.canonical.time_from_canonical	formula_vault.m00.canonical.time_from_canonical	m00_time_from_canonical	time	canonical_time,time_unit	time = canonical_time * TU
+aerocodex.cli_dispatch.v1	m00.canonical.speed_to_canonical	formula_vault.m00.canonical.speed_to_canonical	m00_speed_to_canonical	canonical_speed	speed,distance_unit,time_unit	canonical_speed = speed * TU / DU
+aerocodex.cli_dispatch.v1	m00.canonical.speed_from_canonical	formula_vault.m00.canonical.speed_from_canonical	m00_speed_from_canonical	speed	canonical_speed,distance_unit,time_unit	speed = canonical_speed * DU / TU
+aerocodex.cli_dispatch.v1	m00.angle.deg_to_rad	formula_vault.m00.angle.deg2rad	m00_degrees_to_radians	angle_radians	degrees	angle_radians = degrees * pi / 180
+aerocodex.cli_dispatch.v1	m00.angle.rad_to_deg	formula_vault.m00.angle.rad2deg	m00_radians_to_degrees	angle_degrees	radians	angle_degrees = radians * 180 / pi

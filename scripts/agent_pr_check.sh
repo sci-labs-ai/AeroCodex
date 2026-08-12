@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-TOTAL_STEPS=14
+TOTAL_STEPS=18
 CURRENT_STEP=0
-PRE_ROOT_CARGO_LOCK="absent"
 
 info() {
   printf '[agent-pr-check] %s\n' "$*"
@@ -20,21 +19,6 @@ print_command() {
   printf '\n'
 }
 
-cleanup_cargo_lock() {
-  if [[ "${PRE_ROOT_CARGO_LOCK}" == "absent" && -e Cargo.lock ]]; then
-    if git status --porcelain --untracked-files=all -- Cargo.lock | grep -q '^?? Cargo.lock$'; then
-      local sha
-      local size
-      sha="$(sha256sum Cargo.lock | awk '{print $1}')"
-      size="$(stat -c%s Cargo.lock)"
-      rm Cargo.lock
-      info "removed_generated_untracked_root_Cargo_lock=yes sha256=${sha} size=${size}"
-    fi
-  fi
-}
-
-trap 'cleanup_cargo_lock || true' EXIT
-
 run_step() {
   local label="$1"
   shift
@@ -42,7 +26,9 @@ run_step() {
   info "== step ${CURRENT_STEP}/${TOTAL_STEPS}: ${label} =="
   print_command "$@"
   "$@"
-  cleanup_cargo_lock
+  if ! cargo_lock_guard_verify; then
+    fail "root Cargo.lock ownership verification failed after step ${CURRENT_STEP}"
+  fi
 }
 
 run_shell_step() {
@@ -52,7 +38,9 @@ run_shell_step() {
   info "== step ${CURRENT_STEP}/${TOTAL_STEPS}: ${label} =="
   info "+ ${command_text}"
   bash -o pipefail -c "${command_text}"
-  cleanup_cargo_lock
+  if ! cargo_lock_guard_verify; then
+    fail "root Cargo.lock ownership verification failed after step ${CURRENT_STEP}"
+  fi
 }
 
 require_command() {
@@ -84,6 +72,12 @@ preflight_required_xtask_commands() {
   if ! grep -F '["dependency-policy"]' xtask/src/main.rs >/dev/null; then
     fail "stop condition: xtask dependency-policy command is not present yet"
   fi
+
+  for release_command in verify-checksums verify-release-manifest verify-generated; do
+    if ! grep -F "[\"${release_command}\"]" xtask/src/main.rs >/dev/null; then
+      fail "stop condition: xtask ${release_command} command is not present yet"
+    fi
+  done
 
   info "xtask_command_preflight=PASS"
 }
@@ -227,22 +221,43 @@ REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 [[ -n "${REPO_ROOT}" ]] || fail "not inside a Git repository; run from an AeroCodex checkout"
 cd "${REPO_ROOT}"
 
+# shellcheck source=lib/cargo_lock_guard.sh
+source scripts/lib/cargo_lock_guard.sh
+
+cargo_lock_guard_log() {
+  info "$*"
+}
+
+agent_pr_check_exit() {
+  local rc=$?
+  trap - EXIT INT TERM
+  if ! cargo_lock_guard_cleanup; then
+    info "ERROR: root Cargo.lock cleanup could not prove ownership; current path was preserved"
+    [[ "${rc}" -ne 0 ]] || rc=1
+  fi
+  exit "${rc}"
+}
+
+trap agent_pr_check_exit EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
 info "AeroCodex local agent PR handoff check"
 info "repository_root=${REPO_ROOT}"
 info "command_shape=bash scripts/agent_pr_check.sh"
 info "local_only=yes"
 info "network_github_auth_pr_merge_branch_delete_behavior=none"
 
-for command_name in cargo git grep python3 sha256sum stat awk mktemp; do
+for command_name in cargo git grep python3 sha256sum stat awk mktemp mkdir ln readlink cp mv rm rmdir cmp; do
   require_command "${command_name}"
 done
 
-if [[ -e Cargo.lock ]]; then
-  PRE_ROOT_CARGO_LOCK="present"
+if ! cargo_lock_guard_initialize; then
+  fail "root Cargo.lock ownership initialization failed"
 fi
-info "pre_root_Cargo_lock=${PRE_ROOT_CARGO_LOCK}"
 
 run_step "preflight required local xtask command contracts" preflight_required_xtask_commands
+run_step "Cargo.lock ownership guard harness" bash scripts/tests/agent_pr_check_cargo_lock.sh
 run_step "git diff --check" git diff --check
 run_step "cargo fmt --check" cargo fmt --check
 run_step "cargo check --workspace --all-targets --all-features" cargo check --workspace --all-targets --all-features
@@ -250,6 +265,9 @@ run_step "cargo clippy --all-targets --all-features -- -D warnings" cargo clippy
 run_step "cargo test --all" cargo test --all
 run_step "cargo doc --no-deps" cargo doc --no-deps
 run_step "cargo run -p xtask -- verify --all" cargo run -p xtask -- verify --all
+run_step "cargo run -p xtask -- verify-release-manifest" cargo run -p xtask -- verify-release-manifest
+run_step "cargo run -p xtask -- verify-checksums" cargo run -p xtask -- verify-checksums
+run_step "cargo run -p xtask -- verify-generated" cargo run -p xtask -- verify-generated
 run_shell_step "equation-batch plan JSON check" 'cargo run -p xtask -- equation-batch plan --all-manifests --json > /tmp/equation_batch_plan.json && python3 -m json.tool /tmp/equation_batch_plan.json >/dev/null'
 run_step "equation-batch status report check" cargo run -p xtask -- equation-batch report --all-manifests --out generated/equation_batch_status_report.json --check
 run_step "cargo run -p xtask -- formula-registry check" cargo run -p xtask -- formula-registry check
@@ -257,9 +275,8 @@ run_step "cargo run -p xtask -- dependency-policy" cargo run -p xtask -- depende
 run_step "cargo run -p aero-codex-cli -- self-check --json" cargo run -p aero-codex-cli -- self-check --json
 run_step "forbidden-claim grep/review gate" forbidden_claim_scan
 
-cleanup_cargo_lock
-if [[ "${PRE_ROOT_CARGO_LOCK}" == "absent" && -e Cargo.lock ]]; then
-  fail "root Cargo.lock exists after cleanup; it was absent before the run and was not safely removable as an untracked transient file"
+if ! cargo_lock_guard_cleanup; then
+  fail "root Cargo.lock could not be safely finalized"
 fi
 
 info "root_Cargo_lock_final=$([[ -e Cargo.lock ]] && printf present || printf absent)"

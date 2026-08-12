@@ -150,11 +150,12 @@ fn load_checked_formula_registry(root: &Path) -> Result<RustRegistry, String> {
     let sha_path = root.join(REGISTRY_SHA256_PATH);
     let json_bytes = fs::read(&json_path)
         .map_err(|error| format!("cannot read {}: {error}", json_path.display()))?;
-    let actual_digest = crate::equation_batch::generate::sha256_hex(&json_bytes);
+    let (canonical_json, _) = crate::checksums::canonical_checksum_bytes(&json_bytes);
+    let actual_digest = crate::equation_batch::generate::sha256_hex(canonical_json.as_ref());
     let expected_sha = format!("{actual_digest}  {REGISTRY_JSON_PATH}\n");
     let sidecar = fs::read_to_string(&sha_path)
         .map_err(|error| format!("cannot read {}: {error}", sha_path.display()))?;
-    if sidecar != expected_sha {
+    if crate::checksums::canonical_text(&sidecar) != expected_sha {
         return Err(format!(
             "formula-registry generate-rust refused stale sha256 sidecar: expected `{}` in {}, found `{}`",
             expected_sha.trim_end(),

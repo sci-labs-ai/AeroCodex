@@ -10,24 +10,29 @@ cargo clippy --all-targets --all-features -- -D warnings
 cargo test --all
 cargo doc --no-deps
 cargo run -p xtask -- verify --all
+cargo run -p xtask -- verify-release-manifest
+cargo run -p xtask -- verify-checksums
+cargo run -p xtask -- verify-generated
 cargo run -p xtask -- formula-registry check
 ```
 
 ## Blocking GitHub Actions gate
 
-`.github/workflows/ci.yml` runs on `pull_request` and on `push` to `main` using Rust stable on Linux (`ubuntu-latest`). It keeps the repository cargo-first and runs the baseline gates plus lightweight equation-batch inventory/status checks:
+`.github/workflows/ci.yml` runs on `pull_request` and on `push` to `main` using Rust stable on Linux (`ubuntu-latest`). Checkout uses `fetch-depth: 0` because the release-manifest gate must resolve the pinned object and prove that it is a commit ancestor of `HEAD`. It keeps the repository cargo-first and runs the baseline gates plus lightweight equation-batch inventory/status checks:
 
 ```bash
-cargo fmt --check
+cargo fmt --all -- --check
+bash scripts/tests/agent_pr_check_cargo_lock.sh
 cargo check --workspace --all-targets --all-features
-cargo clippy --all-targets --all-features -- -D warnings
-cargo test --all
-cargo doc --no-deps
+cargo clippy --workspace --all-targets --all-features -- -D warnings
+cargo test --workspace --all-features
+cargo doc --workspace --all-features --no-deps
 cargo run -p xtask -- verify --all
+cargo run -p xtask -- verify-release-manifest
+cargo run -p xtask -- verify-checksums
 cargo run -p xtask -- equation-batch plan --all-manifests --json > /tmp/equation_batch_plan.json
 python3 -m json.tool /tmp/equation_batch_plan.json >/dev/null
-cargo run -p xtask -- equation-batch report --all-manifests --out generated/equation_batch_status_report.json --check
-cargo run -p xtask -- formula-registry check
+cargo run -p xtask -- verify-generated
 cargo run -p xtask -- dependency-policy
 cargo run -p aero-codex-cli -- self-check --json
 ```
@@ -37,13 +42,17 @@ The `python3 -m json.tool` calls are JSON syntax checks using the standard Pytho
 ## Gate intent
 
 - `cargo fmt --check` verifies Rust formatting without rewriting files.
+- `bash scripts/tests/agent_pr_check_cargo_lock.sh` exercises exact transient-lock file identity and replacement preservation on Ubuntu, including the native symbolic-link substitution case that may be unavailable on Windows hosts.
 - `cargo clippy --all-targets --all-features -- -D warnings` treats Clippy warnings as failures for all configured targets and features.
 - `cargo test --all` runs the workspace test suite through Cargo.
 - `cargo doc --no-deps` builds local documentation without third-party dependency docs.
 - `cargo run -p xtask -- verify --all` runs the repository governance and verification checks.
+- `cargo run -p xtask -- verify-release-manifest` parses the release manifest, requires its metadata and references, rejects duplicate IDs, duplicate runtime symbols, and unsafe status/policy combinations, and requires exact formula-ID/runtime-symbol equality with the structured CLI dispatch metadata and the governed registry. Every evidence reference must name an existing regular file through a normalized repository-relative path; absolute paths, traversal, final symlinks, and canonical symlink escapes fail explicitly. This containment check is filesystem-based and still works in a source archive. The separate pinned-base check requires `.git`, resolves the base to a commit, and proves it is an ancestor of `HEAD`.
+- `cargo run -p xtask -- verify-checksums` requires exact set equality between the manifest and the documented governed files. Native governed paths must have one valid UTF-8 representation on every supported platform; discovery fails before hashing or set comparison and reports invalid Unix bytes or Windows UTF-16 deterministically, so no lossy omission or alias is possible. It rejects malformed hashes, unsafe/noncanonical/duplicate/excluded paths, missing or changed content, and both missing and extra set members. Digests include a versioned object-kind and payload-length frame. CRLF normalization applies only to regular files on the explicit text-format allowlist; other regular content is byte-exact. Symbolic links use unresolved raw Unix target bytes or a lossless deterministic Windows UTF-16 representation and are never followed or slash-normalized. `cargo run -p xtask -- generate-checksums` renders a candidate through the same discovery policy without installing it.
 - `cargo run -p xtask -- equation-batch plan --all-manifests --json` checks that every current equation-batch manifest is still readable by the planning/reporting infrastructure and emits parseable JSON.
-- `cargo run -p xtask -- equation-batch report --all-manifests --out generated/equation_batch_status_report.json --check` verifies that the checked-in equation-batch status report remains deterministic and current.
-- `cargo run -p xtask -- formula-registry check` verifies that checked-in formula registry artifacts remain deterministic and current: `generated/formula_registry.json`, `generated/formula_registry.sha256`, and `generated/rust/formula_registry.rs`. This is a software consistency gate, not formula validation, status promotion, certification, or formula execution.
+- `cargo run -p xtask -- verify-generated` runs the equation-batch status-report and formula-registry read-only checks, requires every governed output to be a regular file, and compares the exact Git-aware state before and after. Tracked staged and unstaged content, executable modes, and all untracked paths are covered independently of `.gitignore`, `.git/info/exclude`, and `core.excludesFile`; files beneath the generator-owned `generated/` tree never receive transient exclusions. Raw symbolic-link identities detect creation, deletion, retargeting, and link/file replacement. Only the documented root `Cargo.lock`, `.git/`, `target/`, `.DS_Store`, `*.tmp`, and `*.rs.bk` paths outside generator-owned trees are excluded. A dirty baseline is permitted only when the action produces zero state delta. This is a software consistency gate, not formula validation, status promotion, certification, or formula execution.
+
+The release-manifest pinned-base/ancestry check and the generated-artifact gate require a Git worktree with sufficient object history. Release evidence-path containment itself remains valid without `.git`; a complete source archive still cannot pass the Git-dependent portions and needs a separately designed archive-attestation workflow.
 
 ## Equation-batch verify-all diagnostic gate
 

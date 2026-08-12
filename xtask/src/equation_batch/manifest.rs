@@ -218,7 +218,11 @@ fn validate_repository_relative_path(
     value: &str,
 ) -> Result<(), String> {
     let candidate = Path::new(value);
-    if candidate.is_absolute() || has_windows_absolute_prefix(value) || value.starts_with('\\') {
+    if candidate.is_absolute()
+        || has_windows_absolute_prefix(value)
+        || value.starts_with('/')
+        || value.starts_with('\\')
+    {
         return Err(line_error(
             path,
             line_number,

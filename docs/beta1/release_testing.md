@@ -4,7 +4,7 @@ Status: `research_required`
 
 This public repository keeps the Beta 1 concept release check Rust-only. The former deployment packaging helpers are not tracked here. This procedure validates a clean checkout and a locally built `aerocodex` binary; it is a software release-engineering gate, not an aerospace assurance or certification gate.
 
-The current candidate surface remains exactly ten governed M00 canonical-unit formulas. The 1,000+ equation backlog is outside this release-candidate scope.
+The current candidate has twelve M00 dispatch-linked records (ten canonical-unit plus two angle conversions), zero publicly executable formulas, and ten canonical-unit kernels exercised by the internal self-check. The 1,000+ equation backlog is outside this release-candidate scope.
 
 ## Prerequisites
 
@@ -21,12 +21,14 @@ Run from a clean checkout:
 ```bash
 git status --short
 git diff --check
-sha256sum -c checksums/SHA256SUMS
+cargo run -p xtask -- verify-checksums
 cargo fmt --all -- --check
 cargo check --workspace --all-targets --all-features
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo test --workspace --all-targets --all-features
 cargo run -p xtask -- verify --all
+cargo run -p xtask -- verify-release-manifest
+cargo run -p xtask -- verify-generated
 cargo run -p xtask -- dependency-policy
 cargo run -p aero-codex-cli -- version --json
 cargo run -p aero-codex-cli -- self-check --json
@@ -43,6 +45,7 @@ A candidate is testable when:
 - `aerocodex self-check --json` reports zero failures;
 - the manifest and CLI report `release_channel=beta1-concept` and `package_version=0.0.1`;
 - validation remains `research_required`;
+- public executable formula count remains zero;
 - no operational-readiness, certification, full-inventory, external-parity, or safety claim is added.
 
 Passing this gate authorizes private or internal Beta 1 concept testing only. Publication, signing, tagging, or broader distribution requires a separate release decision.

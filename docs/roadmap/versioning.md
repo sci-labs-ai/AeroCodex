@@ -34,7 +34,8 @@ During the Beta 1 concept:
 
 - Cargo version remains `0.0.1`;
 - validation remains `research_required`;
-- the initial executable surface is exactly the ten governed M00 canonical-unit formulas;
+- the initial self-check pilot directly exercises ten governed M00 canonical-unit kernels;
+- the current CLI has twelve M00 dispatch-linked records but zero formulas pass the public execution gate while status remains `research_required`;
 - release artifacts must identify one Git commit and pass the CLI self-check;
 - later bulk equation ingestion remains automated-and-exception-reviewed work, not a claim that the 1,000+ backlog is complete.
 

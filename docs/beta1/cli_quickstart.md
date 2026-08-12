@@ -1,6 +1,6 @@
 # Beta 1 concept CLI quickstart
 
-The `aerocodex` binary is a bounded, research-only execution surface for ten M00 canonical-unit formulas. It is intended for software testing, integration experiments, and release-process validation.
+The `aerocodex` binary is a bounded, research-only inventory and status surface with twelve M00 dispatch-linked records: ten canonical-unit records and two angle-conversion records. The current registry keeps every record at `research_required` with `execution_policy=blocked`, so none is publicly executable. Runtime dispatch links support internal self-checking and future governed promotion work; they are not execution authorization.
 
 It is not certified, flight-ready, mission-ready, operational, medical, habitat-safe, or approved for regulated use.
 
@@ -24,7 +24,7 @@ cargo run -p aero-codex-cli -- formula describe \
 
 The legacy `describe formula_vault.m00.canonical.distance_to_canonical --json` form is still accepted and reports the canonical formula ID plus `alias_used`/`deprecated_alias` migration fields.
 
-## Run a bounded conversion
+## Observe the fail-closed execution gate
 
 ```bash
 cargo run -p aero-codex-cli -- formula run \
@@ -32,13 +32,13 @@ cargo run -p aero-codex-cli -- formula run \
   distance=-42 distance_unit=7 --json
 ```
 
-The expected output contains:
+The command exits with code `4` and reports `execution_blocked_by_status` before runtime dispatch. The expected status fields include:
 
 ```json
-{"ok":true,"command":"formula run","formula_id":"m00.canonical.distance_to_canonical","canonical_formula_id":"m00.canonical.distance_to_canonical","requested_formula_id":"m00.canonical.distance_to_canonical","alias_used":null,"legacy_formula_id":"formula_vault.m00.canonical.distance_to_canonical","runtime_symbol":"m00_distance_to_canonical","output_variable":"canonical_distance","value":-6,"validation_status":"research_required"}
+{"ok":false,"command":"formula run","formula_id":"m00.canonical.distance_to_canonical","status":"research_required","execution_policy":"blocked","error":{"code":"execution_blocked_by_status"}}
 ```
 
-The real output also includes the safety notice. The legacy `run formula_vault.m00.canonical.distance_to_canonical ... --json` form remains available during the migration window and reports `deprecated_alias=true` plus a migration command.
+The real output also includes registry traceability and the safety notice. The legacy `run formula_vault.m00.canonical.distance_to_canonical ... --json` form routes through the same status gate and cannot bypass it.
 
 ## Run the bounded self-check
 
@@ -46,7 +46,7 @@ The real output also includes the safety notice. The legacy `run formula_vault.m
 cargo run -p aero-codex-cli -- self-check --json
 ```
 
-A clean run reports `"passed":14` and `"failed":0`. The checks cover all ten formulas plus invalid-scale, nonfinite-input, overflow, and unknown-formula rejection.
+A clean run reports `"passed":14` and `"failed":0`. Self-check directly exercises the ten canonical-unit kernels plus invalid-scale, nonfinite-input, overflow, and unknown-formula rejection. It is a software diagnostic, not a public-execution or validation-status claim.
 
 ## Stable exit codes
 
@@ -66,7 +66,7 @@ cargo run -p aero-codex-cli -- formula run \
   distance=1 distance_unit=0 --json
 ```
 
-The command exits with code `4` and writes a JSON error containing the stable code `non_positive_input`.
+The command exits with code `4` and writes a JSON error containing the stable code `execution_blocked_by_status`; the status gate runs before equation-domain evaluation.
 
 ## Release-gate commands
 

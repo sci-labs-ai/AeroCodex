@@ -1,0 +1,122 @@
+schema_version = "aerocodex.release_manifest.v1"
+release_version = "0.1.0-alpha.1"
+release_tier = "research_software_alpha"
+source_revision_policy = "pinned_base_commit"
+base_commit = "ffcc2b218220cf705d4673f3b44b45c929f3a65d"
+validation_status = "research_required"
+execution_policy = "blocked"
+public_executable = false
+validation_record = "validation/equation_inventory.tsv"
+documentation = "docs/release/v0.1.0-alpha.1-status.md"
+registry_formula_count = 152
+cli_dispatch_metadata = "crates/aero-codex-cli/dispatch_metadata.tsv"
+cli_dispatch_formula_count = 12
+public_executable_formula_count = 0
+
+[[formulas]]
+identifier = "m00.angle.deg_to_rad"
+runtime_symbol = "m00_degrees_to_radians"
+validation_status = "research_required"
+execution_policy = "blocked"
+public_executable = false
+validation_record = "validation/cards/validation_formula_vault_m00_angle_unit_conversions.yaml"
+documentation = "docs/research_alpha/cli_formula_quickstart.md"
+
+[[formulas]]
+identifier = "m00.angle.rad_to_deg"
+runtime_symbol = "m00_radians_to_degrees"
+validation_status = "research_required"
+execution_policy = "blocked"
+public_executable = false
+validation_record = "validation/cards/validation_formula_vault_m00_angle_unit_conversions.yaml"
+documentation = "docs/research_alpha/cli_formula_quickstart.md"
+
+[[formulas]]
+identifier = "m00.canonical.distance_from_canonical"
+runtime_symbol = "m00_distance_from_canonical"
+validation_status = "research_required"
+execution_policy = "blocked"
+public_executable = false
+validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
+documentation = "docs/research_alpha/cli_formula_quickstart.md"
+
+[[formulas]]
+identifier = "m00.canonical.distance_to_canonical"
+runtime_symbol = "m00_distance_to_canonical"
+validation_status = "research_required"
+execution_policy = "blocked"
+public_executable = false
+validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
+documentation = "docs/research_alpha/cli_formula_quickstart.md"
+
+[[formulas]]
+identifier = "m00.canonical.mu_from_units"
+runtime_symbol = "m00_canonical_mu_from_units"
+validation_status = "research_required"
+execution_policy = "blocked"
+public_executable = false
+validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
+documentation = "docs/research_alpha/cli_formula_quickstart.md"
+
+[[formulas]]
+identifier = "m00.canonical.speed_from_canonical"
+runtime_symbol = "m00_speed_from_canonical"
+validation_status = "research_required"
+execution_policy = "blocked"
+public_executable = false
+validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
+documentation = "docs/research_alpha/cli_formula_quickstart.md"
+
+[[formulas]]
+identifier = "m00.canonical.speed_to_canonical"
+runtime_symbol = "m00_speed_to_canonical"
+validation_status = "research_required"
+execution_policy = "blocked"
+public_executable = false
+validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
+documentation = "docs/research_alpha/cli_formula_quickstart.md"
+
+[[formulas]]
+identifier = "m00.canonical.speed_unit_from_du_tu"
+runtime_symbol = "m00_canonical_speed_unit_from_du_tu"
+validation_status = "research_required"
+execution_policy = "blocked"
+public_executable = false
+validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
+documentation = "docs/research_alpha/cli_formula_quickstart.md"
+
+[[formulas]]
+identifier = "m00.canonical.speed_unit_from_mu_du"
+runtime_symbol = "m00_canonical_speed_unit_from_mu_du"
+validation_status = "research_required"
+execution_policy = "blocked"
+public_executable = false
+validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
+documentation = "docs/research_alpha/cli_formula_quickstart.md"
+
+[[formulas]]
+identifier = "m00.canonical.time_from_canonical"
+runtime_symbol = "m00_time_from_canonical"
+validation_status = "research_required"
+execution_policy = "blocked"
+public_executable = false
+validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
+documentation = "docs/research_alpha/cli_formula_quickstart.md"
+
+[[formulas]]
+identifier = "m00.canonical.time_to_canonical"
+runtime_symbol = "m00_time_to_canonical"
+validation_status = "research_required"
+execution_policy = "blocked"
+public_executable = false
+validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
+documentation = "docs/research_alpha/cli_formula_quickstart.md"
+
+[[formulas]]
+identifier = "m00.canonical.time_unit_from_mu_du"
+runtime_symbol = "m00_canonical_time_unit_from_mu_du"
+validation_status = "research_required"
+execution_policy = "blocked"
+public_executable = false
+validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
+documentation = "docs/research_alpha/cli_formula_quickstart.md"

@@ -19,6 +19,7 @@ use std::{
     fmt::{self, Write as _},
     io::{self, Write as IoWrite},
     process::ExitCode,
+    sync::OnceLock,
 };
 
 #[path = "../../../generated/rust/formula_registry.rs"]
@@ -62,100 +63,125 @@ fn safety_notice() -> &'static str {
 
 #[derive(Debug)]
 struct FormulaSpec {
+    canonical_id: &'static str,
     id: &'static str,
     runtime_symbol: &'static str,
     output_variable: &'static str,
-    inputs: &'static [&'static str],
+    inputs: Vec<&'static str>,
     summary: &'static str,
+    dispatch: RuntimeDispatch,
+}
+
+#[derive(Debug, Clone, Copy)]
+enum RuntimeDispatch {
+    CanonicalTimeUnitFromMuDu,
+    CanonicalSpeedUnitFromDuTu,
+    CanonicalSpeedUnitFromMuDu,
+    CanonicalMuFromUnits,
+    DistanceToCanonical,
+    DistanceFromCanonical,
+    TimeToCanonical,
+    TimeFromCanonical,
+    SpeedToCanonical,
+    SpeedFromCanonical,
+    DegreesToRadians,
+    RadiansToDegrees,
+}
+
+fn runtime_dispatch(runtime_symbol: &str) -> Option<RuntimeDispatch> {
+    match runtime_symbol {
+        "m00_canonical_time_unit_from_mu_du" => Some(RuntimeDispatch::CanonicalTimeUnitFromMuDu),
+        "m00_canonical_speed_unit_from_du_tu" => Some(RuntimeDispatch::CanonicalSpeedUnitFromDuTu),
+        "m00_canonical_speed_unit_from_mu_du" => Some(RuntimeDispatch::CanonicalSpeedUnitFromMuDu),
+        "m00_canonical_mu_from_units" => Some(RuntimeDispatch::CanonicalMuFromUnits),
+        "m00_distance_to_canonical" => Some(RuntimeDispatch::DistanceToCanonical),
+        "m00_distance_from_canonical" => Some(RuntimeDispatch::DistanceFromCanonical),
+        "m00_time_to_canonical" => Some(RuntimeDispatch::TimeToCanonical),
+        "m00_time_from_canonical" => Some(RuntimeDispatch::TimeFromCanonical),
+        "m00_speed_to_canonical" => Some(RuntimeDispatch::SpeedToCanonical),
+        "m00_speed_from_canonical" => Some(RuntimeDispatch::SpeedFromCanonical),
+        "m00_degrees_to_radians" => Some(RuntimeDispatch::DegreesToRadians),
+        "m00_radians_to_degrees" => Some(RuntimeDispatch::RadiansToDegrees),
+        _ => None,
+    }
 }
 
 fn formula_specs() -> &'static [FormulaSpec] {
-    &[
-        FormulaSpec {
-            id: "formula_vault.m00.canonical.time_unit_from_mu_du",
-            runtime_symbol: "m00_canonical_time_unit_from_mu_du",
-            output_variable: "time_unit",
-            inputs: &["mu", "distance_unit"],
-            summary: "TU = sqrt(DU^3 / mu)",
-        },
-        FormulaSpec {
-            id: "formula_vault.m00.canonical.speed_unit_from_du_tu",
-            runtime_symbol: "m00_canonical_speed_unit_from_du_tu",
-            output_variable: "speed_unit",
-            inputs: &["distance_unit", "time_unit"],
-            summary: "speed_unit = DU / TU",
-        },
-        FormulaSpec {
-            id: "formula_vault.m00.canonical.speed_unit_from_mu_du",
-            runtime_symbol: "m00_canonical_speed_unit_from_mu_du",
-            output_variable: "speed_unit",
-            inputs: &["mu", "distance_unit"],
-            summary: "speed_unit = sqrt(mu / DU)",
-        },
-        FormulaSpec {
-            id: "formula_vault.m00.canonical.mu_from_units",
-            runtime_symbol: "m00_canonical_mu_from_units",
-            output_variable: "canonical_mu",
-            inputs: &["mu", "distance_unit", "time_unit"],
-            summary: "canonical_mu = mu * TU^2 / DU^3",
-        },
-        FormulaSpec {
-            id: "formula_vault.m00.canonical.distance_to_canonical",
-            runtime_symbol: "m00_distance_to_canonical",
-            output_variable: "canonical_distance",
-            inputs: &["distance", "distance_unit"],
-            summary: "canonical_distance = distance / DU",
-        },
-        FormulaSpec {
-            id: "formula_vault.m00.canonical.distance_from_canonical",
-            runtime_symbol: "m00_distance_from_canonical",
-            output_variable: "distance",
-            inputs: &["canonical_distance", "distance_unit"],
-            summary: "distance = canonical_distance * DU",
-        },
-        FormulaSpec {
-            id: "formula_vault.m00.canonical.time_to_canonical",
-            runtime_symbol: "m00_time_to_canonical",
-            output_variable: "canonical_time",
-            inputs: &["time", "time_unit"],
-            summary: "canonical_time = time / TU",
-        },
-        FormulaSpec {
-            id: "formula_vault.m00.canonical.time_from_canonical",
-            runtime_symbol: "m00_time_from_canonical",
-            output_variable: "time",
-            inputs: &["canonical_time", "time_unit"],
-            summary: "time = canonical_time * TU",
-        },
-        FormulaSpec {
-            id: "formula_vault.m00.canonical.speed_to_canonical",
-            runtime_symbol: "m00_speed_to_canonical",
-            output_variable: "canonical_speed",
-            inputs: &["speed", "distance_unit", "time_unit"],
-            summary: "canonical_speed = speed * TU / DU",
-        },
-        FormulaSpec {
-            id: "formula_vault.m00.canonical.speed_from_canonical",
-            runtime_symbol: "m00_speed_from_canonical",
-            output_variable: "speed",
-            inputs: &["canonical_speed", "distance_unit", "time_unit"],
-            summary: "speed = canonical_speed * DU / TU",
-        },
-        FormulaSpec {
-            id: "formula_vault.m00.angle.deg2rad",
-            runtime_symbol: "m00_degrees_to_radians",
-            output_variable: "angle_radians",
-            inputs: &["degrees"],
-            summary: "angle_radians = degrees * pi / 180",
-        },
-        FormulaSpec {
-            id: "formula_vault.m00.angle.rad2deg",
-            runtime_symbol: "m00_radians_to_degrees",
-            output_variable: "angle_degrees",
-            inputs: &["radians"],
-            summary: "angle_degrees = radians * 180 / pi",
-        },
-    ]
+    static SPECS: OnceLock<Vec<FormulaSpec>> = OnceLock::new();
+    SPECS
+        .get_or_init(|| {
+            parse_dispatch_metadata(include_str!("../dispatch_metadata.tsv"))
+                .expect("checked-in CLI dispatch metadata must be valid")
+        })
+        .as_slice()
+}
+
+fn parse_dispatch_metadata(text: &'static str) -> Result<Vec<FormulaSpec>, String> {
+    const HEADER: &str = "schema_version\tcanonical_formula_id\tdispatch_formula_id\truntime_symbol\toutput_variable\tinputs\tsummary";
+    let mut lines = text.lines();
+    if lines.next() != Some(HEADER) {
+        return Err("CLI dispatch metadata has an invalid header".to_string());
+    }
+
+    let mut specs = Vec::new();
+    let mut canonical_ids = std::collections::BTreeSet::new();
+    let mut dispatch_ids = std::collections::BTreeSet::new();
+    let mut runtime_symbols = std::collections::BTreeSet::new();
+    for (index, line) in lines.enumerate() {
+        let line_number = index + 2;
+        let fields: Vec<&str> = line.split('\t').collect();
+        if fields.len() != 7 {
+            return Err(format!(
+                "CLI dispatch metadata line {line_number} has {} fields, expected 7",
+                fields.len()
+            ));
+        }
+        if fields.iter().any(|field| field.trim().is_empty()) {
+            return Err(format!(
+                "CLI dispatch metadata line {line_number} contains an empty field"
+            ));
+        }
+        if fields[0] != "aerocodex.cli_dispatch.v1" {
+            return Err(format!(
+                "CLI dispatch metadata line {line_number} has unsupported schema `{}`",
+                fields[0]
+            ));
+        }
+        if !canonical_ids.insert(fields[1]) {
+            return Err(format!("duplicate canonical formula ID `{}`", fields[1]));
+        }
+        if !dispatch_ids.insert(fields[2]) {
+            return Err(format!("duplicate dispatch formula ID `{}`", fields[2]));
+        }
+        if !runtime_symbols.insert(fields[3]) {
+            return Err(format!("duplicate runtime symbol `{}`", fields[3]));
+        }
+        let dispatch = runtime_dispatch(fields[3]).ok_or_else(|| {
+            format!(
+                "CLI dispatch metadata line {line_number} has unbound runtime symbol `{}`",
+                fields[3]
+            )
+        })?;
+        let inputs: Vec<&str> = fields[5].split(',').collect();
+        if inputs.iter().any(|input| input.trim().is_empty()) {
+            return Err(format!(
+                "CLI dispatch metadata line {line_number} has an empty input name"
+            ));
+        }
+        specs.push(FormulaSpec {
+            canonical_id: fields[1],
+            id: fields[2],
+            runtime_symbol: fields[3],
+            output_variable: fields[4],
+            inputs,
+            summary: fields[6],
+            dispatch,
+        });
+    }
+    if specs.is_empty() {
+        return Err("CLI dispatch metadata has no formula records".to_string());
+    }
+    Ok(specs)
 }
 
 fn supported_formula_count() -> usize {
@@ -569,7 +595,7 @@ impl ResolvedFormula {
 
     fn inputs(&self) -> &'static [&'static str] {
         self.spec
-            .map(|spec| spec.inputs)
+            .map(|spec| spec.inputs.as_slice())
             .or_else(|| self.registry_entry.map(|entry| entry.input_names))
             .unwrap_or(&[])
     }
@@ -650,16 +676,18 @@ fn execution_gate_error(resolved: &ResolvedFormula, preliminary: bool) -> Option
 fn registry_entry_for_spec(
     spec: &FormulaSpec,
 ) -> Option<&'static generated_formula_registry::FormulaRegistryEntry> {
-    generated_formula_registry::find_by_alias(spec.id)
+    generated_formula_registry::find_by_formula_id(spec.canonical_id)
+        .or_else(|| generated_formula_registry::find_by_alias(spec.id))
         .or_else(|| generated_formula_registry::find_by_formula_id(spec.id))
 }
 
 fn formula_spec_for_registry_entry(
     entry: &'static generated_formula_registry::FormulaRegistryEntry,
 ) -> Option<&'static FormulaSpec> {
-    entry
-        .legacy_formula_id
-        .and_then(formula_spec)
+    formula_specs()
+        .iter()
+        .find(|spec| spec.canonical_id == entry.formula_id)
+        .or_else(|| entry.legacy_formula_id.and_then(formula_spec))
         .or_else(|| entry.aliases.iter().find_map(|alias| formula_spec(alias)))
         .or_else(|| formula_spec(entry.formula_id))
 }
@@ -730,7 +758,7 @@ fn validate_input_shape(
     spec: &'static FormulaSpec,
     inputs: &BTreeMap<String, f64>,
 ) -> Result<(), AppError> {
-    validate_input_names(spec.id, spec.inputs, inputs)
+    validate_input_names(spec.id, spec.inputs.as_slice(), inputs)
 }
 
 fn evaluate_formula(
@@ -741,57 +769,56 @@ fn evaluate_formula(
         formula_spec(formula_id).ok_or_else(|| AppError::UnknownFormula(formula_id.to_string()))?;
     validate_input_shape(spec, inputs)?;
 
-    let value = match spec.id {
-        "formula_vault.m00.canonical.time_unit_from_mu_du" => m00_canonical_time_unit_from_mu_du(
+    let value = match spec.dispatch {
+        RuntimeDispatch::CanonicalTimeUnitFromMuDu => m00_canonical_time_unit_from_mu_du(
             required_input(spec, inputs, "mu")?,
             required_input(spec, inputs, "distance_unit")?,
         ),
-        "formula_vault.m00.canonical.speed_unit_from_du_tu" => m00_canonical_speed_unit_from_du_tu(
+        RuntimeDispatch::CanonicalSpeedUnitFromDuTu => m00_canonical_speed_unit_from_du_tu(
             required_input(spec, inputs, "distance_unit")?,
             required_input(spec, inputs, "time_unit")?,
         ),
-        "formula_vault.m00.canonical.speed_unit_from_mu_du" => m00_canonical_speed_unit_from_mu_du(
+        RuntimeDispatch::CanonicalSpeedUnitFromMuDu => m00_canonical_speed_unit_from_mu_du(
             required_input(spec, inputs, "mu")?,
             required_input(spec, inputs, "distance_unit")?,
         ),
-        "formula_vault.m00.canonical.mu_from_units" => m00_canonical_mu_from_units(
+        RuntimeDispatch::CanonicalMuFromUnits => m00_canonical_mu_from_units(
             required_input(spec, inputs, "mu")?,
             required_input(spec, inputs, "distance_unit")?,
             required_input(spec, inputs, "time_unit")?,
         ),
-        "formula_vault.m00.canonical.distance_to_canonical" => m00_distance_to_canonical(
+        RuntimeDispatch::DistanceToCanonical => m00_distance_to_canonical(
             required_input(spec, inputs, "distance")?,
             required_input(spec, inputs, "distance_unit")?,
         ),
-        "formula_vault.m00.canonical.distance_from_canonical" => m00_distance_from_canonical(
+        RuntimeDispatch::DistanceFromCanonical => m00_distance_from_canonical(
             required_input(spec, inputs, "canonical_distance")?,
             required_input(spec, inputs, "distance_unit")?,
         ),
-        "formula_vault.m00.canonical.time_to_canonical" => m00_time_to_canonical(
+        RuntimeDispatch::TimeToCanonical => m00_time_to_canonical(
             required_input(spec, inputs, "time")?,
             required_input(spec, inputs, "time_unit")?,
         ),
-        "formula_vault.m00.canonical.time_from_canonical" => m00_time_from_canonical(
+        RuntimeDispatch::TimeFromCanonical => m00_time_from_canonical(
             required_input(spec, inputs, "canonical_time")?,
             required_input(spec, inputs, "time_unit")?,
         ),
-        "formula_vault.m00.canonical.speed_to_canonical" => m00_speed_to_canonical(
+        RuntimeDispatch::SpeedToCanonical => m00_speed_to_canonical(
             required_input(spec, inputs, "speed")?,
             required_input(spec, inputs, "distance_unit")?,
             required_input(spec, inputs, "time_unit")?,
         ),
-        "formula_vault.m00.canonical.speed_from_canonical" => m00_speed_from_canonical(
+        RuntimeDispatch::SpeedFromCanonical => m00_speed_from_canonical(
             required_input(spec, inputs, "canonical_speed")?,
             required_input(spec, inputs, "distance_unit")?,
             required_input(spec, inputs, "time_unit")?,
         ),
-        "formula_vault.m00.angle.deg2rad" => {
+        RuntimeDispatch::DegreesToRadians => {
             m00_degrees_to_radians(required_input(spec, inputs, "degrees")?)
         }
-        "formula_vault.m00.angle.rad2deg" => {
+        RuntimeDispatch::RadiansToDegrees => {
             m00_radians_to_degrees(required_input(spec, inputs, "radians")?)
         }
-        _ => return Err(AppError::UnknownFormula(formula_id.to_string())),
     }
     .map_err(|source| AppError::Equation {
         formula_id: spec.id,
@@ -2538,14 +2565,32 @@ mod tests {
     #[test]
     fn registry_is_unique_and_complete() {
         assert_eq!(formula_specs().len(), supported_formula_count());
+        let canonical_ids: BTreeSet<&str> = formula_specs()
+            .iter()
+            .map(|spec| spec.canonical_id)
+            .collect();
         let ids: BTreeSet<&str> = formula_specs().iter().map(|spec| spec.id).collect();
         let symbols: BTreeSet<&str> = formula_specs()
             .iter()
             .map(|spec| spec.runtime_symbol)
             .collect();
+        assert_eq!(canonical_ids.len(), supported_formula_count());
         assert_eq!(ids.len(), supported_formula_count());
         assert_eq!(symbols.len(), supported_formula_count());
         assert!(formula_specs().iter().all(|spec| !spec.inputs.is_empty()));
+        assert!(formula_specs().iter().all(|spec| {
+            generated_formula_registry::find_by_formula_id(spec.canonical_id)
+                .is_some_and(|entry| entry.runtime_symbol == Some(spec.runtime_symbol))
+        }));
+    }
+
+    #[test]
+    fn dispatch_metadata_rejects_unbound_runtime_symbol() {
+        let metadata = "schema_version\tcanonical_formula_id\tdispatch_formula_id\truntime_symbol\toutput_variable\tinputs\tsummary\n\
+                        aerocodex.cli_dispatch.v1\tfixture.one\tdispatch.one\tunbound_symbol\toutput\tinput\tsummary\n";
+        let error = parse_dispatch_metadata(metadata)
+            .expect_err("an unbound runtime symbol must not become CLI dispatch metadata");
+        assert!(error.contains("unbound runtime symbol"));
     }
 
     #[test]

@@ -281,7 +281,7 @@ Shape:
   "ok": true,
   "command": "self-check",
   "release_channel": "beta1-concept",
-  "supported_formula_count": 10,
+  "supported_formula_count": 12,
   "passed": 14,
   "failed": 0,
   "checks": [

@@ -43,7 +43,7 @@ It also provides governance machinery:
 - nomenclature, acronym, symbol, terminology, and waiver policy data;
 - clean-room BioSim-RS-style resource identity, transaction, deterministic replay, ledger, and smoke/friend-test primitives;
 - clean-room BioSim-plus synthetic scenario-domain records, structural validation, process records, intent-planning helpers, bounded compartment replay/digest/event helpers, and replay-integrity/ledger/report helpers for research metadata only;
-- a bounded `aerocodex` Beta 1 concept CLI for deterministic text/JSON execution and self-checking of the ten governed M00 canonical-unit formulas.
+- a bounded `aerocodex` research-alpha CLI for deterministic registry inventory, status reporting, and self-checking; its twelve M00 dispatch-linked records remain `research_required`, blocked from public formula execution, and non-promoted.
 
 AeroCodex does **not** currently provide certified flight software, a complete BioSim scenario engine, an operational BLSS controller, a validated habitat-safety model, a medical model, or certified M07/Orekit parity.
 
@@ -63,7 +63,7 @@ AeroCodex does **not** currently provide certified flight software, a complete B
 | `aero-codex-flight-dynamics` | Level-turn, stall-speed, turn-rate/radius, and specific-excess-power helpers. |
 | `aero-codex-astrodynamics` | Two-body orbital helpers, Hohmann transfer helpers, sphere of influence, bounded M00 angle/unit/vector helpers including `m00_wrap2pi`, classical-elements/Kepler research helpers, oracle-record/tolerance-comparison metadata helpers, contract-only two-line-element source-policy helpers, and runtime-linked formula-vault intake records. |
 | `aero-codex-life-support` | BLSS mass-balance helpers, thin-film/MELiSSA research kernels, clean-room BioSim-style resource/tick primitives, BioSim-plus synthetic scenario-domain validation, bounded process/intent helpers, compartment replay/digest/event helpers, and replay-integrity/ledger/report helpers. |
-| `aero-codex-cli` | Beta 1 concept binary for ten governed M00 canonical-unit formulas, stable JSON output, exit codes, and bounded self-checks. |
+| `aero-codex-cli` | Research-alpha inventory/status binary with twelve M00 dispatch-linked records, stable JSON output, exit codes, bounded self-checks, and fail-closed public formula execution. |
 | `xtask` | Dependency-free Rust local governance, validation, data-registry, formula-vault, equation-batch-manifest, and inventory checks. |
 
 ## Developer quickstart
@@ -84,20 +84,20 @@ cargo run -p xtask -- verify --all
 
 See [toolchain baseline](docs/development/toolchain.md) and [CI/local verification gates](docs/development/ci_gates.md) for the RR-003 tooling baseline, including future deterministic registry and formula status/gating check placeholders.
 
-## Beta 1 concept CLI
+## Research-alpha CLI status
 
-The first testable release vertical slice exposes exactly ten governed M00 canonical-unit formulas without changing their `research_required` status or duplicating their mathematics:
+The CLI can list and describe the governed Formula Registry and has twelve M00 runtime dispatch links: ten canonical-unit records and two angle-conversion records. All remain `research_required`, with `execution_policy=blocked` and `public_executable=false`; a runtime symbol or dispatch link is not execution authorization.
 
 ```bash
 cargo run -p aero-codex-cli -- version --json
-cargo run -p aero-codex-cli -- formulas
-cargo run -p aero-codex-cli -- run \
-  formula_vault.m00.canonical.distance_to_canonical \
-  distance=-42 distance_unit=7 --json
+cargo run -p aero-codex-cli -- formula list --family m00 --json
+cargo run -p aero-codex-cli -- formula describe \
+  m00.canonical.distance_to_canonical --json
+cargo run -p aero-codex-cli -- formula status-report --json
 cargo run -p aero-codex-cli -- self-check --json
 ```
 
-A clean self-check reports 14 passing checks and zero failures. See `docs/beta1/release_concept.md` and `docs/beta1/cli_quickstart.md`. The `beta1-concept` label is a software release-channel experiment; Cargo versions remain `0.0.1`, and no operational, parity, safety, or certification claim is made.
+A clean self-check reports 14 passing checks and zero failures, but self-check dispatch is not public formula execution and does not promote status. The authoritative release contract is [`docs/release/v0.1.0-alpha.1.toml`](docs/release/v0.1.0-alpha.1.toml); the live batch record is [`docs/release/v0.1.0-alpha.1-status.md`](docs/release/v0.1.0-alpha.1-status.md). Cargo versions remain `0.0.1` pending a separately authorized versioning/packaging batch, and no operational, parity, safety, or certification claim is made.
 
 ## Validation and governance artifacts
 
@@ -129,15 +129,17 @@ Run these before merging user-visible changes:
 ```bash
 git status --short
 git diff --check
-sha256sum -c checksums/SHA256SUMS
+cargo run -p xtask -- verify-checksums
 cargo fmt --all -- --check
 cargo check --workspace --all-targets --all-features
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo test --workspace --all-targets --all-features
 cargo run -p aero-codex-cli -- version --json
-cargo run -p aero-codex-cli -- run formula_vault.m00.canonical.distance_to_canonical distance=-42 distance_unit=7 --json
+cargo run -p aero-codex-cli -- formula status-report --json
 cargo run -p aero-codex-cli -- self-check --json
 cargo run -p xtask -- verify --all
+cargo run -p xtask -- verify-release-manifest
+cargo run -p xtask -- verify-generated
 cargo run -p xtask -- dependency-policy
 RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps
 ```
