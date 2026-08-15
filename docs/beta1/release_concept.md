@@ -11,7 +11,7 @@ Publicly executable formulas: `0`
 
 Status: historical milestone documentation; current formula validation remains `research_required`.
 
-The AeroCodex Beta 1 concept was a **software-quality vertical slice**, not an aerospace operational-readiness claim. Its Cargo version was `0.0.1`; `beta1-concept` is now retained only as a historical milestone label and compatibility alias. The current runtime identity is AeroCodex `0.1.0-alpha.1`, tier `research_software_alpha` (`Research Software Alpha`).
+The AeroCodex Beta 1 concept was a **software-quality vertical slice**, not an aerospace operational-readiness claim. Its Cargo version was `0.0.1`; `beta1-concept` is now retained only as a historical milestone label and compatibility alias. The current runtime identity is `AeroCodex`; the current release version is `0.1.0-alpha.1`; the current release tier is `research_software_alpha`; the current display tier is `Research Software Alpha`.
 
 AeroCodex remains research/preliminary-design software. It is not certified, flight-ready, mission-ready, operational, medical, habitat-safe, or approved for regulated use.
 

@@ -22,6 +22,8 @@ const EXPECTED_PROGRAM: &str = "aerocodex";
 const EXPECTED_PACKAGE_COUNT: usize = 14;
 const EXPECTED_FORMULA_COUNT: usize = 152;
 const EXPECTED_BASE_COMMIT: &str = "6a94b4628e6e0821a55d6aaadf6925956a5fa2d3";
+const ORIGINAL_IMPLEMENTATION_COMMIT: &str = "04431bb787bd8219fb3df7e237769421106f368a";
+const CORRECTIVE_COMMIT_SUBJECT: &str = "fix: close minimal release identity review findings";
 const FORCE_SELF_CHECK_FAILURE_ENV: &str = "AEROCODEX_TEST_FORCE_SELF_CHECK_FAILURE";
 
 const GOVERNED_DOCUMENTS: &[&str] = &[
@@ -37,11 +39,12 @@ const GOVERNED_DOCUMENTS: &[&str] = &[
 
 const IDENTITY_START: &str = "<!-- aerocodex-current-identity:start -->";
 const IDENTITY_END: &str = "<!-- aerocodex-current-identity:end -->";
+const HISTORICAL_START: &str = "<!-- aerocodex-historical:start -->";
+const HISTORICAL_END: &str = "<!-- aerocodex-historical:end -->";
 const IDENTITY_BODY: &str = "Release version: `0.1.0-alpha.1`\nRelease tier: `research_software_alpha` (`Research Software Alpha`)\nWorkspace packages: `14`\nRegistry formulas: `152`\nBlocked formulas: `152`\nPublicly executable formulas: `0`";
 
 const EVIDENCE_START: &str = "<!-- aerocodex-release-evidence:start -->";
 const EVIDENCE_END: &str = "<!-- aerocodex-release-evidence:end -->";
-const EVIDENCE_BODY: &str = "- Base commit: `6a94b4628e6e0821a55d6aaadf6925956a5fa2d3`\n- Scope: `minimal_release_identity`\n- Semantic-version authority: `Cargo.toml [workspace.package].version`\n- Release-tier authority: `docs/release/v0.1.0-alpha.1.toml`\n- Governed package count: `14`\n- Registry facts: `152 research_required; 152 blocked; 0 publicly executable`\n- CLI self-check: `14 passed; 0 failed`\n- CI authority: `fresh_github_actions_runners`\n- Threat-model boundary: `local_scripts_are_conveniences_not_security_sandboxes`\n- Excluded work: `packaging, signing, tagging, publication, formula promotion`";
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct CargoPackage {
@@ -661,11 +664,49 @@ fn verify_governed_documents(root: &Path) -> Result<(), String> {
 }
 
 fn verify_identity_document_bytes(path: &str, bytes: &[u8]) -> Result<(), String> {
+    if bytes.starts_with(&[0xef, 0xbb, 0xbf]) {
+        return Err(format!(
+            "{path}: UTF-8 BOM at byte zero is not allowed in a governed document"
+        ));
+    }
+    if bytes.starts_with(&[0xff, 0xfe, 0x00, 0x00]) {
+        return Err(format!(
+            "{path}: UTF-32LE BOM is not allowed in a governed document"
+        ));
+    }
+    if bytes.starts_with(&[0x00, 0x00, 0xfe, 0xff]) {
+        return Err(format!(
+            "{path}: UTF-32BE BOM is not allowed in a governed document"
+        ));
+    }
+    if bytes.starts_with(&[0xff, 0xfe]) {
+        return Err(format!(
+            "{path}: UTF-16LE BOM is not allowed in a governed document"
+        ));
+    }
+    if bytes.starts_with(&[0xfe, 0xff]) {
+        return Err(format!(
+            "{path}: UTF-16BE BOM is not allowed in a governed document"
+        ));
+    }
     let text = std::str::from_utf8(bytes)
         .map_err(|error| format!("{path}: invalid UTF-8 at byte {}", error.valid_up_to()))?;
-    for marker in ['\u{FFFD}', 'Ã', 'Â'] {
+    if text.contains('\u{FEFF}') {
+        return Err(format!(
+            "{path}: U+FEFF BOM marker is not allowed in governed current prose"
+        ));
+    }
+    if text.contains('\u{FFFD}') {
+        return Err(format!(
+            "{path}: U+FFFD replacement character is not allowed"
+        ));
+    }
+    for marker in ['Ã', 'Â'] {
         if text.contains(marker) {
-            return Err(format!("{path}: mojibake marker `{marker}` is not allowed"));
+            return Err(format!(
+                "{path}: mojibake marker U+{:04X} is not allowed",
+                marker as u32
+            ));
         }
     }
     if text.contains("â€") || text.contains("ðŸ") {
@@ -712,135 +753,661 @@ fn verify_exact_block(
 }
 
 fn scan_current_identity_claims(path: &str, text: &str) -> Result<(), String> {
-    let mut paragraph = Vec::new();
-    let mut paragraph_line = 1usize;
-    let mut in_fence = false;
-    let mut authoritative_fence = false;
+    let mut paragraph = LogicalParagraph::default();
+    let mut fence: Option<MarkdownFence> = None;
     let mut next_fence_authoritative = false;
+    let mut in_identity_block = false;
+    let mut in_historical_block = false;
     for (index, line) in text.lines().enumerate() {
         let line_number = index + 1;
         let trimmed = line.trim();
+
+        if let Some(open) = fence {
+            if let Some(marker) = parse_fence_marker(line) {
+                if marker.character == open.character
+                    && marker.length >= open.length
+                    && marker.rest.trim().is_empty()
+                {
+                    check_identity_paragraph(path, &paragraph)?;
+                    paragraph.clear();
+                    fence = None;
+                    continue;
+                }
+            }
+            if !open.authoritative {
+                continue;
+            }
+            if trimmed.is_empty() {
+                check_identity_paragraph(path, &paragraph)?;
+                paragraph.clear();
+            } else {
+                paragraph.push(line_number, trimmed);
+            }
+            continue;
+        }
+
+        if trimmed == IDENTITY_START {
+            check_identity_paragraph(path, &paragraph)?;
+            paragraph.clear();
+            in_identity_block = true;
+            continue;
+        }
+        if trimmed == IDENTITY_END {
+            in_identity_block = false;
+            continue;
+        }
+        if in_identity_block {
+            continue;
+        }
+
+        if trimmed == HISTORICAL_START {
+            check_identity_paragraph(path, &paragraph)?;
+            paragraph.clear();
+            if in_historical_block {
+                return Err(format!(
+                    "{path}:{line_number}: nested historical blocks are not allowed"
+                ));
+            }
+            in_historical_block = true;
+            continue;
+        }
+        if trimmed == HISTORICAL_END {
+            if !in_historical_block {
+                return Err(format!(
+                    "{path}:{line_number}: historical block closes without a matching start"
+                ));
+            }
+            in_historical_block = false;
+            continue;
+        }
+        if in_historical_block {
+            continue;
+        }
+
         if trimmed == "<!-- aerocodex-authoritative-example -->" {
-            check_identity_paragraph(path, paragraph_line, &paragraph.join(" "))?;
+            check_identity_paragraph(path, &paragraph)?;
             paragraph.clear();
             next_fence_authoritative = true;
             continue;
         }
-        if trimmed.starts_with("```") || trimmed.starts_with("~~~") {
-            check_identity_paragraph(path, paragraph_line, &paragraph.join(" "))?;
+        if let Some(marker) = parse_fence_marker(line) {
+            check_identity_paragraph(path, &paragraph)?;
             paragraph.clear();
-            if in_fence {
-                in_fence = false;
-                authoritative_fence = false;
-            } else {
-                in_fence = true;
-                authoritative_fence = next_fence_authoritative;
-                next_fence_authoritative = false;
-            }
-            continue;
-        }
-        if in_fence && !authoritative_fence {
+            fence = Some(MarkdownFence {
+                character: marker.character,
+                length: marker.length,
+                authoritative: next_fence_authoritative,
+                opening_line: line_number,
+            });
+            next_fence_authoritative = false;
             continue;
         }
         if trimmed.is_empty() || trimmed.starts_with('#') || trimmed.starts_with("<!--") {
-            check_identity_paragraph(path, paragraph_line, &paragraph.join(" "))?;
+            check_identity_paragraph(path, &paragraph)?;
             paragraph.clear();
             if trimmed.starts_with('#') {
-                check_identity_paragraph(path, line_number, trimmed)?;
+                let mut heading = LogicalParagraph::default();
+                heading.push(line_number, trimmed);
+                check_identity_paragraph(path, &heading)?;
             }
             continue;
         }
-        if paragraph.is_empty() {
-            paragraph_line = line_number;
-        }
-        paragraph.push(trimmed);
+        paragraph.push(line_number, trimmed);
     }
-    check_identity_paragraph(path, paragraph_line, &paragraph.join(" "))
+    if in_historical_block {
+        return Err(format!(
+            "{path}: unclosed historical block beginning before end of file"
+        ));
+    }
+    if let Some(open) = fence {
+        return Err(format!(
+            "{path}:{}: unclosed Markdown fence (delimiter={} length={})",
+            open.opening_line, open.character as char, open.length
+        ));
+    }
+    check_identity_paragraph(path, &paragraph)
 }
 
-fn check_identity_paragraph(path: &str, line: usize, paragraph: &str) -> Result<(), String> {
-    if paragraph.is_empty() {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct MarkdownFence {
+    character: u8,
+    length: usize,
+    authoritative: bool,
+    opening_line: usize,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct FenceMarker<'a> {
+    character: u8,
+    length: usize,
+    rest: &'a str,
+}
+
+fn parse_fence_marker(line: &str) -> Option<FenceMarker<'_>> {
+    let bytes = line.as_bytes();
+    let mut offset = 0usize;
+    while offset < bytes.len() && bytes[offset] == b' ' && offset < 4 {
+        offset += 1;
+    }
+    if offset > 3 || offset >= bytes.len() || !matches!(bytes[offset], b'`' | b'~') {
+        return None;
+    }
+    let character = bytes[offset];
+    let mut end = offset;
+    while end < bytes.len() && bytes[end] == character {
+        end += 1;
+    }
+    let length = end - offset;
+    if length < 3 {
+        return None;
+    }
+    let rest = &line[end..];
+    if character == b'`' && rest.as_bytes().contains(&b'`') {
+        return None;
+    }
+    Some(FenceMarker {
+        character,
+        length,
+        rest,
+    })
+}
+
+#[derive(Debug, Default)]
+struct LogicalParagraph {
+    text: String,
+    lines: Vec<ParagraphLine>,
+}
+
+#[derive(Debug)]
+struct ParagraphLine {
+    end: usize,
+    line: usize,
+}
+
+impl LogicalParagraph {
+    fn push(&mut self, line: usize, text: &str) {
+        if !self.text.is_empty() {
+            self.text.push(' ');
+        }
+        self.text.push_str(text);
+        self.lines.push(ParagraphLine {
+            end: self.text.len(),
+            line,
+        });
+    }
+
+    fn clear(&mut self) {
+        self.text.clear();
+        self.lines.clear();
+    }
+
+    fn line_for_offset(&self, offset: usize) -> usize {
+        self.lines
+            .iter()
+            .find(|line| offset <= line.end)
+            .or_else(|| self.lines.last())
+            .map_or(1, |line| line.line)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ClaimKind {
+    SemanticVersion,
+    MachineTier,
+    DisplayTier,
+    ProgramName,
+    ReleaseChannel,
+    RuntimeIdentity,
+}
+
+impl ClaimKind {
+    fn name(self) -> &'static str {
+        match self {
+            Self::SemanticVersion => "semantic_version",
+            Self::MachineTier => "machine_release_tier",
+            Self::DisplayTier => "display_release_tier",
+            Self::ProgramName => "program_name",
+            Self::ReleaseChannel => "release_channel",
+            Self::RuntimeIdentity => "runtime_identity",
+        }
+    }
+
+    fn expected(self) -> &'static str {
+        match self {
+            Self::SemanticVersion => EXPECTED_VERSION,
+            Self::MachineTier | Self::ReleaseChannel => EXPECTED_TIER,
+            Self::DisplayTier => EXPECTED_TIER_DISPLAY,
+            Self::ProgramName => EXPECTED_PROGRAM,
+            Self::RuntimeIdentity => "AeroCodex",
+        }
+    }
+
+    fn captures_words(self) -> bool {
+        matches!(self, Self::DisplayTier)
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+struct ClaimPattern {
+    needle: &'static str,
+    kind: ClaimKind,
+}
+
+const CLAIM_PATTERNS: &[ClaimPattern] = &[
+    ClaimPattern {
+        needle: "current cargo-compatible semantic version is ",
+        kind: ClaimKind::SemanticVersion,
+    },
+    ClaimPattern {
+        needle: "current cargo package version is ",
+        kind: ClaimKind::SemanticVersion,
+    },
+    ClaimPattern {
+        needle: "current semantic version is ",
+        kind: ClaimKind::SemanticVersion,
+    },
+    ClaimPattern {
+        needle: "current release version is ",
+        kind: ClaimKind::SemanticVersion,
+    },
+    ClaimPattern {
+        needle: "current cargo version is ",
+        kind: ClaimKind::SemanticVersion,
+    },
+    ClaimPattern {
+        needle: "active workspace version is ",
+        kind: ClaimKind::SemanticVersion,
+    },
+    ClaimPattern {
+        needle: "current workspace version is ",
+        kind: ClaimKind::SemanticVersion,
+    },
+    ClaimPattern {
+        needle: "release version remains ",
+        kind: ClaimKind::SemanticVersion,
+    },
+    ClaimPattern {
+        needle: "cargo version remains ",
+        kind: ClaimKind::SemanticVersion,
+    },
+    ClaimPattern {
+        needle: "release version: ",
+        kind: ClaimKind::SemanticVersion,
+    },
+    ClaimPattern {
+        needle: "semantic version: ",
+        kind: ClaimKind::SemanticVersion,
+    },
+    ClaimPattern {
+        needle: "current machine release tier is ",
+        kind: ClaimKind::MachineTier,
+    },
+    ClaimPattern {
+        needle: "current machine tier is ",
+        kind: ClaimKind::MachineTier,
+    },
+    ClaimPattern {
+        needle: "current release tier is ",
+        kind: ClaimKind::MachineTier,
+    },
+    ClaimPattern {
+        needle: "current tier is ",
+        kind: ClaimKind::MachineTier,
+    },
+    ClaimPattern {
+        needle: "release tier remains ",
+        kind: ClaimKind::MachineTier,
+    },
+    ClaimPattern {
+        needle: "release tier: ",
+        kind: ClaimKind::MachineTier,
+    },
+    ClaimPattern {
+        needle: "machine release tier: ",
+        kind: ClaimKind::MachineTier,
+    },
+    ClaimPattern {
+        needle: "machine tier: ",
+        kind: ClaimKind::MachineTier,
+    },
+    ClaimPattern {
+        needle: "current display release tier is ",
+        kind: ClaimKind::DisplayTier,
+    },
+    ClaimPattern {
+        needle: "current display tier is ",
+        kind: ClaimKind::DisplayTier,
+    },
+    ClaimPattern {
+        needle: "display release tier: ",
+        kind: ClaimKind::DisplayTier,
+    },
+    ClaimPattern {
+        needle: "display tier is ",
+        kind: ClaimKind::DisplayTier,
+    },
+    ClaimPattern {
+        needle: "display tier: ",
+        kind: ClaimKind::DisplayTier,
+    },
+    ClaimPattern {
+        needle: "current program name is ",
+        kind: ClaimKind::ProgramName,
+    },
+    ClaimPattern {
+        needle: "program name: ",
+        kind: ClaimKind::ProgramName,
+    },
+    ClaimPattern {
+        needle: "current release name is ",
+        kind: ClaimKind::ProgramName,
+    },
+    ClaimPattern {
+        needle: "release name: ",
+        kind: ClaimKind::ProgramName,
+    },
+    ClaimPattern {
+        needle: "current release channel is ",
+        kind: ClaimKind::ReleaseChannel,
+    },
+    ClaimPattern {
+        needle: "release channel remains ",
+        kind: ClaimKind::ReleaseChannel,
+    },
+    ClaimPattern {
+        needle: "release channel: ",
+        kind: ClaimKind::ReleaseChannel,
+    },
+    ClaimPattern {
+        needle: "current runtime identity is ",
+        kind: ClaimKind::RuntimeIdentity,
+    },
+    ClaimPattern {
+        needle: "current runtime identity remains ",
+        kind: ClaimKind::RuntimeIdentity,
+    },
+    ClaimPattern {
+        needle: "runtime identity: ",
+        kind: ClaimKind::RuntimeIdentity,
+    },
+];
+
+#[derive(Debug, Clone, Copy)]
+struct ClaimCandidate {
+    start: usize,
+    end: usize,
+    kind: ClaimKind,
+}
+
+fn check_identity_paragraph(path: &str, paragraph: &LogicalParagraph) -> Result<(), String> {
+    if paragraph.text.is_empty() {
         return Ok(());
     }
-    let lower = paragraph.to_ascii_lowercase();
-    let current = [
-        "current",
-        "currently",
-        " now ",
-        " remains",
-        "active workspace version",
-        "runtime identity",
-        "release version",
-        "release tier",
-        "cargo version",
-        "cargo package version",
-    ]
-    .iter()
-    .any(|cue| lower.contains(cue));
-    if !current {
-        return Ok(());
+    let inline_spans = inline_code_spans(&paragraph.text);
+    let mut masked = paragraph.text.as_bytes().to_vec();
+    for &(start, end) in &inline_spans {
+        for byte in &mut masked[start..end] {
+            *byte = b' ';
+        }
     }
-    let historical = [
-        "historical",
-        "formerly",
-        "previous",
-        "legacy",
-        "compatibility alias",
-    ]
-    .iter()
-    .any(|cue| lower.contains(cue));
-    let versions = semver_tokens(paragraph);
-    for version in versions {
-        if version != EXPECTED_VERSION && !historical {
-            return Err(format!(
-                "{path}:{line}: competing current semantic version `{version}`; expected `{EXPECTED_VERSION}`"
+    let masked = String::from_utf8(masked).expect("masking UTF-8 with ASCII spaces remains UTF-8");
+    let lower = paragraph.text.to_ascii_lowercase();
+    let masked_lower = masked.to_ascii_lowercase();
+    let mut candidates = Vec::new();
+    for pattern in CLAIM_PATTERNS {
+        let mut offset = 0usize;
+        while let Some(relative) = lower[offset..].find(pattern.needle) {
+            let start = offset + relative;
+            let end = start + pattern.needle.len();
+            if !inline_spans
+                .iter()
+                .any(|&(inline_start, inline_end)| start >= inline_start && start < inline_end)
+            {
+                candidates.push(ClaimCandidate {
+                    start,
+                    end,
+                    kind: pattern.kind,
+                });
+            }
+            offset = end;
+        }
+    }
+    candidates.sort_by(|left, right| {
+        left.start
+            .cmp(&right.start)
+            .then_with(|| (right.end - right.start).cmp(&(left.end - left.start)))
+    });
+    let mut accepted: Vec<ClaimCandidate> = Vec::new();
+    for candidate in candidates {
+        if accepted
+            .iter()
+            .any(|prior| candidate.start < prior.end && candidate.end > prior.start)
+        {
+            continue;
+        }
+        accepted.push(candidate);
+    }
+
+    for candidate in &accepted {
+        let (asserted, value_start, value_end) = extract_asserted_value(
+            &paragraph.text,
+            candidate.end,
+            candidate.kind.captures_words(),
+        );
+        let expected = candidate.kind.expected();
+        if asserted != expected {
+            return Err(claim_diagnostic(
+                path,
+                paragraph,
+                candidate.start,
+                value_end.max(value_start),
+                candidate.kind.name(),
+                &asserted,
+                expected,
             ));
         }
     }
-    let tier_claim = [
-        "release tier is",
-        "release tier:",
-        "release tier remains",
-        "release tier now",
-    ]
-    .iter()
-    .any(|cue| lower.contains(cue));
-    if tier_claim
-        && !paragraph.contains(EXPECTED_TIER)
-        && !paragraph.contains(EXPECTED_TIER_DISPLAY)
-        && !historical
-    {
-        return Err(format!(
-            "{path}:{line}: competing or incomplete current release-tier claim"
-        ));
-    }
-    if (lower.contains("beta1-concept") || lower.contains("beta 1"))
-        && !historical
-        && (lower.contains("current")
-            || lower.contains("runtime identity")
-            || lower.contains("remains"))
-    {
-        return Err(format!(
-            "{path}:{line}: Beta 1 is presented as current identity rather than historical material or a compatibility alias"
-        ));
+
+    for current_start in find_word_occurrences(&masked_lower, "current") {
+        if current_identity_is_negated(&masked_lower, current_start) {
+            continue;
+        }
+        let clause_end = clause_end(&masked_lower, current_start);
+        let clause = &masked_lower[current_start..clause_end];
+        let identity_noun = !find_word_occurrences(clause, "version").is_empty()
+            || !find_word_occurrences(clause, "tier").is_empty()
+            || [
+                "runtime identity",
+                "release channel",
+                "program name",
+                "release name",
+            ]
+            .iter()
+            .any(|noun| clause.contains(noun));
+        if identity_noun
+            && !accepted
+                .iter()
+                .any(|candidate| candidate.start >= current_start && candidate.start < clause_end)
+        {
+            let end_line = paragraph.line_for_offset(clause_end.saturating_sub(1));
+            return Err(format!(
+                "{path}:{}-{end_line}: claim_type=ambiguous_current_identity asserted=`{}` expected=`supported explicit current identity wording`",
+                paragraph.line_for_offset(current_start),
+                paragraph.text[current_start..clause_end].trim()
+            ));
+        }
     }
     Ok(())
 }
 
-fn semver_tokens(text: &str) -> Vec<&str> {
-    text.split(|character: char| {
-        !(character.is_ascii_alphanumeric() || matches!(character, '.' | '-' | '+'))
-    })
-    .map(|token| token.trim_matches('.'))
-    .filter(|token| {
-        let core = token.split(['-', '+']).next().unwrap_or("");
-        let parts: Vec<&str> = core.split('.').collect();
-        parts.len() == 3
-            && parts
-                .iter()
-                .all(|part| !part.is_empty() && part.bytes().all(|byte| byte.is_ascii_digit()))
-    })
-    .collect()
+fn current_identity_is_negated(text: &str, current_start: usize) -> bool {
+    let clause_start = text[..current_start]
+        .rfind(['.', '!', '?', ';', ':', '\n'])
+        .map_or(0, |index| index + 1);
+    text[clause_start..current_start]
+        .split(|character: char| !character.is_ascii_alphanumeric())
+        .filter(|word| !word.is_empty())
+        .rev()
+        .take(3)
+        .any(|word| matches!(word, "not" | "never"))
+}
+
+fn inline_code_spans(text: &str) -> Vec<(usize, usize)> {
+    let bytes = text.as_bytes();
+    let mut spans = Vec::new();
+    let mut index = 0usize;
+    while index < bytes.len() {
+        if bytes[index] != b'`' {
+            index += 1;
+            continue;
+        }
+        let start = index;
+        while index < bytes.len() && bytes[index] == b'`' {
+            index += 1;
+        }
+        let run = index - start;
+        let mut search = index;
+        let mut close = None;
+        while search < bytes.len() {
+            if bytes[search] != b'`' {
+                search += 1;
+                continue;
+            }
+            let close_start = search;
+            while search < bytes.len() && bytes[search] == b'`' {
+                search += 1;
+            }
+            if search - close_start == run {
+                close = Some(search);
+                break;
+            }
+        }
+        if let Some(end) = close {
+            spans.push((start, end));
+            index = end;
+        }
+    }
+    spans
+}
+
+fn extract_asserted_value(text: &str, offset: usize, words: bool) -> (String, usize, usize) {
+    let bytes = text.as_bytes();
+    let mut start = offset;
+    while start < bytes.len()
+        && (bytes[start].is_ascii_whitespace() || matches!(bytes[start], b'*' | b'_'))
+    {
+        start += 1;
+    }
+    if start < bytes.len() && bytes[start] == b'`' {
+        let mut delimiter_end = start;
+        while delimiter_end < bytes.len() && bytes[delimiter_end] == b'`' {
+            delimiter_end += 1;
+        }
+        let run = delimiter_end - start;
+        let mut search = delimiter_end;
+        while search < bytes.len() {
+            if bytes[search] != b'`' {
+                search += 1;
+                continue;
+            }
+            let close_start = search;
+            while search < bytes.len() && bytes[search] == b'`' {
+                search += 1;
+            }
+            if search - close_start == run {
+                return (
+                    text[delimiter_end..close_start].trim().to_string(),
+                    delimiter_end,
+                    close_start,
+                );
+            }
+        }
+    }
+    let mut end = start;
+    if words {
+        while end < bytes.len() {
+            let remaining = &text[end..];
+            if remaining.starts_with('—')
+                || matches!(bytes[end], b';' | b'.' | b'!' | b'?' | b')' | b']' | b'}')
+            {
+                break;
+            }
+            end += text[end..].chars().next().map_or(1, char::len_utf8);
+        }
+    } else {
+        while end < bytes.len()
+            && !bytes[end].is_ascii_whitespace()
+            && !matches!(
+                bytes[end],
+                b';' | b',' | b'!' | b'?' | b'(' | b')' | b'[' | b']' | b'{' | b'}'
+            )
+        {
+            end += 1;
+        }
+    }
+    let asserted = text[start..end]
+        .trim()
+        .trim_matches(|character| matches!(character, '*' | '_' | '`' | '"' | '\''))
+        .trim_end_matches('.')
+        .trim()
+        .to_string();
+    (asserted, start, end)
+}
+
+fn claim_diagnostic(
+    path: &str,
+    paragraph: &LogicalParagraph,
+    start: usize,
+    end: usize,
+    claim_type: &str,
+    asserted: &str,
+    expected: &str,
+) -> String {
+    format!(
+        "{path}:{}-{}: claim_type={claim_type} asserted=`{asserted}` expected=`{expected}`",
+        paragraph.line_for_offset(start),
+        paragraph.line_for_offset(end)
+    )
+}
+
+fn find_word_occurrences(text: &str, needle: &str) -> Vec<usize> {
+    let mut matches = Vec::new();
+    let mut offset = 0usize;
+    while let Some(relative) = text[offset..].find(needle) {
+        let start = offset + relative;
+        let before = start
+            .checked_sub(1)
+            .and_then(|index| text.as_bytes().get(index))
+            .copied();
+        let after = text.as_bytes().get(start + needle.len()).copied();
+        if before.map_or(true, |byte| !byte.is_ascii_alphanumeric())
+            && after.map_or(true, |byte| !byte.is_ascii_alphanumeric())
+        {
+            matches.push(start);
+        }
+        offset = start + needle.len();
+    }
+    matches
+}
+
+fn clause_end(text: &str, start: usize) -> usize {
+    let mut end = start;
+    while end < text.len() {
+        let remaining = &text[end..];
+        if remaining.starts_with('—') || matches!(text.as_bytes()[end], b';' | b'!' | b'?') {
+            break;
+        }
+        if text.as_bytes()[end] == b'.'
+            && text
+                .as_bytes()
+                .get(end + 1)
+                .map_or(true, |byte| byte.is_ascii_whitespace())
+        {
+            break;
+        }
+        end += remaining.chars().next().map_or(1, char::len_utf8);
+    }
+    end
 }
 
 fn verify_release_status_evidence(root: &Path) -> Result<(), String> {
@@ -848,7 +1415,203 @@ fn verify_release_status_evidence(root: &Path) -> Result<(), String> {
     let text = fs::read_to_string(root.join(relative))
         .map_err(|error| format!("cannot read {relative}: {error}"))?
         .replace("\r\n", "\n");
-    verify_exact_block(relative, &text, EVIDENCE_START, EVIDENCE_BODY, EVIDENCE_END)
+    let start_count = text.matches(EVIDENCE_START).count();
+    let end_count = text.matches(EVIDENCE_END).count();
+    if start_count != 1 || end_count != 1 {
+        return Err(format!(
+            "{relative}: release evidence markers must appear exactly once (start={start_count}, end={end_count})"
+        ));
+    }
+    let evidence = text
+        .split_once(EVIDENCE_START)
+        .and_then(|(_, tail)| tail.split_once(EVIDENCE_END).map(|(body, _)| body))
+        .ok_or_else(|| format!("{relative}: release evidence markers are out of order"))?;
+
+    for required in [
+        format!("- Milestone base commit: `{EXPECTED_BASE_COMMIT}`"),
+        format!("- Original implementation commit: `{ORIGINAL_IMPLEMENTATION_COMMIT}`"),
+        "- Corrective commit: `SELF`".to_string(),
+        "- Scope: `minimal_release_identity`".to_string(),
+        "- Registry facts: `152 research_required; 152 blocked; 0 publicly executable`"
+            .to_string(),
+        "- CLI self-check: `14 passed; 0 failed`".to_string(),
+        "- Fresh-runner CI: `pending until push`".to_string(),
+        "- Threat-model boundary: `local_scripts_are_conveniences_not_security_sandboxes`"
+            .to_string(),
+        "- Root Cargo.lock in committed Git tree: `absent`".to_string(),
+        "- Pre-existing ignored local Cargo.lock: `not part of the release commit; preserve bytes; cleanup requires separate user authorization`".to_string(),
+        "- Excluded work: `packaging, signing, tagging, publication, formula promotion`"
+            .to_string(),
+    ] {
+        if !evidence.contains(&required) {
+            return Err(format!(
+                "{relative}: objective evidence is missing exact line `{required}`"
+            ));
+        }
+    }
+
+    let manifest = release_manifest::load_release_manifest(root)?;
+    let expected_packages = manifest
+        .packages
+        .iter()
+        .map(|package| {
+            format!(
+                "- Package: `{}` | `{}`",
+                package.name, package.manifest_path
+            )
+        })
+        .collect::<BTreeSet<_>>();
+    require_exact_prefixed_evidence(relative, evidence, "- Package: `", &expected_packages)?;
+
+    let original_files = git_lines(
+        root,
+        &[
+            "diff-tree",
+            "--no-commit-id",
+            "--name-only",
+            "-r",
+            ORIGINAL_IMPLEMENTATION_COMMIT,
+        ],
+    )?
+    .into_iter()
+    .map(|path| format!("- Original file: `{path}`"))
+    .collect::<BTreeSet<_>>();
+    require_exact_prefixed_evidence(relative, evidence, "- Original file: `", &original_files)?;
+
+    let original_stat = git_text(
+        root,
+        &[
+            "show",
+            "--shortstat",
+            "--format=",
+            ORIGINAL_IMPLEMENTATION_COMMIT,
+        ],
+    )?;
+    require_evidence_stat(
+        relative,
+        evidence,
+        "Original Git statistics",
+        &original_stat,
+    )?;
+
+    let head_subject = git_text(root, &["log", "-1", "--format=%s"])?;
+    let committed = head_subject == CORRECTIVE_COMMIT_SUBJECT;
+    let corrective_files = if committed {
+        git_lines(
+            root,
+            &["diff-tree", "--no-commit-id", "--name-only", "-r", "HEAD"],
+        )?
+    } else {
+        git_lines(root, &["diff", "--name-only", "HEAD", "--"])?
+    }
+    .into_iter()
+    .map(|path| format!("- Corrective file: `{path}`"))
+    .collect::<BTreeSet<_>>();
+    require_exact_prefixed_evidence(
+        relative,
+        evidence,
+        "- Corrective file: `",
+        &corrective_files,
+    )?;
+
+    let corrective_stat = if committed {
+        git_text(root, &["show", "--shortstat", "--format=", "HEAD"])?
+    } else {
+        git_text(root, &["diff", "--shortstat", "HEAD", "--"])?
+    };
+    require_evidence_stat(
+        relative,
+        evidence,
+        "Corrective Git statistics",
+        &corrective_stat,
+    )?;
+
+    let cumulative_stat = if committed {
+        git_text(
+            root,
+            &["diff", "--shortstat", EXPECTED_BASE_COMMIT, "HEAD", "--"],
+        )?
+    } else {
+        git_text(root, &["diff", "--shortstat", EXPECTED_BASE_COMMIT, "--"])?
+    };
+    require_evidence_stat(
+        relative,
+        evidence,
+        "Cumulative Git statistics",
+        &cumulative_stat,
+    )?;
+    Ok(())
+}
+
+fn git_text(root: &Path, arguments: &[&str]) -> Result<String, String> {
+    let safe_directory = format!(
+        "safe.directory={}",
+        root.to_string_lossy().replace('\\', "/")
+    );
+    let output = Command::new("git")
+        .arg("-c")
+        .arg(safe_directory)
+        .arg("-C")
+        .arg(root)
+        .args(arguments)
+        .output()
+        .map_err(|error| format!("cannot execute Git for release evidence: {error}"))?;
+    if !output.status.success() {
+        return Err(format!(
+            "Git release-evidence command failed with {}: {}",
+            output.status,
+            String::from_utf8_lossy(&output.stderr).trim()
+        ));
+    }
+    String::from_utf8(output.stdout)
+        .map(|text| text.trim().to_string())
+        .map_err(|error| format!("Git release-evidence output is invalid UTF-8: {error}"))
+}
+
+fn git_lines(root: &Path, arguments: &[&str]) -> Result<Vec<String>, String> {
+    Ok(git_text(root, arguments)?
+        .lines()
+        .filter(|line| !line.trim().is_empty())
+        .map(|line| line.trim().replace('\\', "/"))
+        .collect())
+}
+
+fn require_exact_prefixed_evidence(
+    path: &str,
+    evidence: &str,
+    prefix: &str,
+    expected: &BTreeSet<String>,
+) -> Result<(), String> {
+    let actual = evidence
+        .lines()
+        .map(str::trim)
+        .filter(|line| line.starts_with(prefix))
+        .map(str::to_string)
+        .collect::<BTreeSet<_>>();
+    if &actual == expected {
+        Ok(())
+    } else {
+        Err(format!(
+            "{path}: evidence inventory `{prefix}` mismatch: expected={expected:?}; actual={actual:?}"
+        ))
+    }
+}
+
+fn require_evidence_stat(
+    path: &str,
+    evidence: &str,
+    label: &str,
+    stat: &str,
+) -> Result<(), String> {
+    let normalized = stat.split_whitespace().collect::<Vec<_>>().join(" ");
+    let expected = format!("- {label}: `{normalized}`");
+    if evidence.contains(&expected) {
+        Ok(())
+    } else {
+        Err(format!(
+            "{path}: objective evidence is missing derived statistic `{expected}`"
+        ))
+    }
 }
 
 fn verify_compiled_cli(root: &Path, target_directory: &Path) -> Result<(), String> {
@@ -1129,6 +1892,208 @@ mod tests {
     use super::*;
     use crate::formula_registry::rust::CheckedFormulaIdentityRow;
 
+    struct TestDirectory {
+        path: PathBuf,
+    }
+
+    impl TestDirectory {
+        fn create(label: &str) -> Self {
+            let nonce = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("test clock should follow UNIX epoch")
+                .as_nanos();
+            let path = env::temp_dir().join(format!(
+                "aerocodex_release_identity_test_{label}_{}_{}",
+                std::process::id(),
+                nonce
+            ));
+            fs::create_dir_all(&path).expect("temporary test directory should be created");
+            Self { path }
+        }
+
+        fn write(&self, relative: &str, contents: impl AsRef<[u8]>) {
+            let path = self.path.join(relative);
+            if let Some(parent) = path.parent() {
+                fs::create_dir_all(parent).expect("fixture parent should be created");
+            }
+            fs::write(path, contents).expect("fixture file should be written");
+        }
+    }
+
+    impl Drop for TestDirectory {
+        fn drop(&mut self) {
+            let _ = fs::remove_dir_all(&self.path);
+        }
+    }
+
+    fn repository_root() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .expect("xtask should have a repository parent")
+            .to_path_buf()
+    }
+
+    fn replace_once(text: &str, old: &str, new: &str) -> String {
+        assert_eq!(
+            text.matches(old).count(),
+            1,
+            "fixture replacement must be unique: {old:?}"
+        );
+        text.replacen(old, new, 1)
+    }
+
+    fn document_with_prose(prose: &str) -> String {
+        format!("{}\n{prose}\n", identity_document(IDENTITY_BODY))
+    }
+
+    fn assert_document_error(prose: &str, required: &[&str]) {
+        let document = document_with_prose(prose);
+        let error = verify_identity_document_bytes("fixture.md", document.as_bytes())
+            .expect_err("document fixture should fail");
+        for value in required {
+            assert!(error.contains(value), "{error:?} did not contain {value:?}");
+        }
+    }
+
+    fn copy_working_tree(source: &Path, destination: &Path) {
+        let mut entries = fs::read_dir(source)
+            .expect("source directory should be readable")
+            .collect::<Result<Vec<_>, _>>()
+            .expect("source entries should be readable");
+        entries.sort_by_key(|entry| entry.file_name());
+        for entry in entries {
+            let name = entry.file_name();
+            if matches!(name.to_str(), Some(".git" | "target" | "Cargo.lock")) {
+                continue;
+            }
+            let source_path = entry.path();
+            let destination_path = destination.join(&name);
+            if source_path.is_dir() {
+                fs::create_dir_all(&destination_path)
+                    .expect("destination directory should be created");
+                copy_working_tree(&source_path, &destination_path);
+            } else {
+                fs::copy(&source_path, &destination_path)
+                    .expect("working-tree fixture file should be copied");
+            }
+        }
+    }
+
+    fn complete_repository_fixture() -> TestDirectory {
+        let source = repository_root();
+        let fixture = TestDirectory::create("complete_repository");
+        let output = Command::new("git")
+            .args(["clone", "--quiet"])
+            .arg(&source)
+            .arg(&fixture.path)
+            .output()
+            .expect("local fixture clone should execute");
+        assert!(
+            output.status.success(),
+            "local fixture clone failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        copy_working_tree(&source, &fixture.path);
+        fixture
+    }
+
+    fn write_package(root: &TestDirectory, path: &str, name: &str, version: &str) {
+        let version_line = if version == "workspace" {
+            "version.workspace = true".to_string()
+        } else {
+            format!("version = \"{version}\"")
+        };
+        root.write(
+            &format!("{path}/Cargo.toml"),
+            format!("[package]\nname = \"{name}\"\n{version_line}\nedition.workspace = true\n"),
+        );
+        root.write(&format!("{path}/src/lib.rs"), "pub fn fixture() {}\n");
+    }
+
+    fn package_workspace_fixture() -> (TestDirectory, Vec<ReleasePackage>) {
+        let fixture = TestDirectory::create("cargo_workspace");
+        let mut members = String::new();
+        let mut governed = Vec::new();
+        for index in 0..EXPECTED_PACKAGE_COUNT {
+            let name = format!("fixture-{index:02}");
+            let path = format!("crates/{name}");
+            members.push_str(&format!("    \"{path}\",\n"));
+            write_package(&fixture, &path, &name, "workspace");
+            governed.push(package(&name, &format!("{path}/Cargo.toml")));
+        }
+        fixture.write(
+            "Cargo.toml",
+            format!(
+                "[workspace]\nresolver = \"2\"\nmembers = [\n{members}]\n\n[workspace.package]\nversion = \"{EXPECTED_VERSION}\"\nedition = \"2021\"\n"
+            ),
+        );
+        (fixture, governed)
+    }
+
+    fn validate_package_fixture(
+        fixture: &TestDirectory,
+        governed: &[ReleasePackage],
+    ) -> Result<(), String> {
+        let metadata = load_cargo_metadata(&fixture.path)?;
+        let discovered = discover_package_manifests(&fixture.path, EXPECTED_VERSION)?;
+        validate_package_sets(governed, EXPECTED_VERSION, &metadata.packages, &discovered)
+    }
+
+    fn registry_fixture() -> TestDirectory {
+        let fixture = TestDirectory::create("registry");
+        let root = repository_root();
+        fixture.write(
+            "generated/formula_registry.json",
+            fs::read(root.join("generated/formula_registry.json"))
+                .expect("checked registry should be readable"),
+        );
+        fixture.write(
+            "generated/formula_registry.sha256",
+            fs::read(root.join("generated/formula_registry.sha256"))
+                .expect("checked registry sidecar should be readable"),
+        );
+        fixture.write(
+            "docs/release/v0.1.0-alpha.1.toml",
+            fs::read(root.join("docs/release/v0.1.0-alpha.1.toml"))
+                .expect("release manifest should be readable"),
+        );
+        fixture
+    }
+
+    fn write_checked_registry(fixture: &TestDirectory, text: &str) {
+        fixture.write("generated/formula_registry.json", text);
+        let (canonical, _) = crate::checksums::canonical_checksum_bytes(text.as_bytes());
+        let digest = crate::equation_batch::generate::sha256_hex(canonical.as_ref());
+        fixture.write(
+            "generated/formula_registry.sha256",
+            format!("{digest}  generated/formula_registry.json\n"),
+        );
+    }
+
+    fn build_cli_fixture(fixture: &TestDirectory, label: &str) -> PathBuf {
+        let cargo = env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
+        let output = Command::new(cargo)
+            .current_dir(&fixture.path)
+            .args(["build", "-p", "aero-codex-cli"])
+            .output()
+            .expect("fixture CLI build should execute");
+        assert!(
+            output.status.success(),
+            "fixture CLI build failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        let mut built = fixture.path.join("target/debug/aerocodex");
+        if cfg!(windows) {
+            built.set_extension("exe");
+        }
+        let mut saved = fixture.path.join(format!("compiled-{label}"));
+        if cfg!(windows) {
+            saved.set_extension("exe");
+        }
+        fs::copy(&built, &saved).expect("compiled fixture binary should be saved");
+        saved
+    }
+
     fn identity_document(body: &str) -> String {
         format!("# Current identity\n\n{IDENTITY_START}\n{body}\n{IDENTITY_END}\n")
     }
@@ -1352,7 +2317,7 @@ mod tests {
         assert!(
             verify_identity_document_bytes("fixture.md", tier.as_bytes())
                 .unwrap_err()
-                .contains("release-tier")
+                .contains("claim_type=machine_release_tier")
         );
     }
 
@@ -1378,7 +2343,7 @@ mod tests {
         assert!(
             verify_identity_document_bytes("fixture.md", text.as_bytes())
                 .unwrap_err()
-                .contains("Beta 1")
+                .contains("asserted=`beta1-concept`")
         );
     }
 
@@ -1420,5 +2385,519 @@ mod tests {
                 .unwrap_err()
                 .contains("release_tier")
         );
+    }
+
+    // Production-document fixtures: these call the same governed-document scanner used by
+    // `verify-release-identity`, with no test-only parser or token shortcut.
+    #[test]
+    fn markdown_fence_character_length_and_line_rules_are_fail_closed() {
+        for prose in [
+            "```text\nThe current release version is 0.1.0-alpha.2.\n```",
+            "~~~text\nThe current release version is 0.1.0-alpha.2.\n~~~",
+            "```text\n~~~\nThe current release version is 0.1.0-alpha.2.\n```",
+            "~~~text\n```\nThe current release version is 0.1.0-alpha.2.\n~~~",
+            "````text\n```\nThe current release version is 0.1.0-alpha.2.\n````",
+            "````text\nThe current release version is 0.1.0-alpha.2.\n`````",
+            "   ```text\nThe current release version is 0.1.0-alpha.2.\n   ```",
+            "Inline ````` fence-like code does not open a block; the current release version is 0.1.0-alpha.1.",
+        ] {
+            verify_identity_document_bytes(
+                "fixture.md",
+                document_with_prose(prose).as_bytes(),
+            )
+            .unwrap();
+        }
+
+        assert_document_error(
+            "````text\n```\nThe current release version is 0.1.0-alpha.2.\n````\nThe current release version is 0.1.0-alpha.2.",
+            &["claim_type=semantic_version", "asserted=`0.1.0-alpha.2`"],
+        );
+        assert_document_error(
+            "```text\nThe current release version is 0.1.0-alpha.2.\n```\nThe current release version is 0.1.0-alpha.2.",
+            &["claim_type=semantic_version", "asserted=`0.1.0-alpha.2`"],
+        );
+        assert_document_error(
+            "```text\n~~~\nThe current release version is 0.1.0-alpha.2.\n```\nThe current release version is 0.1.0-alpha.2.",
+            &["claim_type=semantic_version", "asserted=`0.1.0-alpha.2`"],
+        );
+        assert_document_error(
+            "````text\nThe current release version is 0.1.0-alpha.2.\n```",
+            &["unclosed Markdown fence", "delimiter=`", "length=4"],
+        );
+
+        let crlf = document_with_prose(
+            "~~~text\nThe current release version is 0.1.0-alpha.2.\n~~~\nThe current release version is 0.1.0-alpha.1.",
+        )
+        .replace('\n', "\r\n");
+        verify_identity_document_bytes("fixture.md", crlf.as_bytes()).unwrap();
+    }
+
+    #[test]
+    fn historical_scope_never_exempts_a_current_claim() {
+        for prose in [
+            "Historical Beta 1 used 0.0.1; the current release version is 0.1.0-alpha.1.",
+            "Previously the tier was beta1-concept. The current release version is 0.1.0-alpha.1.",
+            "Historical Beta 1 used 0.0.1 — the current release tier is research_software_alpha.",
+            "(Historical version: 0.0.1.) The current display tier is Research Software Alpha.",
+            "The current release version is 0.1.0-alpha.1; the historical Beta 1 version was 0.0.1.",
+            "The current runtime identity is AeroCodex; Beta 1 is a historical reference.",
+            "## Historical Beta 1\n\nThe current release version is 0.1.0-alpha.1.",
+            "<!-- aerocodex-historical:start -->\nThe current release version was 0.0.1.\n<!-- aerocodex-historical:end -->\n\nThe current release version is 0.1.0-alpha.1.",
+        ] {
+            verify_identity_document_bytes(
+                "docs/beta1/fixture.md",
+                document_with_prose(prose).as_bytes(),
+            )
+            .unwrap();
+        }
+
+        for (prose, asserted) in [
+            (
+                "Historical Beta 1 used 0.0.1; the current release version is 0.1.0-alpha.2.",
+                "0.1.0-alpha.2",
+            ),
+            (
+                "The historical tier was beta1-concept; the current release version is 0.2.",
+                "0.2",
+            ),
+            (
+                "The historical version was 0.0.1; the current release tier is production.",
+                "production",
+            ),
+            (
+                "Historical Beta 1 used 0.0.1. The current runtime identity is beta1-concept.",
+                "beta1-concept",
+            ),
+            (
+                "This is not historical but the current release carries version 0.1.0-alpha.2.",
+                "current release carries version 0.1.0-alpha.2",
+            ),
+        ] {
+            assert_document_error(prose, &["claim_type=", &format!("asserted=`{asserted}`")]);
+        }
+    }
+
+    #[test]
+    fn claims_are_bound_to_their_immediate_asserted_values() {
+        for prose in [
+            "The current release version is 0.1.0-alpha.1.",
+            "The current machine tier is research_software_alpha.",
+            "The current display tier is Research Software Alpha.",
+            "The current program name is aerocodex; the current release channel is research_software_alpha.",
+            "The current Cargo package version is `0.1.0-alpha.1`.",
+            "The active workspace version is 0.1.0-alpha.1.",
+            "The current release version\nis 0.1.0-alpha.1; the current release tier\nis research_software_alpha.",
+            "The current release version is 0.1.0-alpha.1; example: `the current release version is 9.9.9`.",
+        ] {
+            verify_identity_document_bytes(
+                "fixture.md",
+                document_with_prose(prose).as_bytes(),
+            )
+            .unwrap();
+        }
+
+        for asserted in [
+            "0.1",
+            "0.2",
+            "0.1.0",
+            "0.1.0-alpha",
+            "0.1.0-alpha.2",
+            "v0.1.0-alpha.1",
+        ] {
+            assert_document_error(
+                &format!("The current release version is {asserted}."),
+                &[
+                    "claim_type=semantic_version",
+                    &format!("asserted=`{asserted}`"),
+                    "expected=`0.1.0-alpha.1`",
+                ],
+            );
+        }
+        for (prose, claim, asserted, expected) in [
+            (
+                "Current release version is 0.1.0-alpha.2; expected example: 0.1.0-alpha.1.",
+                "semantic_version",
+                "0.1.0-alpha.2",
+                EXPECTED_VERSION,
+            ),
+            (
+                "Current release tier is production; identifier example: research_software_alpha.",
+                "machine_release_tier",
+                "production",
+                EXPECTED_TIER,
+            ),
+            (
+                "Current display tier is Production; machine identifier: research_software_alpha.",
+                "display_release_tier",
+                "Production",
+                EXPECTED_TIER_DISPLAY,
+            ),
+            (
+                "Example: `0.1.0-alpha.1`. The current release version is 0.1.0-alpha.2.",
+                "semantic_version",
+                "0.1.0-alpha.2",
+                EXPECTED_VERSION,
+            ),
+        ] {
+            assert_document_error(
+                prose,
+                &[
+                    &format!("claim_type={claim}"),
+                    &format!("asserted=`{asserted}`"),
+                    &format!("expected=`{expected}`"),
+                ],
+            );
+        }
+        assert_document_error(
+            "The current release carries version 0.1.0-alpha.1.",
+            &["claim_type=ambiguous_current_identity", "fixture.md:"],
+        );
+    }
+
+    #[test]
+    fn governed_document_encoding_rejects_boms_and_preserves_scientific_unicode() {
+        let valid = document_with_prose(
+            "Scientific notation remains valid UTF-8: Δv = 1.0×10⁻³ m·s⁻¹, μ = 3.986×10¹⁴.",
+        );
+        verify_identity_document_bytes("fixture.md", valid.as_bytes()).unwrap();
+
+        let mut utf8_bom = vec![0xef, 0xbb, 0xbf];
+        utf8_bom.extend_from_slice(valid.as_bytes());
+        let error = verify_identity_document_bytes("fixture.md", &utf8_bom).unwrap_err();
+        assert!(error.contains("fixture.md") && error.contains("UTF-8 BOM"));
+
+        let middle = valid.replace("Scientific", "Scien\u{FEFF}tific");
+        assert!(
+            verify_identity_document_bytes("fixture.md", middle.as_bytes())
+                .unwrap_err()
+                .contains("U+FEFF")
+        );
+        assert!(
+            verify_identity_document_bytes("fixture.md", &[0xff, 0xfe, 0x23, 0x00])
+                .unwrap_err()
+                .contains("UTF-16LE")
+        );
+        assert!(
+            verify_identity_document_bytes("fixture.md", &[0xfe, 0xff, 0x00, 0x23])
+                .unwrap_err()
+                .contains("UTF-16BE")
+        );
+
+        let mut crlf_bom = vec![0xef, 0xbb, 0xbf];
+        crlf_bom.extend_from_slice(valid.replace('\n', "\r\n").as_bytes());
+        assert!(verify_identity_document_bytes("fixture.md", &crlf_bom)
+            .unwrap_err()
+            .contains("UTF-8 BOM"));
+    }
+
+    // Complete public-command fixtures: a real repository clone traverses Git, manifest,
+    // Cargo metadata, registry, governed-document, evidence, and compiled-CLI boundaries.
+    #[test]
+    fn complete_public_verifier_rejects_reported_document_bypasses() {
+        let fixture = complete_repository_fixture();
+        let target = "docs/beta1/release_concept.md";
+        for (prose, expected) in [
+            (
+                "```text\n~~~\nThe current release version is 0.1.0-alpha.2.\n```\nThe current release version is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            (
+                "Historical Beta 1 used 0.0.1; the current release tier is production.",
+                "asserted=`production`",
+            ),
+            (
+                "Current release tier is production; example: research_software_alpha.",
+                "asserted=`production`",
+            ),
+        ] {
+            fixture.write(target, document_with_prose(prose));
+            let error = verify_release_identity(&fixture.path)
+                .expect_err("complete public verifier should reject document bypass");
+            assert!(error.contains(expected), "{error:?}");
+        }
+
+        let valid = fs::read(repository_root().join(target))
+            .expect("the governed Beta document should be readable");
+        fixture.write(target, &valid);
+        verify_release_identity(&fixture.path).unwrap();
+
+        let mut bom = vec![0xef, 0xbb, 0xbf];
+        bom.extend_from_slice(&valid);
+        fixture.write(target, bom);
+        let error = verify_release_identity(&fixture.path)
+            .expect_err("complete public verifier should reject UTF-8 BOM");
+        assert!(error.contains(target) && error.contains("UTF-8 BOM"));
+    }
+
+    // Production-loader fixtures: real Cargo workspaces and real `cargo metadata` output.
+    #[test]
+    fn production_cargo_loader_rejects_package_topology_drift() {
+        let (removed, governed) = package_workspace_fixture();
+        let root_manifest = fs::read_to_string(removed.path.join("Cargo.toml")).unwrap();
+        removed.write(
+            "Cargo.toml",
+            replace_once(&root_manifest, "    \"crates/fixture-13\",\n", ""),
+        );
+        assert!(validate_package_fixture(&removed, &governed)
+            .unwrap_err()
+            .contains("cargo_missing"));
+
+        let (extra_member, governed) = package_workspace_fixture();
+        write_package(&extra_member, "crates/extra", "extra", "workspace");
+        let root_manifest = fs::read_to_string(extra_member.path.join("Cargo.toml")).unwrap();
+        extra_member.write(
+            "Cargo.toml",
+            replace_once(
+                &root_manifest,
+                "]\n\n[workspace.package]",
+                "    \"crates/extra\",\n]\n\n[workspace.package]",
+            ),
+        );
+        assert!(validate_package_fixture(&extra_member, &governed)
+            .unwrap_err()
+            .contains("cargo_extra"));
+
+        let (outside, governed) = package_workspace_fixture();
+        write_package(&outside, "crates/outside", "outside", "workspace");
+        assert!(validate_package_fixture(&outside, &governed)
+            .unwrap_err()
+            .contains("discovered_extra"));
+
+        let (version, governed) = package_workspace_fixture();
+        write_package(&version, "crates/fixture-00", "fixture-00", "0.1.0-alpha.2");
+        assert!(validate_package_fixture(&version, &governed)
+            .unwrap_err()
+            .contains("version mismatch"));
+
+        let (name, governed) = package_workspace_fixture();
+        write_package(&name, "crates/fixture-00", "renamed", "workspace");
+        assert!(validate_package_fixture(&name, &governed)
+            .unwrap_err()
+            .contains("name mismatch"));
+
+        let (duplicate, governed) = package_workspace_fixture();
+        write_package(&duplicate, "outside/duplicate", "fixture-00", "workspace");
+        assert!(validate_package_fixture(&duplicate, &governed)
+            .unwrap_err()
+            .contains("duplicate discovered package name"));
+
+        let (excluded_without_reason, governed) = package_workspace_fixture();
+        write_package(
+            &excluded_without_reason,
+            "crates/excluded",
+            "excluded",
+            "workspace",
+        );
+        let root_manifest =
+            fs::read_to_string(excluded_without_reason.path.join("Cargo.toml")).unwrap();
+        excluded_without_reason.write(
+            "Cargo.toml",
+            replace_once(
+                &root_manifest,
+                "]\n\n[workspace.package]",
+                "]\nexclude = [\"crates/excluded\"]\n\n[workspace.package]",
+            ),
+        );
+        assert!(
+            validate_package_fixture(&excluded_without_reason, &governed)
+                .unwrap_err()
+                .contains("discovered_extra")
+        );
+    }
+
+    // Production-loader fixtures: checked registry JSON, SHA-256 sidecar, and parser.
+    #[test]
+    fn production_registry_loader_rejects_artifact_and_policy_drift() {
+        let missing_registry = TestDirectory::create("missing_registry");
+        let error =
+            formula_registry::check::run_check_command(&missing_registry.path, &CheckOptions)
+                .unwrap_err();
+        assert!(error.contains("generated/formula_registry.json is missing or unreadable"));
+
+        let missing_sidecar = registry_fixture();
+        fs::remove_file(
+            missing_sidecar
+                .path
+                .join("generated/formula_registry.sha256"),
+        )
+        .unwrap();
+        assert!(
+            formula_registry::check::run_check_command(&missing_sidecar.path, &CheckOptions)
+                .unwrap_err()
+                .contains("generated/formula_registry.sha256 is missing or unreadable")
+        );
+
+        let wrong_sidecar = registry_fixture();
+        wrong_sidecar.write(
+            "generated/formula_registry.sha256",
+            "0000000000000000000000000000000000000000000000000000000000000000  generated/formula_registry.json\n",
+        );
+        assert!(
+            formula_registry::rust::load_checked_formula_identity_registry(&wrong_sidecar.path)
+                .unwrap_err()
+                .contains("stale sha256 sidecar")
+        );
+
+        let malformed = registry_fixture();
+        write_checked_registry(&malformed, "{\"formulas\":[}");
+        assert!(
+            formula_registry::rust::load_checked_formula_identity_registry(&malformed.path)
+                .unwrap_err()
+                .contains("unexpected JSON character")
+        );
+
+        let duplicate = registry_fixture();
+        let text =
+            fs::read_to_string(duplicate.path.join("generated/formula_registry.json")).unwrap();
+        let parsed =
+            formula_registry::rust::load_checked_formula_identity_registry(&duplicate.path)
+                .unwrap();
+        let first = &parsed.formulas[0].formula_id;
+        let second = &parsed.formulas[1].formula_id;
+        let duplicate_text = replace_once(
+            &text,
+            &format!("\"formula_id\": \"{second}\""),
+            &format!("\"formula_id\": \"{first}\""),
+        );
+        write_checked_registry(&duplicate, &duplicate_text);
+        assert!(
+            formula_registry::rust::load_checked_formula_identity_registry(&duplicate.path)
+                .unwrap_err()
+                .contains("duplicate formula_id")
+        );
+
+        let manifest = release_manifest::load_release_manifest(&registry_fixture().path)
+            .expect("production manifest parser should load the fixture");
+        for (old, new, expected) in [
+            (
+                "\"status\": \"research_required\"",
+                "\"status\": \"equation_traceable\"",
+                "research_required",
+            ),
+            (
+                "\"execution_policy\": \"blocked\"",
+                "\"execution_policy\": \"preliminary_flag_required\"",
+                "blocked",
+            ),
+            (
+                "\"execution_policy\": \"blocked\"",
+                "\"execution_policy\": \"normal_research\"",
+                "publicly_executable",
+            ),
+        ] {
+            let fixture = registry_fixture();
+            let text =
+                fs::read_to_string(fixture.path.join("generated/formula_registry.json")).unwrap();
+            write_checked_registry(&fixture, &text.replacen(old, new, 1));
+            let registry =
+                formula_registry::rust::load_checked_formula_identity_registry(&fixture.path)
+                    .unwrap();
+            let summary = summarize_registry(&registry).unwrap();
+            let error = validate_registry_summary(&manifest, summary).unwrap_err();
+            assert!(error.contains(expected), "{error:?}");
+        }
+
+        let count_mismatch = registry_fixture();
+        let manifest_text =
+            fs::read_to_string(count_mismatch.path.join("docs/release/v0.1.0-alpha.1.toml"))
+                .unwrap();
+        count_mismatch.write(
+            "docs/release/v0.1.0-alpha.1.toml",
+            manifest_text.replacen(
+                "registry_formula_count = 152",
+                "registry_formula_count = 151",
+                1,
+            ),
+        );
+        let manifest = release_manifest::load_release_manifest(&count_mismatch.path).unwrap();
+        let registry =
+            formula_registry::rust::load_checked_formula_identity_registry(&count_mismatch.path)
+                .unwrap();
+        assert!(
+            validate_registry_summary(&manifest, summarize_registry(&registry).unwrap())
+                .unwrap_err()
+                .contains("manifest versus registry count mismatch")
+        );
+    }
+
+    // Compiled-process integration fixtures: each drift is built into and observed from a real
+    // CLI executable. The canonical build also proves external-CWD and repository independence.
+    #[test]
+    fn compiled_cli_process_detects_identity_count_and_legacy_drift() {
+        let fixture = TestDirectory::create("compiled_cli");
+        copy_working_tree(&repository_root(), &fixture.path);
+        let main_path = fixture.path.join("crates/aero-codex-cli/src/main.rs");
+        let registry_path = fixture.path.join("generated/rust/formula_registry.rs");
+        let main_baseline = fs::read_to_string(&main_path).unwrap();
+        let registry_baseline = fs::read_to_string(&registry_path).unwrap();
+
+        for (label, main_old, main_new, registry_old, registry_new, expected) in [
+            (
+                "semantic-version",
+                "fn package_version() -> &'static str {\n    env!(\"CARGO_PKG_VERSION\")\n}",
+                "fn package_version() -> &'static str {\n    \"0.1.0-alpha.2\"\n}",
+                "",
+                "",
+                "semantic_version",
+            ),
+            (
+                "machine-tier",
+                "fn release_tier() -> &'static str {\n    \"research_software_alpha\"\n}",
+                "fn release_tier() -> &'static str {\n    \"production\"\n}",
+                "",
+                "",
+                "release_tier",
+            ),
+            (
+                "display-tier",
+                "fn release_tier_display() -> &'static str {\n    \"Research Software Alpha\"\n}",
+                "fn release_tier_display() -> &'static str {\n    \"Production\"\n}",
+                "",
+                "",
+                "release_tier_display",
+            ),
+            (
+                "formula-count",
+                "",
+                "",
+                "pub const FORMULA_COUNT: usize = 152;",
+                "pub const FORMULA_COUNT: usize = 151;",
+                "registry_formula_count",
+            ),
+            (
+                "legacy-beta",
+                "const PROGRAM_NAME: &str = \"aerocodex\";",
+                "const PROGRAM_NAME: &str = \"beta1-concept\";",
+                "",
+                "",
+                "legacy Beta 1",
+            ),
+        ] {
+            let changed_main = if main_old.is_empty() {
+                main_baseline.clone()
+            } else {
+                replace_once(&main_baseline, main_old, main_new)
+            };
+            let changed_registry = if registry_old.is_empty() {
+                registry_baseline.clone()
+            } else {
+                replace_once(&registry_baseline, registry_old, registry_new)
+            };
+            fs::write(&main_path, changed_main).unwrap();
+            fs::write(&registry_path, changed_registry).unwrap();
+            let binary = build_cli_fixture(&fixture, label);
+            let external = ExternalCliDir::create().unwrap();
+            let output = run_cli(&binary, &external.path, &["version", "--json"], None).unwrap();
+            require_success(&output, "compiled drift fixture").unwrap();
+            let error =
+                validate_cli_version_json(output_utf8(&output.stdout, "drift JSON").unwrap())
+                    .unwrap_err();
+            assert!(error.contains(expected), "{label}: {error:?}");
+        }
+
+        fs::write(&main_path, main_baseline).unwrap();
+        fs::write(&registry_path, registry_baseline).unwrap();
+        let metadata = load_cargo_metadata(&fixture.path).unwrap();
+        verify_compiled_cli(&fixture.path, &metadata.target_directory).unwrap();
     }
 }
