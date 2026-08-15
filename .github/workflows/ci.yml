@@ -14,7 +14,8 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     env:
-      AEROCODEX_RELEASE_IDENTITY_REVISION: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+      AEROCODEX_RELEASE_IDENTITY_REVISION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || (github.event_name == 'push' && github.sha) }}
+      AEROCODEX_RELEASE_IDENTITY_BASE_REVISION: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || '' }}
     steps:
       - uses: actions/checkout@v6
         with:

@@ -27,8 +27,9 @@ const FIRST_CORRECTIVE_COMMIT: &str = "4456fabd97b2108911ed3eb218112ec73e04519f"
 const SECOND_CORRECTIVE_COMMIT: &str = "75f678ba44af942e5910972d1ee34c60572ce733";
 const FINAL_PARSER_CORRECTIVE_COMMIT: &str = "41d8b1d2ee277bb0f7eda7e8af7b4a00eb4c83e6";
 const EVALUATED_REVISION_ENV: &str = "AEROCODEX_RELEASE_IDENTITY_REVISION";
+const EVALUATED_BASE_REVISION_ENV: &str = "AEROCODEX_RELEASE_IDENTITY_BASE_REVISION";
 const COMPLETE_PUBLIC_COMMAND_FIXTURE_COUNT: usize = 55;
-const RELEASE_IDENTITY_TEST_FUNCTION_COUNT: usize = 28;
+const RELEASE_IDENTITY_TEST_FUNCTION_COUNT: usize = 29;
 const FORCE_SELF_CHECK_FAILURE_ENV: &str = "AEROCODEX_TEST_FORCE_SELF_CHECK_FAILURE";
 
 const GOVERNED_IMPLEMENTATION_COMMITS: &[&str] = &[
@@ -113,6 +114,13 @@ struct EvaluatedReleaseRevision {
 
 pub fn verify_release_identity(root: &Path) -> Result<(), String> {
     let revision = evaluated_release_revision(root)?;
+    verify_release_identity_at_revision(root, &revision)
+}
+
+fn verify_release_identity_at_revision(
+    root: &Path,
+    revision: &EvaluatedReleaseRevision,
+) -> Result<(), String> {
     validate_governed_implementation_ancestry(root, &revision.evaluated)?;
     release_manifest::verify_release_manifest(root)?;
     let manifest = release_manifest::load_release_manifest(root)?;
@@ -1966,22 +1974,39 @@ fn clause_start(text: &str, end: usize) -> usize {
 }
 
 fn evaluated_release_revision(root: &Path) -> Result<EvaluatedReleaseRevision, String> {
-    let supplied = match env::var(EVALUATED_REVISION_ENV) {
-        Ok(value) => Some(value),
-        Err(env::VarError::NotPresent) => None,
-        Err(env::VarError::NotUnicode(_)) => {
-            return Err(format!(
-                "{EVALUATED_REVISION_ENV} must be a Unicode full Git commit SHA"
-            ));
-        }
-    };
-    evaluate_release_revision(root, supplied.as_deref())
+    let supplied = revision_environment(EVALUATED_REVISION_ENV)?;
+    evaluate_release_revision_with_base(root, supplied.as_deref(), || {
+        revision_environment(EVALUATED_BASE_REVISION_ENV)
+    })
 }
 
+fn revision_environment(name: &str) -> Result<Option<String>, String> {
+    match env::var(name) {
+        Ok(value) => Ok(Some(value)),
+        Err(env::VarError::NotPresent) => Ok(None),
+        Err(env::VarError::NotUnicode(_)) => {
+            Err(format!("{name} must be a Unicode full Git commit SHA"))
+        }
+    }
+}
+
+#[cfg(test)]
 fn evaluate_release_revision(
     root: &Path,
     supplied: Option<&str>,
+    supplied_base: Option<&str>,
 ) -> Result<EvaluatedReleaseRevision, String> {
+    evaluate_release_revision_with_base(root, supplied, || Ok(supplied_base.map(str::to_owned)))
+}
+
+fn evaluate_release_revision_with_base<F>(
+    root: &Path,
+    supplied: Option<&str>,
+    load_base: F,
+) -> Result<EvaluatedReleaseRevision, String>
+where
+    F: FnOnce() -> Result<Option<String>, String>,
+{
     let checkout = resolve_git_commit(root, "HEAD", "repository checkout HEAD", false)?;
     let Some(supplied) = supplied else {
         return Ok(EvaluatedReleaseRevision {
@@ -2012,10 +2037,17 @@ fn evaluate_release_revision(
             "{EVALUATED_REVISION_ENV} resolved to `{evaluated}`, but checkout `{checkout}` is not a two-parent synthetic pull-request merge; an explicit differing revision is not allowed"
         ));
     }
-    if evaluated == parents[0] {
+    let supplied_base = load_base()?.ok_or_else(|| {
+        format!(
+            "{EVALUATED_BASE_REVISION_ENV} is required when checkout `{checkout}` differs from {EVALUATED_REVISION_ENV} `{evaluated}` for synthetic pull-request merge evaluation"
+        )
+    })?;
+    let evaluated_base =
+        resolve_git_commit(root, &supplied_base, EVALUATED_BASE_REVISION_ENV, true)?;
+    if evaluated_base != parents[0] {
         return Err(format!(
-            "{EVALUATED_REVISION_ENV} resolved to synthetic merge base parent `{evaluated}`; expected pull-request head parent `{}`",
-            parents[1]
+            "{EVALUATED_BASE_REVISION_ENV} resolved to `{evaluated_base}`, which is not trusted base parent `{}` of synthetic merge `{checkout}`",
+            parents[0]
         ));
     }
     if evaluated != parents[1] {
@@ -2045,19 +2077,35 @@ fn resolve_git_commit(
             "{label} must be a full 40-character hexadecimal Git commit SHA; received `{revision}`"
         ));
     }
-    let commit_expression = format!("{revision}^{{commit}}");
+    let type_output = git_output(root, &["cat-file", "-t", revision])?;
+    if !type_output.status.success() {
+        return Err(format!(
+            "{label} `{revision}` is not a valid existing Git object: {}",
+            String::from_utf8_lossy(&type_output.stderr).trim()
+        ));
+    }
+    let type_text = String::from_utf8(type_output.stdout)
+        .map_err(|error| format!("exact object type for {label} is not UTF-8: {error}"))?;
+    let object_type = type_text
+        .strip_suffix("\r\n")
+        .or_else(|| type_text.strip_suffix('\n'))
+        .ok_or_else(|| {
+            format!(
+                "{label} `{revision}` produced unexpected Git object-type output: {type_text:?}"
+            )
+        })?;
+    if object_type != "commit" {
+        return Err(format!(
+            "{label} `{revision}` must identify an exact commit object; exact object type is `{object_type}`"
+        ));
+    }
     let output = git_output(
         root,
-        &[
-            "rev-parse",
-            "--verify",
-            "--end-of-options",
-            &commit_expression,
-        ],
+        &["rev-parse", "--verify", "--end-of-options", revision],
     )?;
     if !output.status.success() {
         return Err(format!(
-            "{label} `{revision}` is not a valid existing Git commit object: {}",
+            "{label} `{revision}` cannot be resolved as the exact commit object: {}",
             String::from_utf8_lossy(&output.stderr).trim()
         ));
     }
@@ -2068,6 +2116,11 @@ fn resolve_git_commit(
     if resolved.len() != 40 || !resolved.bytes().all(|byte| byte.is_ascii_hexdigit()) {
         return Err(format!(
             "{label} `{revision}` did not resolve to a full Git commit SHA: `{resolved}`"
+        ));
+    }
+    if require_full_sha && resolved != revision.to_ascii_lowercase() {
+        return Err(format!(
+            "{label} `{revision}` did not resolve to that exact Git object: `{resolved}`"
         ));
     }
     Ok(resolved)
@@ -2124,7 +2177,10 @@ fn verify_release_status_evidence(root: &Path) -> Result<(), String> {
         format!("- Second corrective commit: `{SECOND_CORRECTIVE_COMMIT}`"),
         format!("- Final parser corrective commit: `{FINAL_PARSER_CORRECTIVE_COMMIT}`"),
         format!("- Evaluated revision environment: `{EVALUATED_REVISION_ENV}`"),
+        format!("- Evaluated base revision environment: `{EVALUATED_BASE_REVISION_ENV}`"),
         "- Pull-request evaluated revision source: `github.event.pull_request.head.sha`"
+            .to_string(),
+        "- Pull-request evaluated base source: `github.event.pull_request.base.sha`"
             .to_string(),
         "- Revision authority: `validated commit relationships, never checkout commit subjects`"
             .to_string(),
@@ -2133,7 +2189,7 @@ fn verify_release_status_evidence(root: &Path) -> Result<(), String> {
         ),
         "- Complete public-command fixture categories: `fence_comment=18; polarity=18; structure_encoding=14; claim_binding=5`".to_string(),
         format!(
-            "- Release-identity test classification: `{RELEASE_IDENTITY_TEST_FUNCTION_COUNT} test functions: 11 helper/unit; 12 production-document; 3 production-loader; 1 compiled-process integration; 1 complete public-command`"
+            "- Release-identity test classification: `{RELEASE_IDENTITY_TEST_FUNCTION_COUNT} test functions: 11 helper/unit; 12 production-document; 3 production-loader; 1 compiled-process integration; 1 complete public-command; 1 production-command Git trust-boundary`"
         ),
         "- Scope: `minimal_release_identity`".to_string(),
         "- Registry facts: `152 research_required; 152 blocked; 0 publicly executable`"
@@ -2718,6 +2774,13 @@ mod tests {
         text.replacen(old, new, 1)
     }
 
+    fn replace_once_in_disposable_fixture(text: &str, old: &str, new: &str) -> String {
+        let normalized_text = text.replace("\r\n", "\n");
+        let normalized_old = old.replace("\r\n", "\n");
+        let normalized_new = new.replace("\r\n", "\n");
+        replace_once(&normalized_text, &normalized_old, &normalized_new)
+    }
+
     fn document_with_prose(prose: &str) -> String {
         format!("{}\n{prose}\n", identity_document(IDENTITY_BODY))
     }
@@ -3077,6 +3140,97 @@ mod tests {
         saved
     }
 
+    fn fixture_commit_tree(path: &Path, tree: &str, parents: &[&str], message: &str) -> String {
+        let mut arguments = vec![
+            "-c".to_string(),
+            "user.name=AeroCodex revision fixture".to_string(),
+            "-c".to_string(),
+            "user.email=revision-fixture@aerocodex.invalid".to_string(),
+            "commit-tree".to_string(),
+            tree.to_string(),
+        ];
+        for parent in parents {
+            arguments.push("-p".to_string());
+            arguments.push((*parent).to_string());
+        }
+        arguments.push("-m".to_string());
+        arguments.push(message.to_string());
+        let references = arguments.iter().map(String::as_str).collect::<Vec<_>>();
+        fixture_git(path, &references)
+    }
+
+    fn annotated_tag_object(path: &Path, name: &str, target: &str) -> String {
+        fixture_git(
+            path,
+            &[
+                "-c",
+                "user.name=AeroCodex revision fixture",
+                "-c",
+                "user.email=revision-fixture@aerocodex.invalid",
+                "tag",
+                "--annotate",
+                "--message=fixture annotated tag",
+                name,
+                target,
+            ],
+        );
+        fixture_git(path, &["rev-parse", &format!("refs/tags/{name}")])
+    }
+
+    fn build_xtask_fixture(root: &Path) -> PathBuf {
+        let cargo = env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
+        let output = Command::new(cargo)
+            .current_dir(root)
+            .args(["build", "-p", "xtask"])
+            .env_remove(EVALUATED_REVISION_ENV)
+            .env_remove(EVALUATED_BASE_REVISION_ENV)
+            .output()
+            .expect("fixture xtask build should execute");
+        assert!(
+            output.status.success(),
+            "fixture xtask build failed: stdout={} stderr={}",
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
+        let mut binary = root.join("target/debug/xtask");
+        if cfg!(windows) {
+            binary.set_extension("exe");
+        }
+        assert!(binary.is_file(), "fixture xtask binary should exist");
+        binary
+    }
+
+    fn run_release_identity_fixture(
+        binary: &Path,
+        root: &Path,
+        head: Option<&str>,
+        base: Option<&str>,
+    ) -> Output {
+        let mut command = Command::new(binary);
+        command
+            .current_dir(root)
+            .arg("verify-release-identity")
+            .env_remove(EVALUATED_REVISION_ENV)
+            .env_remove(EVALUATED_BASE_REVISION_ENV);
+        if let Some(head) = head {
+            command.env(EVALUATED_REVISION_ENV, head);
+        }
+        if let Some(base) = base {
+            command.env(EVALUATED_BASE_REVISION_ENV, base);
+        }
+        command
+            .output()
+            .expect("fixture release-identity command should execute")
+    }
+
+    fn release_identity_fixture_output(output: &Output) -> String {
+        format!(
+            "stdout={} stderr={}",
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        )
+    }
+
     fn identity_document(body: &str) -> String {
         format!("# Current identity\n\n{IDENTITY_START}\n{body}\n{IDENTITY_END}\n")
     }
@@ -3391,13 +3545,13 @@ mod tests {
             root,
             &["switch", "--quiet", "--detach", &fixture.pull_request_head],
         );
-        let direct = evaluate_release_revision(root, None).unwrap();
+        let direct = evaluate_release_revision(root, None, None).unwrap();
         assert_eq!(direct.checkout, fixture.pull_request_head);
         assert_eq!(direct.evaluated, fixture.pull_request_head);
         assert_eq!(direct.mode, EvaluatedRevisionMode::DirectCheckout);
 
         let direct_pr_head =
-            evaluate_release_revision(root, Some(&fixture.pull_request_head)).unwrap();
+            evaluate_release_revision(root, Some(&fixture.pull_request_head), None).unwrap();
         assert_eq!(direct_pr_head.evaluated, fixture.pull_request_head);
         assert_eq!(direct_pr_head.mode, EvaluatedRevisionMode::DirectCheckout);
 
@@ -3405,7 +3559,9 @@ mod tests {
             root,
             &["switch", "--quiet", "--detach", &fixture.synthetic_merge],
         );
-        let synthetic = evaluate_release_revision(root, Some(&fixture.pull_request_head)).unwrap();
+        let synthetic =
+            evaluate_release_revision(root, Some(&fixture.pull_request_head), Some(&fixture.base))
+                .unwrap();
         assert_eq!(synthetic.checkout, fixture.synthetic_merge);
         assert_eq!(synthetic.evaluated, fixture.pull_request_head);
         assert_eq!(
@@ -3413,31 +3569,33 @@ mod tests {
             EvaluatedRevisionMode::SyntheticPullRequestMerge
         );
 
-        let base_error = evaluate_release_revision(root, Some(&fixture.base)).unwrap_err();
+        let base_error =
+            evaluate_release_revision(root, Some(&fixture.base), Some(&fixture.base)).unwrap_err();
         assert!(
-            base_error.contains("synthetic merge base parent"),
+            base_error.contains("not pull-request head parent"),
             "{base_error}"
         );
 
         let unrelated_error =
-            evaluate_release_revision(root, Some(&fixture.unrelated)).unwrap_err();
+            evaluate_release_revision(root, Some(&fixture.unrelated), Some(&fixture.base))
+                .unwrap_err();
         assert!(
             unrelated_error.contains("not pull-request head parent"),
             "{unrelated_error}"
         );
 
         let nonexistent = "1111111111111111111111111111111111111111";
-        let nonexistent_error = evaluate_release_revision(root, Some(nonexistent)).unwrap_err();
+        let nonexistent_error =
+            evaluate_release_revision(root, Some(nonexistent), Some(&fixture.base)).unwrap_err();
         assert!(
-            nonexistent_error.contains("not a valid existing Git commit object"),
+            nonexistent_error.contains("not a valid existing Git object"),
             "{nonexistent_error}"
         );
 
-        let object_error = evaluate_release_revision(root, Some(&fixture.non_commit)).unwrap_err();
-        assert!(
-            object_error.contains("not a valid existing Git commit object"),
-            "{object_error}"
-        );
+        let object_error =
+            evaluate_release_revision(root, Some(&fixture.non_commit), Some(&fixture.base))
+                .unwrap_err();
+        assert!(object_error.contains("exact object type"), "{object_error}");
 
         fixture_git(
             root,
@@ -3449,7 +3607,8 @@ mod tests {
             ],
         );
         let wrong_head_error =
-            evaluate_release_revision(root, Some(&fixture.pull_request_head)).unwrap_err();
+            evaluate_release_revision(root, Some(&fixture.pull_request_head), Some(&fixture.base))
+                .unwrap_err();
         assert!(
             wrong_head_error.contains("not pull-request head parent"),
             "{wrong_head_error}"
@@ -3459,7 +3618,7 @@ mod tests {
             root,
             &["switch", "--quiet", "--detach", &fixture.synthetic_merge],
         );
-        let ordinary_post_merge = evaluate_release_revision(root, None).unwrap();
+        let ordinary_post_merge = evaluate_release_revision(root, None, None).unwrap();
         assert_eq!(ordinary_post_merge.evaluated, fixture.synthetic_merge);
         assert_eq!(
             ordinary_post_merge.mode,
@@ -3471,10 +3630,243 @@ mod tests {
         );
 
         let pr_49_regression =
-            evaluate_release_revision(root, Some(&fixture.pull_request_head)).unwrap();
+            evaluate_release_revision(root, Some(&fixture.pull_request_head), Some(&fixture.base))
+                .unwrap();
         assert_eq!(
             pr_49_regression.mode,
             EvaluatedRevisionMode::SyntheticPullRequestMerge
+        );
+    }
+
+    #[test]
+    fn production_command_authenticates_exact_objects_and_both_merge_parents() {
+        let fixture = complete_repository_fixture();
+        let root = &fixture.path;
+        let fixture_head = fixture_head(root);
+        let reviewed_head = "c751919c021fbff5caff19f5285bf662f84184b8";
+        let historical_head = FINAL_PARSER_CORRECTIVE_COMMIT;
+        let base = EXPECTED_BASE_COMMIT;
+        let tree = fixture_git(root, &["rev-parse", &format!("{fixture_head}^{{tree}}")]);
+        let blob = fixture_git(root, &["rev-parse", &format!("{fixture_head}:Cargo.toml")]);
+        let unrelated = fixture_commit_tree(root, &tree, &[], "fixture: unrelated root");
+        let descendant = fixture_commit_tree(
+            root,
+            &tree,
+            &[reviewed_head],
+            "fixture: descendant outside the reviewed merge",
+        );
+        let reviewed_merge = fixture_commit_tree(
+            root,
+            &tree,
+            &[base, reviewed_head],
+            "subject text is deliberately non-authoritative",
+        );
+        let historical_merge = fixture_commit_tree(
+            root,
+            &tree,
+            &[base, historical_head],
+            "Merge pull request #49 from codex/release-identity-minimal",
+        );
+        let wrong_first_parent = fixture_commit_tree(
+            root,
+            &tree,
+            &[&unrelated, reviewed_head],
+            "fixture: unauthorized first parent",
+        );
+        let wrong_second_parent = fixture_commit_tree(
+            root,
+            &tree,
+            &[base, &unrelated],
+            "fixture: unauthorized second parent",
+        );
+        let three_parent_merge = fixture_commit_tree(
+            root,
+            &tree,
+            &[base, reviewed_head, &unrelated],
+            "fixture: three parents",
+        );
+        let head_tag = annotated_tag_object(root, "reviewed-head-object", reviewed_head);
+        let base_tag = annotated_tag_object(root, "reviewed-base-object", base);
+        fixture_git(root, &["tag", "reviewed-head-lightweight", reviewed_head]);
+
+        let binary = build_xtask_fixture(root);
+        let direct = run_release_identity_fixture(&binary, root, None, None);
+        assert!(
+            direct.status.success(),
+            "direct production command failed: {}",
+            release_identity_fixture_output(&direct)
+        );
+        assert!(
+            release_identity_fixture_output(&direct).contains("mode:direct_checkout"),
+            "{}",
+            release_identity_fixture_output(&direct)
+        );
+        let explicit = run_release_identity_fixture(&binary, root, Some(&fixture_head), Some(""));
+        assert!(
+            explicit.status.success(),
+            "explicit direct production command failed: {}",
+            release_identity_fixture_output(&explicit)
+        );
+
+        fixture_git(root, &["switch", "--quiet", "--detach", reviewed_head]);
+        let direct_tag = run_release_identity_fixture(&binary, root, Some(&head_tag), None);
+        assert!(!direct_tag.status.success());
+        assert!(
+            release_identity_fixture_output(&direct_tag).contains("exact object type is `tag`"),
+            "{}",
+            release_identity_fixture_output(&direct_tag)
+        );
+
+        fixture_git(root, &["switch", "--quiet", "--detach", &reviewed_merge]);
+        let synthetic =
+            run_release_identity_fixture(&binary, root, Some(reviewed_head), Some(base));
+        assert!(
+            synthetic.status.success(),
+            "trusted synthetic production command failed: {}",
+            release_identity_fixture_output(&synthetic)
+        );
+        assert!(
+            release_identity_fixture_output(&synthetic)
+                .contains("mode:synthetic_pull_request_merge"),
+            "{}",
+            release_identity_fixture_output(&synthetic)
+        );
+
+        let reject = |head: Option<&str>, base_input: Option<&str>, required: &str| {
+            let output = run_release_identity_fixture(&binary, root, head, base_input);
+            assert!(
+                !output.status.success(),
+                "fixture should be rejected: {}",
+                release_identity_fixture_output(&output)
+            );
+            assert!(
+                release_identity_fixture_output(&output).contains(required),
+                "{} did not contain {required:?}",
+                release_identity_fixture_output(&output)
+            );
+        };
+
+        reject(Some(&head_tag), Some(base), "exact object type is `tag`");
+        reject(
+            Some(reviewed_head),
+            Some(&base_tag),
+            "exact object type is `tag`",
+        );
+        reject(Some(reviewed_head), None, "is required");
+        reject(
+            Some(reviewed_head),
+            Some(""),
+            "must be a full 40-character hexadecimal Git commit SHA",
+        );
+        reject(
+            Some(reviewed_head),
+            Some("not-a-sha"),
+            "must be a full 40-character hexadecimal Git commit SHA",
+        );
+        reject(
+            Some(reviewed_head),
+            Some(&base[..12]),
+            "must be a full 40-character hexadecimal Git commit SHA",
+        );
+        reject(
+            Some(reviewed_head),
+            Some("1111111111111111111111111111111111111111"),
+            "not a valid existing Git object",
+        );
+        reject(Some(&blob), Some(base), "exact object type is `blob`");
+        reject(Some(&tree), Some(base), "exact object type is `tree`");
+        reject(
+            Some(reviewed_head),
+            Some(&blob),
+            "exact object type is `blob`",
+        );
+        reject(
+            Some(reviewed_head),
+            Some(&tree),
+            "exact object type is `tree`",
+        );
+        for invalid in [
+            "HEAD",
+            "@",
+            "reviewed-head-object",
+            "reviewed-head-lightweight",
+            "c751919c021fbff5caff19f5285bf662f84184b8^{commit}",
+        ] {
+            reject(
+                Some(invalid),
+                Some(base),
+                "must be a full 40-character hexadecimal Git commit SHA",
+            );
+            reject(
+                Some(reviewed_head),
+                Some(invalid),
+                "must be a full 40-character hexadecimal Git commit SHA",
+            );
+        }
+        reject(
+            Some(&reviewed_head[..12]),
+            Some(base),
+            "must be a full 40-character hexadecimal Git commit SHA",
+        );
+        reject(Some(&unrelated), Some(base), "not pull-request head parent");
+        reject(
+            Some(historical_head),
+            Some(base),
+            "not pull-request head parent",
+        );
+        reject(
+            Some(&descendant),
+            Some(base),
+            "not pull-request head parent",
+        );
+        reject(Some(base), Some(reviewed_head), "not trusted base parent");
+        reject(
+            Some(reviewed_head),
+            Some(reviewed_head),
+            "not trusted base parent",
+        );
+
+        fixture_git(
+            root,
+            &["switch", "--quiet", "--detach", &wrong_first_parent],
+        );
+        reject(Some(reviewed_head), Some(base), "not trusted base parent");
+
+        fixture_git(
+            root,
+            &["switch", "--quiet", "--detach", &wrong_second_parent],
+        );
+        reject(
+            Some(reviewed_head),
+            Some(base),
+            "not pull-request head parent",
+        );
+
+        fixture_git(
+            root,
+            &["switch", "--quiet", "--detach", &three_parent_merge],
+        );
+        reject(
+            Some(reviewed_head),
+            Some(base),
+            "not a two-parent synthetic pull-request merge",
+        );
+
+        fixture_git(root, &["switch", "--quiet", "--detach", &reviewed_merge]);
+        let post_merge = run_release_identity_fixture(&binary, root, None, None);
+        assert!(
+            post_merge.status.success(),
+            "post-merge direct production command failed: {}",
+            release_identity_fixture_output(&post_merge)
+        );
+
+        fixture_git(root, &["switch", "--quiet", "--detach", &historical_merge]);
+        let historical =
+            run_release_identity_fixture(&binary, root, Some(historical_head), Some(base));
+        assert!(
+            historical.status.success(),
+            "historical PR #49 parent shape failed: {}",
+            release_identity_fixture_output(&historical)
         );
     }
 
@@ -4494,12 +4886,12 @@ mod tests {
             let changed_main = if main_old.is_empty() {
                 main_baseline.clone()
             } else {
-                replace_once(&main_baseline, main_old, main_new)
+                replace_once_in_disposable_fixture(&main_baseline, main_old, main_new)
             };
             let changed_registry = if registry_old.is_empty() {
                 registry_baseline.clone()
             } else {
-                replace_once(&registry_baseline, registry_old, registry_new)
+                replace_once_in_disposable_fixture(&registry_baseline, registry_old, registry_new)
             };
             fs::write(&main_path, changed_main).unwrap();
             fs::write(&registry_path, changed_registry).unwrap();
@@ -4512,6 +4904,42 @@ mod tests {
                     .unwrap_err();
             assert!(error.contains(expected), "{label}: {error:?}");
         }
+
+        fs::write(&main_path, &main_baseline).unwrap();
+
+        let crlf_registry = registry_baseline
+            .replace("\r\n", "\n")
+            .replace('\n', "\r\n");
+        assert!(
+            crlf_registry.contains("\r\n"),
+            "explicit CRLF fixture must be host-independent"
+        );
+        let crlf_changed = replace_once_in_disposable_fixture(
+            &crlf_registry,
+            "pub const FORMULA_COUNT: usize = 152;",
+            "pub const FORMULA_COUNT: usize = 151;",
+        );
+        assert_eq!(
+            crlf_changed
+                .matches("pub const FORMULA_COUNT: usize = 151;")
+                .count(),
+            1
+        );
+        assert_eq!(
+            crlf_changed
+                .matches("pub const FORMULA_COUNT: usize = 152;")
+                .count(),
+            0
+        );
+        fs::write(&registry_path, crlf_changed).unwrap();
+        let binary = build_cli_fixture(&fixture, "formula-count-crlf");
+        let external = ExternalCliDir::create().unwrap();
+        let output = run_cli(&binary, &external.path, &["version", "--json"], None).unwrap();
+        require_success(&output, "compiled CRLF drift fixture").unwrap();
+        let error =
+            validate_cli_version_json(output_utf8(&output.stdout, "CRLF drift JSON").unwrap())
+                .unwrap_err();
+        assert!(error.contains("registry_formula_count"), "{error:?}");
 
         fs::write(&main_path, main_baseline).unwrap();
         fs::write(&registry_path, registry_baseline).unwrap();
