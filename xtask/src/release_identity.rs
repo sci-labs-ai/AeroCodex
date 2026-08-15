@@ -23,7 +23,10 @@ const EXPECTED_PACKAGE_COUNT: usize = 14;
 const EXPECTED_FORMULA_COUNT: usize = 152;
 const EXPECTED_BASE_COMMIT: &str = "6a94b4628e6e0821a55d6aaadf6925956a5fa2d3";
 const ORIGINAL_IMPLEMENTATION_COMMIT: &str = "04431bb787bd8219fb3df7e237769421106f368a";
-const CORRECTIVE_COMMIT_SUBJECT: &str = "fix: close minimal release identity review findings";
+const FIRST_CORRECTIVE_COMMIT: &str = "4456fabd97b2108911ed3eb218112ec73e04519f";
+const FINAL_CORRECTIVE_COMMIT_SUBJECT: &str = "fix: close final minimal identity parsing gaps";
+const COMPLETE_PUBLIC_COMMAND_FIXTURE_COUNT: usize = 48;
+const RELEASE_IDENTITY_TEST_FUNCTION_COUNT: usize = 26;
 const FORCE_SELF_CHECK_FAILURE_ENV: &str = "AEROCODEX_TEST_FORCE_SELF_CHECK_FAILURE";
 
 const GOVERNED_DOCUMENTS: &[&str] = &[
@@ -755,12 +758,13 @@ fn verify_exact_block(
 fn scan_current_identity_claims(path: &str, text: &str) -> Result<(), String> {
     let mut paragraph = LogicalParagraph::default();
     let mut fence: Option<MarkdownFence> = None;
+    let mut html_comment: Option<HtmlComment> = None;
     let mut next_fence_authoritative = false;
     let mut in_identity_block = false;
     let mut in_historical_block = false;
     for (index, line) in text.lines().enumerate() {
         let line_number = index + 1;
-        let trimmed = line.trim();
+        let raw_trimmed = line.trim();
 
         if let Some(open) = fence {
             if let Some(marker) = parse_fence_marker(line) {
@@ -777,22 +781,22 @@ fn scan_current_identity_claims(path: &str, text: &str) -> Result<(), String> {
             if !open.authoritative {
                 continue;
             }
-            if trimmed.is_empty() {
+            if raw_trimmed.is_empty() {
                 check_identity_paragraph(path, &paragraph)?;
                 paragraph.clear();
             } else {
-                paragraph.push(line_number, trimmed);
+                paragraph.push(line_number, raw_trimmed);
             }
             continue;
         }
 
-        if trimmed == IDENTITY_START {
+        if html_comment.is_none() && raw_trimmed == IDENTITY_START {
             check_identity_paragraph(path, &paragraph)?;
             paragraph.clear();
             in_identity_block = true;
             continue;
         }
-        if trimmed == IDENTITY_END {
+        if html_comment.is_none() && raw_trimmed == IDENTITY_END {
             in_identity_block = false;
             continue;
         }
@@ -800,7 +804,7 @@ fn scan_current_identity_claims(path: &str, text: &str) -> Result<(), String> {
             continue;
         }
 
-        if trimmed == HISTORICAL_START {
+        if html_comment.is_none() && raw_trimmed == HISTORICAL_START {
             check_identity_paragraph(path, &paragraph)?;
             paragraph.clear();
             if in_historical_block {
@@ -811,7 +815,7 @@ fn scan_current_identity_claims(path: &str, text: &str) -> Result<(), String> {
             in_historical_block = true;
             continue;
         }
-        if trimmed == HISTORICAL_END {
+        if html_comment.is_none() && raw_trimmed == HISTORICAL_END {
             if !in_historical_block {
                 return Err(format!(
                     "{path}:{line_number}: historical block closes without a matching start"
@@ -824,13 +828,25 @@ fn scan_current_identity_claims(path: &str, text: &str) -> Result<(), String> {
             continue;
         }
 
-        if trimmed == "<!-- aerocodex-authoritative-example -->" {
+        if html_comment.is_none() && raw_trimmed == "<!-- aerocodex-authoritative-example -->" {
             check_identity_paragraph(path, &paragraph)?;
             paragraph.clear();
             next_fence_authoritative = true;
             continue;
         }
-        if let Some(marker) = parse_fence_marker(line) {
+
+        let visible =
+            visible_markdown_outside_html_comments(path, line, line_number, &mut html_comment)?;
+        let trimmed = visible.trim();
+        if trimmed.is_empty() {
+            if raw_trimmed.is_empty() && html_comment.is_none() {
+                check_identity_paragraph(path, &paragraph)?;
+                paragraph.clear();
+            }
+            continue;
+        }
+
+        if let Some(marker) = parse_fence_marker(&visible) {
             check_identity_paragraph(path, &paragraph)?;
             paragraph.clear();
             fence = Some(MarkdownFence {
@@ -842,14 +858,12 @@ fn scan_current_identity_claims(path: &str, text: &str) -> Result<(), String> {
             next_fence_authoritative = false;
             continue;
         }
-        if trimmed.is_empty() || trimmed.starts_with('#') || trimmed.starts_with("<!--") {
+        if trimmed.starts_with('#') {
             check_identity_paragraph(path, &paragraph)?;
             paragraph.clear();
-            if trimmed.starts_with('#') {
-                let mut heading = LogicalParagraph::default();
-                heading.push(line_number, trimmed);
-                check_identity_paragraph(path, &heading)?;
-            }
+            let mut heading = LogicalParagraph::default();
+            heading.push(line_number, trimmed);
+            check_identity_paragraph(path, &heading)?;
             continue;
         }
         paragraph.push(line_number, trimmed);
@@ -865,7 +879,74 @@ fn scan_current_identity_claims(path: &str, text: &str) -> Result<(), String> {
             open.opening_line, open.character as char, open.length
         ));
     }
+    if let Some(open) = html_comment {
+        return Err(format!(
+            "{path}:{}: unclosed HTML comment",
+            open.opening_line
+        ));
+    }
     check_identity_paragraph(path, &paragraph)
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct HtmlComment {
+    opening_line: usize,
+}
+
+fn visible_markdown_outside_html_comments(
+    path: &str,
+    line: &str,
+    line_number: usize,
+    state: &mut Option<HtmlComment>,
+) -> Result<String, String> {
+    let mut visible = String::with_capacity(line.len());
+    let mut offset = 0usize;
+    while offset < line.len() {
+        if state.is_some() {
+            if let Some(relative_end) = line[offset..].find("-->") {
+                offset += relative_end + 3;
+                *state = None;
+                if !visible.is_empty() && !visible.ends_with(char::is_whitespace) {
+                    visible.push(' ');
+                }
+                if visible.ends_with(char::is_whitespace) {
+                    while line
+                        .as_bytes()
+                        .get(offset)
+                        .is_some_and(u8::is_ascii_whitespace)
+                    {
+                        offset += 1;
+                    }
+                }
+            } else {
+                return Ok(visible);
+            }
+            continue;
+        }
+
+        let opening = line[offset..].find("<!--");
+        let stray_close = line[offset..].find("-->");
+        if let Some(relative_close) = stray_close {
+            if opening.map_or(true, |relative_open| relative_close < relative_open) {
+                return Err(format!(
+                    "{path}:{line_number}: stray HTML comment close marker `-->`"
+                ));
+            }
+        }
+        let Some(relative_open) = opening else {
+            visible.push_str(&line[offset..]);
+            break;
+        };
+        visible.push_str(&line[offset..offset + relative_open]);
+        if !visible.is_empty() && !visible.ends_with(char::is_whitespace) {
+            visible.push(' ');
+        }
+        offset += relative_open + 4;
+        *state = Some(HtmlComment {
+            opening_line: line_number,
+        });
+    }
+    Ok(visible)
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1139,6 +1220,33 @@ struct ClaimCandidate {
     kind: ClaimKind,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ClaimPolarity {
+    Affirmative,
+    Negative,
+    Ambiguous,
+}
+
+impl ClaimPolarity {
+    fn name(self) -> &'static str {
+        match self {
+            Self::Affirmative => "affirmative",
+            Self::Negative => "negative",
+            Self::Ambiguous => "ambiguous",
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct NegativeClaim {
+    start: usize,
+    end: usize,
+    current_start: usize,
+    affirmative_candidate_start: Option<usize>,
+    kind: ClaimKind,
+    asserted: String,
+}
+
 fn check_identity_paragraph(path: &str, paragraph: &LogicalParagraph) -> Result<(), String> {
     if paragraph.text.is_empty() {
         return Ok(());
@@ -1188,7 +1296,31 @@ fn check_identity_paragraph(path: &str, paragraph: &LogicalParagraph) -> Result<
         accepted.push(candidate);
     }
 
+    let negative_claims =
+        collect_negative_claims(&paragraph.text, &masked_lower, &inline_spans, &accepted);
+
+    for negative in &negative_claims {
+        let expected = negative.kind.expected();
+        if negative.asserted == expected {
+            return Err(claim_diagnostic(
+                path,
+                paragraph,
+                negative.start,
+                negative.end,
+                (negative.kind.name(), ClaimPolarity::Negative),
+                &negative.asserted,
+                expected,
+            ));
+        }
+    }
+
     for candidate in &accepted {
+        if negative_claims
+            .iter()
+            .any(|negative| negative.affirmative_candidate_start == Some(candidate.start))
+        {
+            continue;
+        }
         let (asserted, value_start, value_end) = extract_asserted_value(
             &paragraph.text,
             candidate.end,
@@ -1201,7 +1333,7 @@ fn check_identity_paragraph(path: &str, paragraph: &LogicalParagraph) -> Result<
                 paragraph,
                 candidate.start,
                 value_end.max(value_start),
-                candidate.kind.name(),
+                (candidate.kind.name(), ClaimPolarity::Affirmative),
                 &asserted,
                 expected,
             ));
@@ -1209,7 +1341,10 @@ fn check_identity_paragraph(path: &str, paragraph: &LogicalParagraph) -> Result<
     }
 
     for current_start in find_word_occurrences(&masked_lower, "current") {
-        if current_identity_is_negated(&masked_lower, current_start) {
+        if negative_claims
+            .iter()
+            .any(|negative| negative.current_start == current_start)
+        {
             continue;
         }
         let clause_end = clause_end(&masked_lower, current_start);
@@ -1231,8 +1366,9 @@ fn check_identity_paragraph(path: &str, paragraph: &LogicalParagraph) -> Result<
         {
             let end_line = paragraph.line_for_offset(clause_end.saturating_sub(1));
             return Err(format!(
-                "{path}:{}-{end_line}: claim_type=ambiguous_current_identity asserted=`{}` expected=`supported explicit current identity wording`",
+                "{path}:{}-{end_line}: claim_type=ambiguous_current_identity polarity={} asserted=`{}` expected=`supported explicit current identity wording using the canonical value`",
                 paragraph.line_for_offset(current_start),
+                ClaimPolarity::Ambiguous.name(),
                 paragraph.text[current_start..clause_end].trim()
             ));
         }
@@ -1240,16 +1376,233 @@ fn check_identity_paragraph(path: &str, paragraph: &LogicalParagraph) -> Result<
     Ok(())
 }
 
-fn current_identity_is_negated(text: &str, current_start: usize) -> bool {
-    let clause_start = text[..current_start]
-        .rfind(['.', '!', '?', ';', ':', '\n'])
-        .map_or(0, |index| index + 1);
-    text[clause_start..current_start]
-        .split(|character: char| !character.is_ascii_alphanumeric())
-        .filter(|word| !word.is_empty())
-        .rev()
-        .take(3)
-        .any(|word| matches!(word, "not" | "never"))
+fn collect_negative_claims(
+    text: &str,
+    lower: &str,
+    inline_spans: &[(usize, usize)],
+    candidates: &[ClaimCandidate],
+) -> Vec<NegativeClaim> {
+    let mut claims = Vec::new();
+
+    for candidate in candidates {
+        let not_start = skip_ascii_whitespace(lower, candidate.end);
+        if !word_at(lower, not_start, "not") {
+            continue;
+        }
+        let value_offset = skip_ascii_whitespace(lower, not_start + 3);
+        let (asserted, value_start, value_end) =
+            extract_asserted_value(text, value_offset, candidate.kind.captures_words());
+        let first_word = asserted
+            .split(|character: char| !character.is_ascii_alphanumeric() && character != '_')
+            .find(|word| !word.is_empty())
+            .unwrap_or_default()
+            .to_ascii_lowercase();
+        if asserted.is_empty()
+            || matches!(
+                first_word.as_str(),
+                "not" | "merely" | "only" | "simply" | "exclusively" | "necessarily"
+            )
+        {
+            continue;
+        }
+        claims.push(NegativeClaim {
+            start: candidate.start,
+            end: value_end.max(value_start),
+            current_start: candidate.start,
+            affirmative_candidate_start: Some(candidate.start),
+            kind: candidate.kind,
+            asserted,
+        });
+    }
+
+    for (suffix, kind) in [
+        (
+            " is not the current release version",
+            ClaimKind::SemanticVersion,
+        ),
+        (
+            " is not the current cargo version",
+            ClaimKind::SemanticVersion,
+        ),
+        (" is not the current version", ClaimKind::SemanticVersion),
+        (" is not the current release tier", ClaimKind::MachineTier),
+        (" is not the current machine tier", ClaimKind::MachineTier),
+        (" is not the current tier", ClaimKind::MachineTier),
+        (" is not the current program name", ClaimKind::ProgramName),
+        (
+            " is not the current release channel",
+            ClaimKind::ReleaseChannel,
+        ),
+        (
+            " is not the current runtime identity",
+            ClaimKind::RuntimeIdentity,
+        ),
+    ] {
+        let mut offset = 0usize;
+        while let Some(relative) = lower[offset..].find(suffix) {
+            let suffix_start = offset + relative;
+            let current_start = suffix_start
+                + suffix
+                    .find("current")
+                    .expect("negative suffixes contain current");
+            let end = suffix_start + suffix.len();
+            let inside_inline = inline_spans.iter().any(|&(inline_start, inline_end)| {
+                current_start >= inline_start && current_start < inline_end
+            });
+            if !inside_inline {
+                let (asserted, value_start, value_end) =
+                    extract_preceding_asserted_value(text, suffix_start);
+                if !asserted.is_empty() {
+                    claims.push(NegativeClaim {
+                        start: value_start,
+                        end: end.max(value_end),
+                        current_start,
+                        affirmative_candidate_start: None,
+                        kind,
+                        asserted,
+                    });
+                }
+            }
+            offset = end;
+        }
+    }
+
+    for (prefix, suffix, kind) in [
+        (
+            "does not claim ",
+            " as the current release version",
+            ClaimKind::SemanticVersion,
+        ),
+        (
+            "does not claim ",
+            " as the current version",
+            ClaimKind::SemanticVersion,
+        ),
+        (
+            "does not claim ",
+            " as the current release tier",
+            ClaimKind::MachineTier,
+        ),
+        (
+            "does not claim ",
+            " as the current tier",
+            ClaimKind::MachineTier,
+        ),
+        (
+            "does not claim that ",
+            " is the current release version",
+            ClaimKind::SemanticVersion,
+        ),
+        (
+            "does not claim that ",
+            " is the current version",
+            ClaimKind::SemanticVersion,
+        ),
+        (
+            "does not claim that ",
+            " is the current release tier",
+            ClaimKind::MachineTier,
+        ),
+        (
+            "does not claim that ",
+            " is the current tier",
+            ClaimKind::MachineTier,
+        ),
+    ] {
+        let mut offset = 0usize;
+        while let Some(relative_prefix) = lower[offset..].find(prefix) {
+            let start = offset + relative_prefix;
+            let value_start = start + prefix.len();
+            let search_end = clause_end(lower, value_start);
+            let Some(relative_suffix) = lower[value_start..search_end].find(suffix) else {
+                offset = value_start;
+                continue;
+            };
+            let suffix_start = value_start + relative_suffix;
+            let current_start = suffix_start
+                + suffix
+                    .find("current")
+                    .expect("negative suffixes contain current");
+            let end = suffix_start + suffix.len();
+            let asserted = text[value_start..suffix_start]
+                .trim()
+                .trim_matches(|character| matches!(character, '*' | '_' | '`' | '"' | '\''))
+                .to_string();
+            if prefix == "does not claim "
+                && asserted
+                    .get(..5)
+                    .is_some_and(|leading| leading.eq_ignore_ascii_case("that "))
+            {
+                offset = end;
+                continue;
+            }
+            let inside_inline = inline_spans.iter().any(|&(inline_start, inline_end)| {
+                current_start >= inline_start && current_start < inline_end
+            });
+            if !asserted.is_empty() && !inside_inline {
+                claims.push(NegativeClaim {
+                    start,
+                    end,
+                    current_start,
+                    affirmative_candidate_start: None,
+                    kind,
+                    asserted,
+                });
+            }
+            offset = end;
+        }
+    }
+
+    claims.sort_by_key(|claim| (claim.current_start, claim.start, claim.end));
+    claims.dedup_by(|left, right| {
+        left.current_start == right.current_start && left.kind == right.kind
+    });
+    claims
+}
+
+fn skip_ascii_whitespace(text: &str, mut offset: usize) -> usize {
+    while text
+        .as_bytes()
+        .get(offset)
+        .is_some_and(u8::is_ascii_whitespace)
+    {
+        offset += 1;
+    }
+    offset
+}
+
+fn word_at(text: &str, start: usize, word: &str) -> bool {
+    text.get(start..start + word.len()) == Some(word)
+        && text
+            .as_bytes()
+            .get(start + word.len())
+            .map_or(true, |byte| !byte.is_ascii_alphanumeric() && *byte != b'_')
+}
+
+fn extract_preceding_asserted_value(text: &str, offset: usize) -> (String, usize, usize) {
+    let bytes = text.as_bytes();
+    let mut end = offset;
+    while end > 0
+        && (bytes[end - 1].is_ascii_whitespace()
+            || matches!(bytes[end - 1], b'*' | b'_' | b'`' | b'"' | b'\''))
+    {
+        end -= 1;
+    }
+    let mut start = end;
+    while start > 0
+        && !bytes[start - 1].is_ascii_whitespace()
+        && !matches!(
+            bytes[start - 1],
+            b';' | b',' | b'!' | b'?' | b'(' | b'[' | b'{'
+        )
+    {
+        start -= 1;
+    }
+    let asserted = text[start..end]
+        .trim_matches(|character| matches!(character, '*' | '_' | '`' | '"' | '\''))
+        .trim_end_matches('.')
+        .to_string();
+    (asserted, start, end)
 }
 
 fn inline_code_spans(text: &str) -> Vec<(usize, usize)> {
@@ -1359,14 +1712,16 @@ fn claim_diagnostic(
     paragraph: &LogicalParagraph,
     start: usize,
     end: usize,
-    claim_type: &str,
+    claim: (&str, ClaimPolarity),
     asserted: &str,
     expected: &str,
 ) -> String {
+    let (claim_type, polarity) = claim;
     format!(
-        "{path}:{}-{}: claim_type={claim_type} asserted=`{asserted}` expected=`{expected}`",
+        "{path}:{}-{}: claim_type={claim_type} polarity={} asserted=`{asserted}` expected=`{expected}`",
         paragraph.line_for_offset(start),
-        paragraph.line_for_offset(end)
+        paragraph.line_for_offset(end),
+        polarity.name()
     )
 }
 
@@ -1430,7 +1785,14 @@ fn verify_release_status_evidence(root: &Path) -> Result<(), String> {
     for required in [
         format!("- Milestone base commit: `{EXPECTED_BASE_COMMIT}`"),
         format!("- Original implementation commit: `{ORIGINAL_IMPLEMENTATION_COMMIT}`"),
-        "- Corrective commit: `SELF`".to_string(),
+        format!("- First corrective commit: `{FIRST_CORRECTIVE_COMMIT}`"),
+        "- Final corrective commit: `SELF`".to_string(),
+        format!(
+            "- Complete public-command fixture scenarios: `{COMPLETE_PUBLIC_COMMAND_FIXTURE_COUNT}`"
+        ),
+        format!(
+            "- Release-identity test classification: `{RELEASE_IDENTITY_TEST_FUNCTION_COUNT} test functions: 9 helper/unit; 12 production-document; 3 production-loader; 1 compiled-process integration; 1 complete public-command`"
+        ),
         "- Scope: `minimal_release_identity`".to_string(),
         "- Registry facts: `152 research_required; 152 blocked; 0 publicly executable`"
             .to_string(),
@@ -1494,9 +1856,45 @@ fn verify_release_status_evidence(root: &Path) -> Result<(), String> {
         &original_stat,
     )?;
 
+    let first_corrective_files = git_lines(
+        root,
+        &[
+            "diff-tree",
+            "--no-commit-id",
+            "--name-only",
+            "-r",
+            FIRST_CORRECTIVE_COMMIT,
+        ],
+    )?
+    .into_iter()
+    .map(|path| format!("- First corrective file: `{path}`"))
+    .collect::<BTreeSet<_>>();
+    require_exact_prefixed_evidence(
+        relative,
+        evidence,
+        "- First corrective file: `",
+        &first_corrective_files,
+    )?;
+
+    let first_corrective_stat = git_text(
+        root,
+        &["show", "--shortstat", "--format=", FIRST_CORRECTIVE_COMMIT],
+    )?;
+    require_evidence_stat(
+        relative,
+        evidence,
+        "First corrective Git statistics",
+        &first_corrective_stat,
+    )?;
+
     let head_subject = git_text(root, &["log", "-1", "--format=%s"])?;
-    let committed = head_subject == CORRECTIVE_COMMIT_SUBJECT;
-    let corrective_files = if committed {
+    let committed = head_subject == FINAL_CORRECTIVE_COMMIT_SUBJECT;
+    if !committed && git_text(root, &["rev-parse", "HEAD"])? != FIRST_CORRECTIVE_COMMIT {
+        return Err(format!(
+            "{relative}: final corrective evidence must be verified from `{FIRST_CORRECTIVE_COMMIT}` plus its worktree or from a HEAD commit titled `{FINAL_CORRECTIVE_COMMIT_SUBJECT}`"
+        ));
+    }
+    let final_corrective_files = if committed {
         git_lines(
             root,
             &["diff-tree", "--no-commit-id", "--name-only", "-r", "HEAD"],
@@ -1505,16 +1903,16 @@ fn verify_release_status_evidence(root: &Path) -> Result<(), String> {
         git_lines(root, &["diff", "--name-only", "HEAD", "--"])?
     }
     .into_iter()
-    .map(|path| format!("- Corrective file: `{path}`"))
+    .map(|path| format!("- Final corrective file: `{path}`"))
     .collect::<BTreeSet<_>>();
     require_exact_prefixed_evidence(
         relative,
         evidence,
-        "- Corrective file: `",
-        &corrective_files,
+        "- Final corrective file: `",
+        &final_corrective_files,
     )?;
 
-    let corrective_stat = if committed {
+    let final_corrective_stat = if committed {
         git_text(root, &["show", "--shortstat", "--format=", "HEAD"])?
     } else {
         git_text(root, &["diff", "--shortstat", "HEAD", "--"])?
@@ -1522,8 +1920,8 @@ fn verify_release_status_evidence(root: &Path) -> Result<(), String> {
     require_evidence_stat(
         relative,
         evidence,
-        "Corrective Git statistics",
-        &corrective_stat,
+        "Final corrective Git statistics",
+        &final_corrective_stat,
     )?;
 
     let cumulative_stat = if committed {
@@ -1994,7 +2392,72 @@ mod tests {
             String::from_utf8_lossy(&output.stderr)
         );
         copy_working_tree(&source, &fixture.path);
+        let status = Command::new("git")
+            .arg("-C")
+            .arg(&fixture.path)
+            .args(["status", "--porcelain"])
+            .output()
+            .expect("fixture Git status should execute");
+        assert!(status.status.success(), "fixture Git status should pass");
+        if !status.stdout.is_empty() {
+            let add = Command::new("git")
+                .arg("-C")
+                .arg(&fixture.path)
+                .args(["add", "-A", "--", "."])
+                .output()
+                .expect("fixture Git add should execute");
+            assert!(
+                add.status.success(),
+                "fixture Git add failed: {}",
+                String::from_utf8_lossy(&add.stderr)
+            );
+            let commit = Command::new("git")
+                .args([
+                    "-c",
+                    "user.name=AeroCodex fixture",
+                    "-c",
+                    "user.email=fixture@aerocodex.invalid",
+                    "-C",
+                ])
+                .arg(&fixture.path)
+                .args(["commit", "--quiet", "-m", FINAL_CORRECTIVE_COMMIT_SUBJECT])
+                .output()
+                .expect("fixture Git commit should execute");
+            assert!(
+                commit.status.success(),
+                "fixture Git commit failed: {}",
+                String::from_utf8_lossy(&commit.stderr)
+            );
+        }
         fixture
+    }
+
+    fn assert_complete_document_rejected(
+        fixture: &TestDirectory,
+        target: &str,
+        contents: impl AsRef<[u8]>,
+        expected: &str,
+        scenarios: &mut usize,
+    ) {
+        fixture.write(target, contents);
+        let error = verify_release_identity(&fixture.path)
+            .expect_err("complete public verifier should reject document mutation");
+        assert!(
+            error.contains(expected),
+            "{error:?} did not contain {expected:?}"
+        );
+        *scenarios += 1;
+    }
+
+    fn assert_complete_document_accepted(
+        fixture: &TestDirectory,
+        target: &str,
+        contents: impl AsRef<[u8]>,
+        scenarios: &mut usize,
+    ) {
+        fixture.write(target, contents);
+        verify_release_identity(&fixture.path).unwrap();
+        *scenarios += 1;
     }
 
     fn write_package(root: &TestDirectory, path: &str, name: &str, version: &str) {
@@ -2555,6 +3018,133 @@ mod tests {
     }
 
     #[test]
+    fn html_comments_preserve_visible_prose_and_fail_closed() {
+        for prose in [
+            "The current release version is 0.1.0-alpha.1. <!-- harmless note -->",
+            "The current <!-- harmless note --> release version is 0.1.0-alpha.1.",
+            "Visible prefix <!-- one --> and suffix; the current release tier is research_software_alpha.",
+            "```text\n<!-- comment markers stay inside the fence\n-->\nThe current release version is 0.1.0-alpha.2.\n```\nThe current release version is 0.1.0-alpha.1.",
+        ] {
+            verify_identity_document_bytes(
+                "fixture.md",
+                document_with_prose(prose).as_bytes(),
+            )
+            .unwrap();
+        }
+
+        for (prose, expected) in [
+            (
+                "<!-- harmless review note --> The current release version is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            (
+                "<!-- harmless review note --> The current release tier is production.",
+                "asserted=`production`",
+            ),
+            (
+                "The current release version is 0.1.0-alpha.2. <!-- harmless review note -->",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            (
+                "Visible prefix <!-- harmless review note --> the current release version is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            (
+                "<!-- first --> The current release tier is production. <!-- second -->",
+                "asserted=`production`",
+            ),
+            (
+                "<!-- multiline\ncomment -->\nThe current release version is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            (
+                "<!-- multiline\ncomment --> The current release tier is production.",
+                "asserted=`production`",
+            ),
+            (
+                "```text\nbenign content\n```\n<!-- note --> The current release version is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            (
+                "<!-- note --> The current release\nversion is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            (
+                "<!-- historical Beta 1 comment --> The current release tier is production.",
+                "asserted=`production`",
+            ),
+        ] {
+            assert_document_error(prose, &[expected]);
+        }
+
+        let crlf = document_with_prose(
+            "<!-- review note --> The current release version is 0.1.0-alpha.2.",
+        )
+        .replace('\n', "\r\n");
+        let error = verify_identity_document_bytes("fixture.md", crlf.as_bytes()).unwrap_err();
+        assert!(error.contains("asserted=`0.1.0-alpha.2`"), "{error}");
+
+        assert_document_error(
+            "Visible prose <!-- unclosed comment",
+            &["fixture.md:", "unclosed HTML comment"],
+        );
+        assert_document_error(
+            "Visible prose --> remains visible",
+            &["fixture.md:", "stray HTML comment close marker"],
+        );
+    }
+
+    #[test]
+    fn claim_polarity_uses_only_narrow_unambiguous_negatives() {
+        for prose in [
+            "0.1.0-alpha.2 is not the current release version.",
+            "The current release tier is not production.",
+            "This document does not claim production as the current tier.",
+            "This document does not claim that production is the current release tier.",
+            "Historical note: 0.1.0-alpha.2 is not the current release version; the current release version is 0.1.0-alpha.1.",
+            "The current release tier is not\nproduction.",
+            "The current release tier is not  \nproduction.",
+            "It is not uncommon to discuss releases; the current release tier is research_software_alpha.",
+            "0.1.0-alpha.2 is not the current release version; the current release tier is research_software_alpha.",
+            "```text\n0.1.0-alpha.1 is not the current release version.\n```\nThe current release version is 0.1.0-alpha.1.",
+        ] {
+            verify_identity_document_bytes(
+                "fixture.md",
+                document_with_prose(prose).as_bytes(),
+            )
+            .unwrap();
+        }
+
+        for prose in [
+            "It is not merely the current release version 0.1.0-alpha.2.",
+            "It is not only the current release tier production.",
+            "It is not simply the current machine tier production_ready.",
+            "It is not historical but the current release version is 0.1.0-alpha.2.",
+            "Never merely the current release tier is Beta 1.",
+            "0.1.0-alpha.2 is not the current release version; the current release version is 0.1.0-alpha.2.",
+            "It is not merely the current release\nversion 0.1.0-alpha.2.",
+            "`not` is an example; the current release version is 0.1.0-alpha.2.",
+            "The historical tier was not production; the current release tier is production.",
+            "The current release tier is not not production.",
+            "It is not uncommon; the current release version is 0.1.0-alpha.2.",
+            "The current release tier is not production; the current release version is 0.1.0-alpha.2.",
+        ] {
+            let error = verify_identity_document_bytes(
+                "fixture.md",
+                document_with_prose(prose).as_bytes(),
+            )
+            .expect_err("ambiguous or affirmative noncanonical claim should fail closed");
+            assert!(error.contains("polarity="), "{error}");
+            assert!(error.contains("expected=`"), "{error}");
+        }
+
+        let crlf = document_with_prose("It is not only the current release tier production.")
+            .replace('\n', "\r\n");
+        let error = verify_identity_document_bytes("fixture.md", crlf.as_bytes()).unwrap_err();
+        assert!(error.contains("polarity=ambiguous"), "{error}");
+    }
+
+    #[test]
     fn governed_document_encoding_rejects_boms_and_preserves_scientific_unicode() {
         let valid = document_with_prose(
             "Scientific notation remains valid UTF-8: Δv = 1.0×10⁻³ m·s⁻¹, μ = 3.986×10¹⁴.",
@@ -2596,9 +3186,19 @@ mod tests {
     fn complete_public_verifier_rejects_reported_document_bypasses() {
         let fixture = complete_repository_fixture();
         let target = "docs/beta1/release_concept.md";
+        let mut scenarios = 0usize;
+
         for (prose, expected) in [
             (
-                "```text\n~~~\nThe current release version is 0.1.0-alpha.2.\n```\nThe current release version is 0.1.0-alpha.2.",
+                "The current release version is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            (
+                "The current release\nversion is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            (
+                "The current release  \nversion is 0.1.0-alpha.2.",
                 "asserted=`0.1.0-alpha.2`",
             ),
             (
@@ -2606,27 +3206,210 @@ mod tests {
                 "asserted=`production`",
             ),
             (
+                "## Historical Beta 1\n\nThe old tier was beta1-concept.\n\n## Current release\n\nThe current release tier is production.",
+                "asserted=`production`",
+            ),
+            (
+                "```text\nbenign content\n~~~\nstill benign content\n```\nThe current release version is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            (
                 "Current release tier is production; example: research_software_alpha.",
                 "asserted=`production`",
             ),
+            (
+                "Example: `the current release tier is research_software_alpha`; the current release tier is production.",
+                "asserted=`production`",
+            ),
         ] {
-            fixture.write(target, document_with_prose(prose));
-            let error = verify_release_identity(&fixture.path)
-                .expect_err("complete public verifier should reject document bypass");
-            assert!(error.contains(expected), "{error:?}");
+            assert_complete_document_rejected(
+                &fixture,
+                target,
+                document_with_prose(prose),
+                expected,
+                &mut scenarios,
+            );
         }
 
-        let valid = fs::read(repository_root().join(target))
-            .expect("the governed Beta document should be readable");
-        fixture.write(target, &valid);
-        verify_release_identity(&fixture.path).unwrap();
+        let crlf =
+            document_with_prose("The current release tier is production.").replace('\n', "\r\n");
+        assert_complete_document_rejected(
+            &fixture,
+            target,
+            crlf,
+            "asserted=`production`",
+            &mut scenarios,
+        );
+
+        let mixed = document_with_prose("The current release version is 0.1.0-alpha.2.")
+            .replacen('\n', "\r\n", 5);
+        assert_complete_document_rejected(
+            &fixture,
+            target,
+            mixed,
+            "asserted=`0.1.0-alpha.2`",
+            &mut scenarios,
+        );
 
         let mut bom = vec![0xef, 0xbb, 0xbf];
-        bom.extend_from_slice(&valid);
-        fixture.write(target, bom);
-        let error = verify_release_identity(&fixture.path)
-            .expect_err("complete public verifier should reject UTF-8 BOM");
-        assert!(error.contains(target) && error.contains("UTF-8 BOM"));
+        bom.extend_from_slice(document_with_prose("Benign prose.").as_bytes());
+        assert_complete_document_rejected(&fixture, target, bom, "UTF-8 BOM", &mut scenarios);
+        assert_complete_document_rejected(
+            &fixture,
+            target,
+            document_with_prose("Embedded U+FEFF: \u{FEFF}."),
+            "U+FEFF",
+            &mut scenarios,
+        );
+
+        let duplicate = format!(
+            "{}\n{}",
+            identity_document(IDENTITY_BODY),
+            identity_document(IDENTITY_BODY)
+        );
+        assert_complete_document_rejected(
+            &fixture,
+            target,
+            duplicate,
+            "identity block markers must appear exactly once",
+            &mut scenarios,
+        );
+        let missing = identity_document(IDENTITY_BODY).replace(IDENTITY_START, "");
+        assert_complete_document_rejected(
+            &fixture,
+            target,
+            missing,
+            "identity block markers must appear exactly once",
+            &mut scenarios,
+        );
+        let malformed =
+            identity_document(&IDENTITY_BODY.replacen(EXPECTED_VERSION, "0.1.0-alpha.2", 1));
+        assert_complete_document_rejected(
+            &fixture,
+            target,
+            malformed,
+            "current identity block does not contain the exact governed values",
+            &mut scenarios,
+        );
+
+        for (prose, expected) in [
+            (
+                "<!-- harmless review note --> The current release version is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            (
+                "<!-- harmless review note --> The current release tier is production.",
+                "asserted=`production`",
+            ),
+            (
+                "The current release version is 0.1.0-alpha.2. <!-- harmless review note -->",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            (
+                "The current <!-- harmless review note --> release version is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            (
+                "<!-- first --> The current release tier is production. <!-- second -->",
+                "asserted=`production`",
+            ),
+            (
+                "<!-- multiline\ncomment -->\nThe current release version is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            (
+                "<!-- multiline\ncomment --> The current release tier is production.",
+                "asserted=`production`",
+            ),
+            ("Visible prose <!-- unclosed", "unclosed HTML comment"),
+            ("Visible prose --> remains visible", "stray HTML comment close marker"),
+            (
+                "```text\nbenign content\n```\n<!-- note --> The current release version is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            (
+                "<!-- note --> The current release\nversion is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            (
+                "<!-- historical Beta 1 comment --> The current release tier is production.",
+                "asserted=`production`",
+            ),
+        ] {
+            assert_complete_document_rejected(
+                &fixture,
+                target,
+                document_with_prose(prose),
+                expected,
+                &mut scenarios,
+            );
+        }
+        let comment_crlf = document_with_prose(
+            "<!-- review note --> The current release version is 0.1.0-alpha.2.",
+        )
+        .replace('\n', "\r\n");
+        assert_complete_document_rejected(
+            &fixture,
+            target,
+            comment_crlf,
+            "asserted=`0.1.0-alpha.2`",
+            &mut scenarios,
+        );
+
+        for prose in [
+            "It is not merely the current release version 0.1.0-alpha.2.",
+            "It is not only the current release tier production.",
+            "It is not simply the current machine tier production_ready.",
+            "It is not historical but the current release version is 0.1.0-alpha.2.",
+            "Never merely the current release tier is Beta 1.",
+            "0.1.0-alpha.2 is not the current release version; the current release version is 0.1.0-alpha.2.",
+            "It is not merely the current release\nversion 0.1.0-alpha.2.",
+            "`not` is an example; the current release version is 0.1.0-alpha.2.",
+            "The historical tier was not production; the current release tier is production.",
+            "The current release tier is not not production.",
+            "It is not uncommon; the current release version is 0.1.0-alpha.2.",
+        ] {
+            assert_complete_document_rejected(
+                &fixture,
+                target,
+                document_with_prose(prose),
+                "polarity=",
+                &mut scenarios,
+            );
+        }
+        let not_only_crlf =
+            document_with_prose("It is not only the current release tier production.")
+                .replace('\n', "\r\n");
+        assert_complete_document_rejected(
+            &fixture,
+            target,
+            not_only_crlf,
+            "polarity=ambiguous",
+            &mut scenarios,
+        );
+
+        for prose in [
+            "0.1.0-alpha.2 is not the current release version.",
+            "The current release tier is not production.",
+            "This document does not claim production as the current tier.",
+            "Historical note: 0.1.0-alpha.2 is not the current release version; the current release version is 0.1.0-alpha.1.",
+            "The current release version is 0.1.0-alpha.1. <!-- harmless note -->",
+            "```text\n<!-- comment markers stay in the fence\n-->\nThe current release tier is production.\n```\nThe current release tier is research_software_alpha.",
+            "```text\n0.1.0-alpha.1 is not the current release version.\n```\nThe current release version is 0.1.0-alpha.1.",
+            "0.1.0-alpha.2 is not the current release version; the current release tier is research_software_alpha.",
+        ] {
+            assert_complete_document_accepted(
+                &fixture,
+                target,
+                document_with_prose(prose),
+                &mut scenarios,
+            );
+        }
+
+        assert_eq!(
+            scenarios, COMPLETE_PUBLIC_COMMAND_FIXTURE_COUNT,
+            "documented complete public-command scenario count must stay synchronized"
+        );
     }
 
     // Production-loader fixtures: real Cargo workspaces and real `cargo metadata` output.
