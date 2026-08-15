@@ -24,9 +24,10 @@ const EXPECTED_FORMULA_COUNT: usize = 152;
 const EXPECTED_BASE_COMMIT: &str = "6a94b4628e6e0821a55d6aaadf6925956a5fa2d3";
 const ORIGINAL_IMPLEMENTATION_COMMIT: &str = "04431bb787bd8219fb3df7e237769421106f368a";
 const FIRST_CORRECTIVE_COMMIT: &str = "4456fabd97b2108911ed3eb218112ec73e04519f";
-const FINAL_CORRECTIVE_COMMIT_SUBJECT: &str = "fix: close final minimal identity parsing gaps";
-const COMPLETE_PUBLIC_COMMAND_FIXTURE_COUNT: usize = 48;
-const RELEASE_IDENTITY_TEST_FUNCTION_COUNT: usize = 26;
+const SECOND_CORRECTIVE_COMMIT: &str = "75f678ba44af942e5910972d1ee34c60572ce733";
+const FINAL_CORRECTIVE_COMMIT_SUBJECT: &str = "fix: close remaining minimal identity regressions";
+const COMPLETE_PUBLIC_COMMAND_FIXTURE_COUNT: usize = 55;
+const RELEASE_IDENTITY_TEST_FUNCTION_COUNT: usize = 27;
 const FORCE_SELF_CHECK_FAILURE_ENV: &str = "AEROCODEX_TEST_FORCE_SELF_CHECK_FAILURE";
 
 const GOVERNED_DOCUMENTS: &[&str] = &[
@@ -757,8 +758,7 @@ fn verify_exact_block(
 
 fn scan_current_identity_claims(path: &str, text: &str) -> Result<(), String> {
     let mut paragraph = LogicalParagraph::default();
-    let mut fence: Option<MarkdownFence> = None;
-    let mut html_comment: Option<HtmlComment> = None;
+    let mut parser_state = MarkdownParserState::Visible;
     let mut next_fence_authoritative = false;
     let mut in_identity_block = false;
     let mut in_historical_block = false;
@@ -766,7 +766,7 @@ fn scan_current_identity_claims(path: &str, text: &str) -> Result<(), String> {
         let line_number = index + 1;
         let raw_trimmed = line.trim();
 
-        if let Some(open) = fence {
+        if let MarkdownParserState::Fence(open) = parser_state {
             if let Some(marker) = parse_fence_marker(line) {
                 if marker.character == open.character
                     && marker.length >= open.length
@@ -774,7 +774,7 @@ fn scan_current_identity_claims(path: &str, text: &str) -> Result<(), String> {
                 {
                     check_identity_paragraph(path, &paragraph)?;
                     paragraph.clear();
-                    fence = None;
+                    parser_state = MarkdownParserState::Visible;
                     continue;
                 }
             }
@@ -790,13 +790,13 @@ fn scan_current_identity_claims(path: &str, text: &str) -> Result<(), String> {
             continue;
         }
 
-        if html_comment.is_none() && raw_trimmed == IDENTITY_START {
+        if parser_state.is_visible() && raw_trimmed == IDENTITY_START {
             check_identity_paragraph(path, &paragraph)?;
             paragraph.clear();
             in_identity_block = true;
             continue;
         }
-        if html_comment.is_none() && raw_trimmed == IDENTITY_END {
+        if parser_state.is_visible() && raw_trimmed == IDENTITY_END {
             in_identity_block = false;
             continue;
         }
@@ -804,7 +804,7 @@ fn scan_current_identity_claims(path: &str, text: &str) -> Result<(), String> {
             continue;
         }
 
-        if html_comment.is_none() && raw_trimmed == HISTORICAL_START {
+        if parser_state.is_visible() && raw_trimmed == HISTORICAL_START {
             check_identity_paragraph(path, &paragraph)?;
             paragraph.clear();
             if in_historical_block {
@@ -815,7 +815,7 @@ fn scan_current_identity_claims(path: &str, text: &str) -> Result<(), String> {
             in_historical_block = true;
             continue;
         }
-        if html_comment.is_none() && raw_trimmed == HISTORICAL_END {
+        if parser_state.is_visible() && raw_trimmed == HISTORICAL_END {
             if !in_historical_block {
                 return Err(format!(
                     "{path}:{line_number}: historical block closes without a matching start"
@@ -828,35 +828,64 @@ fn scan_current_identity_claims(path: &str, text: &str) -> Result<(), String> {
             continue;
         }
 
-        if html_comment.is_none() && raw_trimmed == "<!-- aerocodex-authoritative-example -->" {
+        if parser_state.is_visible() && raw_trimmed == "<!-- aerocodex-authoritative-example -->" {
             check_identity_paragraph(path, &paragraph)?;
             paragraph.clear();
             next_fence_authoritative = true;
             continue;
         }
 
+        // Fence openers have precedence over HTML-comment syntax on the same physical line.
+        // Once open, the mutually exclusive parser state above prevents fenced markers from
+        // opening, closing, or otherwise mutating an HTML comment.
+        if parser_state.is_visible() {
+            if let Some(marker) = parse_fence_marker(line) {
+                check_identity_paragraph(path, &paragraph)?;
+                paragraph.clear();
+                parser_state = MarkdownParserState::Fence(MarkdownFence {
+                    character: marker.character,
+                    length: marker.length,
+                    authoritative: next_fence_authoritative,
+                    opening_line: line_number,
+                });
+                next_fence_authoritative = false;
+                continue;
+            }
+        }
+
+        let mut html_comment = match parser_state {
+            MarkdownParserState::Visible => None,
+            MarkdownParserState::HtmlComment(open) => Some(open),
+            MarkdownParserState::Fence(_) => unreachable!("fence state handled above"),
+        };
         let visible =
             visible_markdown_outside_html_comments(path, line, line_number, &mut html_comment)?;
+        parser_state = html_comment.map_or(
+            MarkdownParserState::Visible,
+            MarkdownParserState::HtmlComment,
+        );
         let trimmed = visible.trim();
         if trimmed.is_empty() {
-            if raw_trimmed.is_empty() && html_comment.is_none() {
+            if raw_trimmed.is_empty() && parser_state.is_visible() {
                 check_identity_paragraph(path, &paragraph)?;
                 paragraph.clear();
             }
             continue;
         }
 
-        if let Some(marker) = parse_fence_marker(&visible) {
-            check_identity_paragraph(path, &paragraph)?;
-            paragraph.clear();
-            fence = Some(MarkdownFence {
-                character: marker.character,
-                length: marker.length,
-                authoritative: next_fence_authoritative,
-                opening_line: line_number,
-            });
-            next_fence_authoritative = false;
-            continue;
+        if parser_state.is_visible() {
+            if let Some(marker) = parse_fence_marker(&visible) {
+                check_identity_paragraph(path, &paragraph)?;
+                paragraph.clear();
+                parser_state = MarkdownParserState::Fence(MarkdownFence {
+                    character: marker.character,
+                    length: marker.length,
+                    authoritative: next_fence_authoritative,
+                    opening_line: line_number,
+                });
+                next_fence_authoritative = false;
+                continue;
+            }
         }
         if trimmed.starts_with('#') {
             check_identity_paragraph(path, &paragraph)?;
@@ -873,17 +902,20 @@ fn scan_current_identity_claims(path: &str, text: &str) -> Result<(), String> {
             "{path}: unclosed historical block beginning before end of file"
         ));
     }
-    if let Some(open) = fence {
-        return Err(format!(
-            "{path}:{}: unclosed Markdown fence (delimiter={} length={})",
-            open.opening_line, open.character as char, open.length
-        ));
-    }
-    if let Some(open) = html_comment {
-        return Err(format!(
-            "{path}:{}: unclosed HTML comment",
-            open.opening_line
-        ));
+    match parser_state {
+        MarkdownParserState::Fence(open) => {
+            return Err(format!(
+                "{path}:{}: unclosed Markdown fence (delimiter={} length={})",
+                open.opening_line, open.character as char, open.length
+            ));
+        }
+        MarkdownParserState::HtmlComment(open) => {
+            return Err(format!(
+                "{path}:{}: unclosed HTML comment",
+                open.opening_line
+            ));
+        }
+        MarkdownParserState::Visible => {}
     }
     check_identity_paragraph(path, &paragraph)
 }
@@ -955,6 +987,19 @@ struct MarkdownFence {
     length: usize,
     authoritative: bool,
     opening_line: usize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum MarkdownParserState {
+    Visible,
+    HtmlComment(HtmlComment),
+    Fence(MarkdownFence),
+}
+
+impl MarkdownParserState {
+    fn is_visible(self) -> bool {
+        matches!(self, Self::Visible)
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -1298,6 +1343,7 @@ fn check_identity_paragraph(path: &str, paragraph: &LogicalParagraph) -> Result<
 
     let negative_claims =
         collect_negative_claims(&paragraph.text, &masked_lower, &inline_spans, &accepted);
+    validate_negative_claim_grammar(path, paragraph, &masked_lower, &negative_claims)?;
 
     for negative in &negative_claims {
         let expected = negative.kind.expected();
@@ -1374,6 +1420,96 @@ fn check_identity_paragraph(path: &str, paragraph: &LogicalParagraph) -> Result<
         }
     }
     Ok(())
+}
+
+fn validate_negative_claim_grammar(
+    path: &str,
+    paragraph: &LogicalParagraph,
+    masked_lower: &str,
+    negative_claims: &[NegativeClaim],
+) -> Result<(), String> {
+    for current_start in find_word_occurrences(masked_lower, "current") {
+        let start = clause_start(masked_lower, current_start);
+        let end = clause_end(masked_lower, current_start);
+        let clause = &masked_lower[start..end];
+        if identity_kind_for_clause(clause).is_none() {
+            continue;
+        }
+
+        let mut negations = Vec::new();
+        for token in ["not", "never", "cannot", "false", "neither", "nor"] {
+            negations.extend(
+                find_word_occurrences(clause, token)
+                    .into_iter()
+                    .map(|offset| (start + offset, token)),
+            );
+        }
+        negations.sort_by_key(|(offset, _)| *offset);
+        if negations.is_empty() {
+            continue;
+        }
+
+        let matching = negative_claims
+            .iter()
+            .filter(|claim| claim.current_start == current_start)
+            .collect::<Vec<_>>();
+        let supported = matching.len() == 1
+            && negations.len() == 1
+            && negations[0].1 == "not"
+            && negations[0].0 >= matching[0].start
+            && negations[0].0 < matching[0].end;
+        if supported {
+            continue;
+        }
+
+        let reason = if negations.len() > 1 {
+            "multiple_or_nested_negation_tokens"
+        } else if matching.len() > 1 {
+            "multiple_supported_negative_templates_overlap"
+        } else {
+            "unsupported_negation_grammar"
+        };
+        let matched = matching.first().copied();
+        let kind = matched
+            .map(|claim| claim.kind)
+            .or_else(|| identity_kind_for_clause(clause));
+        let diagnostic_start = matched.map_or(start, |claim| claim.start);
+        let diagnostic_end = matched.map_or(end, |claim| claim.end);
+        let asserted = matched.map_or_else(
+            || paragraph.text[start..end].trim(),
+            |claim| claim.asserted.as_str(),
+        );
+        return Err(format!(
+            "{path}:{}-{}: claim_type={} polarity={} asserted=`{asserted}` expected=`{}` reason={reason}",
+            paragraph.line_for_offset(diagnostic_start),
+            paragraph.line_for_offset(diagnostic_end.saturating_sub(1)),
+            kind.map_or("ambiguous_current_identity", ClaimKind::name),
+            ClaimPolarity::Ambiguous.name(),
+            kind.map_or(
+                "supported explicit current identity wording using the canonical value",
+                ClaimKind::expected
+            )
+        ));
+    }
+    Ok(())
+}
+
+fn identity_kind_for_clause(clause: &str) -> Option<ClaimKind> {
+    if clause.contains("version") {
+        Some(ClaimKind::SemanticVersion)
+    } else if clause.contains("display tier") {
+        Some(ClaimKind::DisplayTier)
+    } else if clause.contains("tier") {
+        Some(ClaimKind::MachineTier)
+    } else if clause.contains("release channel") {
+        Some(ClaimKind::ReleaseChannel)
+    } else if clause.contains("runtime identity") {
+        Some(ClaimKind::RuntimeIdentity)
+    } else if clause.contains("program name") || clause.contains("release name") {
+        Some(ClaimKind::ProgramName)
+    } else {
+        None
+    }
 }
 
 fn collect_negative_claims(
@@ -1765,6 +1901,31 @@ fn clause_end(text: &str, start: usize) -> usize {
     end
 }
 
+fn clause_start(text: &str, end: usize) -> usize {
+    let mut start = 0usize;
+    let mut offset = 0usize;
+    while offset < end {
+        let remaining = &text[offset..];
+        if remaining.starts_with('—') {
+            offset += '—'.len_utf8();
+            start = offset;
+            continue;
+        }
+        let byte = text.as_bytes()[offset];
+        if matches!(byte, b';' | b'!' | b'?')
+            || (byte == b'.'
+                && text
+                    .as_bytes()
+                    .get(offset + 1)
+                    .map_or(true, u8::is_ascii_whitespace))
+        {
+            start = offset + 1;
+        }
+        offset += remaining.chars().next().map_or(1, char::len_utf8);
+    }
+    skip_ascii_whitespace(text, start)
+}
+
 fn verify_release_status_evidence(root: &Path) -> Result<(), String> {
     let relative = "docs/release/v0.1.0-alpha.1-status.md";
     let text = fs::read_to_string(root.join(relative))
@@ -1786,12 +1947,14 @@ fn verify_release_status_evidence(root: &Path) -> Result<(), String> {
         format!("- Milestone base commit: `{EXPECTED_BASE_COMMIT}`"),
         format!("- Original implementation commit: `{ORIGINAL_IMPLEMENTATION_COMMIT}`"),
         format!("- First corrective commit: `{FIRST_CORRECTIVE_COMMIT}`"),
-        "- Final corrective commit: `SELF`".to_string(),
+        format!("- Second corrective commit: `{SECOND_CORRECTIVE_COMMIT}`"),
+        "- Latest corrective commit: `SELF`".to_string(),
         format!(
             "- Complete public-command fixture scenarios: `{COMPLETE_PUBLIC_COMMAND_FIXTURE_COUNT}`"
         ),
+        "- Complete public-command fixture categories: `fence_comment=18; polarity=18; structure_encoding=14; claim_binding=5`".to_string(),
         format!(
-            "- Release-identity test classification: `{RELEASE_IDENTITY_TEST_FUNCTION_COUNT} test functions: 9 helper/unit; 12 production-document; 3 production-loader; 1 compiled-process integration; 1 complete public-command`"
+            "- Release-identity test classification: `{RELEASE_IDENTITY_TEST_FUNCTION_COUNT} test functions: 10 helper/unit; 12 production-document; 3 production-loader; 1 compiled-process integration; 1 complete public-command`"
         ),
         "- Scope: `minimal_release_identity`".to_string(),
         "- Registry facts: `152 research_required; 152 blocked; 0 publicly executable`"
@@ -1887,14 +2050,45 @@ fn verify_release_status_evidence(root: &Path) -> Result<(), String> {
         &first_corrective_stat,
     )?;
 
+    let second_corrective_files = git_lines(
+        root,
+        &[
+            "diff-tree",
+            "--no-commit-id",
+            "--name-only",
+            "-r",
+            SECOND_CORRECTIVE_COMMIT,
+        ],
+    )?
+    .into_iter()
+    .map(|path| format!("- Second corrective file: `{path}`"))
+    .collect::<BTreeSet<_>>();
+    require_exact_prefixed_evidence(
+        relative,
+        evidence,
+        "- Second corrective file: `",
+        &second_corrective_files,
+    )?;
+
+    let second_corrective_stat = git_text(
+        root,
+        &["show", "--shortstat", "--format=", SECOND_CORRECTIVE_COMMIT],
+    )?;
+    require_evidence_stat(
+        relative,
+        evidence,
+        "Second corrective Git statistics",
+        &second_corrective_stat,
+    )?;
+
     let head_subject = git_text(root, &["log", "-1", "--format=%s"])?;
     let committed = head_subject == FINAL_CORRECTIVE_COMMIT_SUBJECT;
-    if !committed && git_text(root, &["rev-parse", "HEAD"])? != FIRST_CORRECTIVE_COMMIT {
+    if !committed && git_text(root, &["rev-parse", "HEAD"])? != SECOND_CORRECTIVE_COMMIT {
         return Err(format!(
-            "{relative}: final corrective evidence must be verified from `{FIRST_CORRECTIVE_COMMIT}` plus its worktree or from a HEAD commit titled `{FINAL_CORRECTIVE_COMMIT_SUBJECT}`"
+            "{relative}: latest corrective evidence must be verified from `{SECOND_CORRECTIVE_COMMIT}` plus its worktree or from a HEAD commit titled `{FINAL_CORRECTIVE_COMMIT_SUBJECT}`"
         ));
     }
-    let final_corrective_files = if committed {
+    let latest_corrective_files = if committed {
         git_lines(
             root,
             &["diff-tree", "--no-commit-id", "--name-only", "-r", "HEAD"],
@@ -1903,16 +2097,16 @@ fn verify_release_status_evidence(root: &Path) -> Result<(), String> {
         git_lines(root, &["diff", "--name-only", "HEAD", "--"])?
     }
     .into_iter()
-    .map(|path| format!("- Final corrective file: `{path}`"))
+    .map(|path| format!("- Latest corrective file: `{path}`"))
     .collect::<BTreeSet<_>>();
     require_exact_prefixed_evidence(
         relative,
         evidence,
-        "- Final corrective file: `",
-        &final_corrective_files,
+        "- Latest corrective file: `",
+        &latest_corrective_files,
     )?;
 
-    let final_corrective_stat = if committed {
+    let latest_corrective_stat = if committed {
         git_text(root, &["show", "--shortstat", "--format=", "HEAD"])?
     } else {
         git_text(root, &["diff", "--shortstat", "HEAD", "--"])?
@@ -1920,8 +2114,8 @@ fn verify_release_status_evidence(root: &Path) -> Result<(), String> {
     require_evidence_stat(
         relative,
         evidence,
-        "Final corrective Git statistics",
-        &final_corrective_stat,
+        "Latest corrective Git statistics",
+        &latest_corrective_stat,
     )?;
 
     let cumulative_stat = if committed {
@@ -2392,72 +2586,114 @@ mod tests {
             String::from_utf8_lossy(&output.stderr)
         );
         copy_working_tree(&source, &fixture.path);
-        let status = Command::new("git")
-            .arg("-C")
-            .arg(&fixture.path)
-            .args(["status", "--porcelain"])
-            .output()
-            .expect("fixture Git status should execute");
-        assert!(status.status.success(), "fixture Git status should pass");
-        if !status.stdout.is_empty() {
-            let add = Command::new("git")
-                .arg("-C")
-                .arg(&fixture.path)
-                .args(["add", "-A", "--", "."])
-                .output()
-                .expect("fixture Git add should execute");
-            assert!(
-                add.status.success(),
-                "fixture Git add failed: {}",
-                String::from_utf8_lossy(&add.stderr)
-            );
-            let commit = Command::new("git")
-                .args([
-                    "-c",
-                    "user.name=AeroCodex fixture",
-                    "-c",
-                    "user.email=fixture@aerocodex.invalid",
-                    "-C",
-                ])
-                .arg(&fixture.path)
-                .args(["commit", "--quiet", "-m", FINAL_CORRECTIVE_COMMIT_SUBJECT])
-                .output()
-                .expect("fixture Git commit should execute");
-            assert!(
-                commit.status.success(),
-                "fixture Git commit failed: {}",
-                String::from_utf8_lossy(&commit.stderr)
-            );
-        }
+        stage_and_commit_fixture_changes(&fixture.path);
         fixture
     }
 
-    fn assert_complete_document_rejected(
-        fixture: &TestDirectory,
-        target: &str,
-        contents: impl AsRef<[u8]>,
-        expected: &str,
-        scenarios: &mut usize,
-    ) {
-        fixture.write(target, contents);
-        let error = verify_release_identity(&fixture.path)
-            .expect_err("complete public verifier should reject document mutation");
+    fn stage_and_commit_fixture_changes(path: &Path) -> bool {
+        let add = Command::new("git")
+            .arg("-C")
+            .arg(path)
+            .args(["add", "-A", "--", "."])
+            .output()
+            .expect("fixture Git add should execute");
         assert!(
-            error.contains(expected),
-            "{error:?} did not contain {expected:?}"
+            add.status.success(),
+            "fixture Git add failed: stdout={} stderr={}",
+            String::from_utf8_lossy(&add.stdout),
+            String::from_utf8_lossy(&add.stderr)
         );
-        *scenarios += 1;
+
+        let staged = Command::new("git")
+            .arg("-C")
+            .arg(path)
+            .args(["diff", "--cached", "--quiet", "--exit-code"])
+            .output()
+            .expect("fixture staged-diff check should execute");
+        match staged.status.code() {
+            Some(0) => false,
+            Some(1) => {
+                let commit = Command::new("git")
+                    .args([
+                        "-c",
+                        "user.name=AeroCodex fixture",
+                        "-c",
+                        "user.email=fixture@aerocodex.invalid",
+                        "-C",
+                    ])
+                    .arg(path)
+                    .args(["commit", "--quiet", "-m", FINAL_CORRECTIVE_COMMIT_SUBJECT])
+                    .output()
+                    .expect("fixture Git commit should execute");
+                assert!(
+                    commit.status.success(),
+                    "fixture Git commit failed: stdout={} stderr={}",
+                    String::from_utf8_lossy(&commit.stdout),
+                    String::from_utf8_lossy(&commit.stderr)
+                );
+                true
+            }
+            code => panic!(
+                "fixture staged-diff check failed: status={code:?} stdout={} stderr={}",
+                String::from_utf8_lossy(&staged.stdout),
+                String::from_utf8_lossy(&staged.stderr)
+            ),
+        }
     }
 
-    fn assert_complete_document_accepted(
-        fixture: &TestDirectory,
-        target: &str,
-        contents: impl AsRef<[u8]>,
-        scenarios: &mut usize,
-    ) {
-        fixture.write(target, contents);
-        verify_release_identity(&fixture.path).unwrap();
-        *scenarios += 1;
+    fn fixture_head(path: &Path) -> String {
+        let output = Command::new("git")
+            .arg("-C")
+            .arg(path)
+            .args(["rev-parse", "HEAD"])
+            .output()
+            .expect("fixture HEAD lookup should execute");
+        assert!(
+            output.status.success(),
+            "fixture HEAD lookup failed: stdout={} stderr={}",
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
+        String::from_utf8(output.stdout)
+            .expect("fixture HEAD should be UTF-8")
+            .trim()
+            .to_string()
+    }
+
+    struct CompleteDocumentScenario {
+        name: &'static str,
+        contents: Vec<u8>,
+        expected_error: Option<&'static str>,
+    }
+
+    impl CompleteDocumentScenario {
+        fn reject_prose(name: &'static str, prose: &str, expected_error: &'static str) -> Self {
+            Self {
+                name,
+                contents: document_with_prose(prose).into_bytes(),
+                expected_error: Some(expected_error),
+            }
+        }
+
+        fn reject_document(
+            name: &'static str,
+            contents: impl Into<Vec<u8>>,
+            expected_error: &'static str,
+        ) -> Self {
+            Self {
+                name,
+                contents: contents.into(),
+                expected_error: Some(expected_error),
+            }
+        }
+
+        fn accept_prose(name: &'static str, prose: &str) -> Self {
+            Self {
+                name,
+                contents: document_with_prose(prose).into_bytes(),
+                expected_error: None,
+            }
+        }
     }
 
     fn write_package(root: &TestDirectory, path: &str, name: &str, version: &str) {
@@ -2833,6 +3069,36 @@ mod tests {
     }
 
     #[test]
+    fn fixture_commit_skips_an_empty_normalized_staged_diff() {
+        let fixture = TestDirectory::create("empty_fixture_commit");
+        let init = Command::new("git")
+            .arg("-C")
+            .arg(&fixture.path)
+            .args(["init", "--quiet"])
+            .output()
+            .expect("fixture Git init should execute");
+        assert!(init.status.success(), "fixture Git init should pass");
+        let config = Command::new("git")
+            .arg("-C")
+            .arg(&fixture.path)
+            .args(["config", "core.autocrlf", "true"])
+            .output()
+            .expect("fixture Git configuration should execute");
+        assert!(
+            config.status.success(),
+            "fixture Git configuration should pass"
+        );
+
+        fixture.write("normalized.txt", "normalized\ncontent\n");
+        assert!(stage_and_commit_fixture_changes(&fixture.path));
+        let committed_head = fixture_head(&fixture.path);
+
+        fixture.write("normalized.txt", "normalized\r\ncontent\r\n");
+        assert!(!stage_and_commit_fixture_changes(&fixture.path));
+        assert_eq!(fixture_head(&fixture.path), committed_head);
+    }
+
+    #[test]
     fn runtime_version_and_tier_drift_fail_typed_json_validation() {
         let good = format!(
             "{{\"program_name\":\"aerocodex\",\"semantic_version\":\"{EXPECTED_VERSION}\",\"release_tier\":\"{EXPECTED_TIER}\",\"release_tier_display\":\"{EXPECTED_TIER_DISPLAY}\",\"workspace_package_count\":14,\"registry_formula_count\":152,\"blocked_formula_count\":152,\"public_executable_formula_count\":0}}"
@@ -2857,6 +3123,9 @@ mod tests {
         for prose in [
             "```text\nThe current release version is 0.1.0-alpha.2.\n```",
             "~~~text\nThe current release version is 0.1.0-alpha.2.\n~~~",
+            "```text <!--\nThe current release version is 0.1.0-alpha.2.\n-->\n```\nThe current release version is 0.1.0-alpha.1.",
+            "~~~text <!--\nThe current release tier is production.\n-->\n~~~\nThe current release tier is research_software_alpha.",
+            "```text\n<!-- comment markers stay fenced -->\n``` <!-- not a valid close\nThe current release version is 0.1.0-alpha.2.\n```\nThe current release version is 0.1.0-alpha.1.",
             "```text\n~~~\nThe current release version is 0.1.0-alpha.2.\n```",
             "~~~text\n```\nThe current release version is 0.1.0-alpha.2.\n~~~",
             "````text\n```\nThe current release version is 0.1.0-alpha.2.\n````",
@@ -2884,7 +3153,27 @@ mod tests {
             &["claim_type=semantic_version", "asserted=`0.1.0-alpha.2`"],
         );
         assert_document_error(
+            "```text <!--\nbenign fenced content\n```\nThe current release version is 0.1.0-alpha.2.\n-->",
+            &["stray HTML comment close marker"],
+        );
+        assert_document_error(
+            "~~~text <!--\nbenign fenced content\n~~~\nThe current release tier is production.\n-->",
+            &["stray HTML comment close marker"],
+        );
+        assert_document_error(
+            "```text <!--\nbenign fenced content\n```\nThe current release version is 0.1.0-alpha.2.",
+            &["claim_type=semantic_version", "asserted=`0.1.0-alpha.2`"],
+        );
+        assert_document_error(
+            "~~~text <!--\nbenign fenced content\n~~~\nThe current release tier is production.",
+            &["claim_type=machine_release_tier", "asserted=`production`"],
+        );
+        assert_document_error(
             "````text\nThe current release version is 0.1.0-alpha.2.\n```",
+            &["unclosed Markdown fence", "delimiter=`", "length=4"],
+        );
+        assert_document_error(
+            "````text <!--\n<!-- fenced marker -->\n```",
             &["unclosed Markdown fence", "delimiter=`", "length=4"],
         );
 
@@ -2893,6 +3182,14 @@ mod tests {
         )
         .replace('\n', "\r\n");
         verify_identity_document_bytes("fixture.md", crlf.as_bytes()).unwrap();
+
+        let reproduced_crlf = document_with_prose(
+            "```text <!--\nbenign fenced content\n```\nThe current release version is 0.1.0-alpha.2.\n-->",
+        )
+        .replace('\n', "\r\n");
+        let error =
+            verify_identity_document_bytes("fixture.md", reproduced_crlf.as_bytes()).unwrap_err();
+        assert!(error.contains("stray HTML comment close marker"), "{error}");
     }
 
     #[test]
@@ -2933,7 +3230,7 @@ mod tests {
             ),
             (
                 "This is not historical but the current release carries version 0.1.0-alpha.2.",
-                "current release carries version 0.1.0-alpha.2",
+                "This is not historical but the current release carries version 0.1.0-alpha.2",
             ),
         ] {
             assert_document_error(prose, &["claim_type=", &format!("asserted=`{asserted}`")]);
@@ -3024,6 +3321,8 @@ mod tests {
             "The current <!-- harmless note --> release version is 0.1.0-alpha.1.",
             "Visible prefix <!-- one --> and suffix; the current release tier is research_software_alpha.",
             "```text\n<!-- comment markers stay inside the fence\n-->\nThe current release version is 0.1.0-alpha.2.\n```\nThe current release version is 0.1.0-alpha.1.",
+            "<!-- before fence\ncomment only -->\n```text <!-- fenced info\n<!-- fenced comment-like content -->\n```\n<!-- after fence\ncomment only -->\nThe current release version is 0.1.0-alpha.1.",
+            "<!-- before -->\n~~~text <!-- fenced info\n```\nThe current release tier is production.\n~~~\n<!-- after --> The current release tier is research_software_alpha.",
         ] {
             verify_identity_document_bytes(
                 "fixture.md",
@@ -3092,6 +3391,10 @@ mod tests {
             "Visible prose --> remains visible",
             &["fixture.md:", "stray HTML comment close marker"],
         );
+        assert_document_error(
+            "```text <!-- fenced opener\nbenign content\n```\nVisible prose <!-- unclosed comment",
+            &["fixture.md:", "unclosed HTML comment"],
+        );
     }
 
     #[test]
@@ -3107,6 +3410,7 @@ mod tests {
             "It is not uncommon to discuss releases; the current release tier is research_software_alpha.",
             "0.1.0-alpha.2 is not the current release version; the current release tier is research_software_alpha.",
             "```text\n0.1.0-alpha.1 is not the current release version.\n```\nThe current release version is 0.1.0-alpha.1.",
+            "Example: `0.1.0-alpha.1 is not the current release version.` The current release version is 0.1.0-alpha.1.",
         ] {
             verify_identity_document_bytes(
                 "fixture.md",
@@ -3118,6 +3422,9 @@ mod tests {
         for prose in [
             "It is not merely the current release version 0.1.0-alpha.2.",
             "It is not only the current release tier production.",
+            "It is not true that 0.1.0-alpha.2 is not the current release version.",
+            "It is not false that 0.1.0-alpha.2 is the current release version.",
+            "It cannot be said that 0.1.0-alpha.2 is not the current release version.",
             "It is not simply the current machine tier production_ready.",
             "It is not historical but the current release version is 0.1.0-alpha.2.",
             "Never merely the current release tier is Beta 1.",
@@ -3128,6 +3435,9 @@ mod tests {
             "The current release tier is not not production.",
             "It is not uncommon; the current release version is 0.1.0-alpha.2.",
             "The current release tier is not production; the current release version is 0.1.0-alpha.2.",
+            "It is not true that 0.1.0-alpha.2 is not the current release\nversion.",
+            "Canonical token: 0.1.0-alpha.1; it is not true that 0.1.0-alpha.2 is not the current release version.",
+            "The current release tier is not production; the current release tier is production.",
         ] {
             let error = verify_identity_document_bytes(
                 "fixture.md",
@@ -3138,10 +3448,36 @@ mod tests {
             assert!(error.contains("expected=`"), "{error}");
         }
 
-        let crlf = document_with_prose("It is not only the current release tier production.")
-            .replace('\n', "\r\n");
+        for prose in [
+            "It is not true that 0.1.0-alpha.2 is not the current release version.",
+            "It is not false that 0.1.0-alpha.2 is the current release version.",
+            "It cannot be said that 0.1.0-alpha.2 is not the current release version.",
+        ] {
+            let error =
+                verify_identity_document_bytes("fixture.md", document_with_prose(prose).as_bytes())
+                    .unwrap_err();
+            for field in [
+                "fixture.md:",
+                "claim_type=",
+                "polarity=ambiguous",
+                "asserted=`",
+                "expected=`",
+                "reason=",
+            ] {
+                assert!(error.contains(field), "{error}");
+            }
+        }
+
+        let crlf = document_with_prose(
+            "It is not true that 0.1.0-alpha.2 is not the current release version.",
+        )
+        .replace('\n', "\r\n");
         let error = verify_identity_document_bytes("fixture.md", crlf.as_bytes()).unwrap_err();
         assert!(error.contains("polarity=ambiguous"), "{error}");
+        assert!(
+            error.contains("reason=multiple_or_nested_negation_tokens"),
+            "{error}"
+        );
     }
 
     #[test]
@@ -3186,230 +3522,349 @@ mod tests {
     fn complete_public_verifier_rejects_reported_document_bypasses() {
         let fixture = complete_repository_fixture();
         let target = "docs/beta1/release_concept.md";
-        let mut scenarios = 0usize;
+        let mut utf8_bom = vec![0xef, 0xbb, 0xbf];
+        utf8_bom.extend_from_slice(document_with_prose("Benign prose.").as_bytes());
+        let mut invalid_utf8 = document_with_prose("Benign prose.").into_bytes();
+        invalid_utf8.push(0xff);
 
-        for (prose, expected) in [
-            (
-                "The current release version is 0.1.0-alpha.2.",
+        let scenarios = vec![
+            // Fences and HTML comments.
+            CompleteDocumentScenario::reject_prose(
+                "fence_comment/exact_backtick_opener_comment_leak",
+                "```text <!--\nbenign fenced content\n```\nThe current release version is 0.1.0-alpha.2.\n-->",
+                "stray HTML comment close marker",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "fence_comment/backtick_contains_tilde_marker",
+                "```text\n~~~\nstill fenced\n```\nThe current release version is 0.1.0-alpha.2.",
                 "asserted=`0.1.0-alpha.2`",
             ),
-            (
-                "The current release\nversion is 0.1.0-alpha.2.",
-                "asserted=`0.1.0-alpha.2`",
-            ),
-            (
-                "The current release  \nversion is 0.1.0-alpha.2.",
-                "asserted=`0.1.0-alpha.2`",
-            ),
-            (
-                "Historical Beta 1 used 0.0.1; the current release tier is production.",
+            CompleteDocumentScenario::reject_prose(
+                "fence_comment/tilde_contains_backtick_marker",
+                "~~~text\n```\nstill fenced\n~~~\nThe current release tier is production.",
                 "asserted=`production`",
             ),
-            (
-                "## Historical Beta 1\n\nThe old tier was beta1-concept.\n\n## Current release\n\nThe current release tier is production.",
-                "asserted=`production`",
-            ),
-            (
-                "```text\nbenign content\n~~~\nstill benign content\n```\nThe current release version is 0.1.0-alpha.2.",
+            CompleteDocumentScenario::reject_prose(
+                "fence_comment/four_backticks_shorter_apparent_close",
+                "````text\n```\nstill fenced\n````\nThe current release version is 0.1.0-alpha.2.",
                 "asserted=`0.1.0-alpha.2`",
             ),
-            (
-                "Current release tier is production; example: research_software_alpha.",
-                "asserted=`production`",
-            ),
-            (
-                "Example: `the current release tier is research_software_alpha`; the current release tier is production.",
-                "asserted=`production`",
-            ),
-        ] {
-            assert_complete_document_rejected(
-                &fixture,
-                target,
-                document_with_prose(prose),
-                expected,
-                &mut scenarios,
-            );
-        }
-
-        let crlf =
-            document_with_prose("The current release tier is production.").replace('\n', "\r\n");
-        assert_complete_document_rejected(
-            &fixture,
-            target,
-            crlf,
-            "asserted=`production`",
-            &mut scenarios,
-        );
-
-        let mixed = document_with_prose("The current release version is 0.1.0-alpha.2.")
-            .replacen('\n', "\r\n", 5);
-        assert_complete_document_rejected(
-            &fixture,
-            target,
-            mixed,
-            "asserted=`0.1.0-alpha.2`",
-            &mut scenarios,
-        );
-
-        let mut bom = vec![0xef, 0xbb, 0xbf];
-        bom.extend_from_slice(document_with_prose("Benign prose.").as_bytes());
-        assert_complete_document_rejected(&fixture, target, bom, "UTF-8 BOM", &mut scenarios);
-        assert_complete_document_rejected(
-            &fixture,
-            target,
-            document_with_prose("Embedded U+FEFF: \u{FEFF}."),
-            "U+FEFF",
-            &mut scenarios,
-        );
-
-        let duplicate = format!(
-            "{}\n{}",
-            identity_document(IDENTITY_BODY),
-            identity_document(IDENTITY_BODY)
-        );
-        assert_complete_document_rejected(
-            &fixture,
-            target,
-            duplicate,
-            "identity block markers must appear exactly once",
-            &mut scenarios,
-        );
-        let missing = identity_document(IDENTITY_BODY).replace(IDENTITY_START, "");
-        assert_complete_document_rejected(
-            &fixture,
-            target,
-            missing,
-            "identity block markers must appear exactly once",
-            &mut scenarios,
-        );
-        let malformed =
-            identity_document(&IDENTITY_BODY.replacen(EXPECTED_VERSION, "0.1.0-alpha.2", 1));
-        assert_complete_document_rejected(
-            &fixture,
-            target,
-            malformed,
-            "current identity block does not contain the exact governed values",
-            &mut scenarios,
-        );
-
-        for (prose, expected) in [
-            (
-                "<!-- harmless review note --> The current release version is 0.1.0-alpha.2.",
+            CompleteDocumentScenario::reject_prose(
+                "fence_comment/same_line_comment_then_invalid_visible_prose",
+                "<!-- note --> The current release version is 0.1.0-alpha.2.",
                 "asserted=`0.1.0-alpha.2`",
             ),
-            (
-                "<!-- harmless review note --> The current release tier is production.",
-                "asserted=`production`",
-            ),
-            (
-                "The current release version is 0.1.0-alpha.2. <!-- harmless review note -->",
-                "asserted=`0.1.0-alpha.2`",
-            ),
-            (
-                "The current <!-- harmless review note --> release version is 0.1.0-alpha.2.",
-                "asserted=`0.1.0-alpha.2`",
-            ),
-            (
-                "<!-- first --> The current release tier is production. <!-- second -->",
-                "asserted=`production`",
-            ),
-            (
+            CompleteDocumentScenario::reject_prose(
+                "fence_comment/multiline_comment_then_invalid_visible_prose",
                 "<!-- multiline\ncomment -->\nThe current release version is 0.1.0-alpha.2.",
                 "asserted=`0.1.0-alpha.2`",
             ),
-            (
-                "<!-- multiline\ncomment --> The current release tier is production.",
-                "asserted=`production`",
+            CompleteDocumentScenario::reject_prose(
+                "fence_comment/unclosed_html_comment",
+                "Visible prose <!-- unclosed",
+                "unclosed HTML comment",
             ),
-            ("Visible prose <!-- unclosed", "unclosed HTML comment"),
-            ("Visible prose --> remains visible", "stray HTML comment close marker"),
-            (
-                "```text\nbenign content\n```\n<!-- note --> The current release version is 0.1.0-alpha.2.",
+            CompleteDocumentScenario::accept_prose(
+                "fence_comment/comment_markers_inside_valid_fence",
+                "```text\n<!-- markers remain fenced -->\nThe current release tier is production.\n```\nThe current release tier is research_software_alpha.",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "fence_comment/backtick_info_comment_then_invalid_version",
+                "```text <!--\nbenign fenced content\n```\nThe current release version is 0.1.0-alpha.2.",
                 "asserted=`0.1.0-alpha.2`",
             ),
-            (
-                "<!-- note --> The current release\nversion is 0.1.0-alpha.2.",
-                "asserted=`0.1.0-alpha.2`",
-            ),
-            (
-                "<!-- historical Beta 1 comment --> The current release tier is production.",
+            CompleteDocumentScenario::reject_prose(
+                "fence_comment/tilde_info_comment_then_invalid_tier",
+                "~~~text <!--\nbenign fenced content\n~~~\nThe current release tier is production.",
                 "asserted=`production`",
             ),
-        ] {
-            assert_complete_document_rejected(
-                &fixture,
-                target,
-                document_with_prose(prose),
-                expected,
-                &mut scenarios,
-            );
-        }
-        let comment_crlf = document_with_prose(
-            "<!-- review note --> The current release version is 0.1.0-alpha.2.",
-        )
-        .replace('\n', "\r\n");
-        assert_complete_document_rejected(
-            &fixture,
-            target,
-            comment_crlf,
-            "asserted=`0.1.0-alpha.2`",
-            &mut scenarios,
-        );
+            CompleteDocumentScenario::reject_prose(
+                "fence_comment/fenced_content_comment_then_invalid_visible_version",
+                "```text\n<!-- fenced marker -->\n```\nThe current release version is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "fence_comment/comment_like_apparent_close_then_true_close",
+                "```text\n``` <!-- not a valid close\nThe current release version is 0.1.0-alpha.2.\n```\nThe current release tier is production.",
+                "asserted=`production`",
+            ),
+            CompleteDocumentScenario::accept_prose(
+                "fence_comment/html_comment_before_fence",
+                "<!-- before fence -->\n```text <!-- info\nbenign\n```\nThe current release version is 0.1.0-alpha.1.",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "fence_comment/html_comment_after_fence",
+                "```text\nbenign\n```\n<!-- after fence --> The current release version is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            CompleteDocumentScenario::accept_prose(
+                "fence_comment/multiline_comments_surround_closed_fence",
+                "<!-- before\ncomment -->\n```text <!-- info\nbenign\n```\n<!-- after\ncomment -->\nThe current release version is 0.1.0-alpha.1.",
+            ),
+            CompleteDocumentScenario::reject_document(
+                "fence_comment/crlf_exact_opener_comment_leak",
+                document_with_prose("```text <!--\nbenign fenced content\n```\nThe current release version is 0.1.0-alpha.2.\n-->").replace('\n', "\r\n"),
+                "stray HTML comment close marker",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "fence_comment/unclosed_fence_with_comment_markers",
+                "````text <!--\n<!-- fenced marker -->\n```",
+                "unclosed Markdown fence",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "fence_comment/unclosed_comment_after_closed_fence",
+                "```text <!-- info\nbenign\n```\nVisible prose <!-- unclosed",
+                "unclosed HTML comment",
+            ),
+            // Negation and polarity.
+            CompleteDocumentScenario::reject_prose(
+                "polarity/exact_not_true_not_current",
+                "It is not true that 0.1.0-alpha.2 is not the current release version.",
+                "reason=multiple_or_nested_negation_tokens",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "polarity/not_false_current",
+                "It is not false that 0.1.0-alpha.2 is the current release version.",
+                "reason=multiple_or_nested_negation_tokens",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "polarity/cannot_be_said_not_current",
+                "It cannot be said that 0.1.0-alpha.2 is not the current release version.",
+                "polarity=ambiguous",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "polarity/not_merely",
+                "It is not merely the current release version 0.1.0-alpha.2.",
+                "polarity=ambiguous",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "polarity/not_only",
+                "It is not only the current release tier production.",
+                "polarity=ambiguous",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "polarity/double_negation_soft_wrap",
+                "It is not true that 0.1.0-alpha.2 is not the current release\nversion.",
+                "reason=multiple_or_nested_negation_tokens",
+            ),
+            CompleteDocumentScenario::reject_document(
+                "polarity/double_negation_crlf",
+                document_with_prose("It is not true that 0.1.0-alpha.2 is not the current release version.").replace('\n', "\r\n"),
+                "reason=multiple_or_nested_negation_tokens",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "polarity/supported_negative_then_invalid_affirmative",
+                "0.1.0-alpha.2 is not the current release version; the current release version is 0.1.0-alpha.2.",
+                "polarity=affirmative",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "polarity/historical_negative_then_invalid_current",
+                "The historical tier was not production; the current release tier is production.",
+                "asserted=`production`",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "polarity/double_negation_beside_canonical_token",
+                "Canonical token: 0.1.0-alpha.1; it is not true that 0.1.0-alpha.2 is not the current release version.",
+                "reason=multiple_or_nested_negation_tokens",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "polarity/multiple_current_claims_conflicting_polarity",
+                "The current release tier is not production; the current release tier is production.",
+                "polarity=affirmative",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "polarity/never_merely",
+                "Never merely the current release tier is Beta 1.",
+                "polarity=ambiguous",
+            ),
+            CompleteDocumentScenario::accept_prose(
+                "polarity/supported_simple_negative_version",
+                "0.1.0-alpha.2 is not the current release version.",
+            ),
+            CompleteDocumentScenario::accept_prose(
+                "polarity/supported_simple_negative_tier",
+                "The current release tier is not production.",
+            ),
+            CompleteDocumentScenario::accept_prose(
+                "polarity/supported_does_not_claim",
+                "This document does not claim production as the current tier.",
+            ),
+            CompleteDocumentScenario::accept_prose(
+                "polarity/supported_negative_then_correct_identity",
+                "0.1.0-alpha.2 is not the current release version; the current release version is 0.1.0-alpha.1.",
+            ),
+            CompleteDocumentScenario::accept_prose(
+                "polarity/negative_example_in_fence",
+                "```text\n0.1.0-alpha.1 is not the current release version.\n```\nThe current release version is 0.1.0-alpha.1.",
+            ),
+            CompleteDocumentScenario::accept_prose(
+                "polarity/negative_inline_example_with_valid_prose",
+                "Example: `0.1.0-alpha.1 is not the current release version.` The current release version is 0.1.0-alpha.1.",
+            ),
+            // Document structure and encoding.
+            CompleteDocumentScenario::reject_prose(
+                "structure_encoding/lf_invalid_version",
+                "The current release version is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            CompleteDocumentScenario::reject_document(
+                "structure_encoding/crlf_invalid_tier",
+                document_with_prose("The current release tier is production.").replace('\n', "\r\n"),
+                "asserted=`production`",
+            ),
+            CompleteDocumentScenario::reject_document(
+                "structure_encoding/mixed_newlines_invalid_version",
+                document_with_prose("The current release version is 0.1.0-alpha.2.").replacen('\n', "\r\n", 5),
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "structure_encoding/multiline_soft_break",
+                "The current release\nversion is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "structure_encoding/multiline_hard_break",
+                "The current release  \nversion is 0.1.0-alpha.2.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "structure_encoding/historical_clause_invalid_current",
+                "Historical Beta 1 used 0.0.1; the current release tier is production.",
+                "asserted=`production`",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "structure_encoding/historical_section_invalid_current",
+                "## Historical Beta 1\n\nThe old tier was beta1-concept.\n\n## Current release\n\nThe current release tier is production.",
+                "asserted=`production`",
+            ),
+            CompleteDocumentScenario::reject_document(
+                "structure_encoding/utf8_bom",
+                utf8_bom,
+                "UTF-8 BOM",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "structure_encoding/embedded_ufeff",
+                "Embedded U+FEFF: \u{FEFF}.",
+                "U+FEFF",
+            ),
+            CompleteDocumentScenario::reject_document(
+                "structure_encoding/invalid_utf8",
+                invalid_utf8,
+                "invalid UTF-8",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "structure_encoding/mojibake",
+                "Mojibake marker: AlphÃ.",
+                "mojibake",
+            ),
+            CompleteDocumentScenario::reject_document(
+                "structure_encoding/duplicate_identity_block",
+                format!("{}\n{}", identity_document(IDENTITY_BODY), identity_document(IDENTITY_BODY)),
+                "identity block markers must appear exactly once",
+            ),
+            CompleteDocumentScenario::reject_document(
+                "structure_encoding/missing_identity_block",
+                identity_document(IDENTITY_BODY).replace(IDENTITY_START, ""),
+                "identity block markers must appear exactly once",
+            ),
+            CompleteDocumentScenario::reject_document(
+                "structure_encoding/malformed_identity_block",
+                identity_document(&IDENTITY_BODY.replacen(EXPECTED_VERSION, "0.1.0-alpha.2", 1)),
+                "current identity block does not contain the exact governed values",
+            ),
+            // Immediate claim/value binding.
+            CompleteDocumentScenario::reject_prose(
+                "claim_binding/invalid_version_with_canonical_elsewhere",
+                "Current release version is 0.1.0-alpha.2; expected example: 0.1.0-alpha.1.",
+                "asserted=`0.1.0-alpha.2`",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "claim_binding/invalid_machine_tier_with_canonical_elsewhere",
+                "Current release tier is production; identifier example: research_software_alpha.",
+                "asserted=`production`",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "claim_binding/invalid_display_tier_with_machine_token",
+                "Current display tier is Production; machine identifier: research_software_alpha.",
+                "asserted=`Production`",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "claim_binding/inline_example_beside_invalid_visible_claim",
+                "Example: `the current release tier is research_software_alpha`; the current release tier is production.",
+                "asserted=`production`",
+            ),
+            CompleteDocumentScenario::reject_prose(
+                "claim_binding/multiple_current_claims_one_invalid",
+                "The current release version is 0.1.0-alpha.1; the current release tier is production.",
+                "asserted=`production`",
+            ),
+        ];
 
-        for prose in [
-            "It is not merely the current release version 0.1.0-alpha.2.",
-            "It is not only the current release tier production.",
-            "It is not simply the current machine tier production_ready.",
-            "It is not historical but the current release version is 0.1.0-alpha.2.",
-            "Never merely the current release tier is Beta 1.",
-            "0.1.0-alpha.2 is not the current release version; the current release version is 0.1.0-alpha.2.",
-            "It is not merely the current release\nversion 0.1.0-alpha.2.",
-            "`not` is an example; the current release version is 0.1.0-alpha.2.",
-            "The historical tier was not production; the current release tier is production.",
-            "The current release tier is not not production.",
-            "It is not uncommon; the current release version is 0.1.0-alpha.2.",
-        ] {
-            assert_complete_document_rejected(
-                &fixture,
-                target,
-                document_with_prose(prose),
-                "polarity=",
-                &mut scenarios,
+        let mut names = BTreeSet::new();
+        let mut category_counts = BTreeMap::new();
+        for scenario in &scenarios {
+            assert!(
+                names.insert(scenario.name),
+                "duplicate complete public-command scenario name: {}",
+                scenario.name
             );
+            let category = scenario
+                .name
+                .split_once('/')
+                .expect("scenario names must use category/name")
+                .0;
+            *category_counts.entry(category).or_insert(0usize) += 1;
         }
-        let not_only_crlf =
-            document_with_prose("It is not only the current release tier production.")
-                .replace('\n', "\r\n");
-        assert_complete_document_rejected(
-            &fixture,
-            target,
-            not_only_crlf,
-            "polarity=ambiguous",
-            &mut scenarios,
-        );
-
-        for prose in [
-            "0.1.0-alpha.2 is not the current release version.",
-            "The current release tier is not production.",
-            "This document does not claim production as the current tier.",
-            "Historical note: 0.1.0-alpha.2 is not the current release version; the current release version is 0.1.0-alpha.1.",
-            "The current release version is 0.1.0-alpha.1. <!-- harmless note -->",
-            "```text\n<!-- comment markers stay in the fence\n-->\nThe current release tier is production.\n```\nThe current release tier is research_software_alpha.",
-            "```text\n0.1.0-alpha.1 is not the current release version.\n```\nThe current release version is 0.1.0-alpha.1.",
-            "0.1.0-alpha.2 is not the current release version; the current release tier is research_software_alpha.",
-        ] {
-            assert_complete_document_accepted(
-                &fixture,
-                target,
-                document_with_prose(prose),
-                &mut scenarios,
-            );
-        }
-
         assert_eq!(
-            scenarios, COMPLETE_PUBLIC_COMMAND_FIXTURE_COUNT,
+            scenarios.len(),
+            COMPLETE_PUBLIC_COMMAND_FIXTURE_COUNT,
             "documented complete public-command scenario count must stay synchronized"
         );
+        assert_eq!(
+            category_counts,
+            BTreeMap::from([
+                ("claim_binding", 5usize),
+                ("fence_comment", 18usize),
+                ("polarity", 18usize),
+                ("structure_encoding", 14usize),
+            ])
+        );
+        let status =
+            fs::read_to_string(repository_root().join("docs/release/v0.1.0-alpha.1-status.md"))
+                .expect("release status should be readable for matrix synchronization");
+        assert!(
+            status.contains(&format!(
+                "- Complete public-command fixture scenarios: `{}`",
+                scenarios.len()
+            )),
+            "release status must report the derived complete public-command scenario count"
+        );
+        assert!(
+            status.contains("- Complete public-command fixture categories: `fence_comment=18; polarity=18; structure_encoding=14; claim_binding=5`"),
+            "release status must report the derived complete public-command categories"
+        );
+
+        for scenario in scenarios {
+            fixture.write(target, scenario.contents);
+            match scenario.expected_error {
+                Some(expected) => {
+                    let error = match verify_release_identity(&fixture.path) {
+                        Ok(()) => panic!(
+                            "scenario {} should be rejected by the complete public verifier",
+                            scenario.name
+                        ),
+                        Err(error) => error,
+                    };
+                    assert!(
+                        error.contains(expected),
+                        "scenario {}: {error:?} did not contain {expected:?}",
+                        scenario.name
+                    );
+                }
+                None => verify_release_identity(&fixture.path)
+                    .unwrap_or_else(|error| panic!("scenario {}: {error}", scenario.name)),
+            }
+        }
     }
 
     // Production-loader fixtures: real Cargo workspaces and real `cargo metadata` output.
