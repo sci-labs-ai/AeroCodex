@@ -3,8 +3,10 @@
 use std::{
     env,
     ffi::OsStr,
+    fs,
     path::PathBuf,
     process::{Command, Output},
+    time::{SystemTime, UNIX_EPOCH},
 };
 
 fn binary_path() -> PathBuf {
@@ -27,6 +29,14 @@ fn run(arguments: &[&str]) -> Output {
         .expect("aerocodex binary should execute")
 }
 
+fn run_with_env(arguments: &[&str], key: &str, value: &str) -> Output {
+    Command::new(binary_path())
+        .args(arguments)
+        .env(key, value)
+        .output()
+        .expect("aerocodex binary should execute")
+}
+
 fn stdout(output: &Output) -> String {
     String::from_utf8(output.stdout.clone()).expect("stdout should be valid text")
 }
@@ -36,7 +46,8 @@ fn stderr(output: &Output) -> String {
 }
 
 fn assert_json_semantics_with_python(text: &str, script: &str) {
-    let mut parser = Command::new("python3")
+    let python = if cfg!(windows) { "python" } else { "python3" };
+    let mut parser = Command::new(python)
         .arg("-c")
         .arg(script)
         .stdin(std::process::Stdio::piped())
@@ -117,15 +128,29 @@ fn version_json_exposes_bounded_release_identity() {
     assert!(output.status.success(), "{}", stderr(&output));
     let text = stdout(&output);
     assert_success_json_envelope(&text, "version");
-    assert!(text.contains("\"package_version\":\"0.0.1\""));
-    assert!(text.contains("\"release_channel\":\"beta1-concept\""));
+    assert!(text.contains("\"package_version\":\"0.1.0-alpha.1\""));
+    assert!(text.contains("\"program_name\":\"aerocodex\""));
+    assert!(text.contains("\"semantic_version\":\"0.1.0-alpha.1\""));
+    assert!(text.contains("\"release_tier\":\"research_software_alpha\""));
+    assert!(text.contains("\"release_tier_display\":\"Research Software Alpha\""));
+    assert!(text.contains("\"workspace_package_count\":14"));
     assert!(text.contains("\"build_commit\":"));
     assert!(text.contains("\"build_target\":"));
     assert!(text.contains("\"build_profile\":"));
     assert!(text.contains("\"supported_formula_count\":12"));
     assert!(text.contains("\"registry_formula_count\":152"));
+    assert!(text.contains("\"blocked_formula_count\":152"));
+    assert!(text.contains("\"public_executable_formula_count\":0"));
     assert!(text.contains("\"validation_status\":\"research_required\""));
     assert!(text.contains("\"safety_notice\":"));
+}
+
+#[test]
+fn standard_version_uses_cargo_package_version() {
+    let output = run(&["--version"]);
+    assert!(output.status.success(), "{}", stderr(&output));
+    assert_eq!(stdout(&output), "aerocodex 0.1.0-alpha.1\n");
+    assert!(stderr(&output).is_empty());
 }
 
 #[test]
@@ -314,6 +339,10 @@ assert report["error"] is None
 assert isinstance(report["warnings"], list)
 assert report["registry_schema_version"] == "aerocodex.formula_registry.v1"
 assert report["registry_formula_count"] == 152
+assert report["program_name"] == "aerocodex"
+assert report["semantic_version"] == "0.1.0-alpha.1"
+assert report["release_tier"] == "research_software_alpha"
+assert report["release_tier_display"] == "Research Software Alpha"
 assert report["total_formula_count"] == 152
 assert report["inventory_formula_count"] == 152
 assert report["total_formula_count"] == sum(report["counts_by_status"].values())
@@ -324,6 +353,7 @@ assert report["counts_by_execution_policy"] == {"blocked": 152}
 assert report["blocked_formula_count"] == 152
 assert report["normal_executable_count"] == 0
 assert report["executable_formula_count"] == 0
+assert report["public_executable_formula_count"] == 0
 assert report["preliminary_only_formula_count"] == 0
 assert report["m07_candidate_count"] == 0
 assert report["promotion_candidate_count"] == 0
@@ -683,5 +713,56 @@ fn self_check_is_green_and_complete() {
     assert_success_json_envelope(&text, "self-check");
     assert!(text.contains("\"passed\":14"));
     assert!(text.contains("\"failed\":0"));
+    assert!(text.contains("\"semantic_version\":\"0.1.0-alpha.1\""));
+    assert!(text.contains("\"release_tier\":\"research_software_alpha\""));
     assert!(text.contains("\"name\":\"overflow_is_rejected\""));
+}
+
+#[test]
+fn forced_self_check_failure_uses_real_process_contract() {
+    let output = run_with_env(
+        &["self-check", "--json"],
+        "AEROCODEX_TEST_FORCE_SELF_CHECK_FAILURE",
+        "1",
+    );
+    assert_eq!(output.status.code(), Some(5));
+    assert!(stderr(&output).is_empty(), "{}", stderr(&output));
+    let text = stdout(&output);
+    assert_error_json_envelope(&text, "self-check", "self_check_failed");
+    assert!(text.contains("\"passed\":13"));
+    assert!(text.contains("\"failed\":1"));
+    assert!(text.contains("AeroCodex self-check reported 1 failing checks"));
+    assert!(!text.contains("Beta 1"));
+    assert!(!text.contains("beta1-concept"));
+}
+
+#[test]
+fn copied_binary_runs_from_external_directory_without_repository_context() {
+    let nonce = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("system clock should follow UNIX_EPOCH")
+        .as_nanos();
+    let directory = env::temp_dir().join(format!(
+        "aerocodex_cli_external_test_{}_{}",
+        std::process::id(),
+        nonce
+    ));
+    fs::create_dir(&directory).expect("external test directory should be created");
+    let source = binary_path();
+    let destination = directory.join(source.file_name().expect("binary should have a file name"));
+    fs::copy(&source, &destination).expect("CLI binary should copy outside the repository");
+    for forbidden in [".git", "Cargo.toml", "docs", "v0.1.0-alpha.1.toml"] {
+        assert!(!directory.join(forbidden).exists());
+    }
+    let output = Command::new(&destination)
+        .current_dir(&directory)
+        .args(["version", "--json"])
+        .output()
+        .expect("copied CLI should execute from external directory");
+    assert!(output.status.success(), "{}", stderr(&output));
+    let text = stdout(&output);
+    assert!(text.contains("\"semantic_version\":\"0.1.0-alpha.1\""));
+    assert!(text.contains("\"release_tier\":\"research_software_alpha\""));
+    fs::remove_file(&destination).expect("copied CLI should be removable");
+    fs::remove_dir(&directory).expect("empty external test directory should be removable");
 }

@@ -1,5 +1,14 @@
 # Research Alpha JSON contract
 
+<!-- aerocodex-current-identity:start -->
+Release version: `0.1.0-alpha.1`
+Release tier: `research_software_alpha` (`Research Software Alpha`)
+Workspace packages: `14`
+Registry formulas: `152`
+Blocked formulas: `152`
+Publicly executable formulas: `0`
+<!-- aerocodex-current-identity:end -->
+
 RR-024 defines the stable JSON envelope used by the AeroCodex research-alpha CLI. Human-readable output remains the default. JSON is emitted only when `--json` is supplied.
 
 AeroCodex JSON is for agents, notebooks, regression tests, and later APIs. It is not a validation-status promotion, execution approval, certification, flight-readiness claim, mission-readiness claim, habitat-safety claim, life-support claim, NASA approval, or regulatory approval.
@@ -10,6 +19,7 @@ AeroCodex JSON is for agents, notebooks, regression tests, and later APIs. It is
 - Success responses set `ok=true` and `error=null`.
 - Error responses set `ok=false` and populate `error.code` plus `error.message`.
 - `command` is the stable command label, for example `formula_list`, `formula describe`, `formula run`, `describe`, `run`, `version`, or `self-check`.
+- Identity-bearing responses use typed `program_name`, `semantic_version`, `release_tier`, and `release_tier_display` fields. Formula validation and execution-policy fields remain separate.
 - `formula_id` is present when the command or error can identify a formula.
 - `status`, `execution_policy`, and `quarantine_state` preserve registry/status meanings. They do not imply execution approval.
 - `registry_schema_version` identifies the generated Formula Registry schema used by the CLI when registry metadata is involved.
@@ -218,7 +228,10 @@ Shape on stderr:
     "code": "formula_not_found",
     "message": "unknown formula id `no.such`"
   },
-  "release_channel": "beta1-concept",
+  "program_name": "aerocodex",
+  "semantic_version": "0.1.0-alpha.1",
+  "release_tier": "research_software_alpha",
+  "release_tier_display": "Research Software Alpha",
   "validation_status": "research_required",
   "safety_notice": "research/preliminary-design software; not certified, flight-ready, mission-ready, operational, medical, habitat-safe, or approved for regulated use"
 }
@@ -243,7 +256,10 @@ Shape on stderr:
     "code": "execution_blocked_by_status",
     "message": "formula `aerodynamics.coefficients.drag_coefficient` execution is blocked by status `research_required` with execution_policy `blocked`"
   },
-  "release_channel": "beta1-concept",
+  "program_name": "aerocodex",
+  "semantic_version": "0.1.0-alpha.1",
+  "release_tier": "research_software_alpha",
+  "release_tier_display": "Research Software Alpha",
   "validation_status": "research_required",
   "safety_notice": "research/preliminary-design software; not certified, flight-ready, mission-ready, operational, medical, habitat-safe, or approved for regulated use"
 }
@@ -280,7 +296,10 @@ Shape:
 {
   "ok": true,
   "command": "self-check",
-  "release_channel": "beta1-concept",
+  "program_name": "aerocodex",
+  "semantic_version": "0.1.0-alpha.1",
+  "release_tier": "research_software_alpha",
+  "release_tier_display": "Research Software Alpha",
   "supported_formula_count": 12,
   "passed": 14,
   "failed": 0,
@@ -326,7 +345,7 @@ If any self-check row fails, the same command emits the report once with an erro
   "safety_notice": "research/preliminary-design software; not certified, flight-ready, mission-ready, operational, medical, habitat-safe, or approved for regulated use",
   "error": {
     "code": "self_check_failed",
-    "message": "Beta 1 self-check reported 1 failing checks"
+    "message": "AeroCodex self-check reported 1 failing checks"
   }
 }
 ```

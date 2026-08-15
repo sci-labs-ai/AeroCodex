@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-TOTAL_STEPS=18
+TOTAL_STEPS=19
 CURRENT_STEP=0
 
 info() {
@@ -73,7 +73,7 @@ preflight_required_xtask_commands() {
     fail "stop condition: xtask dependency-policy command is not present yet"
   fi
 
-  for release_command in verify-checksums verify-release-manifest verify-generated; do
+  for release_command in verify-checksums verify-release-manifest verify-release-identity verify-generated; do
     if ! grep -F "[\"${release_command}\"]" xtask/src/main.rs >/dev/null; then
       fail "stop condition: xtask ${release_command} command is not present yet"
     fi
@@ -266,6 +266,7 @@ run_step "cargo test --all" cargo test --all
 run_step "cargo doc --no-deps" cargo doc --no-deps
 run_step "cargo run -p xtask -- verify --all" cargo run -p xtask -- verify --all
 run_step "cargo run -p xtask -- verify-release-manifest" cargo run -p xtask -- verify-release-manifest
+run_step "cargo run -p xtask -- verify-release-identity" cargo run -p xtask -- verify-release-identity
 run_step "cargo run -p xtask -- verify-checksums" cargo run -p xtask -- verify-checksums
 run_step "cargo run -p xtask -- verify-generated" cargo run -p xtask -- verify-generated
 run_shell_step "equation-batch plan JSON check" 'cargo run -p xtask -- equation-batch plan --all-manifests --json > /tmp/equation_batch_plan.json && python3 -m json.tool /tmp/equation_batch_plan.json >/dev/null'

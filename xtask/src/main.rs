@@ -5,6 +5,7 @@ mod equation_batch;
 mod formula_registry;
 mod fs_identity;
 mod generated_artifacts;
+mod release_identity;
 mod release_manifest;
 
 use std::{
@@ -546,6 +547,10 @@ fn main() {
             let root = repo_root();
             release_manifest::verify_release_manifest(&root)
         }
+        ["verify-release-identity"] => {
+            let root = repo_root();
+            release_identity::verify_release_identity(&root)
+        }
         ["dependency-policy"] => dependency_policy(),
         ["help"] | ["--help"] | ["-h"] => {
             print_usage();
@@ -613,7 +618,7 @@ fn run_formula_registry_check(args: &[&str]) -> Result<(), String> {
 
 fn print_usage() {
     eprintln!(
-        "usage:\n  cargo run -p xtask -- verify --all\n  cargo run -p xtask -- verify cards\n  cargo run -p xtask -- verify source-registry\n  cargo run -p xtask -- verify data-registry\n  cargo run -p xtask -- verify status-vocabulary\n  cargo run -p xtask -- verify formula-vault\n  cargo run -p xtask -- verify equation-inventory\n  cargo run -p xtask -- verify beta1\n  cargo run -p xtask -- verify-release-manifest\n  cargo run -p xtask -- verify-checksums\n  cargo run -p xtask -- generate-checksums\n  cargo run -p xtask -- verify-generated\n  cargo run -p xtask -- equation-batch plan --manifest equation-batches/m00-canonical-units.tsv [--json]\n  cargo run -p xtask -- equation-batch plan --all-manifests [--json]\n  cargo run -p xtask -- equation-batch report --all-manifests --out generated/equation_batch_status_report.json [--check]\n  cargo run -p xtask -- equation-batch generate --manifest equation-batches/m00-canonical-units.tsv --output-dir /tmp/acx-m00-probe [--json]\n  cargo run -p xtask -- equation-batch verify --manifest equation-batches/m00-canonical-units.tsv --output-dir /tmp/acx-m00-probe [--json] [--keep-output]\n  cargo run -p xtask -- equation-batch verify --all-manifests --output-dir /tmp/acx-equation-batch-probes [--json] [--check]\n  cargo run -p xtask -- formula-registry generate --out generated/formula_registry.json [--check]\n  cargo run -p xtask -- formula-registry generate-rust --out generated/rust/formula_registry.rs\n  cargo run -p xtask -- formula-registry check\n  cargo run -p xtask -- dependency-policy"
+        "usage:\n  cargo run -p xtask -- verify --all\n  cargo run -p xtask -- verify cards\n  cargo run -p xtask -- verify source-registry\n  cargo run -p xtask -- verify data-registry\n  cargo run -p xtask -- verify status-vocabulary\n  cargo run -p xtask -- verify formula-vault\n  cargo run -p xtask -- verify equation-inventory\n  cargo run -p xtask -- verify beta1\n  cargo run -p xtask -- verify-release-manifest\n  cargo run -p xtask -- verify-release-identity\n  cargo run -p xtask -- verify-checksums\n  cargo run -p xtask -- generate-checksums\n  cargo run -p xtask -- verify-generated\n  cargo run -p xtask -- equation-batch plan --manifest equation-batches/m00-canonical-units.tsv [--json]\n  cargo run -p xtask -- equation-batch plan --all-manifests [--json]\n  cargo run -p xtask -- equation-batch report --all-manifests --out generated/equation_batch_status_report.json [--check]\n  cargo run -p xtask -- equation-batch generate --manifest equation-batches/m00-canonical-units.tsv --output-dir /tmp/acx-m00-probe [--json]\n  cargo run -p xtask -- equation-batch verify --manifest equation-batches/m00-canonical-units.tsv --output-dir /tmp/acx-m00-probe [--json] [--keep-output]\n  cargo run -p xtask -- equation-batch verify --all-manifests --output-dir /tmp/acx-equation-batch-probes [--json] [--check]\n  cargo run -p xtask -- formula-registry generate --out generated/formula_registry.json [--check]\n  cargo run -p xtask -- formula-registry generate-rust --out generated/rust/formula_registry.rs\n  cargo run -p xtask -- formula-registry check\n  cargo run -p xtask -- dependency-policy"
     );
 }
 
@@ -707,7 +712,7 @@ fn verify_beta1(root: &Path) -> Result<(), String> {
         .map_err(|error| format!("Cargo.toml: {error}"))?;
     for marker in [
         "\"crates/aero-codex-cli\"",
-        "version = \"0.0.1\"",
+        "version = \"0.1.0-alpha.1\"",
         "rust-version = \"1.74\"",
     ] {
         if !workspace_manifest.contains(marker) {
@@ -733,7 +738,7 @@ fn verify_beta1(root: &Path) -> Result<(), String> {
     let cli_source = fs::read_to_string(root.join("crates/aero-codex-cli/src/main.rs"))
         .map_err(|error| format!("aero-codex-cli main.rs: {error}"))?;
     for marker in [
-        "fn release_channel() -> &'static str",
+        "fn release_tier() -> &'static str",
         "env!(\"CARGO_PKG_VERSION\")",
         "fn build_commit() -> &'static str",
         "fn build_target() -> &'static str",
@@ -756,7 +761,7 @@ fn verify_beta1(root: &Path) -> Result<(), String> {
         .map_err(|error| format!("Beta 1 release concept: {error}"))?;
     for marker in [
         "Beta 1 concept",
-        "Cargo version remains `0.0.1`",
+        "historical milestone",
         "research_required",
         "not certified",
         "ten canonical-unit formulas",
@@ -798,7 +803,7 @@ fn verify_beta1(root: &Path) -> Result<(), String> {
     }
 
     println!(
-        "verified Beta 1 concept: channel=beta1-concept; cargo_version=0.0.1; self_check_kernel_count=10; cli_dispatch_formula_count=12; public_executable_formula_count=0; validation_status=research_required; release_packaging=not_public_repo_tracked"
+        "verified historical Beta 1 compatibility material: current_version=0.1.0-alpha.1; current_tier=research_software_alpha; self_check_count=14; cli_dispatch_formula_count=12; public_executable_formula_count=0"
     );
     Ok(())
 }
@@ -899,7 +904,7 @@ fn verify_all() -> Result<(), String> {
     verify_equation_inventory(&root)?;
     verify_equation_batch_scaffold(&root)?;
     verify_beta1(&root)?;
-    release_manifest::verify_release_manifest(&root)?;
+    release_identity::verify_release_identity(&root)?;
     Ok(())
 }
 

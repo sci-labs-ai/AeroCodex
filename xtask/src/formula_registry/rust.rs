@@ -98,6 +98,19 @@ struct RustFormulaEntry {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct CheckedFormulaIdentityRow {
+    pub formula_id: String,
+    pub status: String,
+    pub execution_policy: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct CheckedFormulaIdentityRegistry {
+    pub formula_count: usize,
+    pub formulas: Vec<CheckedFormulaIdentityRow>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum JsonValue {
     Null,
     Bool,
@@ -134,6 +147,24 @@ pub(crate) fn render_registry_module_from_json_text(json: &str) -> Result<String
 
 pub(crate) fn parse_json_value(json: &str) -> Result<JsonValue, String> {
     JsonParser::new(json).parse()
+}
+
+pub(crate) fn load_checked_formula_identity_registry(
+    root: &Path,
+) -> Result<CheckedFormulaIdentityRegistry, String> {
+    let registry = load_checked_formula_registry(root)?;
+    Ok(CheckedFormulaIdentityRegistry {
+        formula_count: registry.formula_count,
+        formulas: registry
+            .formulas
+            .into_iter()
+            .map(|formula| CheckedFormulaIdentityRow {
+                formula_id: formula.formula_id,
+                status: formula.status,
+                execution_policy: formula.execution_policy,
+            })
+            .collect(),
+    })
 }
 
 fn require_approved_output_path(out: &Path) -> Result<(), String> {

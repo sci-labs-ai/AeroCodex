@@ -1,6 +1,15 @@
 # Beta 1 concept CLI quickstart
 
-The `aerocodex` binary is a bounded, research-only inventory and status surface with twelve M00 dispatch-linked records: ten canonical-unit records and two angle-conversion records. The current registry keeps every record at `research_required` with `execution_policy=blocked`, so none is publicly executable. Runtime dispatch links support internal self-checking and future governed promotion work; they are not execution authorization.
+<!-- aerocodex-current-identity:start -->
+Release version: `0.1.0-alpha.1`
+Release tier: `research_software_alpha` (`Research Software Alpha`)
+Workspace packages: `14`
+Registry formulas: `152`
+Blocked formulas: `152`
+Publicly executable formulas: `0`
+<!-- aerocodex-current-identity:end -->
+
+This page preserves the historical Beta 1 command surface as compatibility documentation. The current `aerocodex` binary is a bounded, research-only inventory and status surface with twelve M00 dispatch-linked records: ten canonical-unit records and two angle-conversion records. The current registry keeps every record at `research_required` with `execution_policy=blocked`, so none is publicly executable. Runtime dispatch links support internal self-checking and future governed promotion work; they are not execution authorization. Beta 1 is not the current runtime identity.
 
 It is not certified, flight-ready, mission-ready, operational, medical, habitat-safe, or approved for regulated use.
 
@@ -87,4 +96,4 @@ cargo run -p xtask -- dependency-policy
 cargo run -p aero-codex-cli -- self-check --json
 ```
 
-This remains a `research_required` Beta 1 concept check, not a certified or operational release. See [`release_testing.md`](release_testing.md).
+Formula validation remains `research_required`. This historical Beta 1 compatibility check is not a certified or operational release; the current release identity is `0.1.0-alpha.1` and `research_software_alpha`. See [`release_testing.md`](release_testing.md).
