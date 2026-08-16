@@ -426,17 +426,145 @@ mod tests {
     static TEST_COUNTER: AtomicUsize = AtomicUsize::new(0);
     const HASH: &str = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad";
 
-    fn test_root(name: &str) -> PathBuf {
+    fn test_root_path(name: &str) -> PathBuf {
         let serial = TEST_COUNTER.fetch_add(1, Ordering::Relaxed);
-        let root = std::env::temp_dir().join(format!(
+        std::env::temp_dir().join(format!(
             "aerocodex-checksums-{name}-{}-{serial}",
             std::process::id()
-        ));
+        ))
+    }
+
+    fn test_root(name: &str) -> PathBuf {
+        let root = test_root_path(name);
         if root.exists() {
             fs::remove_dir_all(&root).expect("remove stale checksum test directory");
         }
         fs::create_dir_all(root.join("checksums")).expect("create checksum test directory");
         root
+    }
+
+    struct ChecksumFixture {
+        root: PathBuf,
+        armed: bool,
+    }
+
+    impl ChecksumFixture {
+        fn create(name: &str) -> Self {
+            let fixture = Self {
+                root: test_root_path(name),
+                armed: true,
+            };
+            if fixture.root.exists() {
+                fs::remove_dir_all(&fixture.root)
+                    .expect("remove stale guarded checksum test directory");
+            }
+            fs::create_dir_all(fixture.root.join("checksums"))
+                .expect("create guarded checksum test directory");
+            fixture
+        }
+
+        fn root(&self) -> &Path {
+            &self.root
+        }
+
+        fn cleanup(self) -> std::io::Result<()> {
+            self.cleanup_with(|path| fs::remove_dir_all(path))
+        }
+
+        fn cleanup_with(
+            mut self,
+            cleanup: impl FnOnce(&Path) -> std::io::Result<()>,
+        ) -> std::io::Result<()> {
+            match cleanup(&self.root) {
+                Ok(()) => {
+                    self.armed = false;
+                    Ok(())
+                }
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                    self.armed = false;
+                    Ok(())
+                }
+                Err(error) => Err(error),
+            }
+        }
+    }
+
+    impl Drop for ChecksumFixture {
+        fn drop(&mut self) {
+            if self.armed {
+                let _ = fs::remove_dir_all(&self.root);
+            }
+        }
+    }
+
+    #[test]
+    fn checksum_fixture_cleanup_is_explicit_and_reports_errors() {
+        let fixture = ChecksumFixture::create("guard-normal-cleanup");
+        let root = fixture.root().to_path_buf();
+        fs::write(root.join("artifact.txt"), b"fixture\n").expect("write guarded fixture");
+        fixture
+            .cleanup()
+            .expect("explicit fixture cleanup should succeed");
+        assert!(!root.exists(), "explicit cleanup must remove the fixture");
+
+        let fixture = ChecksumFixture::create("guard-cleanup-error");
+        let root = fixture.root().to_path_buf();
+        fs::write(root.join("artifact.txt"), b"fixture\n").expect("write guarded fixture");
+        let error = fixture
+            .cleanup_with(|path| {
+                assert!(path.exists(), "cleanup must receive the live fixture root");
+                Err(std::io::Error::new(
+                    std::io::ErrorKind::PermissionDenied,
+                    "sentinel cleanup failure",
+                ))
+            })
+            .expect_err("explicit cleanup errors must be reported");
+        assert_eq!(error.kind(), std::io::ErrorKind::PermissionDenied);
+        assert_eq!(error.to_string(), "sentinel cleanup failure");
+        assert!(
+            !root.exists(),
+            "best-effort Drop cleanup must still run after a reported cleanup error"
+        );
+
+        let fixture = ChecksumFixture::create("guard-already-removed");
+        let root = fixture.root().to_path_buf();
+        fs::write(root.join("artifact.txt"), b"fixture\n").expect("write guarded fixture");
+        fs::remove_dir_all(&root).expect("remove fixture before explicit cleanup");
+        fixture
+            .cleanup()
+            .expect("an already-removed fixture is intentionally clean");
+        assert!(!root.exists(), "the removed fixture must stay absent");
+    }
+
+    #[test]
+    fn checksum_fixture_cleanup_preserves_panic_during_unwind() {
+        const SENTINEL: &str = "checksum fixture unwind sentinel";
+        let (path_sender, path_receiver) = std::sync::mpsc::sync_channel(1);
+        let unwind = std::panic::catch_unwind(move || {
+            let fixture = ChecksumFixture::create("guard-forced-unwind");
+            let root = fixture.root().to_path_buf();
+            fs::write(root.join("artifact.txt"), b"fixture\n")
+                .expect("write fixture before forced unwind");
+            path_sender
+                .send(root)
+                .expect("publish fixture path before forced unwind");
+            panic!("{SENTINEL}");
+        });
+
+        let root = path_receiver
+            .recv()
+            .expect("forced-unwind branch must publish its fixture path");
+        let payload = unwind.expect_err("forced-unwind branch must panic");
+        let panic_message = payload
+            .downcast_ref::<&str>()
+            .map(|message| (*message).to_string())
+            .or_else(|| payload.downcast_ref::<String>().cloned())
+            .expect("sentinel panic payload must remain a string");
+        assert_eq!(panic_message, SENTINEL);
+        assert!(
+            !root.exists(),
+            "scope-owned fixture must be removed while unwinding"
+        );
     }
 
     fn entry(path: &str, bytes: &[u8]) -> ChecksumEntry {
@@ -588,18 +716,19 @@ mod tests {
         let (invalid_name, expected_error) = invalid_governed_filename();
 
         #[cfg(unix)]
-        let (root, raw_fixture_created) = {
-            let root = test_root("invalid-governed-path");
-            fs::write(root.join("artifact-�.txt"), b"lossy-alias\n")
+        let (fixture, raw_fixture_created) = {
+            let fixture = ChecksumFixture::create("invalid-governed-path");
+            fs::write(fixture.root().join("artifact-�.txt"), b"lossy-alias\n")
                 .expect("write replacement-character alias fixture");
-            let raw_fixture_created = match fs::write(root.join(&invalid_name), b"raw-name\n") {
-                Ok(()) => true,
-                Err(error) if cfg!(target_os = "macos") && error.raw_os_error() == Some(92) => {
-                    false
-                }
-                Err(error) => panic!("write raw filename fixture: {error}"),
-            };
-            (root, raw_fixture_created)
+            let raw_fixture_created =
+                match fs::write(fixture.root().join(&invalid_name), b"raw-name\n") {
+                    Ok(()) => true,
+                    Err(error) if cfg!(target_os = "macos") && error.raw_os_error() == Some(92) => {
+                        false
+                    }
+                    Err(error) => panic!("write raw filename fixture: {error}"),
+                };
+            (fixture, raw_fixture_created)
         };
 
         assert_invalid_governed_filename_rejected_without_aliasing(&invalid_name, expected_error);
@@ -607,27 +736,30 @@ mod tests {
         #[cfg(unix)]
         {
             if raw_fixture_created {
-                let generation_error = generate_checksum_entries(&root)
+                let generation_error = generate_checksum_entries(fixture.root())
                     .expect_err("generation must not omit an invalid native filename");
                 assert_eq!(generation_error, expected_error);
                 assert_eq!(
-                    generate_checksum_entries(&root)
+                    generate_checksum_entries(fixture.root())
                         .expect_err("diagnostic must be deterministic on repeated discovery"),
                     expected_error
                 );
 
-                let verification_error =
-                    verify_entries(&root, &[entry("artifact-�.txt", b"lossy-alias\n")], true)
-                        .expect_err(
-                            "a valid replacement-character entry cannot alias the raw filename",
-                        );
+                let verification_error = verify_entries(
+                    fixture.root(),
+                    &[entry("artifact-�.txt", b"lossy-alias\n")],
+                    true,
+                )
+                .expect_err("a valid replacement-character entry cannot alias the raw filename");
                 assert_eq!(verification_error, expected_error);
                 assert!(
                     !verification_error.contains("governed file is absent"),
                     "discovery must fail before a lossy set comparison can occur"
                 );
             }
-            fs::remove_dir_all(root).expect("remove checksum test directory");
+            fixture
+                .cleanup()
+                .expect("remove guarded checksum test directory");
         }
     }
 
