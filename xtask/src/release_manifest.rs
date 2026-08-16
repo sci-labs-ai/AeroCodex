@@ -7,9 +7,10 @@ use std::{
 
 pub const RELEASE_MANIFEST_PATH: &str = "docs/release/v0.1.0-alpha.1.toml";
 pub const CLI_DISPATCH_METADATA_PATH: &str = "crates/aero-codex-cli/dispatch_metadata.tsv";
-const RELEASE_SCHEMA_VERSION: &str = "aerocodex.release_manifest.v1";
+const RELEASE_SCHEMA_VERSION: &str = "aerocodex.release_manifest.v2";
 const RELEASE_VERSION: &str = "0.1.0-alpha.1";
 const RELEASE_TIER: &str = "research_software_alpha";
+const RELEASE_TIER_DISPLAY: &str = "Research Software Alpha";
 const CLI_DISPATCH_SCHEMA_VERSION: &str = "aerocodex.cli_dispatch.v1";
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -17,6 +18,8 @@ pub struct ReleaseManifest {
     pub schema_version: String,
     pub release_version: String,
     pub release_tier: String,
+    pub release_tier_display: String,
+    pub program_name: String,
     pub source_revision_policy: String,
     pub base_commit: String,
     pub validation_status: String,
@@ -25,10 +28,19 @@ pub struct ReleaseManifest {
     pub validation_record: String,
     pub documentation: String,
     pub registry_formula_count: usize,
+    pub registry_research_required_formula_count: usize,
+    pub registry_blocked_formula_count: usize,
     pub cli_dispatch_metadata: String,
     pub cli_dispatch_formula_count: usize,
     pub public_executable_formula_count: usize,
+    pub packages: Vec<ReleasePackage>,
     pub formulas: Vec<ReleaseFormula>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReleasePackage {
+    pub name: String,
+    pub manifest_path: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -49,10 +61,7 @@ struct CliDispatchFormula {
 }
 
 pub fn verify_release_manifest(root: &Path) -> Result<(), String> {
-    let path = root.join(RELEASE_MANIFEST_PATH);
-    let text = fs::read_to_string(&path)
-        .map_err(|error| format!("cannot read {RELEASE_MANIFEST_PATH}: {error}"))?;
-    let manifest = parse_release_manifest(&text)?;
+    let manifest = load_release_manifest(root)?;
 
     if manifest.schema_version != RELEASE_SCHEMA_VERSION {
         return Err(format!(
@@ -70,6 +79,18 @@ pub fn verify_release_manifest(root: &Path) -> Result<(), String> {
         return Err(format!(
             "{RELEASE_MANIFEST_PATH} has release_tier `{}`, expected `{RELEASE_TIER}`",
             manifest.release_tier
+        ));
+    }
+    if manifest.release_tier_display != RELEASE_TIER_DISPLAY {
+        return Err(format!(
+            "{RELEASE_MANIFEST_PATH} has release_tier_display `{}`, expected `{RELEASE_TIER_DISPLAY}`",
+            manifest.release_tier_display
+        ));
+    }
+    if manifest.program_name != "aerocodex" {
+        return Err(format!(
+            "{RELEASE_MANIFEST_PATH} has program_name `{}`, expected `aerocodex`",
+            manifest.program_name
         ));
     }
 
@@ -100,6 +121,9 @@ pub fn verify_release_manifest(root: &Path) -> Result<(), String> {
         ]
     })) {
         require_existing_repository_file(root, reference)?;
+    }
+    for package in &manifest.packages {
+        require_existing_repository_file(root, &package.manifest_path)?;
     }
 
     let registry = crate::formula_registry::build_formula_registry(root)?;
@@ -142,14 +166,22 @@ pub fn verify_release_manifest(root: &Path) -> Result<(), String> {
     }
 
     println!(
-        "verified release manifest: version={}; tier={}; formulas={}; public_executable_formulas={}; execution_policy={}",
+        "verified release manifest: version={}; tier={}; packages={}; formulas={}; public_executable_formulas={}; execution_policy={}",
         manifest.release_version,
         manifest.release_tier,
+        manifest.packages.len(),
         manifest.formulas.len(),
         manifest.public_executable_formula_count,
         manifest.execution_policy
     );
     Ok(())
+}
+
+pub fn load_release_manifest(root: &Path) -> Result<ReleaseManifest, String> {
+    let path = root.join(RELEASE_MANIFEST_PATH);
+    let text = fs::read_to_string(&path)
+        .map_err(|error| format!("cannot read {RELEASE_MANIFEST_PATH}: {error}"))?;
+    parse_release_manifest(&text)
 }
 
 fn parse_cli_dispatch_metadata(text: &str) -> Result<Vec<CliDispatchFormula>, String> {
@@ -350,7 +382,9 @@ fn verify_pinned_base_commit(root: &Path, base_commit: &str) -> Result<(), Strin
 
 pub fn parse_release_manifest(text: &str) -> Result<ReleaseManifest, String> {
     let mut release = BTreeMap::new();
+    let mut package_tables = Vec::new();
     let mut formula_tables = Vec::new();
+    let mut current_package: Option<BTreeMap<String, String>> = None;
     let mut current_formula: Option<BTreeMap<String, String>> = None;
 
     for (index, raw_line) in text.lines().enumerate() {
@@ -359,7 +393,20 @@ pub fn parse_release_manifest(text: &str) -> Result<ReleaseManifest, String> {
         if line.is_empty() || line.starts_with('#') {
             continue;
         }
+        if line == "[[packages]]" {
+            if let Some(formula) = current_formula.take() {
+                formula_tables.push(formula);
+            }
+            if let Some(package) = current_package.take() {
+                package_tables.push(package);
+            }
+            current_package = Some(BTreeMap::new());
+            continue;
+        }
         if line == "[[formulas]]" {
+            if let Some(package) = current_package.take() {
+                package_tables.push(package);
+            }
             if let Some(formula) = current_formula.take() {
                 formula_tables.push(formula);
             }
@@ -382,12 +429,21 @@ pub fn parse_release_manifest(text: &str) -> Result<ReleaseManifest, String> {
                 "release manifest line {line_number} has an empty key or value"
             ));
         }
-        let table = current_formula.as_mut().unwrap_or(&mut release);
-        if table.insert(key.to_string(), value.to_string()).is_some() {
+        let previous = if let Some(table) = current_formula.as_mut() {
+            table.insert(key.to_string(), value.to_string())
+        } else if let Some(table) = current_package.as_mut() {
+            table.insert(key.to_string(), value.to_string())
+        } else {
+            release.insert(key.to_string(), value.to_string())
+        };
+        if previous.is_some() {
             return Err(format!(
                 "release manifest line {line_number} duplicates key `{key}` in the same table"
             ));
         }
+    }
+    if let Some(package) = current_package {
+        package_tables.push(package);
     }
     if let Some(formula) = current_formula {
         formula_tables.push(formula);
@@ -397,6 +453,8 @@ pub fn parse_release_manifest(text: &str) -> Result<ReleaseManifest, String> {
         schema_version: required_string(&release, "schema_version", "release")?,
         release_version: required_string(&release, "release_version", "release")?,
         release_tier: required_string(&release, "release_tier", "release")?,
+        release_tier_display: required_string(&release, "release_tier_display", "release")?,
+        program_name: required_string(&release, "program_name", "release")?,
         source_revision_policy: required_string(&release, "source_revision_policy", "release")?,
         base_commit: required_string(&release, "base_commit", "release")?,
         validation_status: required_string(&release, "validation_status", "release")?,
@@ -405,6 +463,16 @@ pub fn parse_release_manifest(text: &str) -> Result<ReleaseManifest, String> {
         validation_record: required_string(&release, "validation_record", "release")?,
         documentation: required_string(&release, "documentation", "release")?,
         registry_formula_count: required_usize(&release, "registry_formula_count", "release")?,
+        registry_research_required_formula_count: required_usize(
+            &release,
+            "registry_research_required_formula_count",
+            "release",
+        )?,
+        registry_blocked_formula_count: required_usize(
+            &release,
+            "registry_blocked_formula_count",
+            "release",
+        )?,
         cli_dispatch_metadata: required_string(&release, "cli_dispatch_metadata", "release")?,
         cli_dispatch_formula_count: required_usize(
             &release,
@@ -416,6 +484,11 @@ pub fn parse_release_manifest(text: &str) -> Result<ReleaseManifest, String> {
             "public_executable_formula_count",
             "release",
         )?,
+        packages: package_tables
+            .iter()
+            .enumerate()
+            .map(|(index, table)| parse_package(table, index + 1))
+            .collect::<Result<Vec<_>, _>>()?,
         formulas: formula_tables
             .iter()
             .enumerate()
@@ -429,6 +502,8 @@ pub fn parse_release_manifest(text: &str) -> Result<ReleaseManifest, String> {
             "schema_version",
             "release_version",
             "release_tier",
+            "release_tier_display",
+            "program_name",
             "source_revision_policy",
             "base_commit",
             "validation_status",
@@ -437,6 +512,8 @@ pub fn parse_release_manifest(text: &str) -> Result<ReleaseManifest, String> {
             "validation_record",
             "documentation",
             "registry_formula_count",
+            "registry_research_required_formula_count",
+            "registry_blocked_formula_count",
             "cli_dispatch_metadata",
             "cli_dispatch_formula_count",
             "public_executable_formula_count",
@@ -445,6 +522,15 @@ pub fn parse_release_manifest(text: &str) -> Result<ReleaseManifest, String> {
     )?;
     validate_release_manifest(&manifest)?;
     Ok(manifest)
+}
+
+fn parse_package(table: &BTreeMap<String, String>, index: usize) -> Result<ReleasePackage, String> {
+    let context = format!("packages table {index}");
+    require_only_keys(table, &["name", "manifest_path"], &context)?;
+    Ok(ReleasePackage {
+        name: required_string(table, "name", &context)?,
+        manifest_path: required_string(table, "manifest_path", &context)?,
+    })
 }
 
 fn parse_formula(table: &BTreeMap<String, String>, index: usize) -> Result<ReleaseFormula, String> {
@@ -497,6 +583,41 @@ fn validate_release_manifest(manifest: &ReleaseManifest) -> Result<(), String> {
     )?;
     if manifest.formulas.is_empty() {
         return Err("release manifest must contain at least one formulas table".to_string());
+    }
+    if manifest.packages.len() != 14 {
+        return Err(format!(
+            "release manifest must govern exactly 14 packages, found {}",
+            manifest.packages.len()
+        ));
+    }
+    let mut package_names = BTreeSet::new();
+    let mut package_paths = BTreeSet::new();
+    for package in &manifest.packages {
+        if package.name.trim().is_empty() {
+            return Err("release package name must not be empty".to_string());
+        }
+        if !package_names.insert(package.name.as_str()) {
+            return Err(format!("duplicate release package name `{}`", package.name));
+        }
+        if !package_paths.insert(package.manifest_path.as_str()) {
+            return Err(format!(
+                "duplicate release package manifest_path `{}`",
+                package.manifest_path
+            ));
+        }
+        validate_repository_relative_path(&package.manifest_path).map_err(|error| {
+            format!(
+                "release package `{}` manifest_path is invalid: {error}",
+                package.name
+            )
+        })?;
+        if !package.manifest_path.ends_with("/Cargo.toml") && package.manifest_path != "Cargo.toml"
+        {
+            return Err(format!(
+                "release package `{}` manifest_path must name Cargo.toml",
+                package.name
+            ));
+        }
     }
     if manifest.cli_dispatch_formula_count != manifest.formulas.len() {
         return Err(format!(
@@ -559,6 +680,23 @@ fn validate_release_manifest(manifest: &ReleaseManifest) -> Result<(), String> {
             formula.public_executable,
             &formula.validation_record,
         )?;
+    }
+    Ok(())
+}
+
+fn validate_repository_relative_path(relative: &str) -> Result<(), String> {
+    let path = Path::new(relative);
+    if path.is_absolute()
+        || has_windows_absolute_prefix(relative)
+        || relative.is_empty()
+        || relative.contains('\\')
+        || path
+            .components()
+            .any(|component| !matches!(component, Component::Normal(_)))
+    {
+        return Err(format!(
+            "`{relative}` must be a normalized repository-relative path"
+        ));
     }
     Ok(())
 }
@@ -688,17 +826,11 @@ fn require_existing_repository_file(root: &Path, relative: &str) -> Result<(), S
             "release manifest reference `{relative}` must not traverse outside the repository"
         ));
     }
-    if relative.is_empty()
-        || relative.contains('\\')
-        || path
-            .components()
-            .any(|component| !matches!(component, Component::Normal(_)))
-    {
-        return Err(format!(
+    validate_repository_relative_path(relative).map_err(|_| {
+        format!(
             "release manifest reference `{relative}` must be a normalized repository-relative path"
-        ));
-    }
-
+        )
+    })?;
     let canonical_root = fs::canonicalize(root).map_err(|error| {
         format!(
             "cannot canonicalize repository root {}: {error}",
@@ -760,22 +892,38 @@ mod tests {
 
     static TEST_COUNTER: AtomicUsize = AtomicUsize::new(0);
 
+    fn package_tables() -> String {
+        let mut tables = String::new();
+        for index in 0..14 {
+            tables.push_str(&format!(
+                "[[packages]]\nname = \"package-{index:02}\"\nmanifest_path = \"crates/package-{index:02}/Cargo.toml\"\n\n"
+            ));
+        }
+        tables
+    }
+
     fn manifest(formulas: &str) -> String {
+        let packages = package_tables();
         format!(
-            "schema_version = \"aerocodex.release_manifest.v1\"\n\
+            "schema_version = \"aerocodex.release_manifest.v2\"\n\
              release_version = \"0.1.0-alpha.1\"\n\
              release_tier = \"research_software_alpha\"\n\
+             release_tier_display = \"Research Software Alpha\"\n\
+             program_name = \"aerocodex\"\n\
              source_revision_policy = \"pinned_base_commit\"\n\
-             base_commit = \"ffcc2b218220cf705d4673f3b44b45c929f3a65d\"\n\
+             base_commit = \"6a94b4628e6e0821a55d6aaadf6925956a5fa2d3\"\n\
              validation_status = \"research_required\"\n\
              execution_policy = \"blocked\"\n\
              public_executable = false\n\
              validation_record = \"validation/equation_inventory.tsv\"\n\
              documentation = \"docs/release/v0.1.0-alpha.1-status.md\"\n\
              registry_formula_count = 152\n\
+             registry_research_required_formula_count = 152\n\
+             registry_blocked_formula_count = 152\n\
              cli_dispatch_metadata = \"crates/aero-codex-cli/dispatch_metadata.tsv\"\n\
              cli_dispatch_formula_count = 1\n\
              public_executable_formula_count = 0\n\n\
+             {packages}\
              {formulas}"
         )
     }

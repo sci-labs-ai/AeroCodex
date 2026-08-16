@@ -1,5 +1,5 @@
 #![forbid(unsafe_code)]
-//! User-facing AeroCodex Beta 1 concept command-line interface.
+//! User-facing AeroCodex Research Software Alpha command-line interface.
 //!
 //! This binary exposes deliberately bounded, machine-readable vertical slices
 //! of the already governed M00 canonical-unit and angle-conversion families. It is research
@@ -29,8 +29,16 @@ mod generated_formula_registry;
 const GENERATED_FORMULA_REGISTRY_JSON: &str =
     include_str!("../../../generated/formula_registry.json");
 
-fn release_channel() -> &'static str {
-    "beta1-concept"
+const PROGRAM_NAME: &str = "aerocodex";
+const WORKSPACE_PACKAGE_COUNT: usize = 14;
+const FORCE_SELF_CHECK_FAILURE_ENV: &str = "AEROCODEX_TEST_FORCE_SELF_CHECK_FAILURE";
+
+fn release_tier() -> &'static str {
+    "research_software_alpha"
+}
+
+fn release_tier_display() -> &'static str {
+    "Research Software Alpha"
 }
 
 fn package_version() -> &'static str {
@@ -390,7 +398,7 @@ impl fmt::Display for AppError {
             Self::SelfCheckFailed { failed } => {
                 write!(
                     formatter,
-                    "Beta 1 self-check reported {failed} failing checks"
+                    "AeroCodex self-check reported {failed} failing checks"
                 )
             }
         }
@@ -1015,6 +1023,17 @@ fn push_optional_json_string(output: &mut String, value: Option<&str>) {
     }
 }
 
+fn append_release_identity_json_fields(output: &mut String) {
+    output.push_str(",\"program_name\":");
+    push_json_string(output, PROGRAM_NAME);
+    output.push_str(",\"semantic_version\":");
+    push_json_string(output, package_version());
+    output.push_str(",\"release_tier\":");
+    push_json_string(output, release_tier());
+    output.push_str(",\"release_tier_display\":");
+    push_json_string(output, release_tier_display());
+}
+
 fn append_context_json_fields(output: &mut String, context: CommandContext) {
     if context.deprecated_alias() {
         output.push_str(",\"deprecated_alias\":true,\"migration_command\":");
@@ -1427,6 +1446,7 @@ fn output_formula_status_report(json: bool) {
 
     if json {
         let mut output = String::from("{\"ok\":true,\"command\":\"formula status-report\"");
+        append_release_identity_json_fields(&mut output);
         write!(
             output,
             ",\"registry_formula_count\":{},\"total_formula_count\":{},\"inventory_formula_count\":{}",
@@ -1443,8 +1463,9 @@ fn output_formula_status_report(json: bool) {
         append_count_map(&mut output, &report.counts_by_family);
         write!(
             output,
-            ",\"execution_policy_bucket_total\":{},\"normal_executable_count\":{},\"executable_formula_count\":{},\"preliminary_only_formula_count\":{},\"blocked_formula_count\":{},\"m07_candidate_count\":{},\"promotion_candidate_count\":{}",
+            ",\"execution_policy_bucket_total\":{},\"normal_executable_count\":{},\"executable_formula_count\":{},\"public_executable_formula_count\":{},\"preliminary_only_formula_count\":{},\"blocked_formula_count\":{},\"m07_candidate_count\":{},\"promotion_candidate_count\":{}",
             report.execution_policy_bucket_total(),
+            report.normal_executable_count,
             report.normal_executable_count,
             report.normal_executable_count,
             report.preliminary_only_formula_count,
@@ -1470,6 +1491,12 @@ fn output_formula_status_report(json: bool) {
         let mut output = String::new();
         output.push_str("Formula status report\n");
         output.push_str("command=formula status-report\n");
+        writeln!(output, "program_name={PROGRAM_NAME}").expect("writing to String cannot fail");
+        writeln!(output, "semantic_version={}", package_version())
+            .expect("writing to String cannot fail");
+        writeln!(output, "release_tier={}", release_tier()).expect("writing to String cannot fail");
+        writeln!(output, "release_tier_display={}", release_tier_display())
+            .expect("writing to String cannot fail");
         writeln!(
             output,
             "registry_formula_count={}",
@@ -1493,6 +1520,12 @@ fn output_formula_status_report(json: bool) {
         writeln!(
             output,
             "executable_formula_count={}",
+            report.normal_executable_count
+        )
+        .expect("writing to String cannot fail");
+        writeln!(
+            output,
+            "public_executable_formula_count={}",
             report.normal_executable_count
         )
         .expect("writing to String cannot fail");
@@ -1576,8 +1609,8 @@ fn json_error(error: &AppError, command: Option<&str>) -> String {
     push_json_string(&mut output, error.code());
     output.push_str(",\"message\":");
     push_json_string(&mut output, &error.to_string());
-    output.push_str("},\"release_channel\":");
-    push_json_string(&mut output, release_channel());
+    output.push('}');
+    append_release_identity_json_fields(&mut output);
     output.push_str(",\"validation_status\":");
     push_json_string(&mut output, validation_status());
     output.push_str(",\"safety_notice\":");
@@ -1586,12 +1619,12 @@ fn json_error(error: &AppError, command: Option<&str>) -> String {
     output
 }
 
-fn output_version(json: bool) {
+fn output_version(json: bool, standard_flag: bool) {
+    let report = FormulaStatusReport::from_registry();
     if json {
         let mut output = String::from("{\"ok\":true,\"command\":\"version\",\"package_version\":");
         push_json_string(&mut output, package_version());
-        output.push_str(",\"release_channel\":");
-        push_json_string(&mut output, release_channel());
+        append_release_identity_json_fields(&mut output);
         output.push_str(",\"build_commit\":");
         push_json_string(&mut output, build_commit());
         output.push_str(",\"build_target\":");
@@ -1600,9 +1633,12 @@ fn output_version(json: bool) {
         push_json_string(&mut output, build_profile());
         write!(
             output,
-            ",\"supported_formula_count\":{},\"registry_formula_count\":{},\"registry_schema_version\":",
+            ",\"workspace_package_count\":{},\"supported_formula_count\":{},\"registry_formula_count\":{},\"blocked_formula_count\":{},\"public_executable_formula_count\":{},\"registry_schema_version\":",
+            WORKSPACE_PACKAGE_COUNT,
             supported_formula_count(),
-            generated_formula_registry::FORMULA_COUNT
+            generated_formula_registry::FORMULA_COUNT,
+            report.blocked_formula_count,
+            report.normal_executable_count
         )
         .expect("writing to String cannot fail");
         push_json_string(&mut output, registry_schema_version());
@@ -1614,9 +1650,13 @@ fn output_version(json: bool) {
         push_json_string(&mut output, safety_notice());
         output.push_str(",\"error\":null}\n");
         print!("{output}");
+    } else if standard_flag {
+        println!("{PROGRAM_NAME} {}", package_version());
     } else {
-        println!("AeroCodex {}", package_version());
-        println!("release_channel={}", release_channel());
+        println!("program_name={PROGRAM_NAME}");
+        println!("semantic_version={}", package_version());
+        println!("release_tier={}", release_tier());
+        println!("release_tier_display={}", release_tier_display());
         println!("build_commit={}", build_commit());
         println!("build_target={}", build_target());
         println!("build_profile={}", build_profile());
@@ -1624,6 +1664,11 @@ fn output_version(json: bool) {
         println!(
             "registry_formula_count={}",
             generated_formula_registry::FORMULA_COUNT
+        );
+        println!("blocked_formula_count={}", report.blocked_formula_count);
+        println!(
+            "public_executable_formula_count={}",
+            report.normal_executable_count
         );
         println!("validation_status={}", validation_status());
         println!("safety_notice={}", safety_notice());
@@ -2149,7 +2194,7 @@ fn unknown_formula_check() -> SelfCheckResult {
 }
 
 fn run_self_check() -> SelfCheckReport {
-    let checks = vec![
+    let mut checks = vec![
         value_check(
             "canonical_time_unit_identity",
             "formula_vault.m00.canonical.time_unit_from_mu_du",
@@ -2234,6 +2279,11 @@ fn run_self_check() -> SelfCheckReport {
         ),
         unknown_formula_check(),
     ];
+    if env::var_os(FORCE_SELF_CHECK_FAILURE_ENV).as_deref() == Some(std::ffi::OsStr::new("1")) {
+        checks[0].passed = false;
+        checks[0].detail =
+            "forced deterministic failure for production CLI contract testing".to_string();
+    }
     let passed = checks.iter().filter(|check| check.passed).count();
     let failed = checks.len() - passed;
     SelfCheckReport {
@@ -2244,11 +2294,8 @@ fn run_self_check() -> SelfCheckReport {
 }
 
 fn self_check_json(report: &SelfCheckReport) -> String {
-    let mut output = format!(
-        "{{\"ok\":{},\"command\":\"self-check\",\"release_channel\":",
-        report.failed == 0
-    );
-    push_json_string(&mut output, release_channel());
+    let mut output = format!("{{\"ok\":{},\"command\":\"self-check\"", report.failed == 0);
+    append_release_identity_json_fields(&mut output);
     write!(
         output,
         ",\"supported_formula_count\":{},\"passed\":{},\"failed\":{},\"checks\":[",
@@ -2297,7 +2344,10 @@ fn output_self_check(report: &SelfCheckReport, json: bool) {
     if json {
         print!("{}", self_check_json(report));
     } else {
-        println!("release_channel={}", release_channel());
+        println!("program_name={PROGRAM_NAME}");
+        println!("semantic_version={}", package_version());
+        println!("release_tier={}", release_tier());
+        println!("release_tier_display={}", release_tier_display());
         println!("supported_formula_count={}", supported_formula_count());
         for check in &report.checks {
             let status = if check.passed { "pass" } else { "fail" };
@@ -2315,14 +2365,18 @@ fn output_self_check(report: &SelfCheckReport, json: bool) {
 
 fn print_help() {
     println!(
-        "AeroCodex Beta 1 concept CLI\n\n\
+        "AeroCodex Research Software Alpha CLI\n\n\
 usage:\n  aerocodex formula list [--family <family>] [--status <status>] [--executable] [--json]\n  aerocodex formula describe <formula-id> [--json]\n  aerocodex formula status-report [--json]\n  aerocodex formula run <formula-id> [--preliminary] [--input-name <value> ...] [--json]\n  aerocodex version [--json]\n  aerocodex self-check [--json]\n\n\
 legacy aliases:\n  aerocodex formulas [--json]        -> aerocodex formula list\n  aerocodex describe <formula-id> [--json]\n                                      -> aerocodex formula describe <formula-id>\n  aerocodex run <formula-id> [--preliminary] name=value ... [--json]\n                                      -> aerocodex formula run <formula-id> [--preliminary] --input-name <value> ...\n\n\
 `--json` may appear before or after the command/subcommand. Formula run accepts RR-022 flag-style scalar inputs such as `--degrees 180`; legacy name=value assignments remain compatibility syntax.\n\n\
-The Beta 1 concept includes ten governed M00 canonical-unit implemented concept formulas plus two RR-023 M00 angle conversion dispatch specs behind the RR-025 status gate. The checked-in Formula Registry may also describe inventory-only formulas; registry inclusion is not formula validation, status promotion, certification, execution approval, readiness approval, or regulatory approval.\n\
+The historical Beta 1 compatibility surface includes ten governed M00 canonical-unit kernels plus two M00 angle-conversion dispatch specs behind the status gate. The checked-in Formula Registry may also describe inventory-only formulas; registry inclusion is not formula validation, status promotion, certification, execution approval, readiness approval, or regulatory approval.\n\
+Release identity: {} {} ({}).\n\
 Validation status: {}.\n\
 Exit codes: 0 success, 2 usage/input-shape error, 3 unknown formula, 4 equation/domain/numerical/status-gate error, 5 self-check failure.\n\
 Safety: {}.",
+        package_version(),
+        release_tier_display(),
+        release_tier(),
         validation_status(),
         safety_notice()
     );
@@ -2460,7 +2514,7 @@ fn execute(raw_arguments: &[String]) -> Result<(), AppError> {
                     "version does not accept positional arguments".to_string(),
                 ));
             }
-            output_version(json);
+            output_version(json, command != "version");
             Ok(())
         }
         "formula" => execute_formula_namespace(&arguments[1..], json),
@@ -2540,6 +2594,8 @@ fn main() -> ExitCode {
                     eprint!("{}", json_error(&error, json_command));
                 } else {
                     eprintln!("aerocodex error [{}]: {error}", error.code());
+                    eprintln!("semantic_version={}", package_version());
+                    eprintln!("release_tier={}", release_tier());
                     eprintln!("validation_status={}", validation_status());
                     eprintln!("safety_notice={}", safety_notice());
                 }
@@ -2557,6 +2613,8 @@ mod tests {
     #[test]
     fn release_identity_uses_cargo_metadata_and_safe_defaults() {
         assert_eq!(package_version(), env!("CARGO_PKG_VERSION"));
+        assert_eq!(release_tier(), "research_software_alpha");
+        assert_eq!(release_tier_display(), "Research Software Alpha");
         assert!(!build_commit().is_empty());
         assert!(!build_target().is_empty());
         assert!(matches!(build_profile(), "debug" | "release"));
@@ -2746,14 +2804,15 @@ mod tests {
         };
 
         let text = self_check_json(&report);
-        let mut parser = std::process::Command::new("python3")
+        let python = if cfg!(windows) { "python" } else { "python3" };
+        let mut parser = std::process::Command::new(python)
             .arg("-c")
             .arg("import json, sys; json.load(sys.stdin)")
             .stdin(std::process::Stdio::piped())
             .stdout(std::process::Stdio::piped())
             .stderr(std::process::Stdio::piped())
             .spawn()
-            .expect("python3 should be available for RR-024 JSON syntax regression checks");
+            .expect("Python should be available for self-check JSON syntax regression checks");
         {
             use std::io::Write as _;
             parser
@@ -2781,7 +2840,7 @@ mod tests {
         assert!(text.contains("\"warnings\":"));
         assert!(text.contains("\"safety_notice\":"));
         assert!(
-            text.contains("\"error\":{\"code\":\"self_check_failed\",\"message\":\"Beta 1 self-check reported 1 failing checks\"}"),
+            text.contains("\"error\":{\"code\":\"self_check_failed\",\"message\":\"AeroCodex self-check reported 1 failing checks\"}"),
             "self-check failure must populate error.code and error.message: {text}"
         );
         assert!(

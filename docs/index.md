@@ -1,5 +1,14 @@
 # AeroCodex Documentation
 
+<!-- aerocodex-current-identity:start -->
+Release version: `0.1.0-alpha.1`
+Release tier: `research_software_alpha` (`Research Software Alpha`)
+Workspace packages: `14`
+Registry formulas: `152`
+Blocked formulas: `152`
+Publicly executable formulas: `0`
+<!-- aerocodex-current-identity:end -->
+
 AeroCodex Phase 0.001 establishes a pure-Rust workspace for source-traceable aerospace engineering mathematics.
 
 Start with:
@@ -96,7 +105,7 @@ Start with:
 
 ## Version lock
 
-The human roadmap phase is `Phase 0.001`; Cargo package versions remain `0.0.1`. The project must not use `0.001` as a Cargo package version.
+The human roadmap phase remains `Phase 0.001`; the current Cargo package version is `0.1.0-alpha.1`. The project must not use `0.001` as a Cargo package version.
 
 Certification caveat: AeroCodex is for research, education, verification-oriented development, and preliminary design. Safety-critical, regulated, or mission use requires project-specific assurance, validation, qualification, and certification.
 

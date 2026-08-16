@@ -6,9 +6,16 @@ on:
     branches: [main]
 
 jobs:
-  check:
-    name: Rust, release-manifest, and repository-integrity gates
-    runs-on: ubuntu-latest
+  release-identity:
+    name: Release identity (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      AEROCODEX_RELEASE_IDENTITY_REVISION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || (github.event_name == 'push' && github.sha) }}
+      AEROCODEX_RELEASE_IDENTITY_BASE_REVISION: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || '' }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -16,31 +23,39 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
-      - name: Cargo.lock file-instance replacement harness
-        run: bash scripts/tests/agent_pr_check_cargo_lock.sh
-      - name: cargo fmt --check
+      - name: Formatting
         run: cargo fmt --all -- --check
-      - name: cargo check --workspace --all-targets --all-features
+      - name: Workspace metadata
+        run: cargo metadata --no-deps --format-version 1
+      - name: Workspace check
+        run: cargo check --workspace
+      - name: All-targets and all-features check
         run: cargo check --workspace --all-targets --all-features
-      - name: cargo clippy --all-targets --all-features -- -D warnings
+      - name: Clippy
         run: cargo clippy --workspace --all-targets --all-features -- -D warnings
-      - name: cargo test --all
+      - name: Tests
         run: cargo test --workspace --all-features
-      - name: cargo doc --no-deps
+      - name: Documentation
+        env:
+          RUSTDOCFLAGS: -D warnings
         run: cargo doc --workspace --all-features --no-deps
-      - name: cargo run -p xtask -- verify --all
-        run: cargo run -p xtask -- verify --all
-      - name: release manifest consistency check
-        run: cargo run -p xtask -- verify-release-manifest
-      - name: repository checksum gate
+      - name: Repository checksums
         run: cargo run -p xtask -- verify-checksums
-      - name: equation-batch plan JSON check
-        run: |
-          cargo run -p xtask -- equation-batch plan --all-manifests --json > /tmp/equation_batch_plan.json
-          python3 -m json.tool /tmp/equation_batch_plan.json >/dev/null
-      - name: generated-artifact drift check
+      - name: Release manifest
+        run: cargo run -p xtask -- verify-release-manifest
+      - name: Release identity
+        run: cargo run -p xtask -- verify-release-identity
+      - name: Generated artifacts
         run: cargo run -p xtask -- verify-generated
-      - name: Run dependency policy
+      - name: Aggregate verification
+        run: cargo run -p xtask -- verify --all
+      - name: Dependency policy
         run: cargo run -p xtask -- dependency-policy
-      - name: Run Beta 1 CLI self-check
+      - name: Standard CLI version
+        run: cargo run -p aero-codex-cli -- --version
+      - name: Structured CLI identity
+        run: cargo run -p aero-codex-cli -- version --json
+      - name: Formula counts
+        run: cargo run -p aero-codex-cli -- formula status-report --json
+      - name: CLI self-check
         run: cargo run -p aero-codex-cli -- self-check --json

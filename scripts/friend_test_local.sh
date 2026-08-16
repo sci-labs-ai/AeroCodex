@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 cd "${REPO_ROOT}"
 
-TOTAL_STEPS=15
+TOTAL_STEPS=16
 CURRENT_STEP=0
 
 info() {
@@ -77,6 +77,8 @@ run_step "cargo run -p xtask -- verify --all" \
   cargo run -p xtask -- verify --all
 run_step "cargo run -p xtask -- verify-release-manifest" \
   cargo run -p xtask -- verify-release-manifest
+run_step "cargo run -p xtask -- verify-release-identity" \
+  cargo run -p xtask -- verify-release-identity
 run_step "cargo run -p xtask -- verify-generated" \
   cargo run -p xtask -- verify-generated
 run_step "cargo run -p xtask -- dependency-policy" \

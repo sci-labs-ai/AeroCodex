@@ -4,7 +4,7 @@ Set-StrictMode -Version Latest
 $RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $RepoRoot
 
-$script:TotalSteps = 15
+$script:TotalSteps = 16
 $script:CurrentStep = 0
 
 function Write-FriendTestInfo {
@@ -89,6 +89,9 @@ Invoke-FriendTestStep "cargo run -p xtask -- verify --all" {
 }
 Invoke-FriendTestStep "cargo run -p xtask -- verify-release-manifest" {
     cargo run -p xtask -- verify-release-manifest
+}
+Invoke-FriendTestStep "cargo run -p xtask -- verify-release-identity" {
+    cargo run -p xtask -- verify-release-identity
 }
 Invoke-FriendTestStep "cargo run -p xtask -- verify-generated" {
     cargo run -p xtask -- verify-generated

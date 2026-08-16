@@ -1,17 +1,77 @@
-schema_version = "aerocodex.release_manifest.v1"
+schema_version = "aerocodex.release_manifest.v2"
 release_version = "0.1.0-alpha.1"
 release_tier = "research_software_alpha"
+release_tier_display = "Research Software Alpha"
+program_name = "aerocodex"
 source_revision_policy = "pinned_base_commit"
-base_commit = "ffcc2b218220cf705d4673f3b44b45c929f3a65d"
+base_commit = "6a94b4628e6e0821a55d6aaadf6925956a5fa2d3"
 validation_status = "research_required"
 execution_policy = "blocked"
 public_executable = false
 validation_record = "validation/equation_inventory.tsv"
 documentation = "docs/release/v0.1.0-alpha.1-status.md"
 registry_formula_count = 152
+registry_research_required_formula_count = 152
+registry_blocked_formula_count = 152
 cli_dispatch_metadata = "crates/aero-codex-cli/dispatch_metadata.tsv"
 cli_dispatch_formula_count = 12
 public_executable_formula_count = 0
+
+[[packages]]
+name = "aero-codex-core"
+manifest_path = "crates/aero-codex-core/Cargo.toml"
+
+[[packages]]
+name = "aero-codex-constants"
+manifest_path = "crates/aero-codex-constants/Cargo.toml"
+
+[[packages]]
+name = "aero-codex-atmosphere"
+manifest_path = "crates/aero-codex-atmosphere/Cargo.toml"
+
+[[packages]]
+name = "aero-codex-thermo"
+manifest_path = "crates/aero-codex-thermo/Cargo.toml"
+
+[[packages]]
+name = "aero-codex-gas-dynamics"
+manifest_path = "crates/aero-codex-gas-dynamics/Cargo.toml"
+
+[[packages]]
+name = "aero-codex-aerodynamics"
+manifest_path = "crates/aero-codex-aerodynamics/Cargo.toml"
+
+[[packages]]
+name = "aero-codex-propulsion"
+manifest_path = "crates/aero-codex-propulsion/Cargo.toml"
+
+[[packages]]
+name = "aero-codex-heat-transfer"
+manifest_path = "crates/aero-codex-heat-transfer/Cargo.toml"
+
+[[packages]]
+name = "aero-codex-structures"
+manifest_path = "crates/aero-codex-structures/Cargo.toml"
+
+[[packages]]
+name = "aero-codex-flight-dynamics"
+manifest_path = "crates/aero-codex-flight-dynamics/Cargo.toml"
+
+[[packages]]
+name = "aero-codex-astrodynamics"
+manifest_path = "crates/aero-codex-astrodynamics/Cargo.toml"
+
+[[packages]]
+name = "aero-codex-life-support"
+manifest_path = "crates/aero-codex-life-support/Cargo.toml"
+
+[[packages]]
+name = "aero-codex-cli"
+manifest_path = "crates/aero-codex-cli/Cargo.toml"
+
+[[packages]]
+name = "xtask"
+manifest_path = "xtask/Cargo.toml"
 
 [[formulas]]
 identifier = "m00.angle.deg_to_rad"
