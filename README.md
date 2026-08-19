@@ -106,7 +106,7 @@ cargo run -p aero-codex-cli -- formula status-report --json
 cargo run -p aero-codex-cli -- self-check --json
 ```
 
-A clean self-check reports 14 passing checks and zero failures, but self-check dispatch is not public formula execution and does not promote status. The authoritative release contract is [`docs/release/v0.1.0-alpha.1.toml`](docs/release/v0.1.0-alpha.1.toml); the live batch record is [`docs/release/v0.1.0-alpha.1-status.md`](docs/release/v0.1.0-alpha.1-status.md). The current Cargo version is `0.1.0-alpha.1`, and no operational, parity, safety, or certification claim is made.
+A clean self-check reports 14 passing checks and zero failures, but self-check dispatch is not public formula execution and does not promote status. The sole machine-readable release authority is [`release/release-manifest.toml`](release/release-manifest.toml); the live batch record is [`docs/release/v0.1.0-alpha.1-status.md`](docs/release/v0.1.0-alpha.1-status.md). The current Cargo version is `0.1.0-alpha.1`, and no operational, parity, safety, or certification claim is made.
 
 ## Validation and governance artifacts
 

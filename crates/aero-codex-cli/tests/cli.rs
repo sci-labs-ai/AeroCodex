@@ -751,7 +751,14 @@ fn copied_binary_runs_from_external_directory_without_repository_context() {
     let source = binary_path();
     let destination = directory.join(source.file_name().expect("binary should have a file name"));
     fs::copy(&source, &destination).expect("CLI binary should copy outside the repository");
-    for forbidden in [".git", "Cargo.toml", "docs", "v0.1.0-alpha.1.toml"] {
+    for forbidden in [
+        ".git",
+        "Cargo.toml",
+        "docs",
+        "release",
+        "release-manifest.toml",
+        "v0.1.0-alpha.1.toml",
+    ] {
         assert!(!directory.join(forbidden).exists());
     }
     let output = Command::new(&destination)
