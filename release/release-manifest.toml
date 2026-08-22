@@ -13,9 +13,9 @@ release_validation_record = "validation/equation_inventory.tsv"
 release_documentation = "docs/release/v0.1.0-alpha.1-status.md"
 
 [release_slice_requirements]
-validation_status = "research_required"
-execution_policy = "blocked"
-public_executable = false
+validation_status = "implementation_verified"
+execution_policy = "normal_research"
+public_executable = true
 
 [non_release_requirements]
 validation_status = "research_required"

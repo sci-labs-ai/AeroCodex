@@ -5,8 +5,8 @@ Release version: `0.1.0-alpha.1`
 Release tier: `research_software_alpha` (`Research Software Alpha`)
 Workspace packages: `14`
 Registry formulas: `152`
-Blocked formulas: `152`
-Publicly executable formulas: `0`
+Blocked formulas: `140`
+Publicly executable formulas: `12`
 <!-- aerocodex-current-identity:end -->
 
 RR-024 defines the stable JSON envelope used by the AeroCodex research-alpha CLI. Human-readable output remains the default. JSON is emitted only when `--json` is supplied.
@@ -18,6 +18,7 @@ AeroCodex JSON is for agents, notebooks, regression tests, and later APIs. It is
 - Field names are snake_case.
 - Success responses set `ok=true` and `error=null`.
 - Error responses set `ok=false` and populate `error.code` plus `error.message`.
+- Every response includes `json_contract_version="aerocodex.cli.json.v1"`; the checked-in golden contracts fail if fields are added, removed, or renamed without a deliberate version change.
 - `command` is the stable command label, for example `formula_list`, `formula describe`, `formula run`, `describe`, `run`, `version`, or `self-check`.
 - Identity-bearing responses use typed `program_name`, `semantic_version`, `release_tier`, and `release_tier_display` fields. Formula validation and execution-policy fields remain separate.
 - `formula_id` is present when the command or error can identify a formula.
@@ -41,6 +42,7 @@ Shape:
 {
   "ok": true,
   "command": "formula_list",
+  "json_contract_version": "aerocodex.cli.json.v1",
   "count": 152,
   "registry_formula_count": 152,
   "registry_schema_version": "aerocodex.formula_registry.v1",
@@ -50,16 +52,16 @@ Shape:
     "status": null,
     "executable": false
   },
-  "validation_status": "research_required",
+  "validation_status": "implementation_verified",
   "formulas": [
     {
       "formula_id": "m00.canonical.distance_to_canonical",
       "legacy_formula_id": "formula_vault.m00.canonical.distance_to_canonical",
       "aliases": ["formula_vault.m00.canonical.distance_to_canonical"],
       "name": "Distance To Canonical",
-      "status": "research_required",
-      "execution_policy": "blocked",
-      "quarantine_state": "below_execution_threshold",
+      "status": "implementation_verified",
+      "execution_policy": "normal_research",
+      "quarantine_state": "none",
       "family": "m00",
       "registry_family": "m00.canonical",
       "batch_id": "m00-canonical-units",
@@ -94,6 +96,7 @@ Shape:
 {
   "ok": true,
   "command": "formula describe",
+  "json_contract_version": "aerocodex.cli.json.v1",
   "canonical_formula_id": "m00.canonical.distance_to_canonical",
   "requested_formula_id": "m00.canonical.distance_to_canonical",
   "alias_used": null,
@@ -107,9 +110,9 @@ Shape:
   "summary": "Generated Formula Registry v1 inventory entry for research/preliminary-design traceability; execution remains controlled by status gates.",
   "family": "m00.canonical",
   "batch_id": "m00-canonical-units",
-  "status": "research_required",
-  "quarantine_state": "below_execution_threshold",
-  "execution_policy": "blocked",
+  "status": "implementation_verified",
+  "quarantine_state": "none",
+  "execution_policy": "normal_research",
   "source_trace": {
     "contract_path": "formula-vault/contracts/m00_canonical_unit_conversions_contract.yaml",
     "manifest_line": "6",
@@ -136,9 +139,14 @@ Shape:
   "warnings": [
     "Registry inclusion does not make formulas executable or promote validation status."
   ],
+  "implemented": true,
+  "dispatchable": true,
+  "executable": true,
+  "validated": false,
+  "blocked": false,
   "registry_schema_version": "aerocodex.formula_registry.v1",
   "source_hash": "sha256:...",
-  "validation_status": "research_required",
+  "validation_status": "implementation_verified",
   "safety_notice": "research/preliminary-design software; not certified, flight-ready, mission-ready, operational, medical, habitat-safe, or approved for regulated use",
   "error": null
 }
@@ -150,6 +158,7 @@ Legacy describe keeps the same envelope and adds alias fields:
 {
   "ok": true,
   "command": "describe",
+  "json_contract_version": "aerocodex.cli.json.v1",
   "deprecated_alias": true,
   "migration_command": "aerocodex formula describe <formula-id>",
   "canonical_formula_id": "m00.canonical.distance_to_canonical",
@@ -173,6 +182,7 @@ Shape:
 {
   "ok": true,
   "command": "formula run",
+  "json_contract_version": "aerocodex.cli.json.v1",
   "formula_id": "m00.canonical.distance_to_canonical",
   "canonical_formula_id": "m00.canonical.distance_to_canonical",
   "requested_formula_id": "m00.canonical.distance_to_canonical",
@@ -181,11 +191,12 @@ Shape:
   "runtime_symbol": "m00_distance_to_canonical",
   "output_variable": "canonical_distance",
   "value": -6,
+  "input_syntax": "legacy_assignment",
   "output": "canonical_distance",
   "units": null,
-  "status": "research_required",
-  "execution_policy": "blocked",
-  "quarantine_state": "below_execution_threshold",
+  "status": "implementation_verified",
+  "execution_policy": "normal_research",
+  "quarantine_state": "none",
   "source_trace": {
     "contract_path": "formula-vault/contracts/m00_canonical_unit_conversions_contract.yaml",
     "manifest_line": "6",
@@ -196,7 +207,7 @@ Shape:
   },
   "registry_schema_version": "aerocodex.formula_registry.v1",
   "source_hash": "sha256:...",
-  "validation_status": "research_required",
+  "validation_status": "implementation_verified",
   "warnings": [
     "Registry inclusion does not make formulas executable or promote validation status."
   ],
@@ -221,6 +232,7 @@ Shape on stderr:
 {
   "ok": false,
   "command": "formula describe",
+  "json_contract_version": "aerocodex.cli.json.v1",
   "formula_id": "no.such",
   "status": null,
   "execution_policy": null,
@@ -232,7 +244,7 @@ Shape on stderr:
   "semantic_version": "0.1.0-alpha.1",
   "release_tier": "research_software_alpha",
   "release_tier_display": "Research Software Alpha",
-  "validation_status": "research_required",
+  "validation_status": "implementation_verified",
   "safety_notice": "research/preliminary-design software; not certified, flight-ready, mission-ready, operational, medical, habitat-safe, or approved for regulated use"
 }
 ```
@@ -249,6 +261,7 @@ Shape on stderr:
 {
   "ok": false,
   "command": "formula run",
+  "json_contract_version": "aerocodex.cli.json.v1",
   "formula_id": "aerodynamics.coefficients.drag_coefficient",
   "status": "research_required",
   "execution_policy": "blocked",
@@ -260,7 +273,7 @@ Shape on stderr:
   "semantic_version": "0.1.0-alpha.1",
   "release_tier": "research_software_alpha",
   "release_tier_display": "Research Software Alpha",
-  "validation_status": "research_required",
+  "validation_status": "implementation_verified",
   "safety_notice": "research/preliminary-design software; not certified, flight-ready, mission-ready, operational, medical, habitat-safe, or approved for regulated use"
 }
 ```
@@ -275,6 +288,7 @@ Known stable error codes in the current CLI surface:
 - `missing_input`
 - `unexpected_input`
 - `execution_blocked_by_status`
+- `formula_dispatch_unavailable`
 - `non_positive_input`
 - `out_of_domain`
 - `numerical_failure`
@@ -282,7 +296,7 @@ Known stable error codes in the current CLI surface:
 
 ## Status/report envelope
 
-RR-024 does not add a separate `status-report` command. The current CLI status/report JSON surface is `self-check --json`; any future status-report command must preserve the same success/error envelope fields.
+`formula status-report --json` computes the registry, dispatchable, executable, and blocked counts independently. `self-check --json` then proves the release slice traverses the same public run path.
 
 Command:
 
@@ -296,11 +310,13 @@ Shape:
 {
   "ok": true,
   "command": "self-check",
+  "json_contract_version": "aerocodex.cli.json.v1",
   "program_name": "aerocodex",
   "semantic_version": "0.1.0-alpha.1",
   "release_tier": "research_software_alpha",
   "release_tier_display": "Research Software Alpha",
   "supported_formula_count": 12,
+  "dispatchable_formula_count": 12,
   "passed": 14,
   "failed": 0,
   "checks": [
@@ -308,11 +324,11 @@ Shape:
       "name": "overflow_is_rejected",
       "formula_id": "formula_vault.m00.canonical.distance_from_canonical",
       "passed": true,
-      "detail": "expected_error=numerical_failure observed_error=numerical_failure"
+      "detail": "public_path=resolver+status_gate+input_parser+evaluator+error_envelope expected_error=numerical_failure observed_error=numerical_failure"
     }
   ],
   "registry_schema_version": "aerocodex.formula_registry.v1",
-  "validation_status": "research_required",
+  "validation_status": "implementation_verified",
   "warnings": [
     "Research/preliminary-design JSON contract; status and registry fields are not certification or execution approval."
   ],
@@ -327,6 +343,7 @@ If any self-check row fails, the same command emits the report once with an erro
 {
   "ok": false,
   "command": "self-check",
+  "json_contract_version": "aerocodex.cli.json.v1",
   "passed": 13,
   "failed": 1,
   "checks": [
@@ -338,7 +355,7 @@ If any self-check row fails, the same command emits the report once with an erro
     }
   ],
   "registry_schema_version": "aerocodex.formula_registry.v1",
-  "validation_status": "research_required",
+  "validation_status": "implementation_verified",
   "warnings": [
     "Research/preliminary-design JSON contract; status and registry fields are not certification or execution approval."
   ],

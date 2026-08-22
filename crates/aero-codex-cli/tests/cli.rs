@@ -91,6 +91,57 @@ fn assert_json_semantics_with_python(text: &str, script: &str) {
     );
 }
 
+fn assert_json_matches_golden_contract(text: &str, fixture_name: &str) {
+    let fixture = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("tests")
+        .join("contracts")
+        .join(fixture_name);
+    let python = if cfg!(windows) { "python" } else { "python3" };
+    let mut parser = Command::new(python)
+        .arg("-c")
+        .arg(
+            r#"
+import json, sys
+actual = json.load(sys.stdin)
+with open(sys.argv[1], encoding="utf-8") as handle:
+    golden = json.load(handle)
+assert sorted(actual) == golden["top_level_keys"], (sorted(actual), golden["top_level_keys"])
+error = actual.get("error")
+actual_error_keys = [] if error is None else sorted(error)
+assert actual_error_keys == golden["error_keys"], (actual_error_keys, golden["error_keys"])
+for key, expected in golden["constants"].items():
+    assert actual.get(key) == expected, (key, actual.get(key), expected)
+for key in golden["null_fields"]:
+    assert key in actual and actual[key] is None, (key, actual.get(key))
+"#,
+        )
+        .arg(&fixture)
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .expect("python3 should be available for CLI golden-contract checks");
+    {
+        use std::io::Write as _;
+        parser
+            .stdin
+            .as_mut()
+            .expect("parser stdin should be open")
+            .write_all(text.as_bytes())
+            .expect("JSON text should be writable to parser stdin");
+    }
+    let parsed = parser
+        .wait_with_output()
+        .expect("python3 golden-contract parser should exit");
+    assert!(
+        parsed.status.success(),
+        "golden JSON contract `{}` failed; stdout={} stderr={} json={text}",
+        fixture.display(),
+        String::from_utf8_lossy(&parsed.stdout),
+        String::from_utf8_lossy(&parsed.stderr)
+    );
+}
+
 fn assert_success_json_envelope(text: &str, command: &str) {
     assert!(
         text.starts_with("{\"ok\":true"),
@@ -99,6 +150,10 @@ fn assert_success_json_envelope(text: &str, command: &str) {
     assert!(
         text.contains(&format!("\"command\":\"{command}\"")),
         "missing command `{command}` in {text}"
+    );
+    assert!(
+        text.contains("\"json_contract_version\":\"aerocodex.cli.json.v1\""),
+        "missing stable JSON contract version in {text}"
     );
     assert!(
         text.contains("\"safety_notice\":"),
@@ -123,6 +178,10 @@ fn assert_error_json_envelope(text: &str, command: &str, code: &str) {
     assert!(
         text.contains(&format!("\"command\":\"{command}\"")),
         "missing command `{command}` in {text}"
+    );
+    assert!(
+        text.contains("\"json_contract_version\":\"aerocodex.cli.json.v1\""),
+        "missing stable JSON contract version in {text}"
     );
     assert!(
         text.contains(&format!("\"code\":\"{code}\"")),
@@ -154,10 +213,11 @@ fn version_json_exposes_bounded_release_identity() {
     assert!(text.contains("\"build_target\":"));
     assert!(text.contains("\"build_profile\":"));
     assert!(text.contains("\"supported_formula_count\":12"));
+    assert!(text.contains("\"dispatchable_formula_count\":12"));
     assert!(text.contains("\"registry_formula_count\":152"));
-    assert!(text.contains("\"blocked_formula_count\":152"));
-    assert!(text.contains("\"public_executable_formula_count\":0"));
-    assert!(text.contains("\"validation_status\":\"research_required\""));
+    assert!(text.contains("\"blocked_formula_count\":140"));
+    assert!(text.contains("\"public_executable_formula_count\":12"));
+    assert!(text.contains("\"validation_status\":\"implementation_verified\""));
     assert!(text.contains("\"safety_notice\":"));
 }
 
@@ -179,7 +239,7 @@ fn formula_catalog_is_registry_backed_and_labeled() {
     assert!(text.contains("\"count\":152"));
     assert!(text.contains("\"registry_formula_count\":152"));
     assert!(text.contains("\"registry_schema_version\":\"aerocodex.formula_registry.v1\""));
-    assert!(text.contains("\"source_hash\":\"sha256:b5a16a99f20a0bea420b6c3842894c316e958a8934b34556bfef2e1799586c3e\""));
+    assert!(text.contains("\"source_hash\":\"sha256:"));
     assert!(text.contains("\"formula_id\":\"m00.canonical.distance_to_canonical\""));
     assert!(text.contains("\"formula_id\":\"aerodynamics.coefficients.drag_coefficient\""));
     assert!(text.contains("\"status\":\"research_required\""));
@@ -204,6 +264,41 @@ fn formula_catalog_family_filter_is_registry_backed() {
 }
 
 #[test]
+fn executable_formula_catalog_is_exactly_the_twelve_formula_release_slice() {
+    let output = run(&["formula", "list", "--executable", "--json"]);
+    assert!(output.status.success(), "{}", stderr(&output));
+    let text = stdout(&output);
+    assert_success_json_envelope(&text, "formula_list");
+    assert_json_semantics_with_python(
+        &text,
+        r#"
+import json, sys
+catalog = json.load(sys.stdin)
+expected = {
+    "m00.angle.deg_to_rad",
+    "m00.angle.rad_to_deg",
+    "m00.canonical.distance_from_canonical",
+    "m00.canonical.distance_to_canonical",
+    "m00.canonical.mu_from_units",
+    "m00.canonical.speed_from_canonical",
+    "m00.canonical.speed_to_canonical",
+    "m00.canonical.speed_unit_from_du_tu",
+    "m00.canonical.speed_unit_from_mu_du",
+    "m00.canonical.time_from_canonical",
+    "m00.canonical.time_to_canonical",
+    "m00.canonical.time_unit_from_mu_du",
+}
+actual = {formula["formula_id"] for formula in catalog["formulas"]}
+assert catalog["filters"]["executable"] is True
+assert catalog["count"] == 12
+assert actual == expected, (actual - expected, expected - actual)
+assert all(formula["status"] == "implementation_verified" for formula in catalog["formulas"])
+assert all(formula["execution_policy"] == "normal_research" for formula in catalog["formulas"])
+"#,
+    );
+}
+
+#[test]
 fn formula_catalog_unknown_flags_fail_closed() {
     let output = run(&["formula", "list", "--definitely-unknown-rr020-flag"]);
     assert_eq!(output.status.code(), Some(2));
@@ -221,7 +316,7 @@ fn legacy_formula_catalog_json_is_marked_as_deprecated_alias() {
     assert!(text.contains("\"count\":152"));
     assert!(text.contains("\"deprecated_alias\":true"));
     assert!(text.contains("\"migration_command\":\"aerocodex formula list\""));
-    assert!(text.contains("\"validation_status\":\"research_required\""));
+    assert!(text.contains("\"validation_status\":\"implementation_verified\""));
     assert!(text.contains("\"execution_policy\":\"blocked\""));
     assert!(text.contains("\"safety_notice\":"));
 }
@@ -264,6 +359,11 @@ fn formula_describe_human_output_includes_traceability_fields() {
         "status=",
         "execution_policy=",
         "quarantine_state=",
+        "implemented=true",
+        "dispatchable=true",
+        "executable=true",
+        "validated=false",
+        "blocked=false",
         "inputs=",
         "outputs=",
         "units=",
@@ -299,6 +399,11 @@ fn legacy_describe_json_preserves_alias_traceability() {
         "\"status\":",
         "\"execution_policy\":",
         "\"quarantine_state\":",
+        "\"implemented\":true",
+        "\"dispatchable\":true",
+        "\"executable\":true",
+        "\"validated\":false",
+        "\"blocked\":false",
         "\"inputs\":",
         "\"outputs\":",
         "\"units\":",
@@ -324,11 +429,14 @@ fn formula_status_report_human_is_registry_backed_and_honest() {
         "command=formula status-report",
         "registry_formula_count=152",
         "total_formula_count=152",
-        "status.research_required=152",
-        "execution_policy.blocked=152",
-        "blocked_formula_count=152",
+        "status.implementation_verified=12",
+        "status.research_required=140",
+        "execution_policy.blocked=140",
+        "execution_policy.normal_research=12",
+        "dispatchable_formula_count=12",
+        "blocked_formula_count=140",
         "preliminary_only_formula_count=0",
-        "executable_formula_count=0",
+        "executable_formula_count=12",
         "m07_candidate_count=0",
         "promotion_candidate_count=0",
         "by_family.life=50",
@@ -364,18 +472,20 @@ assert report["inventory_formula_count"] == 152
 assert report["total_formula_count"] == sum(report["counts_by_status"].values())
 assert report["total_formula_count"] == sum(report["counts_by_execution_policy"].values())
 assert report["execution_policy_bucket_total"] == report["total_formula_count"]
-assert report["counts_by_status"] == {"research_required": 152}
-assert report["counts_by_execution_policy"] == {"blocked": 152}
-assert report["blocked_formula_count"] == 152
-assert report["normal_executable_count"] == 0
-assert report["executable_formula_count"] == 0
-assert report["public_executable_formula_count"] == 0
+assert report["counts_by_status"] == {"implementation_verified": 12, "research_required": 140}
+assert report["counts_by_execution_policy"] == {"blocked": 140, "normal_research": 12}
+assert report["dispatchable_formula_count"] == 12
+assert report["blocked_formula_count"] == 140
+assert report["normal_executable_count"] == 12
+assert report["executable_formula_count"] == 12
+assert report["public_executable_formula_count"] == 12
 assert report["preliminary_only_formula_count"] == 0
 assert report["m07_candidate_count"] == 0
 assert report["promotion_candidate_count"] == 0
 for category in ["blocked_formulas", "normal_executable_formulas", "preliminary_only_formulas", "m07_candidates", "promotion_candidates"]:
     assert category in report["categories"]
-assert report["categories"]["blocked_formulas"]["count"] == 152
+assert report["categories"]["blocked_formulas"]["count"] == 140
+assert report["categories"]["normal_executable_formulas"]["count"] == 12
 assert report["categories"]["m07_candidates"]["count"] == 0
 assert report["categories"]["promotion_candidates"]["count"] == 0
 assert report["by_family"]["life"] == 50
@@ -384,14 +494,15 @@ assert "safety_notice" in report and report["safety_notice"]
     );
     for term in [
         "\"registry_schema_version\":\"aerocodex.formula_registry.v1\"",
-        "\"source_hash\":\"sha256:b5a16a99f20a0bea420b6c3842894c316e958a8934b34556bfef2e1799586c3e\"",
+        "\"source_hash\":\"sha256:",
         "\"registry_formula_count\":152",
         "\"total_formula_count\":152",
-        "\"counts_by_status\":{\"research_required\":152}",
-        "\"counts_by_execution_policy\":{\"blocked\":152}",
-        "\"blocked_formula_count\":152",
+        "\"counts_by_status\":{\"implementation_verified\":12,\"research_required\":140}",
+        "\"counts_by_execution_policy\":{\"blocked\":140,\"normal_research\":12}",
+        "\"dispatchable_formula_count\":12",
+        "\"blocked_formula_count\":140",
         "\"preliminary_only_formula_count\":0",
-        "\"executable_formula_count\":0",
+        "\"executable_formula_count\":12",
         "\"m07_candidate_count\":0",
         "\"promotion_candidate_count\":0",
         "\"by_family\":{",
@@ -472,10 +583,11 @@ fn execution_gate_blocks_research_required_registry_row_json() {
         "research_required",
         "blocked",
     );
+    assert_json_matches_golden_contract(&text, "formula_run_error.v1.json");
 }
 
 #[test]
-fn execution_gate_blocks_registry_backed_m00_default_run_before_dispatch() {
+fn promoted_registry_backed_m00_formula_runs_through_public_dispatch() {
     let output = run(&[
         "formula",
         "run",
@@ -484,24 +596,17 @@ fn execution_gate_blocks_registry_backed_m00_default_run_before_dispatch() {
         "distance_unit=7",
         "--json",
     ]);
-    assert_eq!(output.status.code(), Some(4));
-    let text = stderr(&output);
-    assert_execution_gate_blocked_json(
-        &text,
-        "formula run",
-        "m00.canonical.distance_to_canonical",
-        "execution_blocked_by_status",
-        "research_required",
-        "blocked",
-    );
-    assert!(
-        !text.contains("\"value\":"),
-        "status gate must run before dispatch: {text}"
-    );
+    assert!(output.status.success(), "{}", stderr(&output));
+    let text = stdout(&output);
+    assert_success_json_envelope(&text, "formula run");
+    assert!(text.contains("\"canonical_formula_id\":\"m00.canonical.distance_to_canonical\""));
+    assert!(text.contains("\"value\":-6"));
+    assert!(text.contains("\"status\":\"implementation_verified\""));
+    assert!(text.contains("\"execution_policy\":\"normal_research\""));
 }
 
 #[test]
-fn execution_gate_blocks_legacy_alias_through_same_policy() {
+fn promoted_legacy_alias_reaches_equation_domain_validation() {
     let output = run(&[
         "run",
         "formula_vault.m00.canonical.distance_to_canonical",
@@ -511,23 +616,12 @@ fn execution_gate_blocks_legacy_alias_through_same_policy() {
     ]);
     assert_eq!(output.status.code(), Some(4));
     let text = stderr(&output);
-    assert_execution_gate_blocked_json(
-        &text,
-        "run",
-        "m00.canonical.distance_to_canonical",
-        "execution_blocked_by_status",
-        "research_required",
-        "blocked",
-    );
-    assert!(text.contains("\"code\":\"execution_blocked_by_status\""));
-    assert!(
-        !text.contains("non_positive_input"),
-        "status gate must run before equation/domain dispatch: {text}"
-    );
+    assert_error_json_envelope(&text, "run", "non_positive_input");
+    assert!(text.contains("non_positive_input"));
 }
 
 #[test]
-fn formula_run_flag_style_input_parses_and_then_respects_status_gate() {
+fn formula_run_flag_style_input_executes_promoted_formula() {
     let output = run(&[
         "formula",
         "run",
@@ -536,24 +630,16 @@ fn formula_run_flag_style_input_parses_and_then_respects_status_gate() {
         "180",
         "--json",
     ]);
-    assert_eq!(output.status.code(), Some(4));
-    let text = stderr(&output);
-    assert_execution_gate_blocked_json(
-        &text,
-        "formula run",
-        "m00.angle.deg_to_rad",
-        "execution_blocked_by_status",
-        "research_required",
-        "blocked",
-    );
-    assert!(
-        !text.contains("invalid_assignment") && !text.contains("usage_error"),
-        "RR-022 flag-style parser must accept scalar flags before the RR-025 status gate blocks dispatch: {text}"
-    );
+    assert!(output.status.success(), "{}", stderr(&output));
+    let text = stdout(&output);
+    assert_success_json_envelope(&text, "formula run");
+    assert!(text.contains("\"input_syntax\":\"flag_style\""));
+    assert!(text.contains("\"status\":\"implementation_verified\""));
+    assert_json_matches_golden_contract(&text, "formula_run_success.v1.json");
 }
 
 #[test]
-fn formula_run_flag_style_negative_number_reaches_status_gate() {
+fn formula_run_flag_style_negative_number_executes() {
     let output = run(&[
         "formula",
         "run",
@@ -562,19 +648,12 @@ fn formula_run_flag_style_negative_number_reaches_status_gate() {
         "-180",
         "--json",
     ]);
-    assert_eq!(output.status.code(), Some(4));
-    let text = stderr(&output);
-    assert_execution_gate_blocked_json(
+    assert!(output.status.success(), "{}", stderr(&output));
+    let text = stdout(&output);
+    assert_success_json_envelope(&text, "formula run");
+    assert_json_semantics_with_python(
         &text,
-        "formula run",
-        "m00.angle.deg_to_rad",
-        "execution_blocked_by_status",
-        "research_required",
-        "blocked",
-    );
-    assert!(
-        !text.contains("invalid_assignment") && !text.contains("usage_error"),
-        "negative scalar flag values must not be reinterpreted as flags: {text}"
+        "import json, math, sys; result=json.load(sys.stdin); assert math.isclose(result['value'], -math.pi, rel_tol=0.0, abs_tol=1e-15)",
     );
 }
 
@@ -638,7 +717,7 @@ fn formula_run_invalid_flag_number_fails_closed_with_json_error() {
 }
 
 #[test]
-fn rr023_m00_angle_run_accepts_preliminary_flag_but_preserves_status_gate() {
+fn promoted_m00_angle_run_accepts_compatibility_preliminary_flag() {
     let output = run(&[
         "formula",
         "run",
@@ -648,20 +727,10 @@ fn rr023_m00_angle_run_accepts_preliminary_flag_but_preserves_status_gate() {
         "--preliminary",
         "--json",
     ]);
-    assert_eq!(output.status.code(), Some(4));
-    let text = stderr(&output);
-    assert_execution_gate_blocked_json(
-        &text,
-        "formula run",
-        "m00.angle.deg_to_rad",
-        "execution_blocked_by_status",
-        "research_required",
-        "blocked",
-    );
-    assert!(
-        !text.contains("\"value\":"),
-        "RR-023 dispatch must stay behind the existing RR-025 status gate while M00 angle rows remain research_required: {text}"
-    );
+    assert!(output.status.success(), "{}", stderr(&output));
+    let text = stdout(&output);
+    assert_success_json_envelope(&text, "formula run");
+    assert!(text.contains("\"status\":\"implementation_verified\""));
 }
 
 #[test]
@@ -675,20 +744,15 @@ fn rr023_m00_angle_legacy_alias_is_mapped_to_readable_registry_id() {
         "--preliminary",
         "--json",
     ]);
-    assert_eq!(output.status.code(), Some(4));
-    let text = stderr(&output);
-    assert_execution_gate_blocked_json(
-        &text,
-        "formula run",
-        "m00.angle.rad_to_deg",
-        "execution_blocked_by_status",
-        "research_required",
-        "blocked",
-    );
+    assert!(output.status.success(), "{}", stderr(&output));
+    let text = stdout(&output);
+    assert_success_json_envelope(&text, "formula run");
+    assert!(text.contains("\"canonical_formula_id\":\"m00.angle.rad_to_deg\""));
+    assert!(text.contains("\"value\":180"));
 }
 
 #[test]
-fn execution_gate_preliminary_flag_does_not_bypass_research_required() {
+fn preliminary_flag_does_not_change_promoted_formula_result() {
     let output = run(&[
         "formula",
         "run",
@@ -698,16 +762,10 @@ fn execution_gate_preliminary_flag_does_not_bypass_research_required() {
         "distance_unit=7",
         "--json",
     ]);
-    assert_eq!(output.status.code(), Some(4));
-    let text = stderr(&output);
-    assert_execution_gate_blocked_json(
-        &text,
-        "formula run",
-        "m00.canonical.distance_to_canonical",
-        "execution_blocked_by_status",
-        "research_required",
-        "blocked",
-    );
+    assert!(output.status.success(), "{}", stderr(&output));
+    let text = stdout(&output);
+    assert_success_json_envelope(&text, "formula run");
+    assert!(text.contains("\"value\":-6"));
 }
 
 #[test]

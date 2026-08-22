@@ -5,8 +5,8 @@ Release version: `0.1.0-alpha.1`
 Release tier: `research_software_alpha` (`Research Software Alpha`)
 Workspace packages: `14`
 Registry formulas: `152`
-Blocked formulas: `152`
-Publicly executable formulas: `0`
+Blocked formulas: `140`
+Publicly executable formulas: `12`
 <!-- aerocodex-current-identity:end -->
 
 <p align="center">
@@ -52,7 +52,7 @@ It also provides governance machinery:
 - nomenclature, acronym, symbol, terminology, and waiver policy data;
 - clean-room BioSim-RS-style resource identity, transaction, deterministic replay, ledger, and smoke/friend-test primitives;
 - clean-room BioSim-plus synthetic scenario-domain records, structural validation, process records, intent-planning helpers, bounded compartment replay/digest/event helpers, and replay-integrity/ledger/report helpers for research metadata only;
-- a bounded `aerocodex` research-alpha CLI for deterministic registry inventory, status reporting, and self-checking; its twelve M00 dispatch-linked records remain `research_required`, blocked from public formula execution, and non-promoted.
+- a bounded `aerocodex` research-alpha CLI for deterministic registry inventory, status reporting, public execution of twelve audited M00 conversions, and self-checking through the same public path; the other 140 registry records remain `research_required` and blocked.
 
 AeroCodex does **not** currently provide certified flight software, a complete BioSim scenario engine, an operational BLSS controller, a validated habitat-safety model, a medical model, or certified M07/Orekit parity.
 
@@ -72,7 +72,7 @@ AeroCodex does **not** currently provide certified flight software, a complete B
 | `aero-codex-flight-dynamics` | Level-turn, stall-speed, turn-rate/radius, and specific-excess-power helpers. |
 | `aero-codex-astrodynamics` | Two-body orbital helpers, Hohmann transfer helpers, sphere of influence, bounded M00 angle/unit/vector helpers including `m00_wrap2pi`, classical-elements/Kepler research helpers, oracle-record/tolerance-comparison metadata helpers, contract-only two-line-element source-policy helpers, and runtime-linked formula-vault intake records. |
 | `aero-codex-life-support` | BLSS mass-balance helpers, thin-film/MELiSSA research kernels, clean-room BioSim-style resource/tick primitives, BioSim-plus synthetic scenario-domain validation, bounded process/intent helpers, compartment replay/digest/event helpers, and replay-integrity/ledger/report helpers. |
-| `aero-codex-cli` | Research-alpha inventory/status binary with twelve M00 dispatch-linked records, stable JSON output, exit codes, bounded self-checks, and fail-closed public formula execution. |
+| `aero-codex-cli` | Research-alpha inventory/status binary with twelve promoted M00 dispatch-linked records, versioned JSON success/error contracts, stable exit codes, public formula execution, and bounded public-path self-checks. |
 | `xtask` | Dependency-free Rust local governance, validation, data-registry, formula-vault, equation-batch-manifest, and inventory checks. |
 
 ## Developer quickstart
@@ -95,18 +95,21 @@ See [toolchain baseline](docs/development/toolchain.md) and [CI/local verificati
 
 ## Research-alpha CLI status
 
-The CLI can list and describe the governed Formula Registry and has twelve M00 runtime dispatch links: ten canonical-unit records and two angle-conversion records. All remain `research_required`, with `execution_policy=blocked` and `public_executable=false`; a runtime symbol or dispatch link is not execution authorization.
+The CLI can list and describe all 152 governed Formula Registry rows. Exactly twelve M00 conversions—ten canonical-unit records and two angle conversions—are `implementation_verified`, `normal_research`, dispatch-linked, and publicly executable. The other 140 rows remain `research_required` / `blocked`; a runtime symbol or registry row alone is not execution authorization.
 
 ```bash
 cargo run -p aero-codex-cli -- version --json
 cargo run -p aero-codex-cli -- formula list --family m00 --json
+cargo run -p aero-codex-cli -- formula list --executable --json
 cargo run -p aero-codex-cli -- formula describe \
   m00.canonical.distance_to_canonical --json
+cargo run -p aero-codex-cli -- formula run \
+  m00.angle.deg_to_rad --degrees 180 --json
 cargo run -p aero-codex-cli -- formula status-report --json
 cargo run -p aero-codex-cli -- self-check --json
 ```
 
-A clean self-check reports 14 passing checks and zero failures, but self-check dispatch is not public formula execution and does not promote status. The sole machine-readable release authority is [`release/release-manifest.toml`](release/release-manifest.toml); the live batch record is [`docs/release/v0.1.0-alpha.1-status.md`](docs/release/v0.1.0-alpha.1-status.md). The current Cargo version is `0.1.0-alpha.1`, and no operational, parity, safety, or certification claim is made.
+A clean self-check reports 14 passing checks and zero failures after traversing the public resolver, input parser, status gate, evaluator, and JSON envelopes. `implementation_verified` records bounded implementation evidence; it is not scientific reference validation or certification. The sole machine-readable release authority is [`release/release-manifest.toml`](release/release-manifest.toml); the live batch record is [`docs/release/v0.1.0-alpha.1-status.md`](docs/release/v0.1.0-alpha.1-status.md). The current Cargo version is `0.1.0-alpha.1`, and no operational, parity, safety, or certification claim is made.
 
 ## Validation and governance artifacts
 

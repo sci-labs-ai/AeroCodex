@@ -5,8 +5,8 @@ Release version: `0.1.0-alpha.1`
 Release tier: `research_software_alpha` (`Research Software Alpha`)
 Workspace packages: `14`
 Registry formulas: `152`
-Blocked formulas: `152`
-Publicly executable formulas: `0`
+Blocked formulas: `140`
+Publicly executable formulas: `12`
 <!-- aerocodex-current-identity:end -->
 
 Status: current release-identity policy for v0.1.0-alpha.1.

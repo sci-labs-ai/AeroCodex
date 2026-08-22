@@ -345,7 +345,7 @@ pub fn verify_release_manifest(root: &Path) -> Result<(), String> {
     }
 
     println!(
-        "verified release manifest: schema={}; version={}; channel={}; tier={}; packages={}; registry_formulas={}; release_slice={}; non_release={}; targets={}; artifacts={}; research_required=152; blocked=152; publicly_executable=0; production_state=declared_only",
+        "verified release manifest: schema={}; version={}; channel={}; tier={}; packages={}; registry_formulas={}; release_slice={}; non_release={}; targets={}; artifacts={}; implementation_verified=12; research_required=140; blocked=140; publicly_executable=12; production_state=declared_only",
         manifest.schema_version,
         manifest.release_version,
         manifest.release_channel,
@@ -1070,25 +1070,25 @@ fn validate_release_manifest(manifest: &ReleaseManifest) -> Result<(), String> {
     {
         return Err("malformed pinned base revision: release base_commit must be a 40-character lowercase Git object ID".to_string());
     }
-    for (context, requirements) in [
-        (
-            "release_slice_requirements",
-            &manifest.release_slice_requirements,
-        ),
-        (
-            "non_release_requirements",
-            &manifest.non_release_requirements,
-        ),
-    ] {
-        if requirements.validation_status != "research_required"
-            || requirements.execution_policy != "blocked"
-            || requirements.public_executable
-        {
-            return Err(format!(
-                "{context} must be validation_status=research_required, execution_policy=blocked, public_executable=false; found {:?}",
-                requirements
-            ));
-        }
+    let release_requirements = &manifest.release_slice_requirements;
+    if release_requirements.validation_status != "implementation_verified"
+        || release_requirements.execution_policy != "normal_research"
+        || !release_requirements.public_executable
+    {
+        return Err(format!(
+            "release_slice_requirements must be validation_status=implementation_verified, execution_policy=normal_research, public_executable=true; found {:?}",
+            release_requirements
+        ));
+    }
+    let non_release_requirements = &manifest.non_release_requirements;
+    if non_release_requirements.validation_status != "research_required"
+        || non_release_requirements.execution_policy != "blocked"
+        || non_release_requirements.public_executable
+    {
+        return Err(format!(
+            "non_release_requirements must be validation_status=research_required, execution_policy=blocked, public_executable=false; found {:?}",
+            non_release_requirements
+        ));
     }
 
     let actual_packages: Vec<(&str, &str)> = manifest
@@ -2256,7 +2256,15 @@ mod tests {
         assert_eq!(parsed.formulas.len(), 12);
         assert_eq!(parsed.targets.len(), 4);
         assert_eq!(parsed.artifacts.len(), 9);
-        assert!(!parsed.release_slice_requirements.public_executable);
+        assert!(parsed.release_slice_requirements.public_executable);
+        assert_eq!(
+            parsed.release_slice_requirements.validation_status,
+            "implementation_verified"
+        );
+        assert_eq!(
+            parsed.release_slice_requirements.execution_policy,
+            "normal_research"
+        );
         assert!(!parsed.non_release_requirements.public_executable);
     }
 
@@ -2471,27 +2479,27 @@ mod tests {
     fn invalid_execution_policy_combination_fails() {
         let text = replace_first(
             &canonical_manifest(),
-            "execution_policy = \"blocked\"",
-            "execution_policy = \"normal_research\"",
-            2,
+            "[non_release_requirements]\nvalidation_status = \"research_required\"\nexecution_policy = \"blocked\"",
+            "[non_release_requirements]\nvalidation_status = \"research_required\"\nexecution_policy = \"normal_research\"",
             1,
+            0,
         );
         let error = parse_release_manifest(&text)
-            .expect_err("research_required cannot be normal execution");
-        assert!(error.contains("release_slice_requirements must be"));
+            .expect_err("research_required non-release formulas cannot use normal execution");
+        assert!(error.contains("non_release_requirements must be"));
     }
 
     #[test]
     fn executable_formula_without_validation_reference_fails() {
         let text = replace_first(
             &canonical_manifest(),
-            "public_executable = false",
-            "public_executable = true",
-            2,
+            "[non_release_requirements]\nvalidation_status = \"research_required\"\nexecution_policy = \"blocked\"\npublic_executable = false",
+            "[non_release_requirements]\nvalidation_status = \"research_required\"\nexecution_policy = \"blocked\"\npublic_executable = true",
             1,
+            0,
         );
         let error = parse_release_manifest(&text)
-            .expect_err("public execution in release requirements must fail");
+            .expect_err("public execution in non-release requirements must fail");
         assert!(error.contains("public_executable=false"));
     }
 
@@ -2599,12 +2607,12 @@ mod tests {
             ParserNegativeCase { name: "unknown top key", old: "release_documentation = \"docs/release/v0.1.0-alpha.1-status.md\"", new: "release_documentation = \"docs/release/v0.1.0-alpha.1-status.md\"\nunknown = \"value\"", expected_pre_count: 1, expected_post_count: 1, expected: &["release top level has unknown metadata key `unknown`"] },
             ParserNegativeCase { name: "duplicate top key", old: "release_channel = \"github_releases\"", new: "release_channel = \"github_releases\"\nrelease_channel = \"github_releases\"", expected_pre_count: 1, expected_post_count: 2, expected: &["duplicates key `release_channel` in the same table"] },
             ParserNegativeCase { name: "unknown table", old: "[release_slice_requirements]", new: "[release_requirements]", expected_pre_count: 1, expected_post_count: 0, expected: &["unsupported table `[release_requirements]`"] },
-            ParserNegativeCase { name: "unknown nested key", old: "validation_status = \"research_required\"", new: "validation_state = \"research_required\"", expected_pre_count: 2, expected_post_count: 1, expected: &["release_slice_requirements has unknown metadata key `validation_state`"] },
+            ParserNegativeCase { name: "unknown nested key", old: "validation_status = \"implementation_verified\"", new: "validation_state = \"implementation_verified\"", expected_pre_count: 1, expected_post_count: 0, expected: &["release_slice_requirements has unknown metadata key `validation_state`"] },
             ParserNegativeCase { name: "old derivative field", old: "registry_formula_count = 152", new: "registry_formula_count = 152\nregistry_blocked_formula_count = 152", expected_pre_count: 1, expected_post_count: 1, expected: &["release top level has unknown metadata key `registry_blocked_formula_count`"] },
-            ParserNegativeCase { name: "missing release requirement", old: "validation_status = \"research_required\"\n", new: "", expected_pre_count: 2, expected_post_count: 1, expected: &["release_slice_requirements is missing required metadata `validation_status`"] },
-            ParserNegativeCase { name: "status requirement mismatch", old: "validation_status = \"research_required\"", new: "validation_status = \"equation_traceable\"", expected_pre_count: 2, expected_post_count: 1, expected: &["release_slice_requirements must be", "validation_status: \"equation_traceable\""] },
-            ParserNegativeCase { name: "execution requirement mismatch", old: "execution_policy = \"blocked\"", new: "execution_policy = \"normal_research\"", expected_pre_count: 2, expected_post_count: 1, expected: &["release_slice_requirements must be", "execution_policy: \"normal_research\""] },
-            ParserNegativeCase { name: "public release requirement", old: "public_executable = false", new: "public_executable = true", expected_pre_count: 2, expected_post_count: 1, expected: &["release_slice_requirements must be", "public_executable: true"] },
+            ParserNegativeCase { name: "missing release requirement", old: "validation_status = \"implementation_verified\"\n", new: "", expected_pre_count: 1, expected_post_count: 0, expected: &["release_slice_requirements is missing required metadata `validation_status`"] },
+            ParserNegativeCase { name: "status requirement mismatch", old: "validation_status = \"implementation_verified\"", new: "validation_status = \"equation_traceable\"", expected_pre_count: 1, expected_post_count: 0, expected: &["release_slice_requirements must be", "validation_status: \"equation_traceable\""] },
+            ParserNegativeCase { name: "execution requirement mismatch", old: "execution_policy = \"normal_research\"", new: "execution_policy = \"preliminary_flag_required\"", expected_pre_count: 1, expected_post_count: 0, expected: &["release_slice_requirements must be", "execution_policy: \"preliminary_flag_required\""] },
+            ParserNegativeCase { name: "public release requirement", old: "public_executable = true", new: "public_executable = false", expected_pre_count: 1, expected_post_count: 0, expected: &["release_slice_requirements must be", "public_executable: false"] },
             ParserNegativeCase { name: "non-release requirement mismatch", old: "[non_release_requirements]\nvalidation_status = \"research_required\"", new: "[non_release_requirements]\nvalidation_status = \"implementation_verified\"", expected_pre_count: 1, expected_post_count: 0, expected: &["non_release_requirements must be", "validation_status: \"implementation_verified\""] },
             ParserNegativeCase { name: "duplicate formula ID", old: "identifier = \"m00.angle.rad_to_deg\"", new: "identifier = \"m00.angle.deg_to_rad\"", expected_pre_count: 1, expected_post_count: 0, expected: &["duplicate release formula identifier `m00.angle.deg_to_rad`"] },
             ParserNegativeCase { name: "duplicate runtime symbol", old: "runtime_symbol = \"m00_radians_to_degrees\"", new: "runtime_symbol = \"m00_degrees_to_radians\"", expected_pre_count: 1, expected_post_count: 0, expected: &["duplicate or empty release formula runtime symbol `m00_degrees_to_radians`"] },
@@ -2636,7 +2644,7 @@ mod tests {
             ParserNegativeCase { name: "invalid required task", old: "required_by_task = \"R5-09\"", new: "required_by_task = \"R7-01\"", expected_pre_count: 1, expected_post_count: 0, expected: &["release artifact set/contract mismatch", "R7-01"] },
             ParserNegativeCase { name: "unknown artifact field", old: "required_by_task = \"R5-09\"", new: "required_by_task = \"R5-09\"\nself_hash = \"no\"", expected_pre_count: 1, expected_post_count: 1, expected: &["artifacts table 1 has unknown metadata key `self_hash`"] },
             ParserNegativeCase { name: "top-level order drift", old: "release_version = \"0.1.0-alpha.1\"\nrelease_channel = \"github_releases\"", new: "release_channel = \"github_releases\"\nrelease_version = \"0.1.0-alpha.1\"", expected_pre_count: 1, expected_post_count: 0, expected: &["release top level keys are not in canonical order"] },
-            ParserNegativeCase { name: "requirement order drift", old: "validation_status = \"research_required\"\nexecution_policy = \"blocked\"", new: "execution_policy = \"blocked\"\nvalidation_status = \"research_required\"", expected_pre_count: 2, expected_post_count: 1, expected: &["release_slice_requirements keys are not in canonical order"] },
+            ParserNegativeCase { name: "requirement order drift", old: "validation_status = \"implementation_verified\"\nexecution_policy = \"normal_research\"", new: "execution_policy = \"normal_research\"\nvalidation_status = \"implementation_verified\"", expected_pre_count: 1, expected_post_count: 0, expected: &["release_slice_requirements keys are not in canonical order"] },
             ParserNegativeCase { name: "package key order drift", old: "name = \"aero-codex-core\"\nmanifest_path = \"crates/aero-codex-core/Cargo.toml\"", new: "manifest_path = \"crates/aero-codex-core/Cargo.toml\"\nname = \"aero-codex-core\"", expected_pre_count: 1, expected_post_count: 0, expected: &["packages table 1 keys are not in canonical order"] },
             ParserNegativeCase { name: "formula key order drift", old: "identifier = \"m00.angle.deg_to_rad\"\nruntime_symbol = \"m00_degrees_to_radians\"", new: "runtime_symbol = \"m00_degrees_to_radians\"\nidentifier = \"m00.angle.deg_to_rad\"", expected_pre_count: 1, expected_post_count: 0, expected: &["formulas table 1 keys are not in canonical order"] },
             ParserNegativeCase { name: "target key order drift", old: "triple = \"aarch64-apple-darwin\"\nplatform_tier = \"tier2\"", new: "platform_tier = \"tier2\"\ntriple = \"aarch64-apple-darwin\"", expected_pre_count: 1, expected_post_count: 0, expected: &["targets table 1 keys are not in canonical order"] },
