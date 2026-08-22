@@ -2989,8 +2989,8 @@ mod tests {
                             &readme,
                             RELEASE_MANIFEST_PATH,
                             OBSOLETE_RELEASE_MANIFEST_PATH,
-                            2,
                             1,
+                            0,
                         ),
                     );
                 }

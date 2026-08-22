@@ -2513,7 +2513,9 @@ fn dependency_policy() -> Result<(), String> {
     let lock = fs::read_to_string(root.join("Cargo.lock"))
         .map_err(|error| format!("Cargo.lock: {error}"))?;
     if !lock.lines().any(|line| line == "version = 3") {
-        return Err("Cargo.lock must use lockfile version 3 for Rust 1.74 compatibility".to_string());
+        return Err(
+            "Cargo.lock must use lockfile version 3 for Rust 1.74 compatibility".to_string(),
+        );
     }
     let locked_packages: BTreeSet<&str> = lock
         .lines()
@@ -2530,15 +2532,22 @@ fn dependency_policy() -> Result<(), String> {
     if !workspace_manifest.contains("license = \"MIT OR Apache-2.0\"") {
         return Err("workspace license must remain MIT OR Apache-2.0".to_string());
     }
-    for toml in tomls.iter().filter(|path| *path != &root.join("Cargo.toml")) {
-        let text = fs::read_to_string(toml).map_err(|error| format!("{}: {error}", toml.display()))?;
+    for toml in tomls
+        .iter()
+        .filter(|path| *path != &root.join("Cargo.toml"))
+    {
+        let text =
+            fs::read_to_string(toml).map_err(|error| format!("{}: {error}", toml.display()))?;
         if !text.contains("license.workspace = true") {
             return Err(format!(
                 "{} must inherit the reviewed workspace license",
                 toml.display()
             ));
         }
-        for line in text.lines().filter(|line| line.contains("path = \"../aero-codex-")) {
+        for line in text
+            .lines()
+            .filter(|line| line.contains("path = \"../aero-codex-"))
+        {
             if !line.contains("version = \"=0.1.0-alpha.1\"") {
                 return Err(format!(
                     "{} has an internal path dependency without the exact release version: {line}",

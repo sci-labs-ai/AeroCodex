@@ -63,9 +63,8 @@ fn build_profile() -> &'static str {
 }
 
 fn release_manifest_sha256() -> &'static str {
-    option_env!("AEROCODEX_RELEASE_MANIFEST_SHA256").unwrap_or(
-        "0000000000000000000000000000000000000000000000000000000000000000",
-    )
+    option_env!("AEROCODEX_RELEASE_MANIFEST_SHA256")
+        .unwrap_or("0000000000000000000000000000000000000000000000000000000000000000")
 }
 
 fn validation_status() -> &'static str {
