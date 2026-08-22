@@ -2468,7 +2468,7 @@ fn dependency_policy() -> Result<(), String> {
     })?;
 
     for toml in &tomls {
-        let text = fs::read_to_string(&toml).map_err(|e| format!("{}: {e}", toml.display()))?;
+        let text = fs::read_to_string(toml).map_err(|e| format!("{}: {e}", toml.display()))?;
         let lowered = text.to_ascii_lowercase();
         for token in FORBIDDEN_DEPENDENCY_TOKENS {
             if lowered.contains(token) {
