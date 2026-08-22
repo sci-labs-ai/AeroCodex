@@ -644,6 +644,8 @@ fn verify_equation_batch_scaffold(root: &Path) -> Result<(), String> {
         fs::read_dir(&batch_dir).map_err(|error| format!("{}: {error}", batch_dir.display()))?;
     let mut manifest_count = 0usize;
     let mut row_count = 0usize;
+    let mut implementation_verified_count = 0usize;
+    let mut research_required_count = 0usize;
     for entry in entries {
         let entry = entry.map_err(|error| format!("{}: {error}", batch_dir.display()))?;
         let path = entry.path();
@@ -655,12 +657,20 @@ fn verify_equation_batch_scaffold(root: &Path) -> Result<(), String> {
             fs::read_to_string(&path).map_err(|error| format!("{}: {error}", path.display()))?;
         let manifest = equation_batch::manifest::parse_equation_batch_manifest(&path, &text)?;
         for row in &manifest.rows {
-            if row.validation_status != "research_required" {
-                return Err(format!(
-                    "{} line {} validation_status must remain research_required",
-                    path.display(),
-                    row.line_number
-                ));
+            match row.validation_status.as_str() {
+                "implementation_verified" => {
+                    implementation_verified_count += 1;
+                }
+                "research_required" => {
+                    research_required_count += 1;
+                }
+                status => {
+                    return Err(format!(
+                        "{} line {} has unsupported validation_status `{status}`",
+                        path.display(),
+                        row.line_number
+                    ));
+                }
             }
             for (field_name, value) in [
                 ("contract_path", row.contract_path.as_str()),
@@ -690,9 +700,14 @@ fn verify_equation_batch_scaffold(root: &Path) -> Result<(), String> {
     if manifest_count == 0 {
         return Err("equation-batches has no TSV manifests".to_string());
     }
+    if implementation_verified_count != 12 || research_required_count != 140 {
+        return Err(format!(
+            "equation-batch validation-status counts must remain implementation_verified=12 and research_required=140; found implementation_verified={implementation_verified_count} and research_required={research_required_count}"
+        ));
+    }
 
     println!(
-        "verified equation-batch manifests: manifests={manifest_count}; rows={row_count}; validation_status=research_required"
+        "verified equation-batch manifests: manifests={manifest_count}; rows={row_count}; implementation_verified={implementation_verified_count}; research_required={research_required_count}"
     );
     Ok(())
 }
@@ -808,7 +823,7 @@ fn verify_beta1(root: &Path) -> Result<(), String> {
     }
 
     println!(
-        "verified historical Beta 1 compatibility material: current_version=0.1.0-alpha.1; current_tier=research_software_alpha; self_check_count=14; cli_dispatch_formula_count=12; public_executable_formula_count=0"
+        "verified historical Beta 1 compatibility material: current_version=0.1.0-alpha.1; current_tier=research_software_alpha; self_check_count=14; cli_dispatch_formula_count=12; public_executable_formula_count=12"
     );
     Ok(())
 }
