@@ -43,6 +43,14 @@ jobs:
           else
             test "$?" -eq 4
           fi
+          cargo fmt --all
+          mkdir -p /tmp/aerocodex-promotion-probe/formatted/crates/aero-codex-cli/src
+          mkdir -p /tmp/aerocodex-promotion-probe/formatted/crates/aero-codex-cli/tests
+          mkdir -p /tmp/aerocodex-promotion-probe/formatted/xtask/src
+          cp crates/aero-codex-cli/src/main.rs /tmp/aerocodex-promotion-probe/formatted/crates/aero-codex-cli/src/main.rs
+          cp crates/aero-codex-cli/tests/cli.rs /tmp/aerocodex-promotion-probe/formatted/crates/aero-codex-cli/tests/cli.rs
+          cp xtask/src/release_identity.rs /tmp/aerocodex-promotion-probe/formatted/xtask/src/release_identity.rs
+          cp xtask/src/release_manifest.rs /tmp/aerocodex-promotion-probe/formatted/xtask/src/release_manifest.rs
       - name: Upload temporary release-slice generated-state probe
         if: always() && runner.os == 'Linux'
         uses: actions/upload-artifact@v4

@@ -1,7 +1,7 @@
 {  "schema_version": "aerocodex.formula_registry.v1",
   "generator_version": "xtask-formula-registry-v1",
   "generated_by": "cargo run -p xtask -- formula-registry generate",
-  "source_hash": "sha256:b5a16a99f20a0bea420b6c3842894c316e958a8934b34556bfef2e1799586c3e",
+  "source_hash": "sha256:21529531ba30a1429ac9265d4be793b73f2ecb64e1be9a28d92969fa78bf9011",
   "formula_count": 152,
   "non_claims": [
     "Schema validation is not formula validation.",
@@ -5194,9 +5194,9 @@
       "summary": "Generated Formula Registry v1 inventory entry for research/preliminary-design traceability; execution remains controlled by status gates.",
       "family": "m00.angle",
       "batch_id": "m00-angle-vector",
-      "status": "research_required",
-      "quarantine_state": "below_execution_threshold",
-      "execution_policy": "blocked",
+      "status": "implementation_verified",
+      "quarantine_state": "none",
+      "execution_policy": "normal_research",
       "source_trace": {
         "contract_path": "formula-vault/contracts/m00_angle_unit_conversions_contract.yaml",
         "manifest_line": "2",
@@ -5248,7 +5248,6 @@
       "test_vectors": [],
       "warnings": [
         "Registry inclusion does not make formulas executable or promote validation status.",
-        "research_required rows are inventory only and remain blocked by default execution gates.",
         "legacy_formula_id is preserved as an alias for traceability and does not bypass status gates.",
         "Research/preliminary-design metadata only; not certification or operational-readiness evidence.",
         "The examples are future-facing schema examples and are not current normal-execution claims.",
@@ -5265,9 +5264,9 @@
       "summary": "Generated Formula Registry v1 inventory entry for research/preliminary-design traceability; execution remains controlled by status gates.",
       "family": "m00.angle",
       "batch_id": "m00-angle-vector",
-      "status": "research_required",
-      "quarantine_state": "below_execution_threshold",
-      "execution_policy": "blocked",
+      "status": "implementation_verified",
+      "quarantine_state": "none",
+      "execution_policy": "normal_research",
       "source_trace": {
         "contract_path": "formula-vault/contracts/m00_angle_unit_conversions_contract.yaml",
         "manifest_line": "3",
@@ -5309,7 +5308,6 @@
       "test_vectors": [],
       "warnings": [
         "Registry inclusion does not make formulas executable or promote validation status.",
-        "research_required rows are inventory only and remain blocked by default execution gates.",
         "legacy_formula_id is preserved as an alias for traceability and does not bypass status gates.",
         "No formula sidecar metadata was found; this entry is generated from equation-batch TSV and governed alias data only."
       ]
@@ -5371,9 +5369,9 @@
       "summary": "Generated Formula Registry v1 inventory entry for research/preliminary-design traceability; execution remains controlled by status gates.",
       "family": "m00.canonical",
       "batch_id": "m00-canonical-units",
-      "status": "research_required",
-      "quarantine_state": "below_execution_threshold",
-      "execution_policy": "blocked",
+      "status": "implementation_verified",
+      "quarantine_state": "none",
+      "execution_policy": "normal_research",
       "source_trace": {
         "contract_path": "formula-vault/contracts/m00_canonical_unit_conversions_contract.yaml",
         "manifest_line": "7",
@@ -5403,7 +5401,6 @@
       "test_vectors": [],
       "warnings": [
         "Registry inclusion does not make formulas executable or promote validation status.",
-        "research_required rows are inventory only and remain blocked by default execution gates.",
         "legacy_formula_id is preserved as an alias for traceability and does not bypass status gates.",
         "No formula sidecar metadata was found; this entry is generated from equation-batch TSV and governed alias data only."
       ]
@@ -5418,9 +5415,9 @@
       "summary": "Generated Formula Registry v1 inventory entry for research/preliminary-design traceability; execution remains controlled by status gates.",
       "family": "m00.canonical",
       "batch_id": "m00-canonical-units",
-      "status": "research_required",
-      "quarantine_state": "below_execution_threshold",
-      "execution_policy": "blocked",
+      "status": "implementation_verified",
+      "quarantine_state": "none",
+      "execution_policy": "normal_research",
       "source_trace": {
         "contract_path": "formula-vault/contracts/m00_canonical_unit_conversions_contract.yaml",
         "manifest_line": "6",
@@ -5450,7 +5447,6 @@
       "test_vectors": [],
       "warnings": [
         "Registry inclusion does not make formulas executable or promote validation status.",
-        "research_required rows are inventory only and remain blocked by default execution gates.",
         "legacy_formula_id is preserved as an alias for traceability and does not bypass status gates.",
         "No formula sidecar metadata was found; this entry is generated from equation-batch TSV and governed alias data only."
       ]
@@ -5465,9 +5461,9 @@
       "summary": "Generated Formula Registry v1 inventory entry for research/preliminary-design traceability; execution remains controlled by status gates.",
       "family": "m00.canonical",
       "batch_id": "m00-canonical-units",
-      "status": "research_required",
-      "quarantine_state": "below_execution_threshold",
-      "execution_policy": "blocked",
+      "status": "implementation_verified",
+      "quarantine_state": "none",
+      "execution_policy": "normal_research",
       "source_trace": {
         "contract_path": "formula-vault/contracts/m00_canonical_unit_conversions_contract.yaml",
         "manifest_line": "5",
@@ -5497,7 +5493,6 @@
       "test_vectors": [],
       "warnings": [
         "Registry inclusion does not make formulas executable or promote validation status.",
-        "research_required rows are inventory only and remain blocked by default execution gates.",
         "legacy_formula_id is preserved as an alias for traceability and does not bypass status gates.",
         "No formula sidecar metadata was found; this entry is generated from equation-batch TSV and governed alias data only."
       ]
@@ -5512,9 +5507,9 @@
       "summary": "Generated Formula Registry v1 inventory entry for research/preliminary-design traceability; execution remains controlled by status gates.",
       "family": "m00.canonical",
       "batch_id": "m00-canonical-units",
-      "status": "research_required",
-      "quarantine_state": "below_execution_threshold",
-      "execution_policy": "blocked",
+      "status": "implementation_verified",
+      "quarantine_state": "none",
+      "execution_policy": "normal_research",
       "source_trace": {
         "contract_path": "formula-vault/contracts/m00_canonical_unit_conversions_contract.yaml",
         "manifest_line": "11",
@@ -5544,7 +5539,6 @@
       "test_vectors": [],
       "warnings": [
         "Registry inclusion does not make formulas executable or promote validation status.",
-        "research_required rows are inventory only and remain blocked by default execution gates.",
         "legacy_formula_id is preserved as an alias for traceability and does not bypass status gates.",
         "No formula sidecar metadata was found; this entry is generated from equation-batch TSV and governed alias data only."
       ]
@@ -5559,9 +5553,9 @@
       "summary": "Generated Formula Registry v1 inventory entry for research/preliminary-design traceability; execution remains controlled by status gates.",
       "family": "m00.canonical",
       "batch_id": "m00-canonical-units",
-      "status": "research_required",
-      "quarantine_state": "below_execution_threshold",
-      "execution_policy": "blocked",
+      "status": "implementation_verified",
+      "quarantine_state": "none",
+      "execution_policy": "normal_research",
       "source_trace": {
         "contract_path": "formula-vault/contracts/m00_canonical_unit_conversions_contract.yaml",
         "manifest_line": "10",
@@ -5591,7 +5585,6 @@
       "test_vectors": [],
       "warnings": [
         "Registry inclusion does not make formulas executable or promote validation status.",
-        "research_required rows are inventory only and remain blocked by default execution gates.",
         "legacy_formula_id is preserved as an alias for traceability and does not bypass status gates.",
         "No formula sidecar metadata was found; this entry is generated from equation-batch TSV and governed alias data only."
       ]
@@ -5606,9 +5599,9 @@
       "summary": "Generated Formula Registry v1 inventory entry for research/preliminary-design traceability; execution remains controlled by status gates.",
       "family": "m00.canonical",
       "batch_id": "m00-canonical-units",
-      "status": "research_required",
-      "quarantine_state": "below_execution_threshold",
-      "execution_policy": "blocked",
+      "status": "implementation_verified",
+      "quarantine_state": "none",
+      "execution_policy": "normal_research",
       "source_trace": {
         "contract_path": "formula-vault/contracts/m00_canonical_unit_conversions_contract.yaml",
         "manifest_line": "3",
@@ -5638,7 +5631,6 @@
       "test_vectors": [],
       "warnings": [
         "Registry inclusion does not make formulas executable or promote validation status.",
-        "research_required rows are inventory only and remain blocked by default execution gates.",
         "legacy_formula_id is preserved as an alias for traceability and does not bypass status gates.",
         "No formula sidecar metadata was found; this entry is generated from equation-batch TSV and governed alias data only."
       ]
@@ -5653,9 +5645,9 @@
       "summary": "Generated Formula Registry v1 inventory entry for research/preliminary-design traceability; execution remains controlled by status gates.",
       "family": "m00.canonical",
       "batch_id": "m00-canonical-units",
-      "status": "research_required",
-      "quarantine_state": "below_execution_threshold",
-      "execution_policy": "blocked",
+      "status": "implementation_verified",
+      "quarantine_state": "none",
+      "execution_policy": "normal_research",
       "source_trace": {
         "contract_path": "formula-vault/contracts/m00_canonical_unit_conversions_contract.yaml",
         "manifest_line": "4",
@@ -5685,7 +5677,6 @@
       "test_vectors": [],
       "warnings": [
         "Registry inclusion does not make formulas executable or promote validation status.",
-        "research_required rows are inventory only and remain blocked by default execution gates.",
         "legacy_formula_id is preserved as an alias for traceability and does not bypass status gates.",
         "No formula sidecar metadata was found; this entry is generated from equation-batch TSV and governed alias data only."
       ]
@@ -5700,9 +5691,9 @@
       "summary": "Generated Formula Registry v1 inventory entry for research/preliminary-design traceability; execution remains controlled by status gates.",
       "family": "m00.canonical",
       "batch_id": "m00-canonical-units",
-      "status": "research_required",
-      "quarantine_state": "below_execution_threshold",
-      "execution_policy": "blocked",
+      "status": "implementation_verified",
+      "quarantine_state": "none",
+      "execution_policy": "normal_research",
       "source_trace": {
         "contract_path": "formula-vault/contracts/m00_canonical_unit_conversions_contract.yaml",
         "manifest_line": "9",
@@ -5732,7 +5723,6 @@
       "test_vectors": [],
       "warnings": [
         "Registry inclusion does not make formulas executable or promote validation status.",
-        "research_required rows are inventory only and remain blocked by default execution gates.",
         "legacy_formula_id is preserved as an alias for traceability and does not bypass status gates.",
         "No formula sidecar metadata was found; this entry is generated from equation-batch TSV and governed alias data only."
       ]
@@ -5747,9 +5737,9 @@
       "summary": "Generated Formula Registry v1 inventory entry for research/preliminary-design traceability; execution remains controlled by status gates.",
       "family": "m00.canonical",
       "batch_id": "m00-canonical-units",
-      "status": "research_required",
-      "quarantine_state": "below_execution_threshold",
-      "execution_policy": "blocked",
+      "status": "implementation_verified",
+      "quarantine_state": "none",
+      "execution_policy": "normal_research",
       "source_trace": {
         "contract_path": "formula-vault/contracts/m00_canonical_unit_conversions_contract.yaml",
         "manifest_line": "8",
@@ -5779,7 +5769,6 @@
       "test_vectors": [],
       "warnings": [
         "Registry inclusion does not make formulas executable or promote validation status.",
-        "research_required rows are inventory only and remain blocked by default execution gates.",
         "legacy_formula_id is preserved as an alias for traceability and does not bypass status gates.",
         "No formula sidecar metadata was found; this entry is generated from equation-batch TSV and governed alias data only."
       ]
@@ -5794,9 +5783,9 @@
       "summary": "Generated Formula Registry v1 inventory entry for research/preliminary-design traceability; execution remains controlled by status gates.",
       "family": "m00.canonical",
       "batch_id": "m00-canonical-units",
-      "status": "research_required",
-      "quarantine_state": "below_execution_threshold",
-      "execution_policy": "blocked",
+      "status": "implementation_verified",
+      "quarantine_state": "none",
+      "execution_policy": "normal_research",
       "source_trace": {
         "contract_path": "formula-vault/contracts/m00_canonical_unit_conversions_contract.yaml",
         "manifest_line": "2",
@@ -5826,7 +5815,6 @@
       "test_vectors": [],
       "warnings": [
         "Registry inclusion does not make formulas executable or promote validation status.",
-        "research_required rows are inventory only and remain blocked by default execution gates.",
         "legacy_formula_id is preserved as an alias for traceability and does not bypass status gates.",
         "No formula sidecar metadata was found; this entry is generated from equation-batch TSV and governed alias data only."
       ]
