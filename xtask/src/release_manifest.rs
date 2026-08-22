@@ -1631,6 +1631,7 @@ fn has_windows_absolute_prefix(path: &str) -> bool {
 mod tests {
     use super::*;
     use std::{
+        io::ErrorKind,
         path::PathBuf,
         sync::atomic::{AtomicUsize, Ordering},
     };
@@ -1648,6 +1649,51 @@ mod tests {
             "fixture must match once: {old}"
         );
         text.replacen(old, new, 1)
+    }
+
+    struct ParserNegativeCase {
+        name: &'static str,
+        old: &'static str,
+        new: &'static str,
+        expected: &'static [&'static str],
+    }
+
+    #[derive(Clone, Copy)]
+    enum SemanticMutation {
+        RemoveTarget(&'static str),
+        AddTarget,
+        SetArtifactFilename {
+            identifier: &'static str,
+            filename: &'static str,
+        },
+        RemoveArtifact(&'static str),
+        AddArtifact,
+    }
+
+    struct SemanticNegativeCase {
+        name: &'static str,
+        mutation: SemanticMutation,
+        expected: &'static [&'static str],
+    }
+
+    fn assert_discriminating_error(name: &str, error: &str, expected: &[&str]) {
+        assert!(
+            !expected.is_empty(),
+            "negative case `{name}` must declare a discriminating diagnostic"
+        );
+        for fragment in expected {
+            assert!(
+                error.contains(fragment),
+                "negative case `{name}` reached the wrong production guard: expected fragment `{fragment}`, actual error: {error}"
+            );
+        }
+    }
+
+    fn repository_root() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .expect("xtask has repository parent")
+            .to_path_buf()
     }
 
     fn dispatch_metadata(rows: &[(&str, &str, &str)]) -> String {
@@ -1703,6 +1749,105 @@ mod tests {
         }
         fs::create_dir_all(&root).expect("create release reference fixture");
         root
+    }
+
+    struct AuthorityFixture {
+        root: PathBuf,
+        active: bool,
+    }
+
+    impl AuthorityFixture {
+        fn new(name: &str) -> Self {
+            let root = loop {
+                let serial = TEST_COUNTER.fetch_add(1, Ordering::Relaxed);
+                let candidate = std::env::temp_dir().join(format!(
+                    "aerocodex-release-authority-{name}-{}-{serial}",
+                    std::process::id()
+                ));
+                match fs::create_dir(&candidate) {
+                    Ok(()) => break candidate,
+                    Err(error) if error.kind() == ErrorKind::AlreadyExists => continue,
+                    Err(error) => panic!(
+                        "create unique disposable authority repository {}: {error}",
+                        candidate.display()
+                    ),
+                }
+            };
+            let fixture = Self { root, active: true };
+            for relative in [
+                RELEASE_MANIFEST_PATH,
+                "scripts/friend_test_local.sh",
+                "scripts/friend_test_local.ps1",
+                "README.md",
+                "docs/index.md",
+                "docs/roadmap/research_readiness_counts.md",
+                "checksums/SHA256SUMS",
+            ] {
+                fixture.copy_from_repository(relative);
+            }
+            fixture
+        }
+
+        fn root(&self) -> &Path {
+            &self.root
+        }
+
+        fn path(&self, relative: &str) -> PathBuf {
+            self.root.join(relative)
+        }
+
+        fn copy_from_repository(&self, relative: &str) {
+            let destination = self.path(relative);
+            fs::create_dir_all(destination.parent().expect("fixture path has parent"))
+                .expect("create disposable authority repository directory");
+            fs::copy(repository_root().join(relative), &destination)
+                .unwrap_or_else(|error| panic!("copy authority fixture `{relative}`: {error}"));
+        }
+
+        fn read(&self, relative: &str) -> String {
+            fs::read_to_string(self.path(relative))
+                .unwrap_or_else(|error| panic!("read authority fixture `{relative}`: {error}"))
+        }
+
+        fn write(&self, relative: &str, text: &str) {
+            fs::write(self.path(relative), text)
+                .unwrap_or_else(|error| panic!("write authority fixture `{relative}`: {error}"));
+        }
+
+        fn create_parent(&self, relative: &str) {
+            fs::create_dir_all(
+                self.path(relative)
+                    .parent()
+                    .expect("fixture path has parent"),
+            )
+            .unwrap_or_else(|error| {
+                panic!("create authority fixture parent for `{relative}`: {error}")
+            });
+        }
+
+        fn cleanup(mut self) {
+            let root = self.root.clone();
+            fs::remove_dir_all(&root).unwrap_or_else(|error| {
+                panic!(
+                    "remove disposable authority repository {}: {error}",
+                    root.display()
+                )
+            });
+            self.active = false;
+            assert!(
+                !root.exists(),
+                "disposable authority repository still exists: {}",
+                root.display()
+            );
+        }
+    }
+
+    impl Drop for AuthorityFixture {
+        fn drop(&mut self) {
+            if self.active {
+                let _ = fs::remove_dir_all(&self.root);
+            }
+        }
     }
 
     #[cfg(unix)]
@@ -1967,74 +2112,192 @@ mod tests {
 
     #[test]
     fn canonical_v3_negative_matrix_fails_closed() {
-        let base = canonical_manifest();
-        let cases = vec![
-            ("missing release version", replace_first(&base, "release_version = \"0.1.0-alpha.1\"\n", "")),
-            ("malformed release version", replace_first(&base, "release_version = \"0.1.0-alpha.1\"", "release_version = \"0.1\"")),
-            ("wrong release version", replace_first(&base, "release_version = \"0.1.0-alpha.1\"", "release_version = \"0.1.0-alpha.2\"")),
-            ("missing channel", replace_first(&base, "release_channel = \"github_releases\"\n", "")),
-            ("invalid channel", replace_first(&base, "release_channel = \"github_releases\"", "release_channel = \"nightly\"")),
-            ("tier substituted for channel", replace_first(&base, "release_channel = \"github_releases\"", "release_channel = \"research_software_alpha\"")),
-            ("missing schema", replace_first(&base, "schema_version = \"aerocodex.release_manifest.v3\"\n", "")),
-            ("old schema", replace_first(&base, "aerocodex.release_manifest.v3", "aerocodex.release_manifest.v2")),
-            ("unknown schema", replace_first(&base, "aerocodex.release_manifest.v3", "aerocodex.release_manifest.v99")),
-            ("unknown top key", replace_first(&base, "release_documentation = \"docs/release/v0.1.0-alpha.1-status.md\"", "release_documentation = \"docs/release/v0.1.0-alpha.1-status.md\"\nunknown = \"value\"")),
-            ("duplicate top key", replace_first(&base, "release_channel = \"github_releases\"", "release_channel = \"github_releases\"\nrelease_channel = \"github_releases\"")),
-            ("unknown table", replace_first(&base, "[release_slice_requirements]", "[release_requirements]")),
-            ("unknown nested key", replace_first(&base, "validation_status = \"research_required\"", "validation_state = \"research_required\"")),
-            ("old derivative field", replace_first(&base, "registry_formula_count = 152", "registry_formula_count = 152\nregistry_blocked_formula_count = 152")),
-            ("missing release requirement", replace_first(&base, "validation_status = \"research_required\"\n", "")),
-            ("status requirement mismatch", replace_first(&base, "validation_status = \"research_required\"", "validation_status = \"equation_traceable\"")),
-            ("execution requirement mismatch", replace_first(&base, "execution_policy = \"blocked\"", "execution_policy = \"normal_research\"")),
-            ("public release requirement", replace_first(&base, "public_executable = false", "public_executable = true")),
-            ("non-release requirement mismatch", base.replacen("validation_status = \"research_required\"", "validation_status = \"implementation_verified\"", 2)),
-            ("duplicate formula ID", replace_first(&base, "identifier = \"m00.angle.rad_to_deg\"", "identifier = \"m00.angle.deg_to_rad\"")),
-            ("duplicate runtime symbol", replace_first(&base, "runtime_symbol = \"m00_radians_to_degrees\"", "runtime_symbol = \"m00_degrees_to_radians\"")),
-            ("unknown formula", replace_first(&base, "identifier = \"m00.angle.deg_to_rad\"", "identifier = \"m00.unknown\"")),
-            ("formula evidence absolute", replace_first(&base, "validation_record = \"validation/cards/validation_formula_vault_m00_angle_unit_conversions.yaml\"", "validation_record = \"C:/outside.yaml\"")),
-            ("formula evidence traversal", replace_first(&base, "documentation = \"docs/research_alpha/cli_formula_quickstart.md\"", "documentation = \"../outside.md\"")),
-            ("missing target", replace_first(&base, "[[targets]]\ntriple = \"aarch64-apple-darwin\"\n", "")),
-            ("extra target", replace_first(&base, "[[artifacts]]\nidentifier = \"checksums\"", "[[targets]]\ntriple = \"fixture\"\nplatform_tier = \"tier1\"\nci_posture = \"blocking\"\nartifact_eligible = true\ncurrently_tested = false\ncurrently_packaged = false\ncurrent_support = \"source_only\"\n\n[[artifacts]]\nidentifier = \"checksums\"")),
-            ("duplicate target", replace_first(&base, "triple = \"x86_64-apple-darwin\"", "triple = \"aarch64-apple-darwin\"")),
-            ("unknown target tier", replace_first(&base, "platform_tier = \"tier2\"", "platform_tier = \"tier3\"")),
-            ("wrong target tier mapping", replace_first(&base, "platform_tier = \"tier2\"", "platform_tier = \"tier1\"")),
-            ("wrong CI posture", replace_first(&base, "ci_posture = \"required_tier2\"", "ci_posture = \"blocking\"")),
-            ("target currently tested", replace_first(&base, "currently_tested = false", "currently_tested = true")),
-            ("target currently packaged", replace_first(&base, "currently_packaged = false", "currently_packaged = true")),
-            ("unsupported current support", replace_first(&base, "current_support = \"source_only\"", "current_support = \"binary\"")),
-            ("unknown target nested key", replace_first(&base, "current_support = \"source_only\"", "support = \"source_only\"")),
-            ("artifact unknown target", replace_first(&base, "target = \"x86_64-unknown-linux-gnu\"", "target = \"unknown-target\"")),
-            ("non-CLI artifact target", replace_first(&base, "kind = \"checksum\"\narchive_format", "kind = \"checksum\"\ntarget = \"x86_64-unknown-linux-gnu\"\narchive_format")),
-            ("CLI artifact missing target", replace_first(&base, "target = \"x86_64-unknown-linux-gnu\"\n", "")),
-            ("duplicate artifact ID", replace_first(&base, "identifier = \"cli-macos-aarch64\"", "identifier = \"cli-linux-x86-64\"")),
-            ("duplicate artifact filename", replace_first(&base, "filename = \"aerocodex-0.1.0-alpha.1-aarch64-apple-darwin.tar.gz\"", "filename = \"aerocodex-0.1.0-alpha.1-x86_64-unknown-linux-gnu.tar.gz\"")),
-            ("unsafe artifact filename", replace_first(&base, "aerocodex-0.1.0-alpha.1-SHA256SUMS", "unsafe name")),
-            ("absolute artifact filename", replace_first(&base, "aerocodex-0.1.0-alpha.1-SHA256SUMS", "/tmp/SHA256SUMS")),
-            ("artifact traversal", replace_first(&base, "aerocodex-0.1.0-alpha.1-SHA256SUMS", "../SHA256SUMS")),
-            ("artifact backslash", replace_first(&base, "aerocodex-0.1.0-alpha.1-SHA256SUMS", "dir\\SHA256SUMS")),
-            ("artifact drive prefix", replace_first(&base, "aerocodex-0.1.0-alpha.1-SHA256SUMS", "C:/SHA256SUMS")),
-            ("unsupported archive format", replace_first(&base, "archive_format = \"none\"", "archive_format = \"7z\"")),
-            ("kind format mismatch", replace_first(&base, "archive_format = \"none\"", "archive_format = \"zip\"")),
-            ("filename version mismatch", replace_first(&base, "aerocodex-0.1.0-alpha.1-SHA256SUMS", "aerocodex-0.1.0-alpha.2-SHA256SUMS")),
-            ("filename target mismatch", replace_first(&base, "aerocodex-0.1.0-alpha.1-x86_64-unknown-linux-gnu.tar.gz", "aerocodex-0.1.0-alpha.1-aarch64-apple-darwin.tar.gz")),
-            ("missing artifact", replace_first(&base, "[[artifacts]]\nidentifier = \"source-archive\"", "identifier = \"source-archive\"")),
-            ("extra artifact", format!("{base}\n[[artifacts]]\nidentifier = \"extra\"\nfilename = \"extra.zip\"\nkind = \"source_archive\"\narchive_format = \"zip\"\nproduction_state = \"declared_only\"\nrequired_by_task = \"R4-09\"\n")),
-            ("artifact produced", replace_first(&base, "production_state = \"declared_only\"", "production_state = \"built\"")),
-            ("invalid required task", replace_first(&base, "required_by_task = \"R5-09\"", "required_by_task = \"R7-01\"")),
-            ("unknown artifact field", replace_first(&base, "required_by_task = \"R5-09\"", "required_by_task = \"R5-09\"\nself_hash = \"no\"")),
-            ("top-level order drift", replace_first(&base, "release_version = \"0.1.0-alpha.1\"\nrelease_channel = \"github_releases\"", "release_channel = \"github_releases\"\nrelease_version = \"0.1.0-alpha.1\"")),
-            ("requirement order drift", replace_first(&base, "validation_status = \"research_required\"\nexecution_policy = \"blocked\"", "execution_policy = \"blocked\"\nvalidation_status = \"research_required\"")),
-            ("package key order drift", replace_first(&base, "name = \"aero-codex-core\"\nmanifest_path = \"crates/aero-codex-core/Cargo.toml\"", "manifest_path = \"crates/aero-codex-core/Cargo.toml\"\nname = \"aero-codex-core\"")),
-            ("formula key order drift", replace_first(&base, "identifier = \"m00.angle.deg_to_rad\"\nruntime_symbol = \"m00_degrees_to_radians\"", "runtime_symbol = \"m00_degrees_to_radians\"\nidentifier = \"m00.angle.deg_to_rad\"")),
-            ("target key order drift", replace_first(&base, "triple = \"aarch64-apple-darwin\"\nplatform_tier = \"tier2\"", "platform_tier = \"tier2\"\ntriple = \"aarch64-apple-darwin\"")),
-            ("artifact key order drift", replace_first(&base, "identifier = \"checksums\"\nfilename = \"aerocodex-0.1.0-alpha.1-SHA256SUMS\"", "filename = \"aerocodex-0.1.0-alpha.1-SHA256SUMS\"\nidentifier = \"checksums\"")),
+        let parser_cases = vec![
+            ParserNegativeCase { name: "missing release version", old: "release_version = \"0.1.0-alpha.1\"\n", new: "", expected: &["release top level is missing required metadata `release_version`"] },
+            ParserNegativeCase { name: "malformed release version", old: "release_version = \"0.1.0-alpha.1\"", new: "release_version = \"0.1\"", expected: &["release_version `0.1` is not valid SemVer"] },
+            ParserNegativeCase { name: "wrong release version", old: "release_version = \"0.1.0-alpha.1\"", new: "release_version = \"0.1.0-alpha.2\"", expected: &["release top-level key `release_version`", "value `0.1.0-alpha.2`"] },
+            ParserNegativeCase { name: "missing channel", old: "release_channel = \"github_releases\"\n", new: "", expected: &["release top level is missing required metadata `release_channel`"] },
+            ParserNegativeCase { name: "invalid channel", old: "release_channel = \"github_releases\"", new: "release_channel = \"nightly\"", expected: &["release top-level key `release_channel`", "value `nightly`"] },
+            ParserNegativeCase { name: "tier substituted for channel", old: "release_channel = \"github_releases\"", new: "release_channel = \"research_software_alpha\"", expected: &["release top-level key `release_channel`", "value `research_software_alpha`"] },
+            ParserNegativeCase { name: "missing schema", old: "schema_version = \"aerocodex.release_manifest.v3\"\n", new: "", expected: &["release top level is missing required metadata `schema_version`"] },
+            ParserNegativeCase { name: "old schema", old: "aerocodex.release_manifest.v3", new: "aerocodex.release_manifest.v2", expected: &["release top-level key `schema_version`", "aerocodex.release_manifest.v2"] },
+            ParserNegativeCase { name: "unknown schema", old: "aerocodex.release_manifest.v3", new: "aerocodex.release_manifest.v99", expected: &["release top-level key `schema_version`", "aerocodex.release_manifest.v99"] },
+            ParserNegativeCase { name: "unknown top key", old: "release_documentation = \"docs/release/v0.1.0-alpha.1-status.md\"", new: "release_documentation = \"docs/release/v0.1.0-alpha.1-status.md\"\nunknown = \"value\"", expected: &["release top level has unknown metadata key `unknown`"] },
+            ParserNegativeCase { name: "duplicate top key", old: "release_channel = \"github_releases\"", new: "release_channel = \"github_releases\"\nrelease_channel = \"github_releases\"", expected: &["duplicates key `release_channel` in the same table"] },
+            ParserNegativeCase { name: "unknown table", old: "[release_slice_requirements]", new: "[release_requirements]", expected: &["unsupported table `[release_requirements]`"] },
+            ParserNegativeCase { name: "unknown nested key", old: "validation_status = \"research_required\"", new: "validation_state = \"research_required\"", expected: &["release_slice_requirements has unknown metadata key `validation_state`"] },
+            ParserNegativeCase { name: "old derivative field", old: "registry_formula_count = 152", new: "registry_formula_count = 152\nregistry_blocked_formula_count = 152", expected: &["release top level has unknown metadata key `registry_blocked_formula_count`"] },
+            ParserNegativeCase { name: "missing release requirement", old: "validation_status = \"research_required\"\n", new: "", expected: &["release_slice_requirements is missing required metadata `validation_status`"] },
+            ParserNegativeCase { name: "status requirement mismatch", old: "validation_status = \"research_required\"", new: "validation_status = \"equation_traceable\"", expected: &["release_slice_requirements must be", "validation_status: \"equation_traceable\""] },
+            ParserNegativeCase { name: "execution requirement mismatch", old: "execution_policy = \"blocked\"", new: "execution_policy = \"normal_research\"", expected: &["release_slice_requirements must be", "execution_policy: \"normal_research\""] },
+            ParserNegativeCase { name: "public release requirement", old: "public_executable = false", new: "public_executable = true", expected: &["release_slice_requirements must be", "public_executable: true"] },
+            ParserNegativeCase { name: "non-release requirement mismatch", old: "[non_release_requirements]\nvalidation_status = \"research_required\"", new: "[non_release_requirements]\nvalidation_status = \"implementation_verified\"", expected: &["non_release_requirements must be", "validation_status: \"implementation_verified\""] },
+            ParserNegativeCase { name: "duplicate formula ID", old: "identifier = \"m00.angle.rad_to_deg\"", new: "identifier = \"m00.angle.deg_to_rad\"", expected: &["duplicate release formula identifier `m00.angle.deg_to_rad`"] },
+            ParserNegativeCase { name: "duplicate runtime symbol", old: "runtime_symbol = \"m00_radians_to_degrees\"", new: "runtime_symbol = \"m00_degrees_to_radians\"", expected: &["duplicate or empty release formula runtime symbol `m00_degrees_to_radians`"] },
+            ParserNegativeCase { name: "unknown formula", old: "identifier = \"m00.angle.deg_to_rad\"", new: "identifier = \"m00.unknown\"", expected: &["release formula set/order mismatch", "m00.unknown"] },
+            ParserNegativeCase { name: "formula evidence absolute", old: "validation_record = \"validation/cards/validation_formula_vault_m00_angle_unit_conversions.yaml\"", new: "validation_record = \"C:/outside.yaml\"", expected: &["release formula `m00.angle.deg_to_rad` validation_record is invalid", "C:/outside.yaml"] },
+            ParserNegativeCase { name: "formula evidence traversal", old: "documentation = \"docs/research_alpha/cli_formula_quickstart.md\"", new: "documentation = \"../outside.md\"", expected: &["release formula `m00.angle.deg_to_rad` documentation is invalid", "../outside.md"] },
+            ParserNegativeCase { name: "duplicate target", old: "triple = \"x86_64-apple-darwin\"", new: "triple = \"aarch64-apple-darwin\"", expected: &["release target set/tier/CI mapping mismatch"] },
+            ParserNegativeCase { name: "unknown target tier", old: "platform_tier = \"tier2\"", new: "platform_tier = \"tier3\"", expected: &["release target set/tier/CI mapping mismatch", "tier3"] },
+            ParserNegativeCase { name: "wrong target tier mapping", old: "platform_tier = \"tier2\"", new: "platform_tier = \"tier1\"", expected: &["release target set/tier/CI mapping mismatch"] },
+            ParserNegativeCase { name: "wrong CI posture", old: "ci_posture = \"required_tier2\"", new: "ci_posture = \"blocking\"", expected: &["release target set/tier/CI mapping mismatch"] },
+            ParserNegativeCase { name: "target currently tested", old: "currently_tested = false", new: "currently_tested = true", expected: &["target `aarch64-apple-darwin` must be", "currently_tested: true"] },
+            ParserNegativeCase { name: "target currently packaged", old: "currently_packaged = false", new: "currently_packaged = true", expected: &["target `aarch64-apple-darwin` must be", "currently_packaged: true"] },
+            ParserNegativeCase { name: "unsupported current support", old: "current_support = \"source_only\"", new: "current_support = \"binary\"", expected: &["target `aarch64-apple-darwin` must be", "current_support: \"binary\""] },
+            ParserNegativeCase { name: "unknown target nested key", old: "current_support = \"source_only\"", new: "support = \"source_only\"", expected: &["targets table 1 has unknown metadata key `support`"] },
+            ParserNegativeCase { name: "artifact unknown target", old: "target = \"x86_64-unknown-linux-gnu\"", new: "target = \"unknown-target\"", expected: &["CLI artifact `cli-linux-x86-64` references unknown target `unknown-target`"] },
+            ParserNegativeCase { name: "non-CLI artifact target", old: "kind = \"checksum\"\narchive_format", new: "kind = \"checksum\"\ntarget = \"x86_64-unknown-linux-gnu\"\narchive_format", expected: &["non-CLI artifact `checksums` must not contain target `x86_64-unknown-linux-gnu`"] },
+            ParserNegativeCase { name: "CLI artifact missing target", old: "target = \"x86_64-unknown-linux-gnu\"\n", new: "", expected: &["CLI artifact `cli-linux-x86-64` is missing required target"] },
+            ParserNegativeCase { name: "duplicate artifact ID", old: "identifier = \"cli-macos-aarch64\"", new: "identifier = \"cli-linux-x86-64\"", expected: &["duplicate artifact ID `cli-linux-x86-64`"] },
+            ParserNegativeCase { name: "duplicate artifact filename", old: "filename = \"aerocodex-0.1.0-alpha.1-aarch64-apple-darwin.tar.gz\"", new: "filename = \"aerocodex-0.1.0-alpha.1-x86_64-unknown-linux-gnu.tar.gz\"", expected: &["duplicate artifact filename `aerocodex-0.1.0-alpha.1-x86_64-unknown-linux-gnu.tar.gz`"] },
+            ParserNegativeCase { name: "unsafe artifact filename", old: "aerocodex-0.1.0-alpha.1-SHA256SUMS", new: "unsafe name", expected: &["artifact filename `unsafe name` must be a normalized safe ASCII basename"] },
+            ParserNegativeCase { name: "absolute artifact filename", old: "aerocodex-0.1.0-alpha.1-SHA256SUMS", new: "/tmp/SHA256SUMS", expected: &["artifact filename `/tmp/SHA256SUMS` must be a normalized safe ASCII basename"] },
+            ParserNegativeCase { name: "artifact traversal", old: "aerocodex-0.1.0-alpha.1-SHA256SUMS", new: "../SHA256SUMS", expected: &["artifact filename `../SHA256SUMS` must be a normalized safe ASCII basename"] },
+            ParserNegativeCase { name: "artifact drive prefix", old: "aerocodex-0.1.0-alpha.1-SHA256SUMS", new: "C:/SHA256SUMS", expected: &["artifact filename `C:/SHA256SUMS` must be a normalized safe ASCII basename"] },
+            ParserNegativeCase { name: "unsupported archive format", old: "archive_format = \"none\"", new: "archive_format = \"7z\"", expected: &["artifact `checksums` has unsupported archive_format `7z`"] },
+            ParserNegativeCase { name: "kind format mismatch", old: "archive_format = \"none\"", new: "archive_format = \"zip\"", expected: &["artifact `checksums` kind/format/extension mismatch"] },
+            ParserNegativeCase { name: "filename version mismatch", old: "aerocodex-0.1.0-alpha.1-SHA256SUMS", new: "aerocodex-0.1.0-alpha.2-SHA256SUMS", expected: &["release artifact set/contract mismatch", "aerocodex-0.1.0-alpha.2-SHA256SUMS"] },
+            ParserNegativeCase { name: "filename target mismatch", old: "aerocodex-0.1.0-alpha.1-aarch64-apple-darwin.tar.gz", new: "aerocodex-0.1.0-alpha.1-aarch64-apple-darwin-v2.tar.gz", expected: &["release artifact set/contract mismatch", "cli-macos-aarch64", "aerocodex-0.1.0-alpha.1-aarch64-apple-darwin-v2.tar.gz", "aerocodex-0.1.0-alpha.1-aarch64-apple-darwin.tar.gz"] },
+            ParserNegativeCase { name: "artifact produced", old: "production_state = \"declared_only\"", new: "production_state = \"built\"", expected: &["artifact `checksums` production_state must be `declared_only`, found `built`"] },
+            ParserNegativeCase { name: "invalid required task", old: "required_by_task = \"R5-09\"", new: "required_by_task = \"R7-01\"", expected: &["release artifact set/contract mismatch", "R7-01"] },
+            ParserNegativeCase { name: "unknown artifact field", old: "required_by_task = \"R5-09\"", new: "required_by_task = \"R5-09\"\nself_hash = \"no\"", expected: &["artifacts table 1 has unknown metadata key `self_hash`"] },
+            ParserNegativeCase { name: "top-level order drift", old: "release_version = \"0.1.0-alpha.1\"\nrelease_channel = \"github_releases\"", new: "release_channel = \"github_releases\"\nrelease_version = \"0.1.0-alpha.1\"", expected: &["release top level keys are not in canonical order"] },
+            ParserNegativeCase { name: "requirement order drift", old: "validation_status = \"research_required\"\nexecution_policy = \"blocked\"", new: "execution_policy = \"blocked\"\nvalidation_status = \"research_required\"", expected: &["release_slice_requirements keys are not in canonical order"] },
+            ParserNegativeCase { name: "package key order drift", old: "name = \"aero-codex-core\"\nmanifest_path = \"crates/aero-codex-core/Cargo.toml\"", new: "manifest_path = \"crates/aero-codex-core/Cargo.toml\"\nname = \"aero-codex-core\"", expected: &["packages table 1 keys are not in canonical order"] },
+            ParserNegativeCase { name: "formula key order drift", old: "identifier = \"m00.angle.deg_to_rad\"\nruntime_symbol = \"m00_degrees_to_radians\"", new: "runtime_symbol = \"m00_degrees_to_radians\"\nidentifier = \"m00.angle.deg_to_rad\"", expected: &["formulas table 1 keys are not in canonical order"] },
+            ParserNegativeCase { name: "target key order drift", old: "triple = \"aarch64-apple-darwin\"\nplatform_tier = \"tier2\"", new: "platform_tier = \"tier2\"\ntriple = \"aarch64-apple-darwin\"", expected: &["targets table 1 keys are not in canonical order"] },
+            ParserNegativeCase { name: "artifact key order drift", old: "identifier = \"checksums\"\nfilename = \"aerocodex-0.1.0-alpha.1-SHA256SUMS\"", new: "filename = \"aerocodex-0.1.0-alpha.1-SHA256SUMS\"\nidentifier = \"checksums\"", expected: &["artifacts table 1 keys are not in canonical order"] },
         ];
-        assert!(cases.len() >= 58, "negative matrix must remain complete");
-        for (name, text) in cases {
-            assert!(
-                parse_release_manifest(&text).is_err(),
-                "negative production-parser case unexpectedly passed: {name}"
-            );
+
+        let semantic_cases = [
+            SemanticNegativeCase {
+                name: "missing target",
+                mutation: SemanticMutation::RemoveTarget("aarch64-apple-darwin"),
+                expected: &[
+                    "release target set/tier/CI mapping mismatch",
+                    "aarch64-apple-darwin",
+                ],
+            },
+            SemanticNegativeCase {
+                name: "extra target",
+                mutation: SemanticMutation::AddTarget,
+                expected: &[
+                    "release target set/tier/CI mapping mismatch",
+                    "fixture-target",
+                ],
+            },
+            SemanticNegativeCase {
+                name: "artifact backslash",
+                mutation: SemanticMutation::SetArtifactFilename {
+                    identifier: "checksums",
+                    filename: "dir\\SHA256SUMS",
+                },
+                expected: &[
+                    "artifact filename `dir\\SHA256SUMS` must be a normalized safe ASCII basename",
+                ],
+            },
+            SemanticNegativeCase {
+                name: "missing artifact",
+                mutation: SemanticMutation::RemoveArtifact("source-archive"),
+                expected: &["release artifact set/contract mismatch", "source-archive"],
+            },
+            SemanticNegativeCase {
+                name: "extra artifact",
+                mutation: SemanticMutation::AddArtifact,
+                expected: &["release artifact set/contract mismatch", "extra.zip"],
+            },
+        ];
+
+        assert_eq!(parser_cases.len(), 54, "parser negative case count drifted");
+        assert_eq!(
+            semantic_cases.len(),
+            5,
+            "semantic negative case count drifted"
+        );
+        assert_eq!(
+            parser_cases.len() + semantic_cases.len(),
+            59,
+            "complete negative matrix count drifted"
+        );
+
+        for case in parser_cases {
+            let text = replace_first(&canonical_manifest(), case.old, case.new);
+            let error = match parse_release_manifest(&text) {
+                Err(error) => error,
+                Ok(_) => panic!(
+                    "negative production-parser case unexpectedly passed: {}",
+                    case.name
+                ),
+            };
+            assert_discriminating_error(case.name, &error, case.expected);
+        }
+
+        for case in semantic_cases {
+            let mut manifest = parse_release_manifest(&canonical_manifest())
+                .expect("fresh canonical manifest must parse before semantic mutation");
+            match case.mutation {
+                SemanticMutation::RemoveTarget(triple) => {
+                    let before = manifest.targets.len();
+                    manifest.targets.retain(|target| target.triple != triple);
+                    assert_eq!(
+                        manifest.targets.len() + 1,
+                        before,
+                        "case `{}` must remove exactly one complete target record",
+                        case.name
+                    );
+                }
+                SemanticMutation::AddTarget => manifest.targets.push(ReleaseTarget {
+                    triple: "fixture-target".to_string(),
+                    platform_tier: "tier1".to_string(),
+                    ci_posture: "blocking".to_string(),
+                    artifact_eligible: true,
+                    currently_tested: false,
+                    currently_packaged: false,
+                    current_support: "source_only".to_string(),
+                }),
+                SemanticMutation::SetArtifactFilename {
+                    identifier,
+                    filename,
+                } => {
+                    manifest
+                        .artifacts
+                        .iter_mut()
+                        .find(|artifact| artifact.identifier == identifier)
+                        .unwrap_or_else(|| {
+                            panic!("case `{}` missing artifact `{identifier}`", case.name)
+                        })
+                        .filename = filename.to_string();
+                }
+                SemanticMutation::RemoveArtifact(identifier) => {
+                    let before = manifest.artifacts.len();
+                    manifest
+                        .artifacts
+                        .retain(|artifact| artifact.identifier != identifier);
+                    assert_eq!(
+                        manifest.artifacts.len() + 1,
+                        before,
+                        "case `{}` must remove exactly one complete artifact record",
+                        case.name
+                    );
+                }
+                SemanticMutation::AddArtifact => manifest.artifacts.push(ReleaseArtifact {
+                    identifier: "extra".to_string(),
+                    filename: "extra.zip".to_string(),
+                    kind: "source_archive".to_string(),
+                    target: None,
+                    archive_format: "zip".to_string(),
+                    production_state: "declared_only".to_string(),
+                    required_by_task: "R4-09".to_string(),
+                }),
+            }
+            let error = match validate_release_manifest(&manifest) {
+                Err(error) => error,
+                Ok(()) => panic!(
+                    "negative production-semantic case unexpectedly passed: {}",
+                    case.name
+                ),
+            };
+            assert_discriminating_error(case.name, &error, case.expected);
         }
     }
 
@@ -2077,7 +2340,152 @@ mod tests {
 
     #[test]
     fn checked_repository_has_one_authority_and_friend_script_agreement() {
-        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        verify_authority_contract(root.parent().expect("xtask has repository parent")).unwrap();
+        verify_authority_contract(&repository_root()).unwrap();
+    }
+
+    #[test]
+    fn release_manifest_authority_contract_negative_matrix_is_discriminating() {
+        #[derive(Clone, Copy)]
+        enum AuthorityMutation {
+            OldOnly,
+            BothAuthorities,
+            OmitCanonicalChecksum,
+            FriendScriptDisagreement,
+            ObsoleteCurrentConsumer,
+        }
+
+        struct AuthorityNegativeCase {
+            name: &'static str,
+            mutation: AuthorityMutation,
+            expected: &'static [&'static str],
+        }
+
+        let control = AuthorityFixture::new("control");
+        verify_authority_contract(control.root())
+            .expect("canonical new-authority-only disposable repository must pass");
+        control.cleanup();
+
+        let cases = [
+            AuthorityNegativeCase {
+                name: "old authority only",
+                mutation: AuthorityMutation::OldOnly,
+                expected: &[
+                    "obsolete release authority `docs/release/v0.1.0-alpha.1.toml`",
+                    "must be absent",
+                ],
+            },
+            AuthorityNegativeCase {
+                name: "both authorities present",
+                mutation: AuthorityMutation::BothAuthorities,
+                expected: &[
+                    "obsolete release authority `docs/release/v0.1.0-alpha.1.toml`",
+                    "must be absent",
+                ],
+            },
+            AuthorityNegativeCase {
+                name: "canonical authority omitted from checksums",
+                mutation: AuthorityMutation::OmitCanonicalChecksum,
+                expected: &[
+                    "checksums/SHA256SUMS omits sole release authority",
+                    "release/release-manifest.toml",
+                ],
+            },
+            AuthorityNegativeCase {
+                name: "Bash and PowerShell friend scripts disagree",
+                mutation: AuthorityMutation::FriendScriptDisagreement,
+                expected: &[
+                    "scripts/friend_test_local.sh must invoke both governed release verifiers",
+                ],
+            },
+            AuthorityNegativeCase {
+                name: "current consumer retains obsolete authority path",
+                mutation: AuthorityMutation::ObsoleteCurrentConsumer,
+                expected: &[
+                    "current-authority consumer `README.md` must name only",
+                    "release/release-manifest.toml",
+                ],
+            },
+        ];
+        assert_eq!(cases.len(), 5, "authority negative case count drifted");
+
+        for case in cases {
+            let fixture = AuthorityFixture::new(&case.name.replace(' ', "-"));
+            match case.mutation {
+                AuthorityMutation::OldOnly => {
+                    fixture.create_parent(OBSOLETE_RELEASE_MANIFEST_PATH);
+                    fs::rename(
+                        fixture.path(RELEASE_MANIFEST_PATH),
+                        fixture.path(OBSOLETE_RELEASE_MANIFEST_PATH),
+                    )
+                    .expect("replace canonical authority with obsolete authority");
+                    assert!(!fixture.path(RELEASE_MANIFEST_PATH).exists());
+                    assert!(fixture.path(OBSOLETE_RELEASE_MANIFEST_PATH).is_file());
+                }
+                AuthorityMutation::BothAuthorities => {
+                    fixture.create_parent(OBSOLETE_RELEASE_MANIFEST_PATH);
+                    fs::copy(
+                        fixture.path(RELEASE_MANIFEST_PATH),
+                        fixture.path(OBSOLETE_RELEASE_MANIFEST_PATH),
+                    )
+                    .expect("add competing obsolete authority");
+                    assert!(fixture.path(RELEASE_MANIFEST_PATH).is_file());
+                    assert!(fixture.path(OBSOLETE_RELEASE_MANIFEST_PATH).is_file());
+                }
+                AuthorityMutation::OmitCanonicalChecksum => {
+                    let mut checksums = fixture.read("checksums/SHA256SUMS");
+                    let entry = checksums
+                        .lines()
+                        .find(|line| line.ends_with(RELEASE_MANIFEST_PATH))
+                        .expect("canonical authority checksum entry exists")
+                        .to_string();
+                    assert_eq!(
+                        checksums
+                            .lines()
+                            .filter(|line| *line == entry.as_str())
+                            .count(),
+                        1,
+                        "canonical authority checksum entry must be unique"
+                    );
+                    let start = checksums
+                        .find(&entry)
+                        .expect("checksum entry offset exists");
+                    let mut end = start + entry.len();
+                    if checksums.as_bytes().get(end) == Some(&b'\r') {
+                        end += 1;
+                    }
+                    if checksums.as_bytes().get(end) == Some(&b'\n') {
+                        end += 1;
+                    }
+                    checksums.replace_range(start..end, "");
+                    fixture.write("checksums/SHA256SUMS", &checksums);
+                }
+                AuthorityMutation::FriendScriptDisagreement => {
+                    let script = fixture.read("scripts/friend_test_local.sh");
+                    assert_eq!(script.matches("verify-release-identity").count(), 2);
+                    fixture.write(
+                        "scripts/friend_test_local.sh",
+                        &script.replace("verify-release-identity", "verify-generated"),
+                    );
+                }
+                AuthorityMutation::ObsoleteCurrentConsumer => {
+                    let readme = fixture.read("README.md");
+                    fixture.write(
+                        "README.md",
+                        &replace_first(
+                            &readme,
+                            RELEASE_MANIFEST_PATH,
+                            OBSOLETE_RELEASE_MANIFEST_PATH,
+                        ),
+                    );
+                }
+            }
+
+            let error = match verify_authority_contract(fixture.root()) {
+                Err(error) => error,
+                Ok(()) => panic!("negative authority case unexpectedly passed: {}", case.name),
+            };
+            assert_discriminating_error(case.name, &error, case.expected);
+            fixture.cleanup();
+        }
     }
 }
