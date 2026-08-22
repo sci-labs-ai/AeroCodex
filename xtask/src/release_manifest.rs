@@ -1644,14 +1644,12 @@ mod tests {
     static TEST_COUNTER: AtomicUsize = AtomicUsize::new(0);
 
     fn canonical_manifest() -> String {
-        include_str!("../../release/release-manifest.toml").to_string()
+        include_str!("../../release/release-manifest.toml").replace("\r\n", "\n")
     }
 
     fn canonical_manifest_with_newline(newline: &str) -> String {
         assert!(matches!(newline, "\n" | "\r\n"));
-        canonical_manifest()
-            .replace("\r\n", "\n")
-            .replace('\n', newline)
+        canonical_manifest().replace('\n', newline)
     }
 
     fn fixture_fragment_with_text_newline(text: &str, fragment: &str) -> String {
