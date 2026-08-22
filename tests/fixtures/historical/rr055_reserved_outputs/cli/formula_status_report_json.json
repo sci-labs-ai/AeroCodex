@@ -6,7 +6,7 @@
     "RR-026"
   ],
   "contains_execution_evidence": false,
-  "source_fixture": "tests/golden/formula_registry/formula_registry_with_m07_blocked_candidate.json",
+  "source_fixture": "tests/fixtures/historical/rr055_reserved_outputs/formula_registry/formula_registry_with_m07_blocked_candidate.json",
   "counts": {
     "total_fixture_formulas": 3,
     "by_status": {
@@ -21,7 +21,7 @@
     }
   },
   "warnings": [
-    "RR-055 status-report golden placeholder only.",
+    "Historical RR-055 status-report reserved-output fixture only.",
     "blocked/non-executable fixtures do not imply validation promotion or runtime execution."
   ],
   "error": null

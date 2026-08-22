@@ -13,7 +13,7 @@
   "traceability": null,
   "contains_execution_evidence": false,
   "warnings": [
-    "m07_candidate_blocked: visible but blocked and non-executable fixture inventory."
+    "Historical RR-055 m07_candidate_blocked fixture: visible, blocked, and non-executable."
   ],
   "error": {
     "code": "m07_candidate_blocked",

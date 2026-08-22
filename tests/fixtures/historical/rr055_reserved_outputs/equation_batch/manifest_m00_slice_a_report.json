@@ -1,6 +1,6 @@
 {
   "schema_version": "aerocodex.equation_batch.report.placeholder.v1",
-  "fixture_intent": "RR-055 reserved golden placeholder for the future RR-008 deterministic equation-batch report artifact.",
+  "fixture_intent": "Historical RR-055 reserved-output fixture for the then-future RR-008 deterministic equation-batch report artifact.",
   "source_fixture": "tests/fixtures/equation_batch/manifest_m00_slice_a.tsv",
   "reserved_for_tasks": [
     "RR-008"
