@@ -80,7 +80,9 @@ fn release_formula_ids(text: &str) -> Result<Vec<String>, String> {
     }
     let unique: BTreeSet<&str> = ids.iter().map(String::as_str).collect();
     if unique.len() != ids.len() {
-        return Err(format!("{RELEASE_MANIFEST} contains duplicate formula identifiers"));
+        return Err(format!(
+            "{RELEASE_MANIFEST} contains duplicate formula identifiers"
+        ));
     }
     ids.sort();
     Ok(ids)
@@ -117,7 +119,10 @@ fn parse_vectors(text: &str) -> Result<Vec<VectorRecord>, String> {
             ));
         }
         if fields.iter().any(|field| field.is_empty()) {
-            return Err(format!("{VECTOR_PATH} line {} has an empty field", index + 2));
+            return Err(format!(
+                "{VECTOR_PATH} line {} has an empty field",
+                index + 2
+            ));
         }
         for field_index in [3usize, 4, 5, 6, 7, 8] {
             fields[field_index].parse::<f64>().map_err(|error| {
@@ -221,7 +226,12 @@ fn validate_vectors(
                 ));
             }
         }
-        for field in ["equation_batch", "runtime_link", "cli_dispatch", "test_path"] {
+        for field in [
+            "equation_batch",
+            "runtime_link",
+            "cli_dispatch",
+            "test_path",
+        ] {
             let relative = packet_field(&packet, field).expect("required packet field");
             if !root.join(relative).is_file() {
                 return Err(format!(
@@ -271,10 +281,15 @@ fn render_summary(formula_ids: &[String], vectors: &[VectorRecord]) -> String {
     let mut out = String::new();
     out.push_str("{\n");
     out.push_str(&format!("  \"schema_version\": \"{SUMMARY_SCHEMA}\",\n"));
-    out.push_str(&format!("  \"release_manifest\": \"{RELEASE_MANIFEST}\",\n"));
+    out.push_str(&format!(
+        "  \"release_manifest\": \"{RELEASE_MANIFEST}\",\n"
+    ));
     out.push_str(&format!("  \"vector_source\": \"{VECTOR_PATH}\",\n"));
     out.push_str(&format!("  \"formula_count\": {},\n", formula_ids.len()));
-    out.push_str(&format!("  \"analytical_vector_count\": {},\n", vectors.len()));
+    out.push_str(&format!(
+        "  \"analytical_vector_count\": {},\n",
+        vectors.len()
+    ));
     out.push_str("  \"validation_scope\": \"release_slice_only\",\n");
     out.push_str("  \"claim_boundary\": \"implementation evidence for Research Software Alpha; not flight, mission, operational, regulatory, habitat, life-support, or certification evidence\",\n");
     out.push_str("  \"formulas\": [\n");

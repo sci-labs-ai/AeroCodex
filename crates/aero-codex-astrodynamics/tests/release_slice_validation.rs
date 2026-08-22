@@ -69,12 +69,8 @@ fn evaluate(formula_id: &str, input: [f64; 3]) -> f64 {
         "m00.canonical.distance_from_canonical" => {
             m00_distance_from_canonical(input[0], input[1]).unwrap()
         }
-        "m00.canonical.time_to_canonical" => {
-            m00_time_to_canonical(input[0], input[1]).unwrap()
-        }
-        "m00.canonical.time_from_canonical" => {
-            m00_time_from_canonical(input[0], input[1]).unwrap()
-        }
+        "m00.canonical.time_to_canonical" => m00_time_to_canonical(input[0], input[1]).unwrap(),
+        "m00.canonical.time_from_canonical" => m00_time_from_canonical(input[0], input[1]).unwrap(),
         "m00.canonical.speed_to_canonical" => {
             m00_speed_to_canonical(input[0], input[1], input[2]).unwrap()
         }
@@ -112,7 +108,11 @@ fn every_release_formula_matches_an_independently_linked_analytical_vector() {
     let mut formula_ids = BTreeSet::new();
     let mut case_ids = BTreeSet::new();
     for vector in &vectors {
-        assert!(case_ids.insert(vector.case_id), "duplicate {}", vector.case_id);
+        assert!(
+            case_ids.insert(vector.case_id),
+            "duplicate {}",
+            vector.case_id
+        );
         formula_ids.insert(vector.formula_id);
         for evidence in vector.evidence {
             assert!(root.join(evidence).is_file(), "missing evidence {evidence}");
@@ -141,11 +141,8 @@ fn distance_time_speed_and_angle_round_trips_cover_signed_domain() {
             )
             .unwrap();
             assert_policy(distance, value, 1.0e-12, 1.0e-12, 8);
-            let time = m00_time_from_canonical(
-                m00_time_to_canonical(value, scale).unwrap(),
-                scale,
-            )
-            .unwrap();
+            let time = m00_time_from_canonical(m00_time_to_canonical(value, scale).unwrap(), scale)
+                .unwrap();
             assert_policy(time, value, 1.0e-12, 1.0e-12, 8);
         }
         for distance_unit in scales {
@@ -213,8 +210,17 @@ fn broad_domain_loops_are_deterministic_without_random_seeds() {
 #[test]
 fn cross_platform_edge_vectors_preserve_binary64_contract() {
     let smallest = f64::from_bits(1);
-    assert_eq!(m00_distance_to_canonical(smallest, 1.0).unwrap().to_bits(), 1);
-    assert_eq!(m00_time_from_canonical(-0.0, 1.0).unwrap().to_bits(), (-0.0_f64).to_bits());
-    assert_eq!(m00_degrees_to_radians(180.0).unwrap().to_bits(), std::f64::consts::PI.to_bits());
+    assert_eq!(
+        m00_distance_to_canonical(smallest, 1.0).unwrap().to_bits(),
+        1
+    );
+    assert_eq!(
+        m00_time_from_canonical(-0.0, 1.0).unwrap().to_bits(),
+        (-0.0_f64).to_bits()
+    );
+    assert_eq!(
+        m00_degrees_to_radians(180.0).unwrap().to_bits(),
+        std::f64::consts::PI.to_bits()
+    );
     assert_eq!(m00_radians_to_degrees(std::f64::consts::PI).unwrap(), 180.0);
 }
