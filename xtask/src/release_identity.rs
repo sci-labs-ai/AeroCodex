@@ -2576,9 +2576,7 @@ fn run_cli(
     for attempt in 1..=MAX_ATTEMPTS {
         match command.output() {
             Err(error)
-                if cfg!(unix)
-                    && error.raw_os_error() == Some(26)
-                    && attempt < MAX_ATTEMPTS =>
+                if cfg!(unix) && error.raw_os_error() == Some(26) && attempt < MAX_ATTEMPTS =>
             {
                 std::thread::sleep(std::time::Duration::from_millis(10));
             }

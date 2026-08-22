@@ -43,9 +43,7 @@ fn output_with_executable_busy_retry(command: &mut Command) -> std::io::Result<O
     for attempt in 1..=MAX_ATTEMPTS {
         match command.output() {
             Err(error)
-                if cfg!(unix)
-                    && error.raw_os_error() == Some(26)
-                    && attempt < MAX_ATTEMPTS =>
+                if cfg!(unix) && error.raw_os_error() == Some(26) && attempt < MAX_ATTEMPTS =>
             {
                 std::thread::sleep(std::time::Duration::from_millis(10));
             }
@@ -780,9 +778,7 @@ fn copied_binary_runs_from_external_directory_without_repository_context() {
         assert!(!directory.join(forbidden).exists());
     }
     let mut command = Command::new(&destination);
-    command
-        .current_dir(&directory)
-        .args(["version", "--json"]);
+    command.current_dir(&directory).args(["version", "--json"]);
     let output = output_with_executable_busy_retry(&mut command)
         .expect("copied CLI should execute from external directory");
     assert!(output.status.success(), "{}", stderr(&output));
