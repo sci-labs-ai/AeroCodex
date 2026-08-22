@@ -5,7 +5,7 @@
   "reserved_for_tasks": [
     "RR-020"
   ],
-  "source_fixture": "tests/golden/formula_registry/formula_registry_m00_slice_a.json",
+  "source_fixture": "tests/fixtures/historical/rr055_reserved_outputs/formula_registry/formula_registry_m00_slice_a.json",
   "contains_execution_evidence": false,
   "formulas": [
     {
@@ -26,7 +26,7 @@
     }
   ],
   "warnings": [
-    "RR-055 golden placeholder only; CLI formula list command is not implemented here."
+    "Historical RR-055 reserved-output fixture only; CLI formula list command was not implemented by that task."
   ],
   "error": null
 }

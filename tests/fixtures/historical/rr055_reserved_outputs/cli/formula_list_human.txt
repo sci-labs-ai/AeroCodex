@@ -1,4 +1,4 @@
-AeroCodex formula inventory (RR-055 golden placeholder)
+AeroCodex formula inventory (historical RR-055 reserved-output fixture)
 
 ID                                 Status             Execution policy  Summary
 m00.angle.deg_to_rad                research_required  blocked           Fixture metadata only; not executable in this snapshot

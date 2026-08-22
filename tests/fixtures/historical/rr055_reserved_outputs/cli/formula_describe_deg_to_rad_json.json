@@ -14,7 +14,7 @@
   },
   "contains_execution_evidence": false,
   "warnings": [
-    "RR-055 describe snapshot placeholder; not executable in this snapshot."
+    "Historical RR-055 reserved-output fixture; not executable in this snapshot."
   ],
   "error": null
 }

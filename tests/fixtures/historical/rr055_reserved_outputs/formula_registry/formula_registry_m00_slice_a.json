@@ -1,7 +1,7 @@
 {
   "schema_version": "aerocodex.formula_registry.v1",
-  "generator_version": "rr-055-fixture-placeholder-v1",
-  "generated_by": "RR-055 fixture placeholder; registry generator not implemented in this task.",
+  "generator_version": "rr-055-historical-reserved-output-v1",
+  "generated_by": "Historical RR-055 reserved-output fixture; registry generator was not implemented by that task.",
   "source_hash": "sha256:f82b195e4d35293c06142c91627a8795f355ff17789cf2b1a44f01e22ff7b813",
   "formula_count": 2,
   "non_claims": [

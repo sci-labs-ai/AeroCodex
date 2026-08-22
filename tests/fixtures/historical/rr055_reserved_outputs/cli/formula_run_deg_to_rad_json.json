@@ -22,7 +22,7 @@
   "traceability": null,
   "contains_execution_evidence": false,
   "warnings": [
-    "RR-055 golden placeholder only; normal formula execution is not implemented here."
+    "Historical RR-055 reserved-output fixture only; normal formula execution was not implemented by that task."
   ],
   "error": {
     "code": "execution_blocked_by_status",
