@@ -812,7 +812,7 @@ fn verify_beta1(root: &Path) -> Result<(), String> {
         .map_err(|error| format!("Bash friend test: {error}"))?;
     let powershell_friend_test = fs::read_to_string(root.join("scripts/friend_test_local.ps1"))
         .map_err(|error| format!("PowerShell friend test: {error}"))?;
-    let smoke_marker = "cargo run -p aero-codex-cli -- self-check --json";
+    let smoke_marker = "cargo run --locked -p aero-codex-cli -- self-check --json";
     for (name, text) in [
         ("scripts/friend_test_local.sh", bash_friend_test),
         ("scripts/friend_test_local.ps1", powershell_friend_test),
