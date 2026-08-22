@@ -764,7 +764,7 @@ fn verify_beta1(root: &Path) -> Result<(), String> {
         "fn build_target() -> &'static str",
         "fn build_profile() -> &'static str",
         "fn validation_status() -> &'static str",
-        "fn supported_formula_count() -> usize",
+        "fn dispatchable_formula_count() -> usize",
         "formula_vault.m00.canonical.time_unit_from_mu_du",
         "formula_vault.m00.canonical.speed_from_canonical",
         "self-check",
