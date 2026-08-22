@@ -1,6 +1,6 @@
 # AeroCodex friend-test quickstart
 
-This friend-test runs the public Rust-only repository gate from a local checkout. It exercises formatting, build, Clippy, tests, governed metadata checks through `xtask`, release-manifest/checksum/generated-artifact integrity, dependency policy, documentation, and the Beta 1 CLI inventory/status path.
+This friend-test runs the public Rust-only repository gate from a local checkout. It exercises the committed lockfile, formatting, build, Clippy, tests, governed metadata checks through `xtask`, release-manifest/checksum/generated-artifact integrity, dependency policy, documentation, and the Research Software Alpha CLI inventory/status path.
 
 Passing this package does **not** prove physical validity, safety, certification, mission readiness, habitat safety, medical suitability, or regulated-use approval.
 
@@ -35,21 +35,22 @@ The scripts run this sequence in order:
 ```bash
 git status --short
 git diff --check
-cargo run -p xtask -- verify-checksums
+cargo run --locked -p xtask -- verify-checksums
 cargo fmt --all -- --check
-cargo check --workspace --all-targets --all-features
-cargo clippy --workspace --all-targets --all-features -- -D warnings
-cargo test --workspace --all-targets --all-features
-cargo run -p aero-codex-cli -- version --json
-cargo run -p aero-codex-cli -- formula status-report --json
-cargo run -p aero-codex-cli -- self-check --json
-cargo run -p xtask -- verify --all
-cargo run -p xtask -- verify-release-manifest
-cargo run -p xtask -- verify-generated
-cargo run -p xtask -- dependency-policy
-RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps
+cargo check --locked --workspace --all-targets --all-features
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace --all-targets --all-features
+cargo run --locked -p aero-codex-cli -- version --json
+cargo run --locked -p aero-codex-cli -- formula status-report --json
+cargo run --locked -p aero-codex-cli -- self-check --json
+cargo run --locked -p xtask -- verify --all
+cargo run --locked -p xtask -- verify-release-manifest
+cargo run --locked -p xtask -- verify-release-identity
+cargo run --locked -p xtask -- verify-generated
+cargo run --locked -p xtask -- dependency-policy
+RUSTDOCFLAGS="-D warnings" cargo doc --locked --workspace --all-features --no-deps
 ```
 
 ## What to report
 
-Include the OS, Rust versions, the exact failing command, the first error line, and whether a root `Cargo.lock` appeared after the run. Do not report a green friend-test as certification, flight readiness, habitat safety, medical suitability, or regulated-use approval.
+Include the OS, Rust versions, exact commit, the exact failing command, and the first error line. The committed root `Cargo.lock` must remain byte-identical. Do not report a green friend-test as certification, flight readiness, habitat safety, medical suitability, or regulated-use approval.

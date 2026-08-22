@@ -12,7 +12,7 @@ The current candidate has twelve M00 dispatch-linked and publicly executable rec
 - Rust and Cargo compatible with the workspace `rust-version`
 - `rustfmt` and Clippy for the normal repository gate
 
-A root `Cargo.lock` remains intentionally uncommitted while every Cargo dependency is workspace-local and path-only.
+The current release policy commits the root `Cargo.lock`; use `--locked` for every dependency-graph command. The dependency graph remains workspace-local and path-only. This supersedes the historical Beta 1 lockfile policy.
 
 ## Public Rust-only release-candidate check
 
@@ -21,18 +21,18 @@ Run from a clean checkout:
 ```bash
 git status --short
 git diff --check
-cargo run -p xtask -- verify-checksums
+cargo run --locked -p xtask -- verify-checksums
 cargo fmt --all -- --check
-cargo check --workspace --all-targets --all-features
-cargo clippy --workspace --all-targets --all-features -- -D warnings
-cargo test --workspace --all-targets --all-features
-cargo run -p xtask -- verify --all
-cargo run -p xtask -- verify-release-manifest
-cargo run -p xtask -- verify-release-identity
-cargo run -p xtask -- verify-generated
-cargo run -p xtask -- dependency-policy
-cargo run -p aero-codex-cli -- version --json
-cargo run -p aero-codex-cli -- self-check --json
+cargo check --locked --workspace --all-targets --all-features
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace --all-targets --all-features
+cargo run --locked -p xtask -- verify --all
+cargo run --locked -p xtask -- verify-release-manifest
+cargo run --locked -p xtask -- verify-release-identity
+cargo run --locked -p xtask -- verify-generated
+cargo run --locked -p xtask -- dependency-policy
+cargo run --locked -p aero-codex-cli -- version --json
+cargo run --locked -p aero-codex-cli -- self-check --json
 ```
 
 The gate is public-source validation only. It does not create a Git tag, GitHub release, upload, signing bundle, or published artifact. Any private packaging or distribution automation should live outside the public repository unless the maintainers deliberately re-adopt it.

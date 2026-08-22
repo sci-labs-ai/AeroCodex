@@ -1,0 +1,52 @@
+name: Documentation
+
+on:
+  pull_request:
+  push:
+    branches: [main, release/v0.1.0-alpha.1]
+    tags: ["v0.1.0-alpha.1*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@1.98.0
+      - name: Build API documentation
+        env:
+          RUSTDOCFLAGS: -D warnings
+        run: cargo doc --locked --workspace --all-features --no-deps
+      - name: Assemble user and API site
+        run: |
+          mkdir -p _site/api
+          cp -R target/doc/. _site/api/
+          cp docs/site/index.html _site/index.html
+          cp README.md CHANGELOG.md CONTRIBUTING.md SECURITY.md _site/
+          cp -R docs/research_alpha _site/research_alpha
+          cp -R docs/examples _site/examples
+          cp docs/citation.md _site/citation.md
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

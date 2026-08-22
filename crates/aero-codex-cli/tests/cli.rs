@@ -212,6 +212,7 @@ fn version_json_exposes_bounded_release_identity() {
     assert!(text.contains("\"build_commit\":"));
     assert!(text.contains("\"build_target\":"));
     assert!(text.contains("\"build_profile\":"));
+    assert!(text.contains("\"release_manifest_sha256\":"));
     assert!(text.contains("\"supported_formula_count\":12"));
     assert!(text.contains("\"dispatchable_formula_count\":12"));
     assert!(text.contains("\"registry_formula_count\":152"));

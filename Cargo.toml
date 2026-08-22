@@ -24,6 +24,18 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/sci-labs-ai/AeroCodex"
 readme = "README.md"
 rust-version = "1.74"
+description = "Source-traceable aerospace research software in pure Rust"
+homepage = "https://sci-labs-ai.github.io/AeroCodex/"
+documentation = "https://sci-labs-ai.github.io/AeroCodex/api/"
+keywords = ["aerospace", "astrodynamics", "engineering", "research"]
+categories = ["science", "mathematics"]
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+incremental = false
+strip = "symbols"

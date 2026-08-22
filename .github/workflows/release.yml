@@ -1,0 +1,184 @@
+name: Release artifacts
+
+on:
+  push:
+    tags:
+      - "v0.1.0-alpha.1*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+  artifact-metadata: write
+
+jobs:
+  build:
+    name: Build and smoke-test (${{ matrix.target }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            archive: aerocodex-0.1.0-alpha.1-x86_64-unknown-linux-gnu.tar.gz
+            executable: aerocodex
+            shell_kind: unix
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            archive: aerocodex-0.1.0-alpha.1-x86_64-pc-windows-msvc.zip
+            executable: aerocodex.exe
+            shell_kind: windows
+          - os: macos-15-intel
+            target: x86_64-apple-darwin
+            archive: aerocodex-0.1.0-alpha.1-x86_64-apple-darwin.tar.gz
+            executable: aerocodex
+            shell_kind: unix
+          - os: macos-15
+            target: aarch64-apple-darwin
+            archive: aerocodex-0.1.0-alpha.1-aarch64-apple-darwin.tar.gz
+            executable: aerocodex
+            shell_kind: unix
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@1.98.0
+        with:
+          targets: ${{ matrix.target }}
+      - name: Verify release source
+        run: cargo run --locked -p xtask -- verify-release-identity
+      - name: Build locked release binary
+        env:
+          AEROCODEX_BUILD_COMMIT: ${{ github.sha }}
+        run: cargo build --locked --release -p aero-codex-cli --target ${{ matrix.target }}
+      - name: Stage, smoke-test, and archive (Unix)
+        if: matrix.shell_kind == 'unix'
+        shell: bash
+        run: |
+          set -euo pipefail
+          bundle="aerocodex-0.1.0-alpha.1-${{ matrix.target }}"
+          mkdir -p "dist/${bundle}/release"
+          cp "target/${{ matrix.target }}/release/${{ matrix.executable }}" "dist/${bundle}/"
+          cp README.md LICENSE LICENSE-APACHE LICENSE-MIT NOTICE "dist/${bundle}/"
+          cp release/release-manifest.toml release/release-manifest.sha256 "dist/${bundle}/release/"
+          binary="dist/${bundle}/${{ matrix.executable }}"
+          "$binary" version --json > "dist/${bundle}/version.json"
+          "$binary" formula list --executable --json > "dist/${bundle}/formula-list.json"
+          "$binary" formula run m00.angle.deg_to_rad --degrees 180 --json > "dist/${bundle}/formula-run.json"
+          "$binary" self-check --json > "dist/${bundle}/self-check.json"
+          python3 - "$binary" <<'PY'
+          import json, pathlib, subprocess, sys
+          bundle = pathlib.Path(sys.argv[1]).parent
+          version = json.loads((bundle / "version.json").read_text())
+          formulas = json.loads((bundle / "formula-list.json").read_text())
+          self_check = json.loads((bundle / "self-check.json").read_text())
+          expected = (bundle / "release" / "release-manifest.sha256").read_text().split()[0]
+          assert version["package_version"] == "0.1.0-alpha.1"
+          assert version["release_manifest_sha256"] == expected
+          assert version["build_profile"] == "release"
+          assert len(formulas["formulas"]) == 12
+          assert self_check["passed"] == 14 and self_check["failed"] == 0
+          PY
+          tar -C dist -czf "dist/${{ matrix.archive }}" "$bundle"
+      - name: Stage, smoke-test, and archive (Windows)
+        if: matrix.shell_kind == 'windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $bundle = "aerocodex-0.1.0-alpha.1-${{ matrix.target }}"
+          $bundlePath = Join-Path dist $bundle
+          $releasePath = Join-Path $bundlePath release
+          New-Item -ItemType Directory -Force -Path $releasePath | Out-Null
+          Copy-Item "target/${{ matrix.target }}/release/${{ matrix.executable }}" $bundlePath
+          Copy-Item README.md, LICENSE, LICENSE-APACHE, LICENSE-MIT, NOTICE $bundlePath
+          Copy-Item release/release-manifest.toml, release/release-manifest.sha256 $releasePath
+          $binary = Join-Path $bundlePath "${{ matrix.executable }}"
+          (& $binary version --json | Out-String) | Set-Content -Encoding utf8 (Join-Path $bundlePath version.json)
+          if ($LASTEXITCODE -ne 0) { throw "version smoke test failed" }
+          (& $binary formula list --executable --json | Out-String) | Set-Content -Encoding utf8 (Join-Path $bundlePath formula-list.json)
+          if ($LASTEXITCODE -ne 0) { throw "formula list smoke test failed" }
+          (& $binary formula run m00.angle.deg_to_rad --degrees 180 --json | Out-String) | Set-Content -Encoding utf8 (Join-Path $bundlePath formula-run.json)
+          if ($LASTEXITCODE -ne 0) { throw "formula run smoke test failed" }
+          (& $binary self-check --json | Out-String) | Set-Content -Encoding utf8 (Join-Path $bundlePath self-check.json)
+          if ($LASTEXITCODE -ne 0) { throw "self-check smoke test failed" }
+          $version = Get-Content -Raw (Join-Path $bundlePath version.json) | ConvertFrom-Json
+          $formulas = Get-Content -Raw (Join-Path $bundlePath formula-list.json) | ConvertFrom-Json
+          $selfCheck = Get-Content -Raw (Join-Path $bundlePath self-check.json) | ConvertFrom-Json
+          $expected = ((Get-Content -Raw (Join-Path $releasePath release-manifest.sha256)) -split '\s+')[0]
+          if ($version.package_version -ne "0.1.0-alpha.1" -or $version.release_manifest_sha256 -ne $expected -or $version.build_profile -ne "release") { throw "version identity mismatch" }
+          if ($formulas.formulas.Count -ne 12) { throw "executable formula count mismatch" }
+          if ($selfCheck.passed -ne 14 -or $selfCheck.failed -ne 0) { throw "self-check count mismatch" }
+          Compress-Archive -Path $bundlePath -DestinationPath "dist/${{ matrix.archive }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.target }}
+          path: dist/${{ matrix.archive }}
+          if-no-files-found: error
+
+  assemble:
+    name: Assemble, hash, attest, and draft
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: dist
+          merge-multiple: true
+      - name: Build source archive and release metadata
+        env:
+          SOURCE_DATE_EPOCH: ${{ github.event.repository.pushed_at }}
+        run: |
+          set -euo pipefail
+          git archive --format=tar.gz --prefix=aerocodex-0.1.0-alpha.1-source/ --output=dist/aerocodex-0.1.0-alpha.1-source.tar.gz "${GITHUB_SHA}"
+          cp release/release-manifest.toml dist/aerocodex-0.1.0-alpha.1-release-manifest.toml
+          epoch="$(git show -s --format=%ct "${GITHUB_SHA}")"
+          python3 scripts/release/generate_spdx_sbom.py --dist dist --commit "${GITHUB_SHA}" --epoch "$epoch" --output dist/aerocodex-0.1.0-alpha.1.spdx.json
+          python3 scripts/release/generate_provenance.py --dist dist --commit "${GITHUB_SHA}" --run-id "${GITHUB_RUN_ID}" --repository "${GITHUB_REPOSITORY}" --output dist/aerocodex-0.1.0-alpha.1.intoto.jsonl
+          find dist -maxdepth 1 -type f ! -name 'aerocodex-0.1.0-alpha.1-SHA256SUMS' -printf '%f\n' | LC_ALL=C sort | while read -r file; do
+            sha256sum "dist/${file}"
+          done | sed 's#  dist/#  #' > dist/aerocodex-0.1.0-alpha.1-SHA256SUMS
+          (cd dist && sha256sum -c aerocodex-0.1.0-alpha.1-SHA256SUMS)
+      - name: Attest release provenance
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            dist/aerocodex-0.1.0-alpha.1-x86_64-unknown-linux-gnu.tar.gz
+            dist/aerocodex-0.1.0-alpha.1-x86_64-pc-windows-msvc.zip
+            dist/aerocodex-0.1.0-alpha.1-x86_64-apple-darwin.tar.gz
+            dist/aerocodex-0.1.0-alpha.1-aarch64-apple-darwin.tar.gz
+            dist/aerocodex-0.1.0-alpha.1-source.tar.gz
+            dist/aerocodex-0.1.0-alpha.1-release-manifest.toml
+      - name: Attest release SBOM
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            dist/aerocodex-0.1.0-alpha.1-x86_64-unknown-linux-gnu.tar.gz
+            dist/aerocodex-0.1.0-alpha.1-x86_64-pc-windows-msvc.zip
+            dist/aerocodex-0.1.0-alpha.1-x86_64-apple-darwin.tar.gz
+            dist/aerocodex-0.1.0-alpha.1-aarch64-apple-darwin.tar.gz
+            dist/aerocodex-0.1.0-alpha.1-source.tar.gz
+            dist/aerocodex-0.1.0-alpha.1-release-manifest.toml
+          sbom-path: dist/aerocodex-0.1.0-alpha.1.spdx.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aerocodex-release-bundle
+          path: dist/*
+          if-no-files-found: error
+      - name: Create or refresh draft GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" dist/* --clobber
+          else
+            gh release create "$tag" dist/* --draft --verify-tag --title "AeroCodex ${tag}" --notes "Draft release assembled by the governed release workflow. Publication requires the remaining R7 gates."
+          fi

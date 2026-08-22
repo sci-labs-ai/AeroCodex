@@ -62,6 +62,11 @@ fn build_profile() -> &'static str {
     }
 }
 
+fn release_manifest_sha256() -> &'static str {
+    option_env!("AEROCODEX_RELEASE_MANIFEST_SHA256")
+        .unwrap_or("0000000000000000000000000000000000000000000000000000000000000000")
+}
+
 fn validation_status() -> &'static str {
     "implementation_verified"
 }
@@ -1752,6 +1757,8 @@ fn output_version(json: bool, standard_flag: bool) {
         push_json_string(&mut output, build_target());
         output.push_str(",\"build_profile\":");
         push_json_string(&mut output, build_profile());
+        output.push_str(",\"release_manifest_sha256\":");
+        push_json_string(&mut output, release_manifest_sha256());
         write!(
             output,
             ",\"workspace_package_count\":{},\"supported_formula_count\":{},\"dispatchable_formula_count\":{},\"registry_formula_count\":{},\"blocked_formula_count\":{},\"public_executable_formula_count\":{},\"registry_schema_version\":",
@@ -1782,6 +1789,7 @@ fn output_version(json: bool, standard_flag: bool) {
         println!("build_commit={}", build_commit());
         println!("build_target={}", build_target());
         println!("build_profile={}", build_profile());
+        println!("release_manifest_sha256={}", release_manifest_sha256());
         println!(
             "supported_formula_count={}",
             report.dispatchable_formula_count
@@ -2818,6 +2826,7 @@ mod tests {
         assert!(!build_commit().is_empty());
         assert!(!build_target().is_empty());
         assert!(matches!(build_profile(), "debug" | "release"));
+        assert_eq!(release_manifest_sha256().len(), 64);
     }
 
     #[test]

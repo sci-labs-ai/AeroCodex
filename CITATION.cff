@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use AeroCodex, cite the software release and the source record for each formula used."
+type: software
+title: "AeroCodex"
+abstract: "Source-traceable aerospace research software in pure Rust."
+authors:
+  - name: "sci-labs.ai"
+repository-code: "https://github.com/sci-labs-ai/AeroCodex"
+url: "https://sci-labs-ai.github.io/AeroCodex/"
+version: "0.1.0-alpha.1"
+license: "MIT OR Apache-2.0"
+keywords:
+  - aerospace
+  - astrodynamics
+  - engineering
+  - research software

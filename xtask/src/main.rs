@@ -812,7 +812,7 @@ fn verify_beta1(root: &Path) -> Result<(), String> {
         .map_err(|error| format!("Bash friend test: {error}"))?;
     let powershell_friend_test = fs::read_to_string(root.join("scripts/friend_test_local.ps1"))
         .map_err(|error| format!("PowerShell friend test: {error}"))?;
-    let smoke_marker = "cargo run -p aero-codex-cli -- self-check --json";
+    let smoke_marker = "cargo run --locked -p aero-codex-cli -- self-check --json";
     for (name, text) in [
         ("scripts/friend_test_local.sh", bash_friend_test),
         ("scripts/friend_test_local.ps1", powershell_friend_test),
@@ -2467,8 +2467,8 @@ fn dependency_policy() -> Result<(), String> {
         Ok(())
     })?;
 
-    for toml in tomls {
-        let text = fs::read_to_string(&toml).map_err(|e| format!("{}: {e}", toml.display()))?;
+    for toml in &tomls {
+        let text = fs::read_to_string(toml).map_err(|e| format!("{}: {e}", toml.display()))?;
         let lowered = text.to_ascii_lowercase();
         for token in FORBIDDEN_DEPENDENCY_TOKENS {
             if lowered.contains(token) {
@@ -2491,7 +2491,75 @@ fn dependency_policy() -> Result<(), String> {
             }
         }
     }
-    println!("dependency policy check passed");
+
+    let expected_packages: BTreeSet<&str> = [
+        "aero-codex-aerodynamics",
+        "aero-codex-astrodynamics",
+        "aero-codex-atmosphere",
+        "aero-codex-cli",
+        "aero-codex-constants",
+        "aero-codex-core",
+        "aero-codex-flight-dynamics",
+        "aero-codex-gas-dynamics",
+        "aero-codex-heat-transfer",
+        "aero-codex-life-support",
+        "aero-codex-propulsion",
+        "aero-codex-structures",
+        "aero-codex-thermo",
+        "xtask",
+    ]
+    .into_iter()
+    .collect();
+    let lock = fs::read_to_string(root.join("Cargo.lock"))
+        .map_err(|error| format!("Cargo.lock: {error}"))?;
+    if !lock.lines().any(|line| line == "version = 3") {
+        return Err(
+            "Cargo.lock must use lockfile version 3 for Rust 1.74 compatibility".to_string(),
+        );
+    }
+    let locked_packages: BTreeSet<&str> = lock
+        .lines()
+        .filter_map(|line| line.strip_prefix("name = \"")?.strip_suffix('"'))
+        .collect();
+    if locked_packages != expected_packages {
+        return Err(format!(
+            "Cargo.lock package set differs from the fourteen reviewed workspace packages: expected {expected_packages:?}, found {locked_packages:?}"
+        ));
+    }
+
+    let workspace_manifest = fs::read_to_string(root.join("Cargo.toml"))
+        .map_err(|error| format!("Cargo.toml: {error}"))?;
+    if !workspace_manifest.contains("license = \"MIT OR Apache-2.0\"") {
+        return Err("workspace license must remain MIT OR Apache-2.0".to_string());
+    }
+    for toml in tomls
+        .iter()
+        .filter(|path| *path != &root.join("Cargo.toml"))
+    {
+        let text =
+            fs::read_to_string(toml).map_err(|error| format!("{}: {error}", toml.display()))?;
+        if !text.contains("license.workspace = true") {
+            return Err(format!(
+                "{} must inherit the reviewed workspace license",
+                toml.display()
+            ));
+        }
+        for line in text
+            .lines()
+            .filter(|line| line.contains("path = \"../aero-codex-"))
+        {
+            if !line.contains("version = \"=0.1.0-alpha.1\"") {
+                return Err(format!(
+                    "{} has an internal path dependency without the exact release version: {line}",
+                    toml.display()
+                ));
+            }
+        }
+    }
+
+    println!(
+        "dependency policy check passed: workspace_packages=14; third_party_packages=0; allowed_license=MIT_OR_Apache-2.0; vulnerability_advisory_exposure=none"
+    );
     Ok(())
 }
 

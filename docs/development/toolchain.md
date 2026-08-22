@@ -1,22 +1,23 @@
 # Toolchain baseline
 
-RR-003 records the professional open-source tooling baseline for AeroCodex as research/preliminary-design software. AeroCodex is not certified for flight, mission operations, habitat safety, medical/life-support decisions, or regulatory approval.
+AeroCodex is research/preliminary-design software. It is not certified for flight, mission operations, habitat safety, medical/life-support decisions, or regulatory approval.
 
 ## Rust and Cargo
 
-- Rust stable only. AeroCodex does not require nightly Rust for the first research-readiness milestone.
+- Release and normal blocking CI use the exact Rust `1.98.0` toolchain declared by `rust-toolchain.toml`; nightly Rust is not required.
+- A separate blocking Ubuntu job checks and tests the locked workspace with the declared MSRV, Rust `1.74.0`.
 - The repository is cargo-first: use Cargo commands from the workspace root for formatting, linting, tests, documentation, and local governance checks.
 - Optional `just` usage, if added later, is optional only. A contributor must be able to run the documented Cargo commands without installing `just`.
-- The current workspace policy keeps the root `Cargo.lock` absent during this phase.
+- The root `Cargo.lock` is committed, governed by repository checksums, uses lockfile format 3 for MSRV compatibility, and is required through `--locked` in release and friend-test commands.
 
 ## Platform posture
 
-- Linux and macOS first for contributor setup and continuous-integration expectations.
-- Windows should not be intentionally broken. Windows-specific fixes are welcome when they preserve the same Cargo-first workflow and do not add phase-inappropriate dependencies.
+- Ubuntu and Windows are Tier 1 release platforms. macOS x86-64 and ARM64 are Tier 2 release platforms.
+- Blocking pull-request CI runs on Ubuntu, Windows, and macOS; the separate declared-MSRV job runs on Ubuntu.
 
-## Dependencies not required for this phase
+## Dependency posture
 
-The first research-readiness milestone does not require:
+The alpha dependency graph contains only the fourteen workspace packages and no third-party Cargo package. The dependency policy rejects unreviewed native/runtime integration tokens, requires the dual MIT/Apache workspace license, and fails if `Cargo.lock` gains an unreviewed package. The alpha does not require:
 
 - Python, Jupyter, web services, or API servers;
 - nightly Rust;
@@ -27,4 +28,4 @@ Existing source-intake, planning, or evidence materials may mention outside tool
 
 ## Generated registry posture
 
-Generated registry artifacts should be checked in only when their generation is deterministic and governed by documented inputs, stable ordering, reviewable hashes, and local verification gates. RR-003 documents the tooling baseline only; it does not create or execute registry generation.
+Generated registry artifacts are checked in only when their generation is deterministic and governed by documented inputs, stable ordering, reviewable hashes, and blocking freshness gates.

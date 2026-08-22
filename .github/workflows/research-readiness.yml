@@ -12,14 +12,14 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@1.98.0
         with:
           components: rustfmt, clippy
       - name: equation-batch verify-all diagnostic
         run: |
           rm -rf /tmp/acx-equation-batch-probes
           set +e
-          cargo run -p xtask -- equation-batch verify \
+          cargo run --locked -p xtask -- equation-batch verify \
             --all-manifests \
             --output-dir /tmp/acx-equation-batch-probes \
             --json \

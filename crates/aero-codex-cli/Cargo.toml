@@ -5,14 +5,21 @@ edition.workspace = true
 license.workspace = true
 repository.workspace = true
 rust-version.workspace = true
+description.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+publish = ["crates-io"]
 
 [[bin]]
 name = "aerocodex"
 path = "src/main.rs"
 
 [dependencies]
-aero-codex-astrodynamics = { path = "../aero-codex-astrodynamics" }
-aero-codex-core = { path = "../aero-codex-core" }
+aero-codex-astrodynamics = { version = "=0.1.0-alpha.1", path = "../aero-codex-astrodynamics" }
+aero-codex-core = { version = "=0.1.0-alpha.1", path = "../aero-codex-core" }
 
 [lints]
 workspace = true
