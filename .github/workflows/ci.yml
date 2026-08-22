@@ -35,6 +35,8 @@ jobs:
         run: cargo clippy --workspace --all-targets --all-features -- -D warnings
       - name: Tests
         run: cargo test --workspace --all-features
+      - name: Release-slice equation verification
+        run: cargo test -p aero-codex-astrodynamics --test release_slice_validation
       - name: Documentation
         env:
           RUSTDOCFLAGS: -D warnings

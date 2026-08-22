@@ -1,0 +1,29 @@
+schema_version: aerocodex.promotion_packet.v1
+packet_id: alpha1-m00-speed-from-canonical
+formula_id: m00.canonical.speed_from_canonical
+previous_status: research_required
+requested_status: implementation_verified
+requested_execution_policy: normal_research
+formula: speed = canonical_speed * DU / TU
+runtime_symbol: m00_speed_from_canonical
+legacy_formula_id: formula_vault.m00.canonical.speed_from_canonical
+equation_batch: equation-batches/m00-canonical-units.tsv
+runtime_link: formula-vault/resolutions/m00_runtime_links.tsv
+cli_dispatch: crates/aero-codex-cli/dispatch_metadata.tsv
+test_path: crates/aero-codex-astrodynamics/tests/release_slice_validation.rs
+inputs: [canonical_speed_finite, distance_unit_positive_finite, time_unit_positive_finite]
+output: speed_finite
+contract: formula-vault/contracts/m00_canonical_unit_conversions_contract.yaml
+validation_card: validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml
+source_record: validation/source_registry/source_formula_vault_m00_canonical_unit_conversions.yaml
+analytical_vector: speed-from
+tolerance_policy: validation/release_slice/tolerance_policy.md
+traceability_review: { reviewer: "Codex automated traceability review", date: 2026-08-22, decision: accepted }
+implementation_review: { reviewer: "Codex automated implementation review", date: 2026-08-22, decision: accepted }
+evidence: [analytical_vector, signed_zero_round_trip, identity_scale, invalid_scale, nonfinite_rejection, overflow_rejection, cross_platform_ci]
+commands: ["cargo test -p aero-codex-astrodynamics --test release_slice_validation", "cargo run -p xtask -- verify-release-slice-validation", "cargo run -p xtask -- verify --all"]
+decision: recommend_implementation_verified
+non_claims:
+  - not flight or mission readiness
+  - not operational or regulatory approval
+  - not habitat, life-support, or certification evidence
