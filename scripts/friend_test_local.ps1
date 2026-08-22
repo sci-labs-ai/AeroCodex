@@ -99,7 +99,7 @@ Invoke-FriendTestStep "cargo run -p xtask -- verify-generated" {
 Invoke-FriendTestStep "cargo run -p xtask -- dependency-policy" {
     cargo run -p xtask -- dependency-policy
 }
-Invoke-FriendTestStep "RUSTDOCFLAGS=\"-D warnings\" cargo doc --workspace --all-features --no-deps" {
+Invoke-FriendTestStep 'RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps' {
     $PreviousRustdocFlags = $env:RUSTDOCFLAGS
     $env:RUSTDOCFLAGS = "-D warnings"
     try {

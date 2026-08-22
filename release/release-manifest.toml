@@ -1,21 +1,26 @@
-schema_version = "aerocodex.release_manifest.v2"
+schema_version = "aerocodex.release_manifest.v3"
 release_version = "0.1.0-alpha.1"
+release_channel = "github_releases"
 release_tier = "research_software_alpha"
 release_tier_display = "Research Software Alpha"
 program_name = "aerocodex"
 source_revision_policy = "pinned_base_commit"
 base_commit = "6a94b4628e6e0821a55d6aaadf6925956a5fa2d3"
+registry_path = "generated/formula_registry.json"
+registry_formula_count = 152
+cli_dispatch_metadata = "crates/aero-codex-cli/dispatch_metadata.tsv"
+release_validation_record = "validation/equation_inventory.tsv"
+release_documentation = "docs/release/v0.1.0-alpha.1-status.md"
+
+[release_slice_requirements]
 validation_status = "research_required"
 execution_policy = "blocked"
 public_executable = false
-validation_record = "validation/equation_inventory.tsv"
-documentation = "docs/release/v0.1.0-alpha.1-status.md"
-registry_formula_count = 152
-registry_research_required_formula_count = 152
-registry_blocked_formula_count = 152
-cli_dispatch_metadata = "crates/aero-codex-cli/dispatch_metadata.tsv"
-cli_dispatch_formula_count = 12
-public_executable_formula_count = 0
+
+[non_release_requirements]
+validation_status = "research_required"
+execution_policy = "blocked"
+public_executable = false
 
 [[packages]]
 name = "aero-codex-core"
@@ -76,107 +81,183 @@ manifest_path = "xtask/Cargo.toml"
 [[formulas]]
 identifier = "m00.angle.deg_to_rad"
 runtime_symbol = "m00_degrees_to_radians"
-validation_status = "research_required"
-execution_policy = "blocked"
-public_executable = false
 validation_record = "validation/cards/validation_formula_vault_m00_angle_unit_conversions.yaml"
 documentation = "docs/research_alpha/cli_formula_quickstart.md"
 
 [[formulas]]
 identifier = "m00.angle.rad_to_deg"
 runtime_symbol = "m00_radians_to_degrees"
-validation_status = "research_required"
-execution_policy = "blocked"
-public_executable = false
 validation_record = "validation/cards/validation_formula_vault_m00_angle_unit_conversions.yaml"
 documentation = "docs/research_alpha/cli_formula_quickstart.md"
 
 [[formulas]]
 identifier = "m00.canonical.distance_from_canonical"
 runtime_symbol = "m00_distance_from_canonical"
-validation_status = "research_required"
-execution_policy = "blocked"
-public_executable = false
 validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
 documentation = "docs/research_alpha/cli_formula_quickstart.md"
 
 [[formulas]]
 identifier = "m00.canonical.distance_to_canonical"
 runtime_symbol = "m00_distance_to_canonical"
-validation_status = "research_required"
-execution_policy = "blocked"
-public_executable = false
 validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
 documentation = "docs/research_alpha/cli_formula_quickstart.md"
 
 [[formulas]]
 identifier = "m00.canonical.mu_from_units"
 runtime_symbol = "m00_canonical_mu_from_units"
-validation_status = "research_required"
-execution_policy = "blocked"
-public_executable = false
 validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
 documentation = "docs/research_alpha/cli_formula_quickstart.md"
 
 [[formulas]]
 identifier = "m00.canonical.speed_from_canonical"
 runtime_symbol = "m00_speed_from_canonical"
-validation_status = "research_required"
-execution_policy = "blocked"
-public_executable = false
 validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
 documentation = "docs/research_alpha/cli_formula_quickstart.md"
 
 [[formulas]]
 identifier = "m00.canonical.speed_to_canonical"
 runtime_symbol = "m00_speed_to_canonical"
-validation_status = "research_required"
-execution_policy = "blocked"
-public_executable = false
 validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
 documentation = "docs/research_alpha/cli_formula_quickstart.md"
 
 [[formulas]]
 identifier = "m00.canonical.speed_unit_from_du_tu"
 runtime_symbol = "m00_canonical_speed_unit_from_du_tu"
-validation_status = "research_required"
-execution_policy = "blocked"
-public_executable = false
 validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
 documentation = "docs/research_alpha/cli_formula_quickstart.md"
 
 [[formulas]]
 identifier = "m00.canonical.speed_unit_from_mu_du"
 runtime_symbol = "m00_canonical_speed_unit_from_mu_du"
-validation_status = "research_required"
-execution_policy = "blocked"
-public_executable = false
 validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
 documentation = "docs/research_alpha/cli_formula_quickstart.md"
 
 [[formulas]]
 identifier = "m00.canonical.time_from_canonical"
 runtime_symbol = "m00_time_from_canonical"
-validation_status = "research_required"
-execution_policy = "blocked"
-public_executable = false
 validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
 documentation = "docs/research_alpha/cli_formula_quickstart.md"
 
 [[formulas]]
 identifier = "m00.canonical.time_to_canonical"
 runtime_symbol = "m00_time_to_canonical"
-validation_status = "research_required"
-execution_policy = "blocked"
-public_executable = false
 validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
 documentation = "docs/research_alpha/cli_formula_quickstart.md"
 
 [[formulas]]
 identifier = "m00.canonical.time_unit_from_mu_du"
 runtime_symbol = "m00_canonical_time_unit_from_mu_du"
-validation_status = "research_required"
-execution_policy = "blocked"
-public_executable = false
 validation_record = "validation/cards/validation_formula_vault_m00_canonical_unit_conversions.yaml"
 documentation = "docs/research_alpha/cli_formula_quickstart.md"
+
+[[targets]]
+triple = "aarch64-apple-darwin"
+platform_tier = "tier2"
+ci_posture = "required_tier2"
+artifact_eligible = true
+currently_tested = false
+currently_packaged = false
+current_support = "source_only"
+
+[[targets]]
+triple = "x86_64-apple-darwin"
+platform_tier = "tier2"
+ci_posture = "required_tier2"
+artifact_eligible = true
+currently_tested = false
+currently_packaged = false
+current_support = "source_only"
+
+[[targets]]
+triple = "x86_64-pc-windows-msvc"
+platform_tier = "tier1"
+ci_posture = "blocking"
+artifact_eligible = true
+currently_tested = false
+currently_packaged = false
+current_support = "source_only"
+
+[[targets]]
+triple = "x86_64-unknown-linux-gnu"
+platform_tier = "tier1"
+ci_posture = "blocking"
+artifact_eligible = true
+currently_tested = false
+currently_packaged = false
+current_support = "source_only"
+
+[[artifacts]]
+identifier = "checksums"
+filename = "aerocodex-0.1.0-alpha.1-SHA256SUMS"
+kind = "checksum"
+archive_format = "none"
+production_state = "declared_only"
+required_by_task = "R5-09"
+
+[[artifacts]]
+identifier = "cli-linux-x86-64"
+filename = "aerocodex-0.1.0-alpha.1-x86_64-unknown-linux-gnu.tar.gz"
+kind = "cli_archive"
+target = "x86_64-unknown-linux-gnu"
+archive_format = "tar.gz"
+production_state = "declared_only"
+required_by_task = "R4-09"
+
+[[artifacts]]
+identifier = "cli-macos-aarch64"
+filename = "aerocodex-0.1.0-alpha.1-aarch64-apple-darwin.tar.gz"
+kind = "cli_archive"
+target = "aarch64-apple-darwin"
+archive_format = "tar.gz"
+production_state = "declared_only"
+required_by_task = "R4-09"
+
+[[artifacts]]
+identifier = "cli-macos-x86-64"
+filename = "aerocodex-0.1.0-alpha.1-x86_64-apple-darwin.tar.gz"
+kind = "cli_archive"
+target = "x86_64-apple-darwin"
+archive_format = "tar.gz"
+production_state = "declared_only"
+required_by_task = "R4-09"
+
+[[artifacts]]
+identifier = "cli-windows-x86-64"
+filename = "aerocodex-0.1.0-alpha.1-x86_64-pc-windows-msvc.zip"
+kind = "cli_archive"
+target = "x86_64-pc-windows-msvc"
+archive_format = "zip"
+production_state = "declared_only"
+required_by_task = "R4-09"
+
+[[artifacts]]
+identifier = "provenance"
+filename = "aerocodex-0.1.0-alpha.1.intoto.jsonl"
+kind = "provenance"
+archive_format = "none"
+production_state = "declared_only"
+required_by_task = "R5-10"
+
+[[artifacts]]
+identifier = "release-manifest"
+filename = "aerocodex-0.1.0-alpha.1-release-manifest.toml"
+kind = "release_manifest"
+archive_format = "none"
+production_state = "declared_only"
+required_by_task = "R4-09"
+
+[[artifacts]]
+identifier = "sbom"
+filename = "aerocodex-0.1.0-alpha.1.spdx.json"
+kind = "sbom"
+archive_format = "none"
+production_state = "declared_only"
+required_by_task = "R5-10"
+
+[[artifacts]]
+identifier = "source-archive"
+filename = "aerocodex-0.1.0-alpha.1-source.tar.gz"
+kind = "source_archive"
+archive_format = "tar.gz"
+production_state = "declared_only"
+required_by_task = "R4-09"

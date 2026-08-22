@@ -18,8 +18,11 @@ This document separates AeroCodex's human roadmap language from Cargo-compatible
 | Term | Meaning | Current value |
 | --- | --- | --- |
 | Human roadmap phase | Planning and scope marker used in docs, issues, prompts, validation cards, and release notes. | `Phase 0.001` |
-| Cargo package version | SemVer-compatible package version used by all workspace Cargo manifests. | `0.1.0-alpha.1` |
-| Release tier | A maturity label separate from SemVer, validation, and execution policy. | `research_software_alpha` (`Research Software Alpha`) |
+| Semantic version | SemVer-compatible package and release version used by all workspace Cargo manifests. | `0.1.0-alpha.1` |
+| Prerelease component | The SemVer suffix that orders this build before `0.1.0`; it is not a distribution route or maturity tier. | `alpha.1` |
+| Release channel | Intended distribution route, distinct from SemVer and maturity. It does not assert that a release or artifact has been published. | `github_releases` |
+| Machine release tier | Machine-readable maturity label, separate from version, prerelease, channel, validation, and execution policy. | `research_software_alpha` (`Research Software Alpha`) |
+| Publication state | Whether declared release outputs actually exist. Current artifact declarations are future expectations only. | `declared_only`; nothing packaged or published |
 | Public API stability | Compatibility promise for downstream users. | Not promised in Phase 0.001 |
 
 Phase 0.001 is not a Cargo version. Do not write `0.001` in any `Cargo.toml` package version.

@@ -67,7 +67,7 @@ Start with:
 - [Math correctness policy](assurance/math_correctness_policy.md)
 - [Merge and release policy](assurance/merge_and_release_policy.md)
 - [v0.1.0-alpha.1 formal release audit and plan](release/AeroCodex_Formal_Release_Audit_and_Plan.md)
-- [v0.1.0-alpha.1 machine-readable release manifest](release/v0.1.0-alpha.1.toml)
+- [v0.1.0-alpha.1 machine-readable release manifest](../release/release-manifest.toml)
 - [v0.1.0-alpha.1 implementation status](release/v0.1.0-alpha.1-status.md)
 - [Stage 4 source inventory](source_intake/stage4_source_inventory.md)
 - [Nomenclature and acronym policy](nomenclature_policy.md)

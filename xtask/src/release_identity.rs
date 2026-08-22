@@ -16,6 +16,7 @@ use crate::{
 };
 
 const EXPECTED_VERSION: &str = "0.1.0-alpha.1";
+const EXPECTED_CHANNEL: &str = "github_releases";
 const EXPECTED_TIER: &str = "research_software_alpha";
 const EXPECTED_TIER_DISPLAY: &str = "Research Software Alpha";
 const EXPECTED_PROGRAM: &str = "aerocodex";
@@ -147,7 +148,7 @@ fn verify_release_identity_at_revision(
     verify_compiled_cli(root, &metadata.target_directory)?;
 
     println!(
-        "verified release identity: program={EXPECTED_PROGRAM}; version={EXPECTED_VERSION}; tier={EXPECTED_TIER}; tier_display={EXPECTED_TIER_DISPLAY}; packages={EXPECTED_PACKAGE_COUNT}; formulas={}; research_required={}; blocked={}; publicly_executable={}; self_check=14_passed_0_failed; external_binary=PASS",
+        "verified release identity: program={EXPECTED_PROGRAM}; version={EXPECTED_VERSION}; channel={EXPECTED_CHANNEL}; tier={EXPECTED_TIER}; tier_display={EXPECTED_TIER_DISPLAY}; packages={EXPECTED_PACKAGE_COUNT}; formulas={}; research_required={}; blocked={}; publicly_executable={}; self_check=14_passed_0_failed; external_binary=PASS",
         registry_summary.total,
         registry_summary.research_required,
         registry_summary.blocked,
@@ -167,6 +168,12 @@ fn verify_release_identity_at_revision(
 
 fn validate_manifest_identity(manifest: &ReleaseManifest) -> Result<(), String> {
     validate_target_semver(&manifest.release_version)?;
+    if manifest.release_channel != EXPECTED_CHANNEL {
+        return Err(format!(
+            "invalid release channel `{}`; expected `{EXPECTED_CHANNEL}`",
+            manifest.release_channel
+        ));
+    }
     if manifest.release_tier != EXPECTED_TIER {
         return Err(format!(
             "invalid release tier `{}`; expected `{EXPECTED_TIER}`",
@@ -677,9 +684,9 @@ fn validate_registry_summary(
 ) -> Result<(), String> {
     let expected = RegistrySummary {
         total: manifest.registry_formula_count,
-        research_required: manifest.registry_research_required_formula_count,
-        blocked: manifest.registry_blocked_formula_count,
-        publicly_executable: manifest.public_executable_formula_count,
+        research_required: manifest.registry_formula_count,
+        blocked: manifest.registry_formula_count,
+        publicly_executable: 0,
     };
     if summary != expected {
         return Err(format!(
@@ -1148,9 +1155,10 @@ impl ClaimKind {
     fn expected(self) -> &'static str {
         match self {
             Self::SemanticVersion => EXPECTED_VERSION,
-            Self::MachineTier | Self::ReleaseChannel => EXPECTED_TIER,
+            Self::MachineTier => EXPECTED_TIER,
             Self::DisplayTier => EXPECTED_TIER_DISPLAY,
             Self::ProgramName => EXPECTED_PROGRAM,
+            Self::ReleaseChannel => EXPECTED_CHANNEL,
             Self::RuntimeIdentity => "AeroCodex",
         }
     }
@@ -2479,7 +2487,14 @@ fn verify_compiled_cli(root: &Path, target_directory: &Path) -> Result<(), Strin
             copied.display()
         )
     })?;
-    for forbidden in [".git", "Cargo.toml", "docs", "v0.1.0-alpha.1.toml"] {
+    for forbidden in [
+        ".git",
+        "Cargo.toml",
+        "docs",
+        "release",
+        "release-manifest.toml",
+        "v0.1.0-alpha.1.toml",
+    ] {
         if external.path.join(forbidden).exists() {
             return Err(format!(
                 "external CLI directory unexpectedly contains `{forbidden}`"
@@ -2548,6 +2563,8 @@ fn run_cli(
     arguments: &[&str],
     environment: Option<(&str, &str)>,
 ) -> Result<Output, String> {
+    const MAX_ATTEMPTS: usize = 5;
+
     let mut command = Command::new(binary);
     command
         .current_dir(working_directory)
@@ -2556,9 +2573,21 @@ fn run_cli(
     if let Some((key, value)) = environment {
         command.env(key, value);
     }
-    command
-        .output()
-        .map_err(|error| format!("cannot execute copied CLI {}: {error}", binary.display()))
+    for attempt in 1..=MAX_ATTEMPTS {
+        match command.output() {
+            Err(error)
+                if cfg!(unix) && error.raw_os_error() == Some(26) && attempt < MAX_ATTEMPTS =>
+            {
+                std::thread::sleep(std::time::Duration::from_millis(10));
+            }
+            result => {
+                return result.map_err(|error| {
+                    format!("cannot execute copied CLI {}: {error}", binary.display())
+                });
+            }
+        }
+    }
+    unreachable!("bounded copied-CLI execution attempts must return")
 }
 
 fn require_success(output: &Output, context: &str) -> Result<(), String> {
@@ -2833,6 +2862,17 @@ mod tests {
             String::from_utf8_lossy(&output.stderr)
         );
         copy_working_tree(&source, &fixture.path);
+        let obsolete_manifest = fixture
+            .path
+            .join(release_manifest::OBSOLETE_RELEASE_MANIFEST_PATH);
+        if !source
+            .join(release_manifest::OBSOLETE_RELEASE_MANIFEST_PATH)
+            .exists()
+            && obsolete_manifest.exists()
+        {
+            fs::remove_file(&obsolete_manifest)
+                .expect("obsolete release authority should be removed from fixture clone");
+        }
         stage_and_commit_fixture_changes(&fixture.path);
         fixture
     }
@@ -3099,8 +3139,8 @@ mod tests {
                 .expect("checked registry sidecar should be readable"),
         );
         fixture.write(
-            "docs/release/v0.1.0-alpha.1.toml",
-            fs::read(root.join("docs/release/v0.1.0-alpha.1.toml"))
+            "release/release-manifest.toml",
+            fs::read(root.join("release/release-manifest.toml"))
                 .expect("release manifest should be readable"),
         );
         fixture
@@ -4015,7 +4055,7 @@ mod tests {
             "The current release version is 0.1.0-alpha.1.",
             "The current machine tier is research_software_alpha.",
             "The current display tier is Research Software Alpha.",
-            "The current program name is aerocodex; the current release channel is research_software_alpha.",
+            "The current program name is aerocodex; the current release channel is github_releases.",
             "The current Cargo package version is `0.1.0-alpha.1`.",
             "The active workspace version is 0.1.0-alpha.1.",
             "The current release version\nis 0.1.0-alpha.1; the current release tier\nis research_software_alpha.",
@@ -4809,24 +4849,19 @@ mod tests {
 
         let count_mismatch = registry_fixture();
         let manifest_text =
-            fs::read_to_string(count_mismatch.path.join("docs/release/v0.1.0-alpha.1.toml"))
-                .unwrap();
+            fs::read_to_string(count_mismatch.path.join("release/release-manifest.toml")).unwrap();
         count_mismatch.write(
-            "docs/release/v0.1.0-alpha.1.toml",
+            "release/release-manifest.toml",
             manifest_text.replacen(
                 "registry_formula_count = 152",
                 "registry_formula_count = 151",
                 1,
             ),
         );
-        let manifest = release_manifest::load_release_manifest(&count_mismatch.path).unwrap();
-        let registry =
-            formula_registry::rust::load_checked_formula_identity_registry(&count_mismatch.path)
-                .unwrap();
         assert!(
-            validate_registry_summary(&manifest, summarize_registry(&registry).unwrap())
+            release_manifest::load_release_manifest(&count_mismatch.path)
                 .unwrap_err()
-                .contains("manifest versus registry count mismatch")
+                .contains("registry_formula_count")
         );
     }
 
