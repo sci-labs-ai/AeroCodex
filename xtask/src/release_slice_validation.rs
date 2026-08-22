@@ -30,6 +30,7 @@ pub fn verify_release_slice_validation(root: &Path) -> Result<(), String> {
 
     let summary = render_summary(&formula_ids, &vectors);
     let checked = read_utf8(root, SUMMARY_PATH)?;
+    let checked = normalize_logical_text(&checked)?;
     if checked != summary {
         return Err(format!(
             "{SUMMARY_PATH} is stale; regenerate it from {RELEASE_MANIFEST} and {VECTOR_PATH}"
@@ -43,6 +44,16 @@ pub fn verify_release_slice_validation(root: &Path) -> Result<(), String> {
         formula_ids.len()
     );
     Ok(())
+}
+
+fn normalize_logical_text(text: &str) -> Result<String, String> {
+    let normalized = text.replace("\r\n", "\n");
+    if normalized.contains('\r') {
+        return Err(format!(
+            "{SUMMARY_PATH} contains a carriage return outside a CRLF line ending"
+        ));
+    }
+    Ok(normalized)
 }
 
 fn read_utf8(root: &Path, relative: &str) -> Result<String, String> {
@@ -363,5 +374,12 @@ mod tests {
         assert!(summary.contains("\"validation_scope\": \"release_slice_only\""));
         assert_eq!(summary.matches("\"formula_id\"").count(), 2);
         assert_eq!(summary, render_summary(&ids, &vectors));
+    }
+
+    #[test]
+    fn generated_summary_accepts_lf_and_crlf_only() {
+        assert_eq!(normalize_logical_text("a\nb\n").unwrap(), "a\nb\n");
+        assert_eq!(normalize_logical_text("a\r\nb\r\n").unwrap(), "a\nb\n");
+        assert!(normalize_logical_text("a\rb").is_err());
     }
 }
