@@ -501,7 +501,10 @@ struct FormulaListFilters {
 }
 
 impl FormulaListFilters {
-    fn matches(&self, entry: &generated_formula_registry::FormulaRegistryEntry) -> bool {
+    fn matches(
+        &self,
+        entry: &'static generated_formula_registry::FormulaRegistryEntry,
+    ) -> bool {
         if let Some(family) = self.family.as_deref() {
             let root_family = registry_family(entry);
             if entry.family != family && root_family != family {
