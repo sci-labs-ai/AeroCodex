@@ -57,9 +57,11 @@ jobs:
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          for package in aero-codex-core aero-codex-constants aero-codex-astrodynamics aero-codex-cli; do
-            cargo package --locked --allow-dirty --no-verify -p "$package"
-          done
+          cargo package --locked --allow-dirty --no-verify \
+            -p aero-codex-core \
+            -p aero-codex-constants \
+            -p aero-codex-astrodynamics \
+            -p aero-codex-cli
       - name: Standard CLI version
         run: cargo run --locked -p aero-codex-cli -- --version
       - name: Structured CLI identity
