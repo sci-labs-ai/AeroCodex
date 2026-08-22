@@ -1,0 +1,29 @@
+{
+  "contract": "aerocodex.cli.json.v1",
+  "top_level_keys": [
+    "command",
+    "error",
+    "execution_policy",
+    "formula_id",
+    "json_contract_version",
+    "ok",
+    "program_name",
+    "release_tier",
+    "release_tier_display",
+    "safety_notice",
+    "semantic_version",
+    "status",
+    "validation_status"
+  ],
+  "error_keys": ["code", "message"],
+  "constants": {
+    "command": "formula run",
+    "json_contract_version": "aerocodex.cli.json.v1",
+    "ok": false,
+    "program_name": "aerocodex",
+    "release_tier": "research_software_alpha",
+    "release_tier_display": "Research Software Alpha",
+    "semantic_version": "0.1.0-alpha.1"
+  },
+  "null_fields": []
+}

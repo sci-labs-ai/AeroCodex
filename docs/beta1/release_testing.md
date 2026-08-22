@@ -1,10 +1,10 @@
 # Beta 1 release-candidate testing
 
-Status: `research_required`
+Status: `research_software_alpha`; release slice `implementation_verified`
 
 This page preserves the historical Beta 1 test procedure as compatibility guidance. The public repository keeps the release check Rust-only. The former deployment packaging helpers are not tracked here. This procedure validates a clean checkout and a locally built `aerocodex` binary; it is a software release-engineering gate, not an aerospace assurance or certification gate.
 
-The current candidate has twelve M00 dispatch-linked records (ten canonical-unit plus two angle conversions), zero publicly executable formulas, and ten canonical-unit kernels exercised by the internal self-check. The 1,000+ equation backlog is outside this release-candidate scope.
+The current candidate has twelve M00 dispatch-linked and publicly executable records (ten canonical-unit plus two angle conversions). The self-check exercises the same public resolver, input parser, status gate, evaluator, and JSON envelopes as `formula run`. The remaining 140 registry rows and the 1,000+ source-accounting backlog are outside this release-candidate scope.
 
 ## Prerequisites
 
@@ -45,8 +45,8 @@ A candidate is testable when:
 - the Rust-only public gate above passes;
 - `aerocodex self-check --json` reports zero failures;
 - the manifest and CLI report semantic version `0.1.0-alpha.1` and release tier `research_software_alpha` (`Research Software Alpha`);
-- validation remains `research_required`;
-- public executable formula count remains zero;
+- the release slice remains `implementation_verified` while the 140-formula complement remains `research_required`;
+- `formula list --executable --json` returns exactly the twelve manifest-selected formulas;
 - no operational-readiness, certification, full-inventory, external-parity, or safety claim is added.
 
 Passing this gate authorizes research-software-alpha testing only. The `beta1-concept` label remains a historical compatibility name, not the current runtime identity. Publication, signing, tagging, or broader distribution requires a separate release decision.

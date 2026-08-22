@@ -23,6 +23,32 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+      - name: Temporary release-slice generated-state probe
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          mkdir -p /tmp/aerocodex-promotion-probe/generated/rust
+          cargo run -p xtask -- equation-batch report --all-manifests --out generated/equation_batch_status_report.json
+          cargo run -p xtask -- formula-registry generate --out generated/formula_registry.json
+          cargo run -p xtask -- formula-registry generate-rust --out generated/rust/formula_registry.rs
+          cargo build -p aero-codex-cli
+          target/debug/aerocodex formula run m00.angle.deg_to_rad --degrees 180 --json > /tmp/aerocodex-promotion-probe/formula-run-success.json
+          if target/debug/aerocodex formula run aerodynamics.coefficients.drag_coefficient --json 2> /tmp/aerocodex-promotion-probe/formula-run-error.json; then
+            echo "blocked non-release formula unexpectedly executed" >&2
+            exit 1
+          else
+            test "$?" -eq 4
+          fi
+          cp generated/formula_registry.json /tmp/aerocodex-promotion-probe/generated/formula_registry.json
+          cp generated/formula_registry.sha256 /tmp/aerocodex-promotion-probe/generated/formula_registry.sha256
+          cp generated/rust/formula_registry.rs /tmp/aerocodex-promotion-probe/generated/rust/formula_registry.rs
+          cp generated/equation_batch_status_report.json /tmp/aerocodex-promotion-probe/generated/equation_batch_status_report.json
+      - name: Upload temporary release-slice generated-state probe
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-slice-generated-state-probe
+          path: /tmp/aerocodex-promotion-probe
       - name: Formatting
         run: cargo fmt --all -- --check
       - name: Workspace metadata

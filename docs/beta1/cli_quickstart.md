@@ -5,11 +5,11 @@ Release version: `0.1.0-alpha.1`
 Release tier: `research_software_alpha` (`Research Software Alpha`)
 Workspace packages: `14`
 Registry formulas: `152`
-Blocked formulas: `152`
-Publicly executable formulas: `0`
+Blocked formulas: `140`
+Publicly executable formulas: `12`
 <!-- aerocodex-current-identity:end -->
 
-This page preserves the historical Beta 1 command surface as compatibility documentation. The current `aerocodex` binary is a bounded, research-only inventory and status surface with twelve M00 dispatch-linked records: ten canonical-unit records and two angle-conversion records. The current registry keeps every record at `research_required` with `execution_policy=blocked`, so none is publicly executable. Runtime dispatch links support internal self-checking and future governed promotion work; they are not execution authorization. Beta 1 is not the current runtime identity.
+This page preserves the historical Beta 1 command surface as compatibility documentation. The current `aerocodex` binary is a bounded, research-only inventory and execution surface with twelve `implementation_verified` / `normal_research` M00 formulas: ten canonical-unit records and two angle conversions. The other 140 registry rows remain `research_required` / `blocked`. Beta 1 is not the current runtime identity.
 
 It is not certified, flight-ready, mission-ready, operational, medical, habitat-safe, or approved for regulated use.
 
@@ -33,7 +33,7 @@ cargo run -p aero-codex-cli -- formula describe \
 
 The legacy `describe formula_vault.m00.canonical.distance_to_canonical --json` form is still accepted and reports the canonical formula ID plus `alias_used`/`deprecated_alias` migration fields.
 
-## Observe the fail-closed execution gate
+## Run a promoted formula
 
 ```bash
 cargo run -p aero-codex-cli -- formula run \
@@ -41,13 +41,13 @@ cargo run -p aero-codex-cli -- formula run \
   distance=-42 distance_unit=7 --json
 ```
 
-The command exits with code `4` and reports `execution_blocked_by_status` before runtime dispatch. The expected status fields include:
+The command succeeds with a versioned JSON envelope. The expected state fields include:
 
 ```json
-{"ok":false,"command":"formula run","formula_id":"m00.canonical.distance_to_canonical","status":"research_required","execution_policy":"blocked","error":{"code":"execution_blocked_by_status"}}
+{"ok":true,"command":"formula run","json_contract_version":"aerocodex.cli.json.v1","formula_id":"m00.canonical.distance_to_canonical","value":-6,"status":"implementation_verified","execution_policy":"normal_research","error":null}
 ```
 
-The real output also includes registry traceability and the safety notice. The legacy `run formula_vault.m00.canonical.distance_to_canonical ... --json` form routes through the same status gate and cannot bypass it.
+The real output also includes registry traceability and the safety notice. The legacy `run formula_vault.m00.canonical.distance_to_canonical ... --json` form routes through the same resolver, parser, status gate, evaluator, and envelope builder.
 
 ## Run the bounded self-check
 
@@ -55,7 +55,7 @@ The real output also includes registry traceability and the safety notice. The l
 cargo run -p aero-codex-cli -- self-check --json
 ```
 
-A clean run reports `"passed":14` and `"failed":0`. Self-check directly exercises the ten canonical-unit kernels plus invalid-scale, nonfinite-input, overflow, and unknown-formula rejection. It is a software diagnostic, not a public-execution or validation-status claim.
+A clean run reports `"passed":14` and `"failed":0`. Self-check exercises the public formula-run path for the ten canonical-unit kernels plus invalid-scale, nonfinite-input, overflow, and unknown-formula rejection. It is a software diagnostic, not scientific reference validation or certification.
 
 ## Stable exit codes
 
@@ -75,7 +75,7 @@ cargo run -p aero-codex-cli -- formula run \
   distance=1 distance_unit=0 --json
 ```
 
-The command exits with code `4` and writes a JSON error containing the stable code `execution_blocked_by_status`; the status gate runs before equation-domain evaluation.
+The command exits with code `4` and writes a versioned JSON error containing the stable equation code `non_positive_input`; the promoted formula has passed the status and dispatch gates before equation-domain evaluation.
 
 ## Release-gate commands
 
@@ -96,4 +96,4 @@ cargo run -p xtask -- dependency-policy
 cargo run -p aero-codex-cli -- self-check --json
 ```
 
-Formula validation remains `research_required`. This historical Beta 1 compatibility check is not a certified or operational release; the current release identity is `0.1.0-alpha.1` and `research_software_alpha`. See [`release_testing.md`](release_testing.md).
+The release slice is `implementation_verified`; the 140-formula complement remains `research_required`. This historical Beta 1 compatibility surface is not a certified or operational release; the current release identity is `0.1.0-alpha.1` and `research_software_alpha`. See [`release_testing.md`](release_testing.md).

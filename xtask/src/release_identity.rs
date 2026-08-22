@@ -56,7 +56,7 @@ const IDENTITY_START: &str = "<!-- aerocodex-current-identity:start -->";
 const IDENTITY_END: &str = "<!-- aerocodex-current-identity:end -->";
 const HISTORICAL_START: &str = "<!-- aerocodex-historical:start -->";
 const HISTORICAL_END: &str = "<!-- aerocodex-historical:end -->";
-const IDENTITY_BODY: &str = "Release version: `0.1.0-alpha.1`\nRelease tier: `research_software_alpha` (`Research Software Alpha`)\nWorkspace packages: `14`\nRegistry formulas: `152`\nBlocked formulas: `152`\nPublicly executable formulas: `0`";
+const IDENTITY_BODY: &str = "Release version: `0.1.0-alpha.1`\nRelease tier: `research_software_alpha` (`Research Software Alpha`)\nWorkspace packages: `14`\nRegistry formulas: `152`\nBlocked formulas: `140`\nPublicly executable formulas: `12`";
 
 const EVIDENCE_START: &str = "<!-- aerocodex-release-evidence:start -->";
 const EVIDENCE_END: &str = "<!-- aerocodex-release-evidence:end -->";
@@ -86,6 +86,7 @@ struct DiscoveredPackage {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct RegistrySummary {
     total: usize,
+    implementation_verified: usize,
     research_required: usize,
     blocked: usize,
     publicly_executable: usize,
@@ -648,6 +649,7 @@ fn summarize_registry(
     let mut identifiers = BTreeSet::new();
     let mut summary = RegistrySummary {
         total: registry.formulas.len(),
+        implementation_verified: 0,
         research_required: 0,
         blocked: 0,
         publicly_executable: 0,
@@ -665,6 +667,9 @@ fn summarize_registry(
         }
         if formula.status == "research_required" {
             summary.research_required += 1;
+        }
+        if formula.status == "implementation_verified" {
+            summary.implementation_verified += 1;
         }
         if formula.execution_policy == "blocked" {
             summary.blocked += 1;
@@ -684,9 +689,10 @@ fn validate_registry_summary(
 ) -> Result<(), String> {
     let expected = RegistrySummary {
         total: manifest.registry_formula_count,
-        research_required: manifest.registry_formula_count,
-        blocked: manifest.registry_formula_count,
-        publicly_executable: 0,
+        implementation_verified: manifest.formulas.len(),
+        research_required: manifest.registry_formula_count - manifest.formulas.len(),
+        blocked: manifest.registry_formula_count - manifest.formulas.len(),
+        publicly_executable: manifest.formulas.len(),
     };
     if summary != expected {
         return Err(format!(
@@ -696,13 +702,14 @@ fn validate_registry_summary(
     if summary
         != (RegistrySummary {
             total: EXPECTED_FORMULA_COUNT,
-            research_required: EXPECTED_FORMULA_COUNT,
-            blocked: EXPECTED_FORMULA_COUNT,
-            publicly_executable: 0,
+            implementation_verified: 12,
+            research_required: 140,
+            blocked: 140,
+            publicly_executable: 12,
         })
     {
         return Err(format!(
-            "release registry posture changed: expected 152 research_required and blocked rows with zero publicly executable formulas, found {summary:?}"
+            "release registry posture changed: expected 12 implementation_verified/publicly executable rows and 140 research_required/blocked rows, found {summary:?}"
         ));
     }
     Ok(())
@@ -2200,7 +2207,7 @@ fn verify_release_status_evidence(root: &Path) -> Result<(), String> {
             "- Release-identity test classification: `{RELEASE_IDENTITY_TEST_FUNCTION_COUNT} test functions: 11 helper/unit; 12 production-document; 3 production-loader; 1 compiled-process integration; 1 complete public-command; 1 production-command Git trust-boundary`"
         ),
         "- Scope: `minimal_release_identity`".to_string(),
-        "- Registry facts: `152 research_required; 152 blocked; 0 publicly executable`"
+        "- Registry facts: `12 implementation_verified; 140 research_required; 140 blocked; 12 publicly executable`"
             .to_string(),
         "- CLI self-check: `14 passed; 0 failed`".to_string(),
         "- Fresh-runner CI: `pending corrective push and rerun`".to_string(),
@@ -2208,7 +2215,7 @@ fn verify_release_status_evidence(root: &Path) -> Result<(), String> {
             .to_string(),
         "- Root Cargo.lock in committed Git tree: `absent`".to_string(),
         "- Pre-existing ignored local Cargo.lock: `not part of the release commit; preserve bytes; cleanup requires separate user authorization`".to_string(),
-        "- Excluded work: `packaging, signing, tagging, publication, formula promotion`"
+        "- Excluded work: `packaging, signing, tagging, publication, broader formula promotion`"
             .to_string(),
     ] {
         if !evidence.contains(&required) {
@@ -2655,9 +2662,10 @@ fn validate_cli_version_json(text: &str) -> Result<(), String> {
     validate_common_cli_identity(&object, "CLI version JSON")?;
     for (field, expected) in [
         ("workspace_package_count", "14"),
+        ("dispatchable_formula_count", "12"),
         ("registry_formula_count", "152"),
-        ("blocked_formula_count", "152"),
-        ("public_executable_formula_count", "0"),
+        ("blocked_formula_count", "140"),
+        ("public_executable_formula_count", "12"),
     ] {
         let actual = json_number_field(&object, field)?;
         if actual != expected {
@@ -2674,8 +2682,9 @@ fn validate_cli_status_json(text: &str) -> Result<(), String> {
     validate_common_cli_identity(&object, "CLI status JSON")?;
     for (field, expected) in [
         ("registry_formula_count", "152"),
-        ("blocked_formula_count", "152"),
-        ("public_executable_formula_count", "0"),
+        ("dispatchable_formula_count", "12"),
+        ("blocked_formula_count", "140"),
+        ("public_executable_formula_count", "12"),
     ] {
         let actual = json_number_field(&object, field)?;
         if actual != expected {
@@ -3913,7 +3922,7 @@ mod tests {
     #[test]
     fn runtime_version_and_tier_drift_fail_typed_json_validation() {
         let good = format!(
-            "{{\"program_name\":\"aerocodex\",\"semantic_version\":\"{EXPECTED_VERSION}\",\"release_tier\":\"{EXPECTED_TIER}\",\"release_tier_display\":\"{EXPECTED_TIER_DISPLAY}\",\"workspace_package_count\":14,\"registry_formula_count\":152,\"blocked_formula_count\":152,\"public_executable_formula_count\":0}}"
+            "{{\"program_name\":\"aerocodex\",\"semantic_version\":\"{EXPECTED_VERSION}\",\"release_tier\":\"{EXPECTED_TIER}\",\"release_tier_display\":\"{EXPECTED_TIER_DISPLAY}\",\"workspace_package_count\":14,\"dispatchable_formula_count\":12,\"registry_formula_count\":152,\"blocked_formula_count\":140,\"public_executable_formula_count\":12}}"
         );
         validate_cli_version_json(&good).unwrap();
         assert!(

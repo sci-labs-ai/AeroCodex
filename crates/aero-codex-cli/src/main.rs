@@ -31,6 +31,7 @@ const GENERATED_FORMULA_REGISTRY_JSON: &str =
 
 const PROGRAM_NAME: &str = "aerocodex";
 const WORKSPACE_PACKAGE_COUNT: usize = 14;
+const JSON_CONTRACT_VERSION: &str = "aerocodex.cli.json.v1";
 const FORCE_SELF_CHECK_FAILURE_ENV: &str = "AEROCODEX_TEST_FORCE_SELF_CHECK_FAILURE";
 
 fn release_tier() -> &'static str {
@@ -62,7 +63,7 @@ fn build_profile() -> &'static str {
 }
 
 fn validation_status() -> &'static str {
-    "research_required"
+    "implementation_verified"
 }
 
 fn safety_notice() -> &'static str {
@@ -192,7 +193,7 @@ fn parse_dispatch_metadata(text: &'static str) -> Result<Vec<FormulaSpec>, Strin
     Ok(specs)
 }
 
-fn supported_formula_count() -> usize {
+fn dispatchable_formula_count() -> usize {
     formula_specs().len()
 }
 
@@ -200,6 +201,13 @@ fn supported_formula_count() -> usize {
 struct EvaluationResult {
     spec: &'static FormulaSpec,
     value: f64,
+}
+
+#[derive(Debug)]
+struct PublicFormulaRun {
+    resolved: ResolvedFormula,
+    result: EvaluationResult,
+    input_syntax: InputSyntax,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -256,6 +264,11 @@ enum AppError {
         status: &'static str,
         execution_policy: &'static str,
     },
+    DispatchUnavailable {
+        formula_id: String,
+        status: &'static str,
+        execution_policy: &'static str,
+    },
     Equation {
         formula_id: &'static str,
         source: AeroError,
@@ -278,6 +291,7 @@ impl AppError {
             Self::ExecutionBlockedByStatus { .. } => "execution_blocked_by_status",
             Self::PreliminaryFlagRequired { .. } => "preliminary_flag_required",
             Self::M07CandidateBlocked { .. } => "m07_candidate_blocked",
+            Self::DispatchUnavailable { .. } => "formula_dispatch_unavailable",
             Self::Equation { source, .. } => source.code(),
             Self::SelfCheckFailed { .. } => "self_check_failed",
         }
@@ -291,7 +305,8 @@ impl AppError {
             | Self::Equation { formula_id, .. } => Some(formula_id),
             Self::ExecutionBlockedByStatus { formula_id, .. }
             | Self::PreliminaryFlagRequired { formula_id, .. }
-            | Self::M07CandidateBlocked { formula_id, .. } => Some(formula_id.as_str()),
+            | Self::M07CandidateBlocked { formula_id, .. }
+            | Self::DispatchUnavailable { formula_id, .. } => Some(formula_id.as_str()),
             Self::Usage(_)
             | Self::InvalidAssignment(_)
             | Self::DuplicateInput(_)
@@ -304,7 +319,8 @@ impl AppError {
         match self {
             Self::ExecutionBlockedByStatus { status, .. }
             | Self::PreliminaryFlagRequired { status, .. }
-            | Self::M07CandidateBlocked { status, .. } => Some(status),
+            | Self::M07CandidateBlocked { status, .. }
+            | Self::DispatchUnavailable { status, .. } => Some(status),
             _ => None,
         }
     }
@@ -318,6 +334,9 @@ impl AppError {
                 execution_policy, ..
             }
             | Self::M07CandidateBlocked {
+                execution_policy, ..
+            }
+            | Self::DispatchUnavailable {
                 execution_policy, ..
             } => Some(execution_policy),
             _ => None,
@@ -336,7 +355,8 @@ impl AppError {
             Self::Equation { .. }
             | Self::ExecutionBlockedByStatus { .. }
             | Self::PreliminaryFlagRequired { .. }
-            | Self::M07CandidateBlocked { .. } => 4,
+            | Self::M07CandidateBlocked { .. }
+            | Self::DispatchUnavailable { .. } => 4,
             Self::SelfCheckFailed { .. } => 5,
         }
     }
@@ -391,6 +411,14 @@ impl fmt::Display for AppError {
             } => write!(
                 formatter,
                 "formula `{formula_id}` is an M07 candidate and remains blocked by public-alpha execution gates with status `{status}` and execution_policy `{execution_policy}`"
+            ),
+            Self::DispatchUnavailable {
+                formula_id,
+                status,
+                execution_policy,
+            } => write!(
+                formatter,
+                "formula `{formula_id}` has executable status `{status}` with execution_policy `{execution_policy}` but no CLI dispatch specification"
             ),
             Self::Equation { formula_id, source } => {
                 write!(formatter, "formula `{formula_id}` failed: {source}")
@@ -486,10 +514,10 @@ impl FormulaListFilters {
             }
         }
         if self.executable
-            && !matches!(
+            && (!matches!(
                 entry.execution_policy,
                 "normal_research" | "publication_supporting"
-            )
+            ) || formula_spec_for_registry_entry(entry).is_none())
         {
             return false;
         }
@@ -679,6 +707,86 @@ fn execution_gate_error(resolved: &ResolvedFormula, preliminary: bool) -> Option
         resolved.status(),
         preliminary,
     )
+}
+
+fn public_run_precondition_error_for_parts(
+    formula_id: &str,
+    family: Option<&str>,
+    legacy_formula_id: Option<&str>,
+    status: &'static str,
+    preliminary: bool,
+    dispatch_available: bool,
+) -> Option<AppError> {
+    execution_gate_error_for_parts(
+        formula_id,
+        family,
+        legacy_formula_id,
+        status,
+        preliminary,
+    )
+    .or_else(|| {
+        (!dispatch_available).then(|| AppError::DispatchUnavailable {
+            formula_id: formula_id.to_string(),
+            status,
+            execution_policy: execution_policy_for_status(status),
+        })
+    })
+}
+
+fn public_run_precondition_error(
+    resolved: &ResolvedFormula,
+    preliminary: bool,
+) -> Option<AppError> {
+    public_run_precondition_error_for_parts(
+        resolved.formula_id(),
+        resolved.registry_entry.map(|entry| entry.family),
+        resolved.legacy_formula_id(),
+        resolved.status(),
+        preliminary,
+        resolved.spec.is_some(),
+    )
+}
+
+fn formula_is_implemented(resolved: &ResolvedFormula) -> bool {
+    resolved.runtime_symbol().is_some()
+        && resolved
+            .registry_entry
+            .and_then(|entry| entry.implementation_path)
+            .is_some()
+}
+
+fn formula_is_dispatchable(resolved: &ResolvedFormula) -> bool {
+    resolved.spec.is_some()
+}
+
+fn formula_is_executable(resolved: &ResolvedFormula) -> bool {
+    formula_is_dispatchable(resolved) && execution_gate_error(resolved, false).is_none()
+}
+
+fn formula_is_validated(resolved: &ResolvedFormula) -> bool {
+    matches!(resolved.status(), "reference_validated" | "experiment_validated")
+}
+
+fn formula_is_blocked(resolved: &ResolvedFormula) -> bool {
+    resolved.execution_policy() == Some("blocked")
+        || is_m07_candidate_parts(
+            resolved.formula_id(),
+            resolved.registry_entry.map(|entry| entry.family),
+            resolved.legacy_formula_id(),
+        )
+}
+
+fn append_formula_state_json(output: &mut String, resolved: &ResolvedFormula) {
+    write!(
+        output,
+        ",\"implemented\":{},\"dispatchable\":{},\"executable\":{},\"validated\":{},\"blocked\":{}",
+        formula_is_implemented(resolved),
+        formula_is_dispatchable(resolved),
+        formula_is_executable(resolved),
+        formula_is_validated(resolved),
+        formula_is_blocked(resolved),
+    )
+    .expect("writing to String cannot fail");
 }
 
 fn registry_entry_for_spec(
@@ -1278,6 +1386,7 @@ fn append_formula_list_filters_json(output: &mut String, filters: &FormulaListFi
 #[derive(Debug)]
 struct FormulaStatusReport {
     total_formula_count: usize,
+    dispatchable_formula_count: usize,
     counts_by_status: BTreeMap<&'static str, usize>,
     counts_by_execution_policy: BTreeMap<&'static str, usize>,
     counts_by_family: BTreeMap<&'static str, usize>,
@@ -1292,6 +1401,7 @@ impl FormulaStatusReport {
     fn from_registry() -> Self {
         let mut report = Self {
             total_formula_count: generated_formula_registry::FORMULA_REGISTRY.len(),
+            dispatchable_formula_count: formula_specs().len(),
             counts_by_status: BTreeMap::new(),
             counts_by_execution_policy: BTreeMap::new(),
             counts_by_family: BTreeMap::new(),
@@ -1315,7 +1425,9 @@ impl FormulaStatusReport {
 
             match entry.execution_policy {
                 "normal_research" | "publication_supporting" => {
-                    report.normal_executable_count += 1;
+                    if formula_spec_for_registry_entry(entry).is_some() {
+                        report.normal_executable_count += 1;
+                    }
                 }
                 "preliminary_flag_required" => {
                     report.preliminary_only_formula_count += 1;
@@ -1446,13 +1558,16 @@ fn output_formula_status_report(json: bool) {
 
     if json {
         let mut output = String::from("{\"ok\":true,\"command\":\"formula status-report\"");
+        output.push_str(",\"json_contract_version\":");
+        push_json_string(&mut output, JSON_CONTRACT_VERSION);
         append_release_identity_json_fields(&mut output);
         write!(
             output,
-            ",\"registry_formula_count\":{},\"total_formula_count\":{},\"inventory_formula_count\":{}",
+            ",\"registry_formula_count\":{},\"total_formula_count\":{},\"inventory_formula_count\":{},\"dispatchable_formula_count\":{}",
             generated_formula_registry::FORMULA_COUNT,
             report.total_formula_count,
-            report.total_formula_count
+            report.total_formula_count,
+            report.dispatchable_formula_count
         )
         .expect("writing to String cannot fail");
         output.push_str(",\"counts_by_status\":");
@@ -1509,6 +1624,12 @@ fn output_formula_status_report(json: bool) {
             output,
             "inventory_formula_count={}",
             report.total_formula_count
+        )
+        .expect("writing to String cannot fail");
+        writeln!(
+            output,
+            "dispatchable_formula_count={}",
+            report.dispatchable_formula_count
         )
         .expect("writing to String cannot fail");
         writeln!(
@@ -1599,6 +1720,8 @@ fn write_stdout(output: &str) {
 fn json_error(error: &AppError, command: Option<&str>) -> String {
     let mut output = String::from("{\"ok\":false,\"command\":");
     push_optional_json_string(&mut output, command);
+    output.push_str(",\"json_contract_version\":");
+    push_json_string(&mut output, JSON_CONTRACT_VERSION);
     output.push_str(",\"formula_id\":");
     push_optional_json_string(&mut output, error.formula_id());
     output.push_str(",\"status\":");
@@ -1624,6 +1747,8 @@ fn output_version(json: bool, standard_flag: bool) {
     if json {
         let mut output = String::from("{\"ok\":true,\"command\":\"version\",\"package_version\":");
         push_json_string(&mut output, package_version());
+        output.push_str(",\"json_contract_version\":");
+        push_json_string(&mut output, JSON_CONTRACT_VERSION);
         append_release_identity_json_fields(&mut output);
         output.push_str(",\"build_commit\":");
         push_json_string(&mut output, build_commit());
@@ -1633,9 +1758,10 @@ fn output_version(json: bool, standard_flag: bool) {
         push_json_string(&mut output, build_profile());
         write!(
             output,
-            ",\"workspace_package_count\":{},\"supported_formula_count\":{},\"registry_formula_count\":{},\"blocked_formula_count\":{},\"public_executable_formula_count\":{},\"registry_schema_version\":",
+            ",\"workspace_package_count\":{},\"supported_formula_count\":{},\"dispatchable_formula_count\":{},\"registry_formula_count\":{},\"blocked_formula_count\":{},\"public_executable_formula_count\":{},\"registry_schema_version\":",
             WORKSPACE_PACKAGE_COUNT,
-            supported_formula_count(),
+            report.dispatchable_formula_count,
+            report.dispatchable_formula_count,
             generated_formula_registry::FORMULA_COUNT,
             report.blocked_formula_count,
             report.normal_executable_count
@@ -1660,7 +1786,14 @@ fn output_version(json: bool, standard_flag: bool) {
         println!("build_commit={}", build_commit());
         println!("build_target={}", build_target());
         println!("build_profile={}", build_profile());
-        println!("supported_formula_count={}", supported_formula_count());
+        println!(
+            "supported_formula_count={}",
+            report.dispatchable_formula_count
+        );
+        println!(
+            "dispatchable_formula_count={}",
+            report.dispatchable_formula_count
+        );
         println!(
             "registry_formula_count={}",
             generated_formula_registry::FORMULA_COUNT
@@ -1685,6 +1818,8 @@ fn output_formula_list(json: bool, context: CommandContext, filters: &FormulaLis
     if json {
         let mut output = String::from("{\"ok\":true,\"command\":");
         push_json_string(&mut output, context.command());
+        output.push_str(",\"json_contract_version\":");
+        push_json_string(&mut output, JSON_CONTRACT_VERSION);
         append_context_json_fields(&mut output, context);
         write!(
             output,
@@ -1806,6 +1941,8 @@ fn output_formula_description(resolved: &ResolvedFormula, json: bool, context: C
     if json {
         let mut output = String::from("{\"ok\":true,\"command\":");
         push_json_string(&mut output, context.command());
+        output.push_str(",\"json_contract_version\":");
+        push_json_string(&mut output, JSON_CONTRACT_VERSION);
         append_context_json_fields(&mut output, context);
         output.push_str(",\"canonical_formula_id\":");
         push_json_string(&mut output, resolved.formula_id());
@@ -1866,6 +2003,8 @@ fn output_formula_description(resolved: &ResolvedFormula, json: bool, context: C
             output.push_str(",\"warnings\":[]");
         }
 
+        append_formula_state_json(&mut output, resolved);
+
         output.push_str(",\"registry_schema_version\":");
         push_json_string(&mut output, registry_schema_version());
         output.push_str(",\"source_hash\":");
@@ -1909,6 +2048,11 @@ fn output_formula_description(resolved: &ResolvedFormula, json: bool, context: C
                 .quarantine_state()
                 .unwrap_or("below_execution_threshold")
         );
+        println!("implemented={}", formula_is_implemented(resolved));
+        println!("dispatchable={}", formula_is_dispatchable(resolved));
+        println!("executable={}", formula_is_executable(resolved));
+        println!("validated={}", formula_is_validated(resolved));
+        println!("blocked={}", formula_is_blocked(resolved));
         if let Some(object) = registry_object {
             println!(
                 "inputs={}",
@@ -2009,6 +2153,69 @@ fn output_formula_description(resolved: &ResolvedFormula, json: bool, context: C
     }
 }
 
+fn evaluation_json(
+    result: &EvaluationResult,
+    resolved: &ResolvedFormula,
+    context: CommandContext,
+    input_syntax: InputSyntax,
+) -> String {
+    let registry_object = formula_registry_json_object(resolved.formula_id());
+    let mut output = String::from("{\"ok\":true,\"command\":");
+    push_json_string(&mut output, context.command());
+    output.push_str(",\"json_contract_version\":");
+    push_json_string(&mut output, JSON_CONTRACT_VERSION);
+    append_context_json_fields(&mut output, context);
+    output.push_str(",\"formula_id\":");
+    push_json_string(&mut output, resolved.formula_id());
+    output.push_str(",\"canonical_formula_id\":");
+    push_json_string(&mut output, resolved.formula_id());
+    output.push_str(",\"requested_formula_id\":");
+    push_json_string(&mut output, &resolved.requested_id);
+    output.push_str(",\"alias_used\":");
+    push_optional_json_string(&mut output, resolved.alias_used.as_deref());
+    output.push_str(",\"legacy_formula_id\":");
+    push_optional_json_string(&mut output, resolved.legacy_formula_id());
+    output.push_str(",\"runtime_symbol\":");
+    push_json_string(&mut output, result.spec.runtime_symbol);
+    output.push_str(",\"output_variable\":");
+    push_json_string(&mut output, result.spec.output_variable);
+    write!(output, ",\"value\":{}", result.value).expect("writing to String cannot fail");
+    output.push_str(",\"input_syntax\":");
+    push_json_string(&mut output, input_syntax.as_str());
+    output.push_str(",\"output\":");
+    push_json_string(&mut output, result.spec.output_variable);
+    output.push_str(",\"units\":");
+    output.push_str(
+        registry_object
+            .and_then(|object| json_field_value_slice(object, "units"))
+            .unwrap_or("null"),
+    );
+    output.push_str(",\"status\":");
+    push_json_string(&mut output, resolved.status());
+    output.push_str(",\"execution_policy\":");
+    push_optional_json_string(&mut output, resolved.execution_policy());
+    output.push_str(",\"quarantine_state\":");
+    push_optional_json_string(&mut output, resolved.quarantine_state());
+    output.push_str(",\"source_trace\":");
+    output.push_str(
+        registry_object
+            .and_then(|object| json_field_value_slice(object, "source_trace"))
+            .unwrap_or("null"),
+    );
+    output.push_str(",\"registry_schema_version\":");
+    push_json_string(&mut output, registry_schema_version());
+    output.push_str(",\"source_hash\":");
+    push_json_string(&mut output, registry_source_hash());
+    output.push_str(",\"validation_status\":");
+    push_json_string(&mut output, validation_status());
+    output.push_str(",\"warnings\":");
+    append_registry_warnings_or_default(&mut output, registry_object);
+    output.push_str(",\"safety_notice\":");
+    push_json_string(&mut output, safety_notice());
+    output.push_str(",\"error\":null}\n");
+    output
+}
+
 fn output_evaluation(
     result: &EvaluationResult,
     resolved: &ResolvedFormula,
@@ -2017,59 +2224,7 @@ fn output_evaluation(
     input_syntax: InputSyntax,
 ) {
     if json {
-        let registry_object = formula_registry_json_object(resolved.formula_id());
-        let mut output = String::from("{\"ok\":true,\"command\":");
-        push_json_string(&mut output, context.command());
-        append_context_json_fields(&mut output, context);
-        output.push_str(",\"formula_id\":");
-        push_json_string(&mut output, resolved.formula_id());
-        output.push_str(",\"canonical_formula_id\":");
-        push_json_string(&mut output, resolved.formula_id());
-        output.push_str(",\"requested_formula_id\":");
-        push_json_string(&mut output, &resolved.requested_id);
-        output.push_str(",\"alias_used\":");
-        push_optional_json_string(&mut output, resolved.alias_used.as_deref());
-        output.push_str(",\"legacy_formula_id\":");
-        push_optional_json_string(&mut output, resolved.legacy_formula_id());
-        output.push_str(",\"runtime_symbol\":");
-        push_json_string(&mut output, result.spec.runtime_symbol);
-        output.push_str(",\"output_variable\":");
-        push_json_string(&mut output, result.spec.output_variable);
-        write!(output, ",\"value\":{}", result.value).expect("writing to String cannot fail");
-        output.push_str(",\"input_syntax\":");
-        push_json_string(&mut output, input_syntax.as_str());
-        output.push_str(",\"output\":");
-        push_json_string(&mut output, result.spec.output_variable);
-        output.push_str(",\"units\":");
-        output.push_str(
-            registry_object
-                .and_then(|object| json_field_value_slice(object, "units"))
-                .unwrap_or("null"),
-        );
-        output.push_str(",\"status\":");
-        push_json_string(&mut output, resolved.status());
-        output.push_str(",\"execution_policy\":");
-        push_optional_json_string(&mut output, resolved.execution_policy());
-        output.push_str(",\"quarantine_state\":");
-        push_optional_json_string(&mut output, resolved.quarantine_state());
-        output.push_str(",\"source_trace\":");
-        output.push_str(
-            registry_object
-                .and_then(|object| json_field_value_slice(object, "source_trace"))
-                .unwrap_or("null"),
-        );
-        output.push_str(",\"registry_schema_version\":");
-        push_json_string(&mut output, registry_schema_version());
-        output.push_str(",\"source_hash\":");
-        push_json_string(&mut output, registry_source_hash());
-        output.push_str(",\"validation_status\":");
-        push_json_string(&mut output, validation_status());
-        output.push_str(",\"warnings\":");
-        append_registry_warnings_or_default(&mut output, registry_object);
-        output.push_str(",\"safety_notice\":");
-        push_json_string(&mut output, safety_notice());
-        output.push_str(",\"error\":null}\n");
-        print!("{output}");
+        print!("{}", evaluation_json(result, resolved, context, input_syntax));
     } else {
         println!("command={}", context.command());
         if let Some(migration_command) = context.migration_command() {
@@ -2093,10 +2248,18 @@ fn output_evaluation(
     }
 }
 
+#[cfg(test)]
 fn map_inputs(pairs: &[(&str, f64)]) -> BTreeMap<String, f64> {
     pairs
         .iter()
         .map(|(name, value)| ((*name).to_string(), *value))
+        .collect()
+}
+
+fn self_check_input_arguments(inputs: &[(&str, f64)]) -> Vec<String> {
+    inputs
+        .iter()
+        .flat_map(|(name, value)| [format!("--{name}"), value.to_string()])
         .collect()
 }
 
@@ -2106,14 +2269,28 @@ fn value_check(
     inputs: &[(&str, f64)],
     expected: f64,
 ) -> SelfCheckResult {
-    match evaluate_formula(formula_id, &map_inputs(inputs)) {
-        Ok(result) => {
-            let passed = result.value.to_bits() == expected.to_bits();
+    let arguments = self_check_input_arguments(inputs);
+    match evaluate_public_formula_run(formula_id, &arguments) {
+        Ok(run) => {
+            let envelope = evaluation_json(
+                &run.result,
+                &run.resolved,
+                CommandContext::Namespace {
+                    command: "formula run",
+                },
+                run.input_syntax,
+            );
+            let passed = run.result.value.to_bits() == expected.to_bits()
+                && envelope.starts_with("{\"ok\":true")
+                && envelope.contains("\"error\":null");
             SelfCheckResult {
                 name,
                 formula_id,
                 passed,
-                detail: format!("expected={expected} observed={}", result.value),
+                detail: format!(
+                    "public_path=resolver+status_gate+input_parser+evaluator+success_envelope expected={expected} observed={}",
+                    run.result.value
+                ),
             }
         }
         Err(error) => SelfCheckResult {
@@ -2131,16 +2308,22 @@ fn equation_error_check(
     inputs: &[(&str, f64)],
     expected_code: &'static str,
 ) -> SelfCheckResult {
-    match evaluate_formula(formula_id, &map_inputs(inputs)) {
-        Err(AppError::Equation { source, .. }) => SelfCheckResult {
-            name,
-            formula_id,
-            passed: source.code() == expected_code,
-            detail: format!(
-                "expected_error={expected_code} observed_error={}",
-                source.code()
-            ),
-        },
+    let arguments = self_check_input_arguments(inputs);
+    match evaluate_public_formula_run(formula_id, &arguments) {
+        Err(error @ AppError::Equation { .. }) => {
+            let observed_code = error.code();
+            let envelope = json_error(&error, Some("formula run"));
+            SelfCheckResult {
+                name,
+                formula_id,
+                passed: observed_code == expected_code
+                    && envelope.starts_with("{\"ok\":false")
+                    && envelope.contains(&format!("\"code\":\"{expected_code}\"")),
+                detail: format!(
+                    "public_path=resolver+status_gate+input_parser+evaluator+error_envelope expected_error={expected_code} observed_error={observed_code}"
+                ),
+            }
+        }
         Err(error) => SelfCheckResult {
             name,
             formula_id,
@@ -2150,13 +2333,13 @@ fn equation_error_check(
                 error.code()
             ),
         },
-        Ok(result) => SelfCheckResult {
+        Ok(run) => SelfCheckResult {
             name,
             formula_id,
             passed: false,
             detail: format!(
                 "expected_error={expected_code} observed_value={}",
-                result.value
+                run.result.value
             ),
         },
     }
@@ -2164,14 +2347,17 @@ fn equation_error_check(
 
 fn unknown_formula_check() -> SelfCheckResult {
     let formula_id = "formula_vault.m00.canonical.not_present";
-    let inputs = BTreeMap::new();
-    match evaluate_formula(formula_id, &inputs) {
-        Err(AppError::UnknownFormula(_)) => SelfCheckResult {
-            name: "unknown_formula_is_rejected",
-            formula_id,
-            passed: true,
-            detail: "expected_error=unknown_formula observed_error=unknown_formula".to_string(),
-        },
+    match evaluate_public_formula_run(formula_id, &[]) {
+        Err(error @ AppError::UnknownFormula(_)) => {
+            let envelope = json_error(&error, Some("formula run"));
+            SelfCheckResult {
+                name: "unknown_formula_is_rejected",
+                formula_id,
+                passed: envelope.starts_with("{\"ok\":false")
+                    && envelope.contains("\"code\":\"formula_not_found\""),
+                detail: "public_path=resolver+error_envelope expected_error=formula_not_found observed_error=formula_not_found".to_string(),
+            }
+        }
         Err(error) => SelfCheckResult {
             name: "unknown_formula_is_rejected",
             formula_id,
@@ -2181,13 +2367,13 @@ fn unknown_formula_check() -> SelfCheckResult {
                 error.code()
             ),
         },
-        Ok(result) => SelfCheckResult {
+        Ok(run) => SelfCheckResult {
             name: "unknown_formula_is_rejected",
             formula_id,
             passed: false,
             detail: format!(
                 "expected_error=unknown_formula observed_value={}",
-                result.value
+                run.result.value
             ),
         },
     }
@@ -2295,11 +2481,14 @@ fn run_self_check() -> SelfCheckReport {
 
 fn self_check_json(report: &SelfCheckReport) -> String {
     let mut output = format!("{{\"ok\":{},\"command\":\"self-check\"", report.failed == 0);
+    output.push_str(",\"json_contract_version\":");
+    push_json_string(&mut output, JSON_CONTRACT_VERSION);
     append_release_identity_json_fields(&mut output);
     write!(
         output,
-        ",\"supported_formula_count\":{},\"passed\":{},\"failed\":{},\"checks\":[",
-        supported_formula_count(),
+        ",\"supported_formula_count\":{},\"dispatchable_formula_count\":{},\"passed\":{},\"failed\":{},\"checks\":[",
+        dispatchable_formula_count(),
+        dispatchable_formula_count(),
         report.passed,
         report.failed
     )
@@ -2348,7 +2537,14 @@ fn output_self_check(report: &SelfCheckReport, json: bool) {
         println!("semantic_version={}", package_version());
         println!("release_tier={}", release_tier());
         println!("release_tier_display={}", release_tier_display());
-        println!("supported_formula_count={}", supported_formula_count());
+        println!(
+            "supported_formula_count={}",
+            dispatchable_formula_count()
+        );
+        println!(
+            "dispatchable_formula_count={}",
+            dispatchable_formula_count()
+        );
         for check in &report.checks {
             let status = if check.passed { "pass" } else { "fail" };
             println!(
@@ -2395,6 +2591,21 @@ fn execute_run(
     json: bool,
     context: CommandContext,
 ) -> Result<(), AppError> {
+    let run = evaluate_public_formula_run(formula_id, input_arguments)?;
+    output_evaluation(
+        &run.result,
+        &run.resolved,
+        json,
+        context,
+        run.input_syntax,
+    );
+    Ok(())
+}
+
+fn evaluate_public_formula_run(
+    formula_id: &str,
+    input_arguments: &[String],
+) -> Result<PublicFormulaRun, AppError> {
     let resolved = resolve_formula(formula_id)
         .ok_or_else(|| AppError::UnknownFormula(formula_id.to_string()))?;
     let (preliminary, filtered_input_arguments) = remove_preliminary_flag(input_arguments)?;
@@ -2403,19 +2614,18 @@ fn execute_run(
         resolved.inputs(),
         &filtered_input_arguments,
     )?;
-    if let Some(error) = execution_gate_error(&resolved, preliminary) {
+    if let Some(error) = public_run_precondition_error(&resolved, preliminary) {
         return Err(error);
     }
-    let Some(spec) = resolved.spec else {
-        return Err(AppError::ExecutionBlockedByStatus {
-            formula_id: resolved.formula_id().to_string(),
-            status: resolved.status(),
-            execution_policy: execution_policy_for_status(resolved.status()),
-        });
-    };
+    let spec = resolved
+        .spec
+        .expect("public run precondition requires a dispatch specification");
     let result = evaluate_formula(spec.id, &parsed_inputs.inputs)?;
-    output_evaluation(&result, &resolved, json, context, parsed_inputs.syntax);
-    Ok(())
+    Ok(PublicFormulaRun {
+        resolved,
+        result,
+        input_syntax: parsed_inputs.syntax,
+    })
 }
 
 fn execute_formula_namespace(arguments: &[String], json: bool) -> Result<(), AppError> {
@@ -2622,7 +2832,7 @@ mod tests {
 
     #[test]
     fn registry_is_unique_and_complete() {
-        assert_eq!(formula_specs().len(), supported_formula_count());
+        assert_eq!(formula_specs().len(), dispatchable_formula_count());
         let canonical_ids: BTreeSet<&str> = formula_specs()
             .iter()
             .map(|spec| spec.canonical_id)
@@ -2632,9 +2842,9 @@ mod tests {
             .iter()
             .map(|spec| spec.runtime_symbol)
             .collect();
-        assert_eq!(canonical_ids.len(), supported_formula_count());
-        assert_eq!(ids.len(), supported_formula_count());
-        assert_eq!(symbols.len(), supported_formula_count());
+        assert_eq!(canonical_ids.len(), dispatchable_formula_count());
+        assert_eq!(ids.len(), dispatchable_formula_count());
+        assert_eq!(symbols.len(), dispatchable_formula_count());
         assert!(formula_specs().iter().all(|spec| !spec.inputs.is_empty()));
         assert!(formula_specs().iter().all(|spec| {
             generated_formula_registry::find_by_formula_id(spec.canonical_id)
@@ -2747,12 +2957,12 @@ mod tests {
     }
 
     #[test]
-    fn rr023_m00_angle_registry_ids_resolve_to_dispatch_specs_without_status_promotion() {
+    fn promoted_m00_angle_registry_ids_resolve_to_public_dispatch_specs() {
         let deg_to_rad = resolve_formula("m00.angle.deg_to_rad")
             .expect("readable M00 angle registry id should resolve");
         assert_eq!(deg_to_rad.formula_id(), "m00.angle.deg_to_rad");
-        assert_eq!(deg_to_rad.status(), "research_required");
-        assert_eq!(deg_to_rad.execution_policy(), Some("blocked"));
+        assert_eq!(deg_to_rad.status(), "implementation_verified");
+        assert_eq!(deg_to_rad.execution_policy(), Some("normal_research"));
         assert_eq!(deg_to_rad.inputs(), &["degrees"]);
         assert_eq!(
             deg_to_rad
@@ -2761,9 +2971,7 @@ mod tests {
                 .id,
             "formula_vault.m00.angle.deg2rad"
         );
-        let gate = execution_gate_error(&deg_to_rad, true)
-            .expect("research_required M00 angle row must remain status-gated");
-        assert_eq!(gate.code(), "execution_blocked_by_status");
+        assert!(execution_gate_error(&deg_to_rad, false).is_none());
 
         let rad_to_deg = resolve_formula("formula_vault.m00.angle.rad2deg")
             .expect("legacy M00 angle formula-vault id should resolve");
@@ -2921,5 +3129,33 @@ mod tests {
         )
         .expect("M07 candidates must stay blocked even with --preliminary");
         assert_eq!(m07.code(), "m07_candidate_blocked");
+    }
+
+    #[test]
+    fn self_check_public_preconditions_reject_blocked_release_formula_fixture() {
+        let error = public_run_precondition_error_for_parts(
+            "m00.angle.deg_to_rad",
+            Some("m00"),
+            Some("formula_vault.m00.angle.deg2rad"),
+            "research_required",
+            false,
+            true,
+        )
+        .expect("a blocked release formula must fail the same public precondition used by self-check");
+        assert_eq!(error.code(), "execution_blocked_by_status");
+    }
+
+    #[test]
+    fn self_check_public_preconditions_reject_missing_release_dispatch_fixture() {
+        let error = public_run_precondition_error_for_parts(
+            "m00.angle.deg_to_rad",
+            Some("m00"),
+            Some("formula_vault.m00.angle.deg2rad"),
+            "implementation_verified",
+            false,
+            false,
+        )
+        .expect("an executable release formula without dispatch must fail self-check");
+        assert_eq!(error.code(), "formula_dispatch_unavailable");
     }
 }
