@@ -37,6 +37,24 @@ fn run_with_env(arguments: &[&str], key: &str, value: &str) -> Output {
         .expect("aerocodex binary should execute")
 }
 
+fn output_with_executable_busy_retry(command: &mut Command) -> std::io::Result<Output> {
+    const MAX_ATTEMPTS: usize = 5;
+
+    for attempt in 1..=MAX_ATTEMPTS {
+        match command.output() {
+            Err(error)
+                if cfg!(unix)
+                    && error.raw_os_error() == Some(26)
+                    && attempt < MAX_ATTEMPTS =>
+            {
+                std::thread::sleep(std::time::Duration::from_millis(10));
+            }
+            result => return result,
+        }
+    }
+    unreachable!("bounded copied-CLI execution attempts must return")
+}
+
 fn stdout(output: &Output) -> String {
     String::from_utf8(output.stdout.clone()).expect("stdout should be valid text")
 }
@@ -761,10 +779,11 @@ fn copied_binary_runs_from_external_directory_without_repository_context() {
     ] {
         assert!(!directory.join(forbidden).exists());
     }
-    let output = Command::new(&destination)
+    let mut command = Command::new(&destination);
+    command
         .current_dir(&directory)
-        .args(["version", "--json"])
-        .output()
+        .args(["version", "--json"]);
+    let output = output_with_executable_busy_retry(&mut command)
         .expect("copied CLI should execute from external directory");
     assert!(output.status.success(), "{}", stderr(&output));
     let text = stdout(&output);

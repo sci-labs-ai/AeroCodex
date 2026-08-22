@@ -2563,6 +2563,8 @@ fn run_cli(
     arguments: &[&str],
     environment: Option<(&str, &str)>,
 ) -> Result<Output, String> {
+    const MAX_ATTEMPTS: usize = 5;
+
     let mut command = Command::new(binary);
     command
         .current_dir(working_directory)
@@ -2571,9 +2573,23 @@ fn run_cli(
     if let Some((key, value)) = environment {
         command.env(key, value);
     }
-    command
-        .output()
-        .map_err(|error| format!("cannot execute copied CLI {}: {error}", binary.display()))
+    for attempt in 1..=MAX_ATTEMPTS {
+        match command.output() {
+            Err(error)
+                if cfg!(unix)
+                    && error.raw_os_error() == Some(26)
+                    && attempt < MAX_ATTEMPTS =>
+            {
+                std::thread::sleep(std::time::Duration::from_millis(10));
+            }
+            result => {
+                return result.map_err(|error| {
+                    format!("cannot execute copied CLI {}: {error}", binary.display())
+                });
+            }
+        }
+    }
+    unreachable!("bounded copied-CLI execution attempts must return")
 }
 
 fn require_success(output: &Output, context: &str) -> Result<(), String> {
