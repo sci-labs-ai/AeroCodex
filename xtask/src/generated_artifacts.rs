@@ -9,6 +9,7 @@ const GOVERNED_GENERATED_FILES: &[&str] = &[
     "generated/equation_batch_status_report.json",
     "generated/formula_registry.json",
     "generated/formula_registry.sha256",
+    "generated/release_slice_validation_summary.json",
     "generated/rust/formula_registry.rs",
 ];
 const GENERATOR_OWNED_DIRECTORIES: &[&str] = &["generated"];
@@ -48,6 +49,8 @@ pub fn verify_generated_artifacts(root: &Path) -> Result<(), String> {
             "--check",
         ])?;
         crate::equation_batch::report::run_report_command(root, &report_options)?;
+
+        crate::release_slice_validation::verify_release_slice_validation(root)?;
 
         let registry_options = crate::formula_registry::check::CheckOptions::parse_args(&[])?;
         crate::formula_registry::check::run_check_command(root, &registry_options)

@@ -1,0 +1,71 @@
+{
+  "schema_version": "aerocodex.release_slice_validation_summary.v1",
+  "release_manifest": "release/release-manifest.toml",
+  "vector_source": "validation/release_slice/m00_reference_vectors.tsv",
+  "formula_count": 12,
+  "analytical_vector_count": 12,
+  "validation_scope": "release_slice_only",
+  "claim_boundary": "implementation evidence for Research Software Alpha; not flight, mission, operational, regulatory, habitat, life-support, or certification evidence",
+  "formulas": [
+    {
+      "formula_id": "m00.angle.deg_to_rad",
+      "analytical_vector_count": 1,
+      "promotion_packet_state": "complete_recommendation"
+    },
+    {
+      "formula_id": "m00.angle.rad_to_deg",
+      "analytical_vector_count": 1,
+      "promotion_packet_state": "complete_recommendation"
+    },
+    {
+      "formula_id": "m00.canonical.distance_from_canonical",
+      "analytical_vector_count": 1,
+      "promotion_packet_state": "complete_recommendation"
+    },
+    {
+      "formula_id": "m00.canonical.distance_to_canonical",
+      "analytical_vector_count": 1,
+      "promotion_packet_state": "complete_recommendation"
+    },
+    {
+      "formula_id": "m00.canonical.mu_from_units",
+      "analytical_vector_count": 1,
+      "promotion_packet_state": "complete_recommendation"
+    },
+    {
+      "formula_id": "m00.canonical.speed_from_canonical",
+      "analytical_vector_count": 1,
+      "promotion_packet_state": "complete_recommendation"
+    },
+    {
+      "formula_id": "m00.canonical.speed_to_canonical",
+      "analytical_vector_count": 1,
+      "promotion_packet_state": "complete_recommendation"
+    },
+    {
+      "formula_id": "m00.canonical.speed_unit_from_du_tu",
+      "analytical_vector_count": 1,
+      "promotion_packet_state": "complete_recommendation"
+    },
+    {
+      "formula_id": "m00.canonical.speed_unit_from_mu_du",
+      "analytical_vector_count": 1,
+      "promotion_packet_state": "complete_recommendation"
+    },
+    {
+      "formula_id": "m00.canonical.time_from_canonical",
+      "analytical_vector_count": 1,
+      "promotion_packet_state": "complete_recommendation"
+    },
+    {
+      "formula_id": "m00.canonical.time_to_canonical",
+      "analytical_vector_count": 1,
+      "promotion_packet_state": "complete_recommendation"
+    },
+    {
+      "formula_id": "m00.canonical.time_unit_from_mu_du",
+      "analytical_vector_count": 1,
+      "promotion_packet_state": "complete_recommendation"
+    }
+  ]
+}
