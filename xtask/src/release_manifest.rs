@@ -1649,7 +1649,9 @@ mod tests {
 
     fn canonical_manifest_with_newline(newline: &str) -> String {
         assert!(matches!(newline, "\n" | "\r\n"));
-        canonical_manifest().replace("\r\n", "\n").replace('\n', newline)
+        canonical_manifest()
+            .replace("\r\n", "\n")
+            .replace('\n', newline)
     }
 
     fn fixture_fragment_with_text_newline(text: &str, fragment: &str) -> String {
@@ -1665,7 +1667,10 @@ mod tests {
         occurrence_index: usize,
         expected_post_count: usize,
     ) -> String {
-        assert!(!old.is_empty(), "fixture replacement needle must not be empty");
+        assert!(
+            !old.is_empty(),
+            "fixture replacement needle must not be empty"
+        );
         let actual_pre_count = text.matches(old).count();
         assert_eq!(
             actual_pre_count, expected_pre_count,
@@ -2499,14 +2504,7 @@ mod tests {
         expected_pre_count: usize,
         expected_post_count: usize,
     ) -> String {
-        replace_manifest_text_occurrence(
-            text,
-            old,
-            new,
-            expected_pre_count,
-            0,
-            expected_post_count,
-        )
+        replace_manifest_text_occurrence(text, old, new, expected_pre_count, 0, expected_post_count)
     }
 
     fn captured_panic_message<F>(action: F) -> String
@@ -2531,19 +2529,10 @@ mod tests {
                 replace_text_occurrence("value\n", "value", "value", 1, 0, 1);
             }),
             captured_panic_message(|| {
-                replace_manifest_text_occurrence(
-                    "value\n", "value\n", "value\n", 1, 0, 1,
-                );
+                replace_manifest_text_occurrence("value\n", "value\n", "value\n", 1, 0, 1);
             }),
             captured_panic_message(|| {
-                replace_manifest_text_occurrence(
-                    "value\r\n",
-                    "value\n",
-                    "value\n",
-                    1,
-                    0,
-                    1,
-                );
+                replace_manifest_text_occurrence("value\r\n", "value\n", "value\n", 1, 0, 1);
             }),
             captured_panic_message(|| {
                 replace_manifest_text_occurrence("value", "value", "value", 1, 0, 1);
@@ -2560,14 +2549,7 @@ mod tests {
             "other\n"
         );
         assert_eq!(
-            replace_manifest_text_occurrence(
-                "value\r\n",
-                "value\n",
-                "other\n",
-                1,
-                0,
-                0,
-            ),
+            replace_manifest_text_occurrence("value\r\n", "value\n", "other\n", 1, 0, 0,),
             "other\r\n"
         );
         assert_eq!(
