@@ -501,10 +501,7 @@ struct FormulaListFilters {
 }
 
 impl FormulaListFilters {
-    fn matches(
-        &self,
-        entry: &'static generated_formula_registry::FormulaRegistryEntry,
-    ) -> bool {
+    fn matches(&self, entry: &'static generated_formula_registry::FormulaRegistryEntry) -> bool {
         if let Some(family) = self.family.as_deref() {
             let root_family = registry_family(entry);
             if entry.family != family && root_family != family {
@@ -720,20 +717,14 @@ fn public_run_precondition_error_for_parts(
     preliminary: bool,
     dispatch_available: bool,
 ) -> Option<AppError> {
-    execution_gate_error_for_parts(
-        formula_id,
-        family,
-        legacy_formula_id,
-        status,
-        preliminary,
-    )
-    .or_else(|| {
-        (!dispatch_available).then(|| AppError::DispatchUnavailable {
-            formula_id: formula_id.to_string(),
-            status,
-            execution_policy: execution_policy_for_status(status),
+    execution_gate_error_for_parts(formula_id, family, legacy_formula_id, status, preliminary)
+        .or_else(|| {
+            (!dispatch_available).then(|| AppError::DispatchUnavailable {
+                formula_id: formula_id.to_string(),
+                status,
+                execution_policy: execution_policy_for_status(status),
+            })
         })
-    })
 }
 
 fn public_run_precondition_error(
@@ -754,8 +745,10 @@ fn formula_is_implemented(resolved: &ResolvedFormula) -> bool {
     resolved.runtime_symbol().is_some()
         && resolved
             .registry_entry
-            .and_then(|entry| entry.implementation_path)
-            .is_some()
+            .is_some_and(|entry| {
+                entry.implementation_package.is_some()
+                    && entry.implementation_crate.is_some()
+            })
 }
 
 fn formula_is_dispatchable(resolved: &ResolvedFormula) -> bool {
@@ -767,7 +760,10 @@ fn formula_is_executable(resolved: &ResolvedFormula) -> bool {
 }
 
 fn formula_is_validated(resolved: &ResolvedFormula) -> bool {
-    matches!(resolved.status(), "reference_validated" | "experiment_validated")
+    matches!(
+        resolved.status(),
+        "reference_validated" | "experiment_validated"
+    )
 }
 
 fn formula_is_blocked(resolved: &ResolvedFormula) -> bool {
@@ -2227,7 +2223,10 @@ fn output_evaluation(
     input_syntax: InputSyntax,
 ) {
     if json {
-        print!("{}", evaluation_json(result, resolved, context, input_syntax));
+        print!(
+            "{}",
+            evaluation_json(result, resolved, context, input_syntax)
+        );
     } else {
         println!("command={}", context.command());
         if let Some(migration_command) = context.migration_command() {
@@ -2540,10 +2539,7 @@ fn output_self_check(report: &SelfCheckReport, json: bool) {
         println!("semantic_version={}", package_version());
         println!("release_tier={}", release_tier());
         println!("release_tier_display={}", release_tier_display());
-        println!(
-            "supported_formula_count={}",
-            dispatchable_formula_count()
-        );
+        println!("supported_formula_count={}", dispatchable_formula_count());
         println!(
             "dispatchable_formula_count={}",
             dispatchable_formula_count()
@@ -2595,13 +2591,7 @@ fn execute_run(
     context: CommandContext,
 ) -> Result<(), AppError> {
     let run = evaluate_public_formula_run(formula_id, input_arguments)?;
-    output_evaluation(
-        &run.result,
-        &run.resolved,
-        json,
-        context,
-        run.input_syntax,
-    );
+    output_evaluation(&run.result, &run.resolved, json, context, run.input_syntax);
     Ok(())
 }
 
@@ -3144,7 +3134,9 @@ mod tests {
             false,
             true,
         )
-        .expect("a blocked release formula must fail the same public precondition used by self-check");
+        .expect(
+            "a blocked release formula must fail the same public precondition used by self-check",
+        );
         assert_eq!(error.code(), "execution_blocked_by_status");
     }
 
