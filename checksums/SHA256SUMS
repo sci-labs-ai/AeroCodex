@@ -35,7 +35,7 @@ eb47098a506e87d2fc956d5a5846e21544df3614742d44746e3d2e5e7183d723  crates/aero-co
 e029220aca8da26c1f23f272d87ac56e49ac5b82fd8443197e85cf4dffaf834b  crates/aero-codex-atmosphere/src/lib.rs
 d8353ce6b47a732714fb53f1bf09b2c42f2fc462a2333004fc2ac7a97e296899  crates/aero-codex-cli/Cargo.toml
 e89b02e7d5efe4202d1613204adee700202ed86a5b6f00a4c1c66b0e17d7accf  crates/aero-codex-cli/dispatch_metadata.tsv
-81c8a16918b33eb5e0746e10e4f6403e32f33b9f70ab8f216490c448bf87f283  crates/aero-codex-cli/src/main.rs
+01c5843da1b58691eb9b226f09ae64cb8a38d9d15c0ba71bfc172f65bb8d6176  crates/aero-codex-cli/src/main.rs
 9ba0abc9a0f660fa3b29f2cb3f2be6f2a306d691f4a1f5347ff9b1be137f363c  crates/aero-codex-cli/tests/cli.rs
 6cd78ea001ad264a2cd1659c43a70a1e842171beceae5629fd80a5904ab28b48  crates/aero-codex-cli/tests/contracts/formula_run_error.v1.json
 744fa567f424ebc86ffb9d5973cd487443ab0f65f9c3a591648c18012a363880  crates/aero-codex-cli/tests/contracts/formula_run_success.v1.json

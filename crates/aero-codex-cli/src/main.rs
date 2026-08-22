@@ -743,12 +743,9 @@ fn public_run_precondition_error(
 
 fn formula_is_implemented(resolved: &ResolvedFormula) -> bool {
     resolved.runtime_symbol().is_some()
-        && resolved
-            .registry_entry
-            .is_some_and(|entry| {
-                entry.implementation_package.is_some()
-                    && entry.implementation_crate.is_some()
-            })
+        && resolved.registry_entry.is_some_and(|entry| {
+            entry.implementation_package.is_some() && entry.implementation_crate.is_some()
+        })
 }
 
 fn formula_is_dispatchable(resolved: &ResolvedFormula) -> bool {
