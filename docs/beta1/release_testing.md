@@ -12,7 +12,7 @@ The current candidate has twelve M00 dispatch-linked and publicly executable rec
 - Rust and Cargo compatible with the workspace `rust-version`
 - `rustfmt` and Clippy for the normal repository gate
 
-The current release policy commits the root `Cargo.lock`; use `--locked` for every dependency-graph command. This supersedes the historical Beta 1 lockfile policy.
+The current release policy commits the root `Cargo.lock`; use `--locked` for every dependency-graph command. The dependency graph remains workspace-local and path-only. This supersedes the historical Beta 1 lockfile policy.
 
 ## Public Rust-only release-candidate check
 
