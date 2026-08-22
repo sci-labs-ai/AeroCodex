@@ -2213,9 +2213,10 @@ fn verify_release_status_evidence(root: &Path) -> Result<(), String> {
         "- Fresh-runner CI: `pending corrective push and rerun`".to_string(),
         "- Threat-model boundary: `local_scripts_are_conveniences_not_security_sandboxes`"
             .to_string(),
-        "- Root Cargo.lock in committed Git tree: `absent`".to_string(),
-        "- Pre-existing ignored local Cargo.lock: `not part of the release commit; preserve bytes; cleanup requires separate user authorization`".to_string(),
-        "- Excluded work: `packaging, signing, tagging, publication, broader formula promotion`"
+        "- Root Cargo.lock in committed Git tree: `present`".to_string(),
+        "- Release build toolchain: `rust-toolchain.toml pins 1.98.0; blocking Linux MSRV uses 1.74.0`".to_string(),
+        "- Lockfile policy: `committed version 3; release, CI, and friend-test dependency commands use --locked`".to_string(),
+        "- Excluded work: `tagging, publication, broader formula promotion, external acceptance`"
             .to_string(),
     ] {
         if !evidence.contains(&required) {
@@ -2673,6 +2674,16 @@ fn validate_cli_version_json(text: &str) -> Result<(), String> {
                 "CLI version JSON field `{field}` is `{actual}`, expected `{expected}`"
             ));
         }
+    }
+    let manifest_hash = json_string_field(&object, "release_manifest_sha256")?;
+    if manifest_hash.len() != 64
+        || !manifest_hash
+            .bytes()
+            .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+    {
+        return Err(format!(
+            "CLI version JSON field `release_manifest_sha256` is not a lowercase SHA-256 digest: `{manifest_hash}`"
+        ));
     }
     Ok(())
 }
@@ -3922,7 +3933,7 @@ mod tests {
     #[test]
     fn runtime_version_and_tier_drift_fail_typed_json_validation() {
         let good = format!(
-            "{{\"program_name\":\"aerocodex\",\"semantic_version\":\"{EXPECTED_VERSION}\",\"release_tier\":\"{EXPECTED_TIER}\",\"release_tier_display\":\"{EXPECTED_TIER_DISPLAY}\",\"workspace_package_count\":14,\"dispatchable_formula_count\":12,\"registry_formula_count\":152,\"blocked_formula_count\":140,\"public_executable_formula_count\":12}}"
+            "{{\"program_name\":\"aerocodex\",\"semantic_version\":\"{EXPECTED_VERSION}\",\"release_tier\":\"{EXPECTED_TIER}\",\"release_tier_display\":\"{EXPECTED_TIER_DISPLAY}\",\"workspace_package_count\":14,\"dispatchable_formula_count\":12,\"registry_formula_count\":152,\"blocked_formula_count\":140,\"public_executable_formula_count\":12,\"release_manifest_sha256\":\"0000000000000000000000000000000000000000000000000000000000000000\"}}"
         );
         validate_cli_version_json(&good).unwrap();
         assert!(

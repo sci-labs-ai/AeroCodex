@@ -225,9 +225,6 @@ fn untracked_path_is_excluded(path: &Path) -> bool {
     {
         return false;
     }
-    if path == Path::new("Cargo.lock") {
-        return true;
-    }
     if path.components().any(|component| {
         matches!(component, Component::Normal(name) if name == ".git" || name == "target")
     }) {

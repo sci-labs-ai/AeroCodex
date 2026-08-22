@@ -340,9 +340,6 @@ fn exclusion_reason(path: &Path) -> Option<&'static str> {
     if path == Path::new(CHECKSUM_MANIFEST_PATH) {
         return Some("the checksum manifest cannot checksum itself");
     }
-    if path == Path::new("Cargo.lock") {
-        return Some("the workspace intentionally does not track the root Cargo.lock");
-    }
     if path.components().any(|component| {
         matches!(component, Component::Normal(name) if name == ".git" || name == "target")
     }) {
@@ -788,7 +785,6 @@ mod tests {
             format!("{HASH}  C:/absolute.txt\n"),
             format!("{HASH}  docs\\a.txt\n"),
             format!("{HASH}  docs//a.txt\n"),
-            format!("{HASH}  Cargo.lock\n"),
             format!("{HASH}  .git/config\n"),
             format!("{HASH}  target/output\n"),
             format!("{HASH}  checksums/SHA256SUMS\n"),
@@ -869,14 +865,18 @@ mod tests {
     }
 
     #[test]
-    fn excluded_outputs_do_not_change_governed_set() {
+    fn transient_outputs_do_not_change_governed_set() {
         let root = test_root("excluded");
         fs::write(root.join("kept.txt"), b"kept\n").expect("write fixture");
-        fs::write(root.join("Cargo.lock"), b"lock\n").expect("write excluded lockfile");
+        fs::write(root.join("Cargo.lock"), b"lock\n").expect("write governed lockfile");
         fs::create_dir_all(root.join("target/debug")).expect("create target fixture");
         fs::write(root.join("target/debug/output"), b"generated").expect("write excluded output");
-        verify_entries(&root, &[entry("kept.txt", b"kept\n")], true)
-            .expect("documented excluded outputs must not be governed");
+        verify_entries(
+            &root,
+            &[entry("Cargo.lock", b"lock\n"), entry("kept.txt", b"kept\n")],
+            true,
+        )
+        .expect("the lockfile is governed while transient target output is excluded");
         fs::remove_dir_all(root).expect("remove checksum test directory");
     }
 

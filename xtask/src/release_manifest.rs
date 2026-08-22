@@ -6,6 +6,7 @@ use std::{
 };
 
 pub const RELEASE_MANIFEST_PATH: &str = "release/release-manifest.toml";
+pub const RELEASE_MANIFEST_SHA256_PATH: &str = "release/release-manifest.sha256";
 pub const OBSOLETE_RELEASE_MANIFEST_PATH: &str = "docs/release/v0.1.0-alpha.1.toml";
 pub const CLI_DISPATCH_METADATA_PATH: &str = "crates/aero-codex-cli/dispatch_metadata.tsv";
 const REGISTRY_PATH: &str = "generated/formula_registry.json";
@@ -239,6 +240,7 @@ struct CliDispatchFormula {
 
 pub fn verify_release_manifest(root: &Path) -> Result<(), String> {
     verify_authority_contract(root)?;
+    verify_manifest_sha256_sidecar(root)?;
     let manifest = load_release_manifest(root)?;
     verify_pinned_base_commit(root, &manifest.base_commit)?;
 
@@ -357,6 +359,22 @@ pub fn verify_release_manifest(root: &Path) -> Result<(), String> {
         manifest.targets.len(),
         manifest.artifacts.len(),
     );
+    Ok(())
+}
+
+fn verify_manifest_sha256_sidecar(root: &Path) -> Result<(), String> {
+    let manifest_bytes = fs::read(root.join(RELEASE_MANIFEST_PATH))
+        .map_err(|error| format!("cannot read {RELEASE_MANIFEST_PATH}: {error}"))?;
+    let actual = crate::equation_batch::generate::sha256_hex(&manifest_bytes);
+    let sidecar = fs::read_to_string(root.join(RELEASE_MANIFEST_SHA256_PATH))
+        .map_err(|error| format!("cannot read {RELEASE_MANIFEST_SHA256_PATH}: {error}"))?;
+    let expected = format!("{actual}  {RELEASE_MANIFEST_PATH}\n");
+    if sidecar.replace("\r\n", "\n") != expected {
+        return Err(format!(
+            "{RELEASE_MANIFEST_SHA256_PATH} is stale or malformed; expected `{}`",
+            expected.trim_end()
+        ));
+    }
     Ok(())
 }
 

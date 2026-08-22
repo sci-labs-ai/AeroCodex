@@ -13,159 +13,128 @@ Publicly executable formulas: `12`
   <img src="assets/aerocodex_patch.png" alt="AeroCodex mission patch" width="420">
 </p>
 
-**Source-traceable aerospace, astrodynamics, and bio-regenerative life-support mathematics in pure Rust.**
+Source-traceable aerospace research software in pure Rust.
 
-AeroCodex is a Phase 0.001 Rust workspace for research, education, verification-oriented development, and preliminary design. The human roadmap phase remains `Phase 0.001`, while the current Cargo-compatible semantic version is `0.1.0-alpha.1`. Roadmap phase and package version are separate concepts; do not use `0.001` as a Cargo package version.
+AeroCodex `0.1.0-alpha.1` provides a bounded command-line release of twelve audited M00 canonical-unit and angle conversions. The other 140 Formula Registry records remain blocked. This is Research Software Alpha for research, education, verification-oriented development, and preliminary design.
 
-Research-readiness planning authority: the v0.7.2 [research readiness decision packet](docs/roadmap/research_readiness_agent_decision_packet.md) states that AeroCodex is intended to become professional-grade, traceable aerospace research software suitable for academic, laboratory, and agency evaluation. It is not certified for flight, mission operations, habitat safety, medical/life-support decisions, or regulatory approval.
+## Install
 
-## Current governed state
+### Release archive
 
-AeroCodex currently records a closed external M07 metadata-accounting state in the governed inventory. The current readiness count source of truth is `docs/roadmap/research_readiness_counts.md`, which separates inventory visibility, runtime implementation, CLI accessibility, validation status, execution readiness, and M07 quarantine.
+After the final release is published, download the archive for your platform from [GitHub Releases](https://github.com/sci-labs-ai/AeroCodex/releases), verify it against `aerocodex-0.1.0-alpha.1-SHA256SUMS`, extract it, and place `aerocodex` (`aerocodex.exe` on Windows) on your command path.
 
-That count source explicitly keeps M07 terminal rows quarantined and states that the 1,323 M07 rows are not 1,323 usable equations. This closure does **not** claim M07/Scilab parity, certification, flight readiness, mission readiness, operational approval, medical approval, or regulated-use approval.
+The release workflow produces Linux x86-64, Windows x86-64, macOS x86-64, and macOS ARM64 archives. Exact names and layouts are governed in [artifact layout](docs/release/artifact_layout.md).
 
-## Safety and certification caveat
+### Build from source
 
-AeroCodex is **not** certified, flight-ready, mission-ready, habitat-safe, medical, operational, or regulated-use approved. Use it as research and preliminary-design engineering mathematics only. Safety-critical, regulated, operational, crewed, habitat, medical, or mission use requires independent project-specific assurance, validation, qualification, and certification.
-
-Negative statements such as “not certified” and “does not currently provide certified flight software” are intentional safety disclaimers. They must not be weakened, removed, or misread as positive readiness assertions.
-
-The enforced public wording guardrails live in `docs/assurance/public_wording_guardrails.md` and are checked by `cargo run -p xtask -- verify --all`.
-
-## Pure Rust policy
-
-The core repository is intentionally pure Rust. It does not include C/C++/Fortran source, BLAS/LAPACK native linkage, CEA/REFPROP/CoolProp/Cantera wrappers, non-Rust scripting or numerical-runtime dependencies, `bindgen`, `cc`, `cmake`, `pkg-config`, `vcpkg`, native binary blobs, generated binaries, or a committed root `Cargo.lock`.
-
-The repository intentionally keeps the root `Cargo.lock` absent during the current workspace phase.
-
-## What AeroCodex can do now
-
-AeroCodex currently provides source-traceable research kernels for common engineering calculations across atmosphere, thermodynamics, gas dynamics, aerodynamics, propulsion, heat transfer, structures, flight dynamics, astrodynamics, and bio-regenerative life-support scaffolding.
-
-It also provides governance machinery:
-
-- validation cards and source-registry seeds;
-- data/source registry policy and governed in-repo artifact hashes;
-- formula-vault intake/provenance records and runtime-resolution manifests;
-- equation inventory/readiness accounting;
-- nomenclature, acronym, symbol, terminology, and waiver policy data;
-- clean-room BioSim-RS-style resource identity, transaction, deterministic replay, ledger, and smoke/friend-test primitives;
-- clean-room BioSim-plus synthetic scenario-domain records, structural validation, process records, intent-planning helpers, bounded compartment replay/digest/event helpers, and replay-integrity/ledger/report helpers for research metadata only;
-- a bounded `aerocodex` research-alpha CLI for deterministic registry inventory, status reporting, public execution of twelve audited M00 conversions, and self-checking through the same public path; the other 140 registry records remain `research_required` and blocked.
-
-AeroCodex does **not** currently provide certified flight software, a complete BioSim scenario engine, an operational BLSS controller, a validated habitat-safety model, a medical model, or certified M07/Orekit parity.
-
-## Workspace crates
-
-| Crate | Current role |
-|---|---|
-| `aero-codex-core` | Shared result, error, validation, traceability, and scalar unit types. |
-| `aero-codex-constants` | Phase 0.001 constants and source seeds. |
-| `aero-codex-atmosphere` | Sea-level, simplified troposphere, density, pressure, temperature, and speed-of-sound helpers. |
-| `aero-codex-thermo` | Perfect-gas density, speed of sound, heat-capacity, and molar-mass gas-constant helpers. |
-| `aero-codex-gas-dynamics` | Isentropic, normal-shock, Mach-angle, Prandtl-Meyer, and branch-explicit oblique-shock relations. |
-| `aero-codex-aerodynamics` | Dynamic pressure, lift, drag, coefficient inverses, and induced-drag helpers. |
-| `aero-codex-propulsion` | Rocket equation, ideal thrust, specific impulse, and ideal choked mass-flux helpers. |
-| `aero-codex-heat-transfer` | Stefan-Boltzmann radiation, Newton-law convection, and one-dimensional conduction helpers. |
-| `aero-codex-structures` | Axial stress, bending stress, cantilever end-load deflection, and Euler column buckling helpers. |
-| `aero-codex-flight-dynamics` | Level-turn, stall-speed, turn-rate/radius, and specific-excess-power helpers. |
-| `aero-codex-astrodynamics` | Two-body orbital helpers, Hohmann transfer helpers, sphere of influence, bounded M00 angle/unit/vector helpers including `m00_wrap2pi`, classical-elements/Kepler research helpers, oracle-record/tolerance-comparison metadata helpers, contract-only two-line-element source-policy helpers, and runtime-linked formula-vault intake records. |
-| `aero-codex-life-support` | BLSS mass-balance helpers, thin-film/MELiSSA research kernels, clean-room BioSim-style resource/tick primitives, BioSim-plus synthetic scenario-domain validation, bounded process/intent helpers, compartment replay/digest/event helpers, and replay-integrity/ledger/report helpers. |
-| `aero-codex-cli` | Research-alpha inventory/status binary with twelve promoted M00 dispatch-linked records, versioned JSON success/error contracts, stable exit codes, public formula execution, and bounded public-path self-checks. |
-| `xtask` | Dependency-free Rust local governance, validation, data-registry, formula-vault, equation-batch-manifest, and inventory checks. |
-
-## Developer quickstart
-
-AeroCodex uses Rust stable only and a cargo-first workflow for the first research-readiness milestone. Linux and macOS are the primary contributor targets; Windows should not be intentionally broken. This repository is research/preliminary-design software and is not certified for flight, mission operations, habitat safety, medical/life-support decisions, or regulatory approval.
-
-Fresh-clone baseline commands:
+Install the pinned Rust toolchain, then build or install with the committed dependency graph:
 
 ```bash
 git clone https://github.com/sci-labs-ai/AeroCodex.git
 cd AeroCodex
-cargo fmt --check
-cargo clippy --all-targets --all-features -- -D warnings
-cargo test --all
-cargo doc --no-deps
-cargo run -p xtask -- verify --all
+rustup show
+cargo build --locked --release -p aero-codex-cli
+cargo install --locked --path crates/aero-codex-cli
 ```
 
-See [toolchain baseline](docs/development/toolchain.md) and [CI/local verification gates](docs/development/ci_gates.md) for the RR-003 tooling baseline, including future deterministic registry and formula status/gating check placeholders.
+Release builds use Rust `1.98.0`; blocking CI separately checks the declared MSRV, Rust `1.74.0`. See [release build policy](docs/development/release_builds.md).
 
-## Research-alpha CLI status
-
-The CLI can list and describe all 152 governed Formula Registry rows. Exactly twelve M00 conversions—ten canonical-unit records and two angle conversions—are `implementation_verified`, `normal_research`, dispatch-linked, and publicly executable. The other 140 rows remain `research_required` / `blocked`; a runtime symbol or registry row alone is not execution authorization.
+## First successful formula run
 
 ```bash
-cargo run -p aero-codex-cli -- version --json
-cargo run -p aero-codex-cli -- formula list --family m00 --json
-cargo run -p aero-codex-cli -- formula list --executable --json
-cargo run -p aero-codex-cli -- formula describe \
-  m00.canonical.distance_to_canonical --json
-cargo run -p aero-codex-cli -- formula run \
-  m00.angle.deg_to_rad --degrees 180 --json
-cargo run -p aero-codex-cli -- formula status-report --json
-cargo run -p aero-codex-cli -- self-check --json
+aerocodex version --json
+aerocodex formula list --executable --json
+aerocodex formula run m00.angle.deg_to_rad --degrees 180 --json
+aerocodex self-check --json
 ```
 
-A clean self-check reports 14 passing checks and zero failures after traversing the public resolver, input parser, status gate, evaluator, and JSON envelopes. `implementation_verified` records bounded implementation evidence; it is not scientific reference validation or certification. The sole machine-readable release authority is [`release/release-manifest.toml`](release/release-manifest.toml); the live batch record is [`docs/release/v0.1.0-alpha.1-status.md`](docs/release/v0.1.0-alpha.1-status.md). The current Cargo version is `0.1.0-alpha.1`, and no operational, parity, safety, or certification claim is made.
+The formula result is π radians. A clean self-check reports 14 passed and 0 failed after using the same public resolver, input parser, status gate, evaluator, and JSON envelope as `formula run`.
 
-## Validation and governance artifacts
+For the complete trace from ID and input through output, source record, validation card, promotion packet, tolerance, and caveat, see the [degrees-to-radians worked example](docs/examples/m00-angle-conversion.md).
 
-Key governance surfaces:
+## Supported alpha scope
 
-- `validation/cards/` — validation-planning cards.
-- `validation/source_registry/` — conservative source-registry seed files.
-- `validation/equation_inventory.tsv` — machine-readable equation inventory/readiness accounting.
-- `validation/schema/` — Codex Card schema.
-- `data-governance/` — data/source policy and governed in-repo/external artifact registry.
-- `formula-vault/` — quarantined formula-candidate metadata, contracts, manifests, and implementation gates.
-- `nomenclature/` — acronym, symbol, terminology, and waiver policy.
+Exactly these formula families are executable:
 
-Current cards, source-registry seeds, formula-vault dispositions, and external M07 terminal metadata remain conservative `research_required` artifacts unless exact source, test, tolerance, and validation evidence has been reviewed. A validation card, source-registry seed, or terminal metadata disposition does not imply certification, flight readiness, mission readiness, operational approval, medical approval, habitat-safety approval, or external parity.
+- ten M00 canonical-unit conversions covering canonical time, speed, gravitational parameter, distance, time, and speed scaling;
+- two M00 angle conversions covering degrees to radians and radians to degrees.
 
-## Source boundaries
+Use `aerocodex formula list --executable --json` as the runtime source of truth. `release/release-manifest.toml` is the machine-readable release authority. Runtime symbols, inventory rows, or source records do not independently authorize execution.
 
-AeroCodex uses one canonical GitHub `main` branch. External source materials are not automatic public API.
+## Status meanings
 
-- **M07 astrodynamics materials**: quarantined formula-vault candidate source. No bulk import, astrodynamics crate overwrite, public API promotion, or external parity claim is authorized without per-slice contracts, tests, tolerances, reference/equivalence gates, and safety review.
-- **BioSim Java and BioSim-RS bootstrap**: GPL-boundaried source/reference material. Do not mix GPL implementation code into the dual MIT/Apache AeroCodex core unless a future deliberate licensing path authorizes it.
-- **Orekit**: reference oracle and architecture guide only. Do not clone the Java class hierarchy class-for-class.
-- **Thin-film BLSS materials**: equation-traceable research kernels and data artifacts with cited-source boundaries; not calibrated habitat or medical designs.
+| Status | Meaning in this alpha | Execution |
+| --- | --- | --- |
+| `implementation_verified` | The bounded implementation and linked software evidence were reviewed. | Allowed only when the independent dispatch and release-policy gates also pass. |
+| `research_required` | Additional evidence or review is still required. | Blocked. |
+| `reference_validated` / `experiment_validated` | Higher evidence states defined for future governed work. | Not assigned to the twelve alpha formulas. |
 
-## Recommended checks
+`implemented`, `dispatchable`, `executable`, `validated`, and `blocked` are separate fields in `formula describe --json`. `implementation_verified` is not a claim of scientific reference validation.
 
-Run these before merging user-visible changes:
+## Safety boundary
+
+AeroCodex is not certified, flight-ready, mission-ready, habitat-safe, medical, operational, or approved for regulated use. Safety-critical, regulated, operational, crewed, habitat, medical, or mission use requires independent project-specific assurance, validation, qualification, and certification.
+
+The twelve-formula alpha does not claim M07/Scilab parity, broader physical validation, a complete BioSim scenario engine, an operational life-support controller, or validation of the other 140 registry records. The enforced wording policy is [public wording guardrails](docs/assurance/public_wording_guardrails.md).
+
+## Commands
 
 ```bash
-git status --short
-git diff --check
-cargo run -p xtask -- verify-checksums
+aerocodex --version
+aerocodex version --json
+aerocodex formula list --family m00 --json
+aerocodex formula list --executable --json
+aerocodex formula describe m00.canonical.distance_to_canonical --json
+aerocodex formula run m00.canonical.distance_to_canonical --distance 12000 --distance-unit 1000 --json
+aerocodex formula status-report --json
+aerocodex self-check --json
+```
+
+The JSON contract version is `aerocodex.cli.json.v1`. Success and error envelopes have golden key-set tests. See the [CLI quickstart](docs/research_alpha/cli_formula_quickstart.md) and [JSON contract](docs/research_alpha/json_contract.md).
+
+## Evidence and release integrity
+
+The repository governs:
+
+- a 152-row Formula Registry and exact 12 / 140 release partition;
+- formula contracts, validation cards, source records, promotion packets, and analytical vectors;
+- deterministic generated registry, Rust registry, status report, and validation summary;
+- cross-platform checksums with exact repository-file coverage;
+- stable and MSRV CI, release-slice tests, package checks, archive smoke tests, SPDX SBOM, in-toto provenance, and GitHub attestations;
+- embedded version, commit, build target, profile, and raw release-manifest SHA-256 in `aerocodex version --json`.
+
+The live engineering record is [v0.1.0-alpha.1 release status](docs/release/v0.1.0-alpha.1-status.md). Passing software gates does not create a certification claim.
+
+## Development
+
+Use the committed lockfile and the same governed commands as CI:
+
+```bash
 cargo fmt --all -- --check
-cargo check --workspace --all-targets --all-features
-cargo clippy --workspace --all-targets --all-features -- -D warnings
-cargo test --workspace --all-targets --all-features
-cargo run -p aero-codex-cli -- version --json
-cargo run -p aero-codex-cli -- formula status-report --json
-cargo run -p aero-codex-cli -- self-check --json
-cargo run -p xtask -- verify --all
-cargo run -p xtask -- verify-release-manifest
-cargo run -p xtask -- verify-generated
-cargo run -p xtask -- dependency-policy
-RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps
+cargo check --locked --workspace --all-targets --all-features
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace --all-features
+cargo run --locked -p xtask -- verify-checksums
+cargo run --locked -p xtask -- verify-release-manifest
+cargo run --locked -p xtask -- verify-release-identity
+cargo run --locked -p xtask -- verify-generated
+cargo run --locked -p xtask -- verify --all
+cargo run --locked -p xtask -- dependency-policy
+RUSTDOCFLAGS="-D warnings" cargo doc --locked --workspace --all-features --no-deps
 ```
 
-## Citation and reuse guidelines
+See [CONTRIBUTING](CONTRIBUTING.md) for code and formula-promotion paths, [SECURITY](SECURITY.md) for private vulnerability reporting, and the [community code of conduct](CODE_OF_CONDUCT.md).
 
-When discussing or reusing an AeroCodex calculation:
+## Documentation and citation
 
-- cite the original equation, dataset, standard, paper, report, or source material;
-- cite the exact AeroCodex commit, crate, function, validation card, and source-registry entry;
-- preserve the conservative validation status and safety caveats;
-- for thin-film BLSS work, include the relevant files in `citations/`, `data/thinfilm/`, and `crates/aero-codex-life-support/src/thinfilm_provenance.rs`;
-- when adding a new public calculation, add or update its source-registry entry, validation card, tests, evidence-card linkage, equation inventory row, checksum/data manifests as required, and README-facing citation guidance.
+- [User and API documentation](https://sci-labs-ai.github.io/AeroCodex/)
+- [Documentation index](docs/index.md)
+- [Citation guide](docs/citation.md) and [CITATION.cff](CITATION.cff)
+- [Historical documentation archive index](docs/archive/README.md)
+- [Changelog](CHANGELOG.md)
+
+When publishing a result, cite both the exact AeroCodex release or commit and the original scientific source linked by each formula record.
 
 ## License
 
-AeroCodex core repository code is licensed under `MIT OR Apache-2.0` unless a file states otherwise. External source materials retain their own licenses and source-boundary restrictions. GPL BioSim-related materials remain license-boundaried from the dual MIT/Apache core unless a future explicit licensing decision changes that.
+Repository code is licensed under `MIT OR Apache-2.0` unless a file states otherwise. External source materials retain their own licenses and source-boundary restrictions. GPL BioSim-related material remains license-boundaried from the dual MIT/Apache core unless a future explicit licensing decision changes that boundary.

@@ -20,44 +20,62 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@1.98.0
         with:
           components: rustfmt, clippy
       - name: Formatting
         run: cargo fmt --all -- --check
       - name: Workspace metadata
-        run: cargo metadata --no-deps --format-version 1
+        run: cargo metadata --locked --no-deps --format-version 1
       - name: Workspace check
-        run: cargo check --workspace
+        run: cargo check --locked --workspace
       - name: All-targets and all-features check
-        run: cargo check --workspace --all-targets --all-features
+        run: cargo check --locked --workspace --all-targets --all-features
       - name: Clippy
-        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+        run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
       - name: Tests
-        run: cargo test --workspace --all-features
+        run: cargo test --locked --workspace --all-features
       - name: Release-slice equation verification
-        run: cargo test -p aero-codex-astrodynamics --test release_slice_validation
+        run: cargo test --locked -p aero-codex-astrodynamics --test release_slice_validation
       - name: Documentation
         env:
           RUSTDOCFLAGS: -D warnings
-        run: cargo doc --workspace --all-features --no-deps
+        run: cargo doc --locked --workspace --all-features --no-deps
       - name: Repository checksums
-        run: cargo run -p xtask -- verify-checksums
+        run: cargo run --locked -p xtask -- verify-checksums
       - name: Release manifest
-        run: cargo run -p xtask -- verify-release-manifest
+        run: cargo run --locked -p xtask -- verify-release-manifest
       - name: Release identity
-        run: cargo run -p xtask -- verify-release-identity
+        run: cargo run --locked -p xtask -- verify-release-identity
       - name: Generated artifacts
-        run: cargo run -p xtask -- verify-generated
+        run: cargo run --locked -p xtask -- verify-generated
       - name: Aggregate verification
-        run: cargo run -p xtask -- verify --all
+        run: cargo run --locked -p xtask -- verify --all
       - name: Dependency policy
-        run: cargo run -p xtask -- dependency-policy
+        run: cargo run --locked -p xtask -- dependency-policy
+      - name: Publishable package archives
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          for package in aero-codex-core aero-codex-constants aero-codex-astrodynamics aero-codex-cli; do
+            cargo package --locked --allow-dirty --no-verify -p "$package"
+          done
       - name: Standard CLI version
-        run: cargo run -p aero-codex-cli -- --version
+        run: cargo run --locked -p aero-codex-cli -- --version
       - name: Structured CLI identity
-        run: cargo run -p aero-codex-cli -- version --json
+        run: cargo run --locked -p aero-codex-cli -- version --json
       - name: Formula counts
-        run: cargo run -p aero-codex-cli -- formula status-report --json
+        run: cargo run --locked -p aero-codex-cli -- formula status-report --json
       - name: CLI self-check
-        run: cargo run -p aero-codex-cli -- self-check --json
+        run: cargo run --locked -p aero-codex-cli -- self-check --json
+
+  msrv:
+    name: Declared MSRV (Linux, Rust 1.74.0)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@1.74.0
+      - name: Check committed dependency graph
+        run: cargo check --locked --workspace --all-targets --all-features
+      - name: Test committed dependency graph
+        run: cargo test --locked --workspace --all-features
