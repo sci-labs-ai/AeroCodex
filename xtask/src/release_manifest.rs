@@ -1647,19 +1647,90 @@ mod tests {
         include_str!("../../release/release-manifest.toml").to_string()
     }
 
-    fn replace_once(text: &str, old: &str, new: &str) -> String {
+    fn canonical_manifest_with_newline(newline: &str) -> String {
+        assert!(matches!(newline, "\n" | "\r\n"));
+        canonical_manifest().replace("\r\n", "\n").replace('\n', newline)
+    }
+
+    fn fixture_fragment_with_text_newline(text: &str, fragment: &str) -> String {
+        let newline = if text.contains("\r\n") { "\r\n" } else { "\n" };
+        fragment.replace("\r\n", "\n").replace('\n', newline)
+    }
+
+    fn replace_text_occurrence(
+        text: &str,
+        old: &str,
+        new: &str,
+        expected_pre_count: usize,
+        occurrence_index: usize,
+        expected_post_count: usize,
+    ) -> String {
+        assert!(!old.is_empty(), "fixture replacement needle must not be empty");
+        let actual_pre_count = text.matches(old).count();
         assert_eq!(
-            text.matches(old).count(),
-            1,
-            "fixture must match once: {old}"
+            actual_pre_count, expected_pre_count,
+            "fixture replacement expected {expected_pre_count} pre-mutation occurrences of `{old}`, found {actual_pre_count}"
         );
-        text.replacen(old, new, 1)
+        assert!(
+            occurrence_index < actual_pre_count,
+            "fixture replacement occurrence index {occurrence_index} is out of range for {actual_pre_count} occurrences of `{old}`"
+        );
+
+        let start = text
+            .match_indices(old)
+            .nth(occurrence_index)
+            .expect("validated fixture occurrence index")
+            .0;
+        let end = start + old.len();
+        let mut candidate = String::with_capacity(text.len() - old.len() + new.len());
+        candidate.push_str(&text[..start]);
+        candidate.push_str(new);
+        candidate.push_str(&text[end..]);
+
+        assert_ne!(
+            candidate.as_bytes(),
+            text.as_bytes(),
+            "fixture replacement must change bytes"
+        );
+
+        let actual_post_count = candidate.matches(old).count();
+        assert_eq!(
+            actual_post_count, expected_post_count,
+            "fixture replacement expected {expected_post_count} post-mutation occurrences of `{old}`, found {actual_post_count}"
+        );
+        candidate
+    }
+
+    fn replace_manifest_text_occurrence(
+        text: &str,
+        old: &str,
+        new: &str,
+        expected_pre_count: usize,
+        occurrence_index: usize,
+        expected_post_count: usize,
+    ) -> String {
+        let old = fixture_fragment_with_text_newline(text, old);
+        let new = fixture_fragment_with_text_newline(text, new);
+        replace_text_occurrence(
+            text,
+            &old,
+            &new,
+            expected_pre_count,
+            occurrence_index,
+            expected_post_count,
+        )
+    }
+
+    fn replace_once(text: &str, old: &str, new: &str, expected_post_count: usize) -> String {
+        replace_text_occurrence(text, old, new, 1, 0, expected_post_count)
     }
 
     struct ParserNegativeCase {
         name: &'static str,
         old: &'static str,
         new: &'static str,
+        expected_pre_count: usize,
+        expected_post_count: usize,
         expected: &'static [&'static str],
     }
 
@@ -2259,6 +2330,7 @@ mod tests {
             &canonical_manifest(),
             "identifier = \"m00.angle.rad_to_deg\"",
             "identifier = \"m00.angle.deg_to_rad\"",
+            0,
         );
         let error = parse_release_manifest(&text).expect_err("duplicates must fail");
         assert!(error.contains("duplicate release formula identifier"));
@@ -2270,6 +2342,7 @@ mod tests {
             &canonical_manifest(),
             "runtime_symbol = \"m00_radians_to_degrees\"",
             "runtime_symbol = \"m00_degrees_to_radians\"",
+            0,
         );
         let error = parse_release_manifest(&text).expect_err("duplicate symbols must fail");
         assert!(error.contains("duplicate or empty release formula runtime symbol"));
@@ -2397,6 +2470,8 @@ mod tests {
             &canonical_manifest(),
             "execution_policy = \"blocked\"",
             "execution_policy = \"normal_research\"",
+            2,
+            1,
         );
         let error = parse_release_manifest(&text)
             .expect_err("research_required cannot be normal execution");
@@ -2409,74 +2484,183 @@ mod tests {
             &canonical_manifest(),
             "public_executable = false",
             "public_executable = true",
+            2,
+            1,
         );
         let error = parse_release_manifest(&text)
             .expect_err("public execution in release requirements must fail");
         assert!(error.contains("public_executable=false"));
     }
 
-    fn replace_first(text: &str, old: &str, new: &str) -> String {
-        assert!(text.contains(old), "fixture must contain: {old}");
-        text.replacen(old, new, 1)
+    fn replace_first(
+        text: &str,
+        old: &str,
+        new: &str,
+        expected_pre_count: usize,
+        expected_post_count: usize,
+    ) -> String {
+        replace_manifest_text_occurrence(
+            text,
+            old,
+            new,
+            expected_pre_count,
+            0,
+            expected_post_count,
+        )
+    }
+
+    fn captured_panic_message<F>(action: F) -> String
+    where
+        F: FnOnce(),
+    {
+        let payload = catch_unwind(AssertUnwindSafe(action))
+            .expect_err("fixture replacement control must panic");
+        if let Some(message) = payload.downcast_ref::<String>() {
+            message.clone()
+        } else if let Some(message) = payload.downcast_ref::<&str>() {
+            (*message).to_string()
+        } else {
+            "non-string panic payload".to_string()
+        }
+    }
+
+    #[test]
+    fn fixture_replacement_contract_is_newline_stable_and_count_complete() {
+        for message in [
+            captured_panic_message(|| {
+                replace_text_occurrence("value\n", "value", "value", 1, 0, 1);
+            }),
+            captured_panic_message(|| {
+                replace_manifest_text_occurrence(
+                    "value\n", "value\n", "value\n", 1, 0, 1,
+                );
+            }),
+            captured_panic_message(|| {
+                replace_manifest_text_occurrence(
+                    "value\r\n",
+                    "value\n",
+                    "value\n",
+                    1,
+                    0,
+                    1,
+                );
+            }),
+            captured_panic_message(|| {
+                replace_manifest_text_occurrence("value", "value", "value", 1, 0, 1);
+            }),
+        ] {
+            assert!(
+                message.contains("fixture replacement must change bytes"),
+                "stable no-op diagnostic changed: {message}"
+            );
+        }
+
+        assert_eq!(
+            replace_manifest_text_occurrence("value\n", "value\n", "other\n", 1, 0, 0),
+            "other\n"
+        );
+        assert_eq!(
+            replace_manifest_text_occurrence(
+                "value\r\n",
+                "value\n",
+                "other\n",
+                1,
+                0,
+                0,
+            ),
+            "other\r\n"
+        );
+        assert_eq!(
+            replace_manifest_text_occurrence("value", "value", "other", 1, 0, 0),
+            "other"
+        );
+
+        let overmatch = captured_panic_message(|| {
+            replace_text_occurrence("value\n", "value", "valuevalue", 1, 0, 0);
+        });
+        assert!(
+            overmatch.contains(
+                "fixture replacement expected 0 post-mutation occurrences of `value`, found 2"
+            ),
+            "post-mutation overmatch reached the wrong guard: {overmatch}"
+        );
+
+        assert_eq!(
+            replace_text_occurrence("value\n", "value", "value!", 1, 0, 1),
+            "value!\n",
+            "a byte-changing replacement may legitimately preserve the needle count"
+        );
+
+        for (text, expected) in [("other\n", 0usize), ("value value\n", 2usize)] {
+            let message = captured_panic_message(|| {
+                replace_text_occurrence(text, "value", "other", 1, 0, 0);
+            });
+            assert!(
+                message.contains(&format!(
+                    "fixture replacement expected 1 pre-mutation occurrences of `value`, found {expected}"
+                )),
+                "pre-mutation count diagnostic changed: {message}"
+            );
+        }
     }
 
     #[test]
     fn canonical_v3_negative_matrix_fails_closed() {
         let parser_cases = vec![
-            ParserNegativeCase { name: "missing release version", old: "release_version = \"0.1.0-alpha.1\"\n", new: "", expected: &["release top level is missing required metadata `release_version`"] },
-            ParserNegativeCase { name: "malformed release version", old: "release_version = \"0.1.0-alpha.1\"", new: "release_version = \"0.1\"", expected: &["release_version `0.1` is not valid SemVer"] },
-            ParserNegativeCase { name: "wrong release version", old: "release_version = \"0.1.0-alpha.1\"", new: "release_version = \"0.1.0-alpha.2\"", expected: &["release top-level key `release_version`", "value `0.1.0-alpha.2`"] },
-            ParserNegativeCase { name: "missing channel", old: "release_channel = \"github_releases\"\n", new: "", expected: &["release top level is missing required metadata `release_channel`"] },
-            ParserNegativeCase { name: "invalid channel", old: "release_channel = \"github_releases\"", new: "release_channel = \"nightly\"", expected: &["release top-level key `release_channel`", "value `nightly`"] },
-            ParserNegativeCase { name: "tier substituted for channel", old: "release_channel = \"github_releases\"", new: "release_channel = \"research_software_alpha\"", expected: &["release top-level key `release_channel`", "value `research_software_alpha`"] },
-            ParserNegativeCase { name: "missing schema", old: "schema_version = \"aerocodex.release_manifest.v3\"\n", new: "", expected: &["release top level is missing required metadata `schema_version`"] },
-            ParserNegativeCase { name: "old schema", old: "aerocodex.release_manifest.v3", new: "aerocodex.release_manifest.v2", expected: &["release top-level key `schema_version`", "aerocodex.release_manifest.v2"] },
-            ParserNegativeCase { name: "unknown schema", old: "aerocodex.release_manifest.v3", new: "aerocodex.release_manifest.v99", expected: &["release top-level key `schema_version`", "aerocodex.release_manifest.v99"] },
-            ParserNegativeCase { name: "unknown top key", old: "release_documentation = \"docs/release/v0.1.0-alpha.1-status.md\"", new: "release_documentation = \"docs/release/v0.1.0-alpha.1-status.md\"\nunknown = \"value\"", expected: &["release top level has unknown metadata key `unknown`"] },
-            ParserNegativeCase { name: "duplicate top key", old: "release_channel = \"github_releases\"", new: "release_channel = \"github_releases\"\nrelease_channel = \"github_releases\"", expected: &["duplicates key `release_channel` in the same table"] },
-            ParserNegativeCase { name: "unknown table", old: "[release_slice_requirements]", new: "[release_requirements]", expected: &["unsupported table `[release_requirements]`"] },
-            ParserNegativeCase { name: "unknown nested key", old: "validation_status = \"research_required\"", new: "validation_state = \"research_required\"", expected: &["release_slice_requirements has unknown metadata key `validation_state`"] },
-            ParserNegativeCase { name: "old derivative field", old: "registry_formula_count = 152", new: "registry_formula_count = 152\nregistry_blocked_formula_count = 152", expected: &["release top level has unknown metadata key `registry_blocked_formula_count`"] },
-            ParserNegativeCase { name: "missing release requirement", old: "validation_status = \"research_required\"\n", new: "", expected: &["release_slice_requirements is missing required metadata `validation_status`"] },
-            ParserNegativeCase { name: "status requirement mismatch", old: "validation_status = \"research_required\"", new: "validation_status = \"equation_traceable\"", expected: &["release_slice_requirements must be", "validation_status: \"equation_traceable\""] },
-            ParserNegativeCase { name: "execution requirement mismatch", old: "execution_policy = \"blocked\"", new: "execution_policy = \"normal_research\"", expected: &["release_slice_requirements must be", "execution_policy: \"normal_research\""] },
-            ParserNegativeCase { name: "public release requirement", old: "public_executable = false", new: "public_executable = true", expected: &["release_slice_requirements must be", "public_executable: true"] },
-            ParserNegativeCase { name: "non-release requirement mismatch", old: "[non_release_requirements]\nvalidation_status = \"research_required\"", new: "[non_release_requirements]\nvalidation_status = \"implementation_verified\"", expected: &["non_release_requirements must be", "validation_status: \"implementation_verified\""] },
-            ParserNegativeCase { name: "duplicate formula ID", old: "identifier = \"m00.angle.rad_to_deg\"", new: "identifier = \"m00.angle.deg_to_rad\"", expected: &["duplicate release formula identifier `m00.angle.deg_to_rad`"] },
-            ParserNegativeCase { name: "duplicate runtime symbol", old: "runtime_symbol = \"m00_radians_to_degrees\"", new: "runtime_symbol = \"m00_degrees_to_radians\"", expected: &["duplicate or empty release formula runtime symbol `m00_degrees_to_radians`"] },
-            ParserNegativeCase { name: "unknown formula", old: "identifier = \"m00.angle.deg_to_rad\"", new: "identifier = \"m00.unknown\"", expected: &["release formula set/order mismatch", "m00.unknown"] },
-            ParserNegativeCase { name: "formula evidence absolute", old: "validation_record = \"validation/cards/validation_formula_vault_m00_angle_unit_conversions.yaml\"", new: "validation_record = \"C:/outside.yaml\"", expected: &["release formula `m00.angle.deg_to_rad` validation_record is invalid", "C:/outside.yaml"] },
-            ParserNegativeCase { name: "formula evidence traversal", old: "documentation = \"docs/research_alpha/cli_formula_quickstart.md\"", new: "documentation = \"../outside.md\"", expected: &["release formula `m00.angle.deg_to_rad` documentation is invalid", "../outside.md"] },
-            ParserNegativeCase { name: "duplicate target", old: "triple = \"x86_64-apple-darwin\"", new: "triple = \"aarch64-apple-darwin\"", expected: &["release target set/tier/CI mapping mismatch"] },
-            ParserNegativeCase { name: "unknown target tier", old: "platform_tier = \"tier2\"", new: "platform_tier = \"tier3\"", expected: &["release target set/tier/CI mapping mismatch", "tier3"] },
-            ParserNegativeCase { name: "wrong target tier mapping", old: "platform_tier = \"tier2\"", new: "platform_tier = \"tier1\"", expected: &["release target set/tier/CI mapping mismatch"] },
-            ParserNegativeCase { name: "wrong CI posture", old: "ci_posture = \"required_tier2\"", new: "ci_posture = \"blocking\"", expected: &["release target set/tier/CI mapping mismatch"] },
-            ParserNegativeCase { name: "target currently tested", old: "currently_tested = false", new: "currently_tested = true", expected: &["target `aarch64-apple-darwin` must be", "currently_tested: true"] },
-            ParserNegativeCase { name: "target currently packaged", old: "currently_packaged = false", new: "currently_packaged = true", expected: &["target `aarch64-apple-darwin` must be", "currently_packaged: true"] },
-            ParserNegativeCase { name: "unsupported current support", old: "current_support = \"source_only\"", new: "current_support = \"binary\"", expected: &["target `aarch64-apple-darwin` must be", "current_support: \"binary\""] },
-            ParserNegativeCase { name: "unknown target nested key", old: "current_support = \"source_only\"", new: "support = \"source_only\"", expected: &["targets table 1 has unknown metadata key `support`"] },
-            ParserNegativeCase { name: "artifact unknown target", old: "target = \"x86_64-unknown-linux-gnu\"", new: "target = \"unknown-target\"", expected: &["CLI artifact `cli-linux-x86-64` references unknown target `unknown-target`"] },
-            ParserNegativeCase { name: "non-CLI artifact target", old: "kind = \"checksum\"\narchive_format", new: "kind = \"checksum\"\ntarget = \"x86_64-unknown-linux-gnu\"\narchive_format", expected: &["non-CLI artifact `checksums` must not contain target `x86_64-unknown-linux-gnu`"] },
-            ParserNegativeCase { name: "CLI artifact missing target", old: "target = \"x86_64-unknown-linux-gnu\"\n", new: "", expected: &["CLI artifact `cli-linux-x86-64` is missing required target"] },
-            ParserNegativeCase { name: "duplicate artifact ID", old: "identifier = \"cli-macos-aarch64\"", new: "identifier = \"cli-linux-x86-64\"", expected: &["duplicate artifact ID `cli-linux-x86-64`"] },
-            ParserNegativeCase { name: "duplicate artifact filename", old: "filename = \"aerocodex-0.1.0-alpha.1-aarch64-apple-darwin.tar.gz\"", new: "filename = \"aerocodex-0.1.0-alpha.1-x86_64-unknown-linux-gnu.tar.gz\"", expected: &["duplicate artifact filename `aerocodex-0.1.0-alpha.1-x86_64-unknown-linux-gnu.tar.gz`"] },
-            ParserNegativeCase { name: "unsafe artifact filename", old: "aerocodex-0.1.0-alpha.1-SHA256SUMS", new: "unsafe name", expected: &["artifact filename `unsafe name` must be a normalized safe ASCII basename"] },
-            ParserNegativeCase { name: "absolute artifact filename", old: "aerocodex-0.1.0-alpha.1-SHA256SUMS", new: "/tmp/SHA256SUMS", expected: &["artifact filename `/tmp/SHA256SUMS` must be a normalized safe ASCII basename"] },
-            ParserNegativeCase { name: "artifact traversal", old: "aerocodex-0.1.0-alpha.1-SHA256SUMS", new: "../SHA256SUMS", expected: &["artifact filename `../SHA256SUMS` must be a normalized safe ASCII basename"] },
-            ParserNegativeCase { name: "artifact drive prefix", old: "aerocodex-0.1.0-alpha.1-SHA256SUMS", new: "C:/SHA256SUMS", expected: &["artifact filename `C:/SHA256SUMS` must be a normalized safe ASCII basename"] },
-            ParserNegativeCase { name: "unsupported archive format", old: "archive_format = \"none\"", new: "archive_format = \"7z\"", expected: &["artifact `checksums` has unsupported archive_format `7z`"] },
-            ParserNegativeCase { name: "kind format mismatch", old: "archive_format = \"none\"", new: "archive_format = \"zip\"", expected: &["artifact `checksums` kind/format/extension mismatch"] },
-            ParserNegativeCase { name: "filename version mismatch", old: "aerocodex-0.1.0-alpha.1-SHA256SUMS", new: "aerocodex-0.1.0-alpha.2-SHA256SUMS", expected: &["release artifact set/contract mismatch", "aerocodex-0.1.0-alpha.2-SHA256SUMS"] },
-            ParserNegativeCase { name: "filename target mismatch", old: "aerocodex-0.1.0-alpha.1-aarch64-apple-darwin.tar.gz", new: "aerocodex-0.1.0-alpha.1-aarch64-apple-darwin-v2.tar.gz", expected: &["release artifact set/contract mismatch", "cli-macos-aarch64", "aerocodex-0.1.0-alpha.1-aarch64-apple-darwin-v2.tar.gz", "aerocodex-0.1.0-alpha.1-aarch64-apple-darwin.tar.gz"] },
-            ParserNegativeCase { name: "artifact produced", old: "production_state = \"declared_only\"", new: "production_state = \"built\"", expected: &["artifact `checksums` production_state must be `declared_only`, found `built`"] },
-            ParserNegativeCase { name: "invalid required task", old: "required_by_task = \"R5-09\"", new: "required_by_task = \"R7-01\"", expected: &["release artifact set/contract mismatch", "R7-01"] },
-            ParserNegativeCase { name: "unknown artifact field", old: "required_by_task = \"R5-09\"", new: "required_by_task = \"R5-09\"\nself_hash = \"no\"", expected: &["artifacts table 1 has unknown metadata key `self_hash`"] },
-            ParserNegativeCase { name: "top-level order drift", old: "release_version = \"0.1.0-alpha.1\"\nrelease_channel = \"github_releases\"", new: "release_channel = \"github_releases\"\nrelease_version = \"0.1.0-alpha.1\"", expected: &["release top level keys are not in canonical order"] },
-            ParserNegativeCase { name: "requirement order drift", old: "validation_status = \"research_required\"\nexecution_policy = \"blocked\"", new: "execution_policy = \"blocked\"\nvalidation_status = \"research_required\"", expected: &["release_slice_requirements keys are not in canonical order"] },
-            ParserNegativeCase { name: "package key order drift", old: "name = \"aero-codex-core\"\nmanifest_path = \"crates/aero-codex-core/Cargo.toml\"", new: "manifest_path = \"crates/aero-codex-core/Cargo.toml\"\nname = \"aero-codex-core\"", expected: &["packages table 1 keys are not in canonical order"] },
-            ParserNegativeCase { name: "formula key order drift", old: "identifier = \"m00.angle.deg_to_rad\"\nruntime_symbol = \"m00_degrees_to_radians\"", new: "runtime_symbol = \"m00_degrees_to_radians\"\nidentifier = \"m00.angle.deg_to_rad\"", expected: &["formulas table 1 keys are not in canonical order"] },
-            ParserNegativeCase { name: "target key order drift", old: "triple = \"aarch64-apple-darwin\"\nplatform_tier = \"tier2\"", new: "platform_tier = \"tier2\"\ntriple = \"aarch64-apple-darwin\"", expected: &["targets table 1 keys are not in canonical order"] },
-            ParserNegativeCase { name: "artifact key order drift", old: "identifier = \"checksums\"\nfilename = \"aerocodex-0.1.0-alpha.1-SHA256SUMS\"", new: "filename = \"aerocodex-0.1.0-alpha.1-SHA256SUMS\"\nidentifier = \"checksums\"", expected: &["artifacts table 1 keys are not in canonical order"] },
+            ParserNegativeCase { name: "missing release version", old: "release_version = \"0.1.0-alpha.1\"\n", new: "", expected_pre_count: 1, expected_post_count: 0, expected: &["release top level is missing required metadata `release_version`"] },
+            ParserNegativeCase { name: "malformed release version", old: "release_version = \"0.1.0-alpha.1\"", new: "release_version = \"0.1\"", expected_pre_count: 1, expected_post_count: 0, expected: &["release_version `0.1` is not valid SemVer"] },
+            ParserNegativeCase { name: "wrong release version", old: "release_version = \"0.1.0-alpha.1\"", new: "release_version = \"0.1.0-alpha.2\"", expected_pre_count: 1, expected_post_count: 0, expected: &["release top-level key `release_version`", "value `0.1.0-alpha.2`"] },
+            ParserNegativeCase { name: "missing channel", old: "release_channel = \"github_releases\"\n", new: "", expected_pre_count: 1, expected_post_count: 0, expected: &["release top level is missing required metadata `release_channel`"] },
+            ParserNegativeCase { name: "invalid channel", old: "release_channel = \"github_releases\"", new: "release_channel = \"nightly\"", expected_pre_count: 1, expected_post_count: 0, expected: &["release top-level key `release_channel`", "value `nightly`"] },
+            ParserNegativeCase { name: "tier substituted for channel", old: "release_channel = \"github_releases\"", new: "release_channel = \"research_software_alpha\"", expected_pre_count: 1, expected_post_count: 0, expected: &["release top-level key `release_channel`", "value `research_software_alpha`"] },
+            ParserNegativeCase { name: "missing schema", old: "schema_version = \"aerocodex.release_manifest.v3\"\n", new: "", expected_pre_count: 1, expected_post_count: 0, expected: &["release top level is missing required metadata `schema_version`"] },
+            ParserNegativeCase { name: "old schema", old: "aerocodex.release_manifest.v3", new: "aerocodex.release_manifest.v2", expected_pre_count: 1, expected_post_count: 0, expected: &["release top-level key `schema_version`", "aerocodex.release_manifest.v2"] },
+            ParserNegativeCase { name: "unknown schema", old: "aerocodex.release_manifest.v3", new: "aerocodex.release_manifest.v99", expected_pre_count: 1, expected_post_count: 0, expected: &["release top-level key `schema_version`", "aerocodex.release_manifest.v99"] },
+            ParserNegativeCase { name: "unknown top key", old: "release_documentation = \"docs/release/v0.1.0-alpha.1-status.md\"", new: "release_documentation = \"docs/release/v0.1.0-alpha.1-status.md\"\nunknown = \"value\"", expected_pre_count: 1, expected_post_count: 1, expected: &["release top level has unknown metadata key `unknown`"] },
+            ParserNegativeCase { name: "duplicate top key", old: "release_channel = \"github_releases\"", new: "release_channel = \"github_releases\"\nrelease_channel = \"github_releases\"", expected_pre_count: 1, expected_post_count: 2, expected: &["duplicates key `release_channel` in the same table"] },
+            ParserNegativeCase { name: "unknown table", old: "[release_slice_requirements]", new: "[release_requirements]", expected_pre_count: 1, expected_post_count: 0, expected: &["unsupported table `[release_requirements]`"] },
+            ParserNegativeCase { name: "unknown nested key", old: "validation_status = \"research_required\"", new: "validation_state = \"research_required\"", expected_pre_count: 2, expected_post_count: 1, expected: &["release_slice_requirements has unknown metadata key `validation_state`"] },
+            ParserNegativeCase { name: "old derivative field", old: "registry_formula_count = 152", new: "registry_formula_count = 152\nregistry_blocked_formula_count = 152", expected_pre_count: 1, expected_post_count: 1, expected: &["release top level has unknown metadata key `registry_blocked_formula_count`"] },
+            ParserNegativeCase { name: "missing release requirement", old: "validation_status = \"research_required\"\n", new: "", expected_pre_count: 2, expected_post_count: 1, expected: &["release_slice_requirements is missing required metadata `validation_status`"] },
+            ParserNegativeCase { name: "status requirement mismatch", old: "validation_status = \"research_required\"", new: "validation_status = \"equation_traceable\"", expected_pre_count: 2, expected_post_count: 1, expected: &["release_slice_requirements must be", "validation_status: \"equation_traceable\""] },
+            ParserNegativeCase { name: "execution requirement mismatch", old: "execution_policy = \"blocked\"", new: "execution_policy = \"normal_research\"", expected_pre_count: 2, expected_post_count: 1, expected: &["release_slice_requirements must be", "execution_policy: \"normal_research\""] },
+            ParserNegativeCase { name: "public release requirement", old: "public_executable = false", new: "public_executable = true", expected_pre_count: 2, expected_post_count: 1, expected: &["release_slice_requirements must be", "public_executable: true"] },
+            ParserNegativeCase { name: "non-release requirement mismatch", old: "[non_release_requirements]\nvalidation_status = \"research_required\"", new: "[non_release_requirements]\nvalidation_status = \"implementation_verified\"", expected_pre_count: 1, expected_post_count: 0, expected: &["non_release_requirements must be", "validation_status: \"implementation_verified\""] },
+            ParserNegativeCase { name: "duplicate formula ID", old: "identifier = \"m00.angle.rad_to_deg\"", new: "identifier = \"m00.angle.deg_to_rad\"", expected_pre_count: 1, expected_post_count: 0, expected: &["duplicate release formula identifier `m00.angle.deg_to_rad`"] },
+            ParserNegativeCase { name: "duplicate runtime symbol", old: "runtime_symbol = \"m00_radians_to_degrees\"", new: "runtime_symbol = \"m00_degrees_to_radians\"", expected_pre_count: 1, expected_post_count: 0, expected: &["duplicate or empty release formula runtime symbol `m00_degrees_to_radians`"] },
+            ParserNegativeCase { name: "unknown formula", old: "identifier = \"m00.angle.deg_to_rad\"", new: "identifier = \"m00.unknown\"", expected_pre_count: 1, expected_post_count: 0, expected: &["release formula set/order mismatch", "m00.unknown"] },
+            ParserNegativeCase { name: "formula evidence absolute", old: "validation_record = \"validation/cards/validation_formula_vault_m00_angle_unit_conversions.yaml\"", new: "validation_record = \"C:/outside.yaml\"", expected_pre_count: 2, expected_post_count: 1, expected: &["release formula `m00.angle.deg_to_rad` validation_record is invalid", "C:/outside.yaml"] },
+            ParserNegativeCase { name: "formula evidence traversal", old: "documentation = \"docs/research_alpha/cli_formula_quickstart.md\"", new: "documentation = \"../outside.md\"", expected_pre_count: 12, expected_post_count: 11, expected: &["release formula `m00.angle.deg_to_rad` documentation is invalid", "../outside.md"] },
+            ParserNegativeCase { name: "duplicate target", old: "triple = \"x86_64-apple-darwin\"", new: "triple = \"aarch64-apple-darwin\"", expected_pre_count: 1, expected_post_count: 0, expected: &["release target set/tier/CI mapping mismatch"] },
+            ParserNegativeCase { name: "unknown target tier", old: "platform_tier = \"tier2\"", new: "platform_tier = \"tier3\"", expected_pre_count: 2, expected_post_count: 1, expected: &["release target set/tier/CI mapping mismatch", "tier3"] },
+            ParserNegativeCase { name: "wrong target tier mapping", old: "platform_tier = \"tier2\"", new: "platform_tier = \"tier1\"", expected_pre_count: 2, expected_post_count: 1, expected: &["release target set/tier/CI mapping mismatch"] },
+            ParserNegativeCase { name: "wrong CI posture", old: "ci_posture = \"required_tier2\"", new: "ci_posture = \"blocking\"", expected_pre_count: 2, expected_post_count: 1, expected: &["release target set/tier/CI mapping mismatch"] },
+            ParserNegativeCase { name: "target currently tested", old: "currently_tested = false", new: "currently_tested = true", expected_pre_count: 4, expected_post_count: 3, expected: &["target `aarch64-apple-darwin` must be", "currently_tested: true"] },
+            ParserNegativeCase { name: "target currently packaged", old: "currently_packaged = false", new: "currently_packaged = true", expected_pre_count: 4, expected_post_count: 3, expected: &["target `aarch64-apple-darwin` must be", "currently_packaged: true"] },
+            ParserNegativeCase { name: "unsupported current support", old: "current_support = \"source_only\"", new: "current_support = \"binary\"", expected_pre_count: 4, expected_post_count: 3, expected: &["target `aarch64-apple-darwin` must be", "current_support: \"binary\""] },
+            ParserNegativeCase { name: "unknown target nested key", old: "current_support = \"source_only\"", new: "support = \"source_only\"", expected_pre_count: 4, expected_post_count: 3, expected: &["targets table 1 has unknown metadata key `support`"] },
+            ParserNegativeCase { name: "artifact unknown target", old: "target = \"x86_64-unknown-linux-gnu\"", new: "target = \"unknown-target\"", expected_pre_count: 1, expected_post_count: 0, expected: &["CLI artifact `cli-linux-x86-64` references unknown target `unknown-target`"] },
+            ParserNegativeCase { name: "non-CLI artifact target", old: "kind = \"checksum\"\narchive_format", new: "kind = \"checksum\"\ntarget = \"x86_64-unknown-linux-gnu\"\narchive_format", expected_pre_count: 1, expected_post_count: 0, expected: &["non-CLI artifact `checksums` must not contain target `x86_64-unknown-linux-gnu`"] },
+            ParserNegativeCase { name: "CLI artifact missing target", old: "target = \"x86_64-unknown-linux-gnu\"\n", new: "", expected_pre_count: 1, expected_post_count: 0, expected: &["CLI artifact `cli-linux-x86-64` is missing required target"] },
+            ParserNegativeCase { name: "duplicate artifact ID", old: "identifier = \"cli-macos-aarch64\"", new: "identifier = \"cli-linux-x86-64\"", expected_pre_count: 1, expected_post_count: 0, expected: &["duplicate artifact ID `cli-linux-x86-64`"] },
+            ParserNegativeCase { name: "duplicate artifact filename", old: "filename = \"aerocodex-0.1.0-alpha.1-aarch64-apple-darwin.tar.gz\"", new: "filename = \"aerocodex-0.1.0-alpha.1-x86_64-unknown-linux-gnu.tar.gz\"", expected_pre_count: 1, expected_post_count: 0, expected: &["duplicate artifact filename `aerocodex-0.1.0-alpha.1-x86_64-unknown-linux-gnu.tar.gz`"] },
+            ParserNegativeCase { name: "unsafe artifact filename", old: "aerocodex-0.1.0-alpha.1-SHA256SUMS", new: "unsafe name", expected_pre_count: 1, expected_post_count: 0, expected: &["artifact filename `unsafe name` must be a normalized safe ASCII basename"] },
+            ParserNegativeCase { name: "absolute artifact filename", old: "aerocodex-0.1.0-alpha.1-SHA256SUMS", new: "/tmp/SHA256SUMS", expected_pre_count: 1, expected_post_count: 0, expected: &["artifact filename `/tmp/SHA256SUMS` must be a normalized safe ASCII basename"] },
+            ParserNegativeCase { name: "artifact traversal", old: "aerocodex-0.1.0-alpha.1-SHA256SUMS", new: "../SHA256SUMS", expected_pre_count: 1, expected_post_count: 0, expected: &["artifact filename `../SHA256SUMS` must be a normalized safe ASCII basename"] },
+            ParserNegativeCase { name: "artifact drive prefix", old: "aerocodex-0.1.0-alpha.1-SHA256SUMS", new: "C:/SHA256SUMS", expected_pre_count: 1, expected_post_count: 0, expected: &["artifact filename `C:/SHA256SUMS` must be a normalized safe ASCII basename"] },
+            ParserNegativeCase { name: "unsupported archive format", old: "archive_format = \"none\"", new: "archive_format = \"7z\"", expected_pre_count: 4, expected_post_count: 3, expected: &["artifact `checksums` has unsupported archive_format `7z`"] },
+            ParserNegativeCase { name: "kind format mismatch", old: "archive_format = \"none\"", new: "archive_format = \"zip\"", expected_pre_count: 4, expected_post_count: 3, expected: &["artifact `checksums` kind/format/extension mismatch"] },
+            ParserNegativeCase { name: "filename version mismatch", old: "aerocodex-0.1.0-alpha.1-SHA256SUMS", new: "aerocodex-0.1.0-alpha.2-SHA256SUMS", expected_pre_count: 1, expected_post_count: 0, expected: &["release artifact set/contract mismatch", "aerocodex-0.1.0-alpha.2-SHA256SUMS"] },
+            ParserNegativeCase { name: "filename target mismatch", old: "aerocodex-0.1.0-alpha.1-aarch64-apple-darwin.tar.gz", new: "aerocodex-0.1.0-alpha.1-aarch64-apple-darwin-v2.tar.gz", expected_pre_count: 1, expected_post_count: 0, expected: &["release artifact set/contract mismatch", "cli-macos-aarch64", "aerocodex-0.1.0-alpha.1-aarch64-apple-darwin-v2.tar.gz", "aerocodex-0.1.0-alpha.1-aarch64-apple-darwin.tar.gz"] },
+            ParserNegativeCase { name: "artifact produced", old: "production_state = \"declared_only\"", new: "production_state = \"built\"", expected_pre_count: 9, expected_post_count: 8, expected: &["artifact `checksums` production_state must be `declared_only`, found `built`"] },
+            ParserNegativeCase { name: "invalid required task", old: "required_by_task = \"R5-09\"", new: "required_by_task = \"R7-01\"", expected_pre_count: 1, expected_post_count: 0, expected: &["release artifact set/contract mismatch", "R7-01"] },
+            ParserNegativeCase { name: "unknown artifact field", old: "required_by_task = \"R5-09\"", new: "required_by_task = \"R5-09\"\nself_hash = \"no\"", expected_pre_count: 1, expected_post_count: 1, expected: &["artifacts table 1 has unknown metadata key `self_hash`"] },
+            ParserNegativeCase { name: "top-level order drift", old: "release_version = \"0.1.0-alpha.1\"\nrelease_channel = \"github_releases\"", new: "release_channel = \"github_releases\"\nrelease_version = \"0.1.0-alpha.1\"", expected_pre_count: 1, expected_post_count: 0, expected: &["release top level keys are not in canonical order"] },
+            ParserNegativeCase { name: "requirement order drift", old: "validation_status = \"research_required\"\nexecution_policy = \"blocked\"", new: "execution_policy = \"blocked\"\nvalidation_status = \"research_required\"", expected_pre_count: 2, expected_post_count: 1, expected: &["release_slice_requirements keys are not in canonical order"] },
+            ParserNegativeCase { name: "package key order drift", old: "name = \"aero-codex-core\"\nmanifest_path = \"crates/aero-codex-core/Cargo.toml\"", new: "manifest_path = \"crates/aero-codex-core/Cargo.toml\"\nname = \"aero-codex-core\"", expected_pre_count: 1, expected_post_count: 0, expected: &["packages table 1 keys are not in canonical order"] },
+            ParserNegativeCase { name: "formula key order drift", old: "identifier = \"m00.angle.deg_to_rad\"\nruntime_symbol = \"m00_degrees_to_radians\"", new: "runtime_symbol = \"m00_degrees_to_radians\"\nidentifier = \"m00.angle.deg_to_rad\"", expected_pre_count: 1, expected_post_count: 0, expected: &["formulas table 1 keys are not in canonical order"] },
+            ParserNegativeCase { name: "target key order drift", old: "triple = \"aarch64-apple-darwin\"\nplatform_tier = \"tier2\"", new: "platform_tier = \"tier2\"\ntriple = \"aarch64-apple-darwin\"", expected_pre_count: 1, expected_post_count: 0, expected: &["targets table 1 keys are not in canonical order"] },
+            ParserNegativeCase { name: "artifact key order drift", old: "identifier = \"checksums\"\nfilename = \"aerocodex-0.1.0-alpha.1-SHA256SUMS\"", new: "filename = \"aerocodex-0.1.0-alpha.1-SHA256SUMS\"\nidentifier = \"checksums\"", expected_pre_count: 1, expected_post_count: 0, expected: &["artifacts table 1 keys are not in canonical order"] },
         ];
 
         let semantic_cases = [
@@ -2531,15 +2715,27 @@ mod tests {
         );
 
         for case in parser_cases {
-            let text = replace_first(&canonical_manifest(), case.old, case.new);
-            let error = match parse_release_manifest(&text) {
-                Err(error) => error,
-                Ok(_) => panic!(
-                    "negative production-parser case unexpectedly passed: {}",
-                    case.name
-                ),
-            };
-            assert_discriminating_error(case.name, &error, case.expected);
+            for (line_ending, newline) in [("LF", "\n"), ("CRLF", "\r\n")] {
+                let text = replace_first(
+                    &canonical_manifest_with_newline(newline),
+                    case.old,
+                    case.new,
+                    case.expected_pre_count,
+                    case.expected_post_count,
+                );
+                let error = match parse_release_manifest(&text) {
+                    Err(error) => error,
+                    Ok(_) => panic!(
+                        "negative production-parser case unexpectedly passed: {} ({line_ending})",
+                        case.name
+                    ),
+                };
+                assert_discriminating_error(
+                    &format!("{} ({line_ending})", case.name),
+                    &error,
+                    case.expected,
+                );
+            }
         }
 
         for case in semantic_cases {
@@ -2787,6 +2983,8 @@ mod tests {
                             &readme,
                             RELEASE_MANIFEST_PATH,
                             OBSOLETE_RELEASE_MANIFEST_PATH,
+                            2,
+                            1,
                         ),
                     );
                 }
