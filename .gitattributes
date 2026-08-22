@@ -1,2 +1,7 @@
 release/release-manifest.toml text eol=lf
 release/release-manifest.sha256 text eol=lf
+Cargo.lock text eol=lf
+CITATION.cff text eol=lf
+docs/site/index.html text eol=lf
+scripts/release/generate_provenance.py text eol=lf
+scripts/release/generate_spdx_sbom.py text eol=lf
