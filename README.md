@@ -73,7 +73,9 @@ Use `aerocodex formula list --executable --json` as the runtime source of truth.
 
 ## Safety boundary
 
-AeroCodex is not certified, flight-ready, mission-ready, habitat-safe, medical, operational, or approved for regulated use. Safety-critical, regulated, operational, crewed, habitat, medical, or mission use requires independent project-specific assurance, validation, qualification, and certification.
+AeroCodex is intended to become professional-grade, traceable aerospace research software suitable for academic, laboratory, and agency evaluation. It is not certified for flight, mission operations, habitat safety, medical/life-support decisions, or regulatory approval.
+
+Safety-critical, regulated, operational, crewed, habitat, medical, or mission use requires independent project-specific assurance, validation, qualification, and certification.
 
 The twelve-formula alpha does not claim M07/Scilab parity, broader physical validation, a complete BioSim scenario engine, an operational life-support controller, or validation of the other 140 registry records. The enforced wording policy is [public wording guardrails](docs/assurance/public_wording_guardrails.md).
 
