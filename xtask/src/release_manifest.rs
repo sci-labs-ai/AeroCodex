@@ -1631,9 +1631,14 @@ fn has_windows_absolute_prefix(path: &str) -> bool {
 mod tests {
     use super::*;
     use std::{
-        io::ErrorKind,
+        cell::Cell,
+        collections::hash_map::RandomState,
+        hash::{BuildHasher, Hash, Hasher},
+        io::{self, ErrorKind},
+        panic::{catch_unwind, AssertUnwindSafe},
         path::PathBuf,
         sync::atomic::{AtomicUsize, Ordering},
+        time::{SystemTime, UNIX_EPOCH},
     };
 
     static TEST_COUNTER: AtomicUsize = AtomicUsize::new(0);
@@ -1719,61 +1724,241 @@ mod tests {
             .to_string()
     }
 
-    fn git_root(name: &str) -> PathBuf {
-        let serial = TEST_COUNTER.fetch_add(1, Ordering::Relaxed);
-        let root = std::env::temp_dir().join(format!(
-            "aerocodex-release-manifest-{name}-{}-{serial}",
-            std::process::id()
-        ));
-        if root.exists() {
-            fs::remove_dir_all(&root).expect("remove stale release manifest fixture");
-        }
-        fs::create_dir_all(&root).expect("create release manifest fixture");
-        git(&root, &["init", "-b", "main"]);
-        git(&root, &["config", "user.email", "tests@example.invalid"]);
-        git(&root, &["config", "user.name", "AeroCodex Tests"]);
-        fs::write(root.join("fixture.txt"), b"base\n").expect("write base fixture");
-        git(&root, &["add", "."]);
-        git(&root, &["commit", "-m", "base"]);
-        root
+    const FIXTURE_CREATE_ATTEMPTS: usize = 64;
+
+    struct OwnedFixtureRoot {
+        root: PathBuf,
+        cleanup_armed: bool,
     }
 
-    fn plain_root(name: &str) -> PathBuf {
-        let serial = TEST_COUNTER.fetch_add(1, Ordering::Relaxed);
-        let root = std::env::temp_dir().join(format!(
-            "aerocodex-release-reference-{name}-{}-{serial}",
-            std::process::id()
-        ));
-        if root.exists() {
-            fs::remove_dir_all(&root).expect("remove stale release reference fixture");
+    impl OwnedFixtureRoot {
+        fn create(name: &str) -> io::Result<Self> {
+            let parent = std::env::temp_dir();
+            let serial = TEST_COUNTER.fetch_add(1, Ordering::Relaxed);
+            let now = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .map(|duration| duration.as_nanos())
+                .unwrap_or_default();
+            let nonce = Self::unique_component(name, serial, now);
+            Self::create_with_candidate_source(|attempt| {
+                parent.join(format!(
+                    "aerocodex-release-fixture-{name}-{nonce}-{attempt:02}"
+                ))
+            })
         }
-        fs::create_dir_all(&root).expect("create release reference fixture");
-        root
+
+        fn unique_component(name: &str, serial: usize, now: u128) -> String {
+            fn keyed_hash(domain: u64, name: &str, serial: usize, now: u128) -> u64 {
+                let mut hasher = RandomState::new().build_hasher();
+                domain.hash(&mut hasher);
+                name.hash(&mut hasher);
+                std::process::id().hash(&mut hasher);
+                serial.hash(&mut hasher);
+                now.hash(&mut hasher);
+                hasher.finish()
+            }
+
+            format!(
+                "{:016x}{:016x}",
+                keyed_hash(0x4f574e45445f524f, name, serial, now),
+                keyed_hash(0x4f4f545f4e4f4e43, name, serial, now)
+            )
+        }
+
+        fn create_with_candidate_source<F>(mut candidate_source: F) -> io::Result<Self>
+        where
+            F: FnMut(usize) -> PathBuf,
+        {
+            for attempt in 0..FIXTURE_CREATE_ATTEMPTS {
+                let candidate = candidate_source(attempt);
+                match fs::create_dir(&candidate) {
+                    Ok(()) => {
+                        return Ok(Self {
+                            root: candidate,
+                            cleanup_armed: true,
+                        })
+                    }
+                    Err(error) if error.kind() == ErrorKind::AlreadyExists => continue,
+                    Err(error) => return Err(error),
+                }
+            }
+            Err(io::Error::new(
+                ErrorKind::AlreadyExists,
+                format!(
+                    "could not atomically create an owned fixture root after {FIXTURE_CREATE_ATTEMPTS} collision retries"
+                ),
+            ))
+        }
+
+        fn root(&self) -> &Path {
+            &self.root
+        }
+
+        fn path(&self, relative: &str) -> PathBuf {
+            self.root.join(relative)
+        }
+
+        fn cleanup(self) -> io::Result<()> {
+            self.cleanup_with(|path| fs::remove_dir_all(path))
+        }
+
+        fn cleanup_with<F>(mut self, remove: F) -> io::Result<()>
+        where
+            F: FnOnce(&Path) -> io::Result<()>,
+        {
+            match remove(&self.root) {
+                Ok(()) => {
+                    self.cleanup_armed = false;
+                    Ok(())
+                }
+                Err(error) if error.kind() == ErrorKind::NotFound => {
+                    self.cleanup_armed = false;
+                    Ok(())
+                }
+                Err(error) => Err(error),
+            }
+        }
+    }
+
+    impl Drop for OwnedFixtureRoot {
+        fn drop(&mut self) {
+            if self.cleanup_armed {
+                match fs::remove_dir_all(&self.root) {
+                    Ok(()) => self.cleanup_armed = false,
+                    Err(error) if error.kind() == ErrorKind::NotFound => {
+                        self.cleanup_armed = false;
+                    }
+                    Err(_) => {}
+                }
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Eq)]
+    struct FixtureTreeSnapshot {
+        entries: Vec<FixtureTreeEntry>,
+        directory_count: usize,
+        file_count: usize,
+    }
+
+    #[derive(Debug, PartialEq, Eq)]
+    struct FixtureTreeEntry {
+        relative_path: String,
+        file_type: String,
+        length: u64,
+        sha256: Option<String>,
+        readonly: bool,
+        created_nanos: Option<u128>,
+        modified_nanos: Option<u128>,
+        symlink_target: Option<PathBuf>,
+    }
+
+    fn fixture_tree_snapshot(root: &Path) -> io::Result<FixtureTreeSnapshot> {
+        fn system_time_nanos(value: io::Result<SystemTime>) -> Option<u128> {
+            value
+                .ok()
+                .and_then(|time| time.duration_since(UNIX_EPOCH).ok())
+                .map(|duration| duration.as_nanos())
+        }
+
+        fn visit(
+            root: &Path,
+            current: &Path,
+            entries: &mut Vec<FixtureTreeEntry>,
+        ) -> io::Result<()> {
+            let metadata = fs::symlink_metadata(current)?;
+            let file_type = metadata.file_type();
+            let kind = if file_type.is_dir() {
+                "directory"
+            } else if file_type.is_file() {
+                "file"
+            } else if file_type.is_symlink() {
+                "symlink"
+            } else {
+                "other"
+            };
+            let relative_path = if current == root {
+                ".".to_string()
+            } else {
+                current
+                    .strip_prefix(root)
+                    .map_err(|error| io::Error::new(ErrorKind::InvalidInput, error))?
+                    .to_string_lossy()
+                    .replace('\\', "/")
+            };
+            entries.push(FixtureTreeEntry {
+                relative_path,
+                file_type: kind.to_string(),
+                length: metadata.len(),
+                sha256: if file_type.is_file() {
+                    Some(crate::equation_batch::generate::sha256_hex(&fs::read(
+                        current,
+                    )?))
+                } else {
+                    None
+                },
+                readonly: metadata.permissions().readonly(),
+                created_nanos: system_time_nanos(metadata.created()),
+                modified_nanos: system_time_nanos(metadata.modified()),
+                symlink_target: if file_type.is_symlink() {
+                    Some(fs::read_link(current)?)
+                } else {
+                    None
+                },
+            });
+
+            if file_type.is_dir() {
+                let mut children = fs::read_dir(current)?
+                    .map(|entry| entry.map(|entry| entry.path()))
+                    .collect::<io::Result<Vec<_>>>()?;
+                children.sort();
+                for child in children {
+                    visit(root, &child, entries)?;
+                }
+            }
+            Ok(())
+        }
+
+        let mut entries = Vec::new();
+        visit(root, root, &mut entries)?;
+        Ok(FixtureTreeSnapshot {
+            directory_count: entries
+                .iter()
+                .filter(|entry| entry.file_type == "directory")
+                .count(),
+            file_count: entries
+                .iter()
+                .filter(|entry| entry.file_type == "file")
+                .count(),
+            entries,
+        })
+    }
+
+    fn git_root(name: &str) -> OwnedFixtureRoot {
+        let fixture = OwnedFixtureRoot::create(&format!("git-{name}"))
+            .expect("atomically create owned release manifest Git fixture");
+        git(fixture.root(), &["init", "-b", "main"]);
+        git(
+            fixture.root(),
+            &["config", "user.email", "tests@example.invalid"],
+        );
+        git(fixture.root(), &["config", "user.name", "AeroCodex Tests"]);
+        fs::write(fixture.path("fixture.txt"), b"base\n").expect("write base fixture");
+        git(fixture.root(), &["add", "."]);
+        git(fixture.root(), &["commit", "-m", "base"]);
+        fixture
     }
 
     struct AuthorityFixture {
-        root: PathBuf,
-        active: bool,
+        owner: OwnedFixtureRoot,
     }
 
     impl AuthorityFixture {
         fn new(name: &str) -> Self {
-            let root = loop {
-                let serial = TEST_COUNTER.fetch_add(1, Ordering::Relaxed);
-                let candidate = std::env::temp_dir().join(format!(
-                    "aerocodex-release-authority-{name}-{}-{serial}",
-                    std::process::id()
-                ));
-                match fs::create_dir(&candidate) {
-                    Ok(()) => break candidate,
-                    Err(error) if error.kind() == ErrorKind::AlreadyExists => continue,
-                    Err(error) => panic!(
-                        "create unique disposable authority repository {}: {error}",
-                        candidate.display()
-                    ),
-                }
+            let fixture = Self {
+                owner: OwnedFixtureRoot::create(&format!("authority-{name}"))
+                    .expect("atomically create owned authority fixture"),
             };
-            let fixture = Self { root, active: true };
             for relative in [
                 RELEASE_MANIFEST_PATH,
                 "scripts/friend_test_local.sh",
@@ -1789,11 +1974,11 @@ mod tests {
         }
 
         fn root(&self) -> &Path {
-            &self.root
+            self.owner.root()
         }
 
         fn path(&self, relative: &str) -> PathBuf {
-            self.root.join(relative)
+            self.owner.path(relative)
         }
 
         fn copy_from_repository(&self, relative: &str) {
@@ -1825,29 +2010,140 @@ mod tests {
             });
         }
 
-        fn cleanup(mut self) {
-            let root = self.root.clone();
-            fs::remove_dir_all(&root).unwrap_or_else(|error| {
-                panic!(
-                    "remove disposable authority repository {}: {error}",
-                    root.display()
-                )
-            });
-            self.active = false;
-            assert!(
-                !root.exists(),
-                "disposable authority repository still exists: {}",
-                root.display()
-            );
+        fn cleanup(self) -> io::Result<()> {
+            self.owner.cleanup()
         }
     }
 
-    impl Drop for AuthorityFixture {
-        fn drop(&mut self) {
-            if self.active {
-                let _ = fs::remove_dir_all(&self.root);
+    #[test]
+    fn owned_fixture_root_retries_collision_without_touching_preexisting_path() {
+        let regression = OwnedFixtureRoot::create("collision-regression")
+            .expect("atomically create collision regression parent");
+        let sentinel = regression.path("sentinel-collision");
+        fs::create_dir(&sentinel).expect("atomically create owned collision sentinel");
+        fs::create_dir(sentinel.join("nested")).expect("create nested sentinel directory");
+        fs::write(sentinel.join("nested/preserved.bin"), b"preserve me\n")
+            .expect("write nested sentinel content");
+        let before = fixture_tree_snapshot(&sentinel).expect("snapshot collision sentinel");
+
+        let retry = regression.path("owned-retry");
+        let attempts = Cell::new(0usize);
+        let fixture = OwnedFixtureRoot::create_with_candidate_source(|attempt| {
+            attempts.set(attempts.get() + 1);
+            match attempt {
+                0 => sentinel.clone(),
+                1 => retry.clone(),
+                _ => regression.path(&format!("unexpected-retry-{attempt}")),
             }
-        }
+        })
+        .expect("retry collision without changing the pre-existing candidate");
+
+        assert_eq!(attempts.get(), 2, "allocator must retry exactly once");
+        assert_ne!(fixture.root(), sentinel.as_path());
+        assert_eq!(fixture.root(), retry.as_path());
+        fs::write(fixture.path("owned.txt"), b"owned\n")
+            .expect("write only inside newly owned fixture root");
+        let owned_root = fixture.root().to_path_buf();
+        fixture
+            .cleanup()
+            .expect("explicitly remove newly owned retry root");
+        assert!(!owned_root.exists(), "owned retry root must be removed");
+
+        assert!(sentinel.is_dir(), "collision sentinel must remain present");
+        let after = fixture_tree_snapshot(&sentinel).expect("resnapshot collision sentinel");
+        assert_eq!(after, before, "collision sentinel changed during retry");
+        fs::remove_dir_all(&sentinel).expect("remove regression-owned collision sentinel");
+        regression
+            .cleanup()
+            .expect("remove collision regression parent");
+    }
+
+    #[test]
+    fn owned_fixture_root_cleanup_is_non_panicking_during_unwind() {
+        const SENTINEL_PANIC: &str = "owned fixture unwind sentinel";
+
+        let unrelated = OwnedFixtureRoot::create("unwind-unrelated")
+            .expect("atomically create unrelated preservation fixture");
+        fs::write(unrelated.path("preserved.txt"), b"unrelated\n")
+            .expect("write unrelated sentinel content");
+        let unrelated_before =
+            fixture_tree_snapshot(unrelated.root()).expect("snapshot unrelated fixture");
+
+        let fixture =
+            OwnedFixtureRoot::create("unwind").expect("atomically create owned unwind fixture");
+        fs::create_dir(fixture.path("nested")).expect("create nested unwind directory");
+        fs::write(fixture.path("nested/file.txt"), b"owned\n").expect("write nested unwind file");
+        let root = fixture.root().to_path_buf();
+        let panic = catch_unwind(AssertUnwindSafe(|| {
+            let _fixture = fixture;
+            std::panic::panic_any(SENTINEL_PANIC);
+        }))
+        .expect_err("sentinel panic must escape the fixture scope");
+
+        assert_eq!(
+            panic.downcast_ref::<&str>().copied(),
+            Some(SENTINEL_PANIC),
+            "fixture Drop replaced the exact sentinel panic payload"
+        );
+        assert!(
+            !root.exists(),
+            "Drop must remove the exact owned unwind root"
+        );
+        assert_eq!(
+            fixture_tree_snapshot(unrelated.root()).expect("resnapshot unrelated fixture"),
+            unrelated_before,
+            "unwind cleanup touched an unrelated owned path"
+        );
+        unrelated
+            .cleanup()
+            .expect("remove unrelated preservation fixture");
+    }
+
+    #[test]
+    fn owned_fixture_root_explicit_cleanup_surfaces_errors() {
+        let successful = OwnedFixtureRoot::create("cleanup-success")
+            .expect("atomically create successful cleanup fixture");
+        fs::write(successful.path("nested.txt"), b"owned\n")
+            .expect("write successful cleanup content");
+        let successful_root = successful.root().to_path_buf();
+        successful.cleanup().expect("explicit cleanup must succeed");
+        assert!(!successful_root.exists());
+
+        let unrelated = OwnedFixtureRoot::create("cleanup-unrelated")
+            .expect("atomically create cleanup preservation fixture");
+        fs::write(unrelated.path("preserved.txt"), b"unrelated\n")
+            .expect("write cleanup preservation content");
+        let unrelated_before =
+            fixture_tree_snapshot(unrelated.root()).expect("snapshot cleanup preservation fixture");
+
+        let failing = OwnedFixtureRoot::create("cleanup-error")
+            .expect("atomically create failing cleanup fixture");
+        fs::write(failing.path("nested.txt"), b"owned\n").expect("write failing cleanup content");
+        let failing_root = failing.root().to_path_buf();
+        let error = failing
+            .cleanup_with(|path| {
+                assert_eq!(path, failing_root.as_path());
+                Err(io::Error::new(
+                    ErrorKind::PermissionDenied,
+                    "injected normal-cleanup failure",
+                ))
+            })
+            .expect_err("normal cleanup error must be returned");
+        assert_eq!(error.kind(), ErrorKind::PermissionDenied);
+        assert_eq!(error.to_string(), "injected normal-cleanup failure");
+        assert!(
+            !failing_root.exists(),
+            "best-effort Drop must remain non-panicking after returned cleanup error"
+        );
+        assert_eq!(
+            fixture_tree_snapshot(unrelated.root())
+                .expect("resnapshot cleanup preservation fixture"),
+            unrelated_before,
+            "cleanup error handling touched an unrelated owned path"
+        );
+        unrelated
+            .cleanup()
+            .expect("remove cleanup preservation fixture");
     }
 
     #[cfg(unix)]
@@ -1892,10 +2188,11 @@ mod tests {
 
     #[test]
     fn repository_evidence_requires_normalized_contained_regular_files_without_git() {
-        let root = plain_root("containment");
-        fs::create_dir_all(root.join("docs")).expect("create evidence directory");
-        fs::write(root.join("docs/evidence.md"), b"evidence\n").expect("write evidence");
-        require_existing_repository_file(&root, "docs/evidence.md")
+        let fixture = OwnedFixtureRoot::create("containment")
+            .expect("atomically create owned containment fixture");
+        fs::create_dir_all(fixture.path("docs")).expect("create evidence directory");
+        fs::write(fixture.path("docs/evidence.md"), b"evidence\n").expect("write evidence");
+        require_existing_repository_file(fixture.root(), "docs/evidence.md")
             .expect("source-archive evidence does not require .git");
 
         for (reference, expected) in [
@@ -1908,24 +2205,31 @@ mod tests {
             ("docs/missing.md", "does not exist"),
             ("docs", "not a regular file"),
         ] {
-            let error = require_existing_repository_file(&root, reference)
+            let error = require_existing_repository_file(fixture.root(), reference)
                 .expect_err("invalid evidence reference must fail");
             assert!(error.contains(expected), "unexpected error: {error}");
         }
-        fs::remove_dir_all(root).expect("remove release reference fixture");
+        fixture
+            .cleanup()
+            .expect("remove owned release reference fixture");
     }
 
     #[cfg(any(unix, windows))]
     #[test]
     fn repository_evidence_rejects_symlinks_and_symlink_escapes() {
-        let root = plain_root("symlink-containment");
-        let outside = plain_root("outside");
+        let fixture = OwnedFixtureRoot::create("symlink-containment")
+            .expect("atomically create owned symlink-containment fixture");
+        let root = fixture.path("repository");
+        let outside = fixture.path("outside");
+        fs::create_dir(&root).expect("create simulated repository root");
+        fs::create_dir(&outside).expect("create outside-repository fixture path");
         fs::write(root.join("inside.md"), b"inside\n").expect("write inside evidence");
         fs::write(outside.join("outside.md"), b"outside\n").expect("write outside evidence");
 
         if !create_file_symlink(Path::new("inside.md"), &root.join("inside-link.md")) {
-            fs::remove_dir_all(root).expect("remove release reference fixture");
-            fs::remove_dir_all(outside).expect("remove outside fixture");
+            fixture
+                .cleanup()
+                .expect("remove owned symlink-containment fixture");
             return;
         }
         let error = require_existing_repository_file(&root, "inside-link.md")
@@ -1937,8 +2241,9 @@ mod tests {
                 .expect_err("outside evidence symlink must fail");
             assert!(error.contains("symbolic-link escape outside the repository"));
         }
-        fs::remove_dir_all(root).expect("remove release reference fixture");
-        fs::remove_dir_all(outside).expect("remove outside fixture");
+        fixture
+            .cleanup()
+            .expect("remove owned symlink-containment fixture");
     }
 
     #[test]
@@ -2031,22 +2336,25 @@ mod tests {
 
     #[test]
     fn pinned_base_requires_existing_commit_ancestor() {
-        let root = git_root("objects");
-        let base = git(&root, &["rev-parse", "HEAD"]);
-        fs::write(root.join("fixture.txt"), b"head\n").expect("write head fixture");
-        git(&root, &["commit", "-am", "head"]);
-        verify_pinned_base_commit(&root, &base).expect("base commit is an ancestor of HEAD");
+        let fixture = git_root("objects");
+        let base = git(fixture.root(), &["rev-parse", "HEAD"]);
+        fs::write(fixture.path("fixture.txt"), b"head\n").expect("write head fixture");
+        git(fixture.root(), &["commit", "-am", "head"]);
+        verify_pinned_base_commit(fixture.root(), &base)
+            .expect("base commit is an ancestor of HEAD");
 
         let nonexistent = "0000000000000000000000000000000000000000";
-        let error = verify_pinned_base_commit(&root, nonexistent)
+        let error = verify_pinned_base_commit(fixture.root(), nonexistent)
             .expect_err("nonexistent object must fail");
         assert!(error.contains("does not resolve to a Git object"));
 
-        fs::write(root.join("blob.txt"), b"blob\n").expect("write blob fixture");
-        let blob = git(&root, &["hash-object", "-w", "blob.txt"]);
-        let error = verify_pinned_base_commit(&root, &blob).expect_err("blob must fail");
+        fs::write(fixture.path("blob.txt"), b"blob\n").expect("write blob fixture");
+        let blob = git(fixture.root(), &["hash-object", "-w", "blob.txt"]);
+        let error = verify_pinned_base_commit(fixture.root(), &blob).expect_err("blob must fail");
         assert!(error.contains("not a commit"));
-        fs::remove_dir_all(root).expect("remove release manifest fixture");
+        fixture
+            .cleanup()
+            .expect("remove owned release manifest Git fixture");
     }
 
     #[test]
@@ -2055,30 +2363,32 @@ mod tests {
             .expect_err("malformed object ID must fail before Git access");
         assert!(malformed.contains("malformed pinned base revision"));
 
-        let root = git_root("nonancestor");
-        git(&root, &["checkout", "-b", "side"]);
-        fs::write(root.join("side.txt"), b"side\n").expect("write side fixture");
-        git(&root, &["add", "."]);
-        git(&root, &["commit", "-m", "side"]);
-        let side = git(&root, &["rev-parse", "HEAD"]);
-        git(&root, &["checkout", "main"]);
-        fs::write(root.join("main.txt"), b"main\n").expect("write main fixture");
-        git(&root, &["add", "."]);
-        git(&root, &["commit", "-m", "main"]);
-        let error = verify_pinned_base_commit(&root, &side).expect_err("nonancestor must fail");
+        let fixture = git_root("nonancestor");
+        git(fixture.root(), &["checkout", "-b", "side"]);
+        fs::write(fixture.path("side.txt"), b"side\n").expect("write side fixture");
+        git(fixture.root(), &["add", "."]);
+        git(fixture.root(), &["commit", "-m", "side"]);
+        let side = git(fixture.root(), &["rev-parse", "HEAD"]);
+        git(fixture.root(), &["checkout", "main"]);
+        fs::write(fixture.path("main.txt"), b"main\n").expect("write main fixture");
+        git(fixture.root(), &["add", "."]);
+        git(fixture.root(), &["commit", "-m", "main"]);
+        let error =
+            verify_pinned_base_commit(fixture.root(), &side).expect_err("nonancestor must fail");
         assert!(error.contains("is not an ancestor"));
-        fs::remove_dir_all(&root).expect("remove release manifest fixture");
+        fixture
+            .cleanup()
+            .expect("remove owned release manifest Git fixture");
 
-        let archive = std::env::temp_dir().join(format!(
-            "aerocodex-release-archive-{}-{}",
-            std::process::id(),
-            TEST_COUNTER.fetch_add(1, Ordering::Relaxed)
-        ));
-        fs::create_dir_all(&archive).expect("create source archive fixture");
-        let error = verify_pinned_base_commit(&archive, "1111111111111111111111111111111111111111")
-            .expect_err("source archive must fail");
+        let archive = OwnedFixtureRoot::create("source-archive")
+            .expect("atomically create owned source archive fixture");
+        let error =
+            verify_pinned_base_commit(archive.root(), "1111111111111111111111111111111111111111")
+                .expect_err("source archive must fail");
         assert!(error.contains("source archives without .git cannot pass"));
-        fs::remove_dir_all(archive).expect("remove source archive fixture");
+        archive
+            .cleanup()
+            .expect("remove owned source archive fixture");
     }
 
     #[test]
@@ -2363,7 +2673,9 @@ mod tests {
         let control = AuthorityFixture::new("control");
         verify_authority_contract(control.root())
             .expect("canonical new-authority-only disposable repository must pass");
-        control.cleanup();
+        control
+            .cleanup()
+            .expect("remove owned canonical authority fixture");
 
         let cases = [
             AuthorityNegativeCase {
@@ -2485,7 +2797,9 @@ mod tests {
                 Ok(()) => panic!("negative authority case unexpectedly passed: {}", case.name),
             };
             assert_discriminating_error(case.name, &error, case.expected);
-            fixture.cleanup();
+            fixture
+                .cleanup()
+                .expect("remove owned negative authority fixture");
         }
     }
 }
