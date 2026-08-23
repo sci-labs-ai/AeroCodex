@@ -101,6 +101,17 @@ function Test-AllOrSourceArchive {
     }
 }
 
+function Test-WorkspaceOrSourceArchive {
+    if ($script:InGitCheckout) {
+        cargo test --locked --workspace --all-targets --all-features
+    } else {
+        Write-FriendTestInfo "source archive omits Git history; skipping the two Git-history-only xtask fixtures"
+        cargo test --locked --workspace --all-targets --all-features -- `
+            --skip release_identity::tests::complete_public_verifier_rejects_reported_document_bypasses `
+            --skip release_identity::tests::production_command_authenticates_exact_objects_and_both_merge_parents
+    }
+}
+
 function Test-ReleaseIdentityOrArchive {
     if ($script:InGitCheckout) {
         cargo run --locked -p xtask -- verify-release-identity
@@ -140,7 +151,7 @@ Invoke-FriendTestStep "cargo clippy --locked --workspace --all-targets --all-fea
     cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 }
 Invoke-FriendTestStep "cargo test --locked --workspace --all-targets --all-features" {
-    cargo test --locked --workspace --all-targets --all-features
+    Test-WorkspaceOrSourceArchive
 }
 Invoke-FriendTestStep "cargo run --locked -p aero-codex-cli -- version --json" {
     Invoke-PublicCli version --json

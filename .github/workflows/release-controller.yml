@@ -49,19 +49,29 @@ jobs:
           tag = request["tag"]
           target = request["target"]
           if kind == "candidate":
-              if tag != "v0.1.0-alpha.1-rc.1" or target != "self":
-                  raise SystemExit("candidate request must create rc.1 at the request merge commit")
+              if not re.fullmatch(r"v0\.1\.0-alpha\.1-rc\.[1-9][0-9]*", tag) or target != "self":
+                  raise SystemExit("candidate request must create a numbered RC tag at the request merge commit")
               commit = sys.argv[1]
           elif kind == "final":
               if tag != "v0.1.0-alpha.1" or not re.fullmatch(r"[0-9a-f]{40}", target):
                   raise SystemExit("final request must name the exact reviewed RC commit")
               commit = target
-              rc_ref = subprocess.check_output(
-                  ["gh", "api", f"repos/{os.environ['GITHUB_REPOSITORY']}/git/ref/tags/v0.1.0-alpha.1-rc.1", "--jq", ".object.sha"],
+              rc_rows = subprocess.check_output(
+                  [
+                      "gh", "api", "--paginate",
+                      f"repos/{os.environ['GITHUB_REPOSITORY']}/git/matching-refs/tags/v0.1.0-alpha.1-rc.",
+                      "--jq", '.[] | select(.object.type == "commit") | [.ref, .object.sha] | @tsv',
+                  ],
                   text=True,
-              ).strip()
-              if rc_ref != commit:
-                  raise SystemExit(f"final target {commit} does not equal RC tag target {rc_ref}")
+              ).splitlines()
+              matching_rc_tags = []
+              for row in rc_rows:
+                  ref, sha = row.split("\t")
+                  candidate_tag = ref.removeprefix("refs/tags/")
+                  if re.fullmatch(r"v0\.1\.0-alpha\.1-rc\.[1-9][0-9]*", candidate_tag) and sha == commit:
+                      matching_rc_tags.append(candidate_tag)
+              if not matching_rc_tags:
+                  raise SystemExit(f"final target {commit} is not the target of a governed RC tag")
           else:
               raise SystemExit("release request kind must be candidate or final")
 
