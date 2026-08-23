@@ -96,6 +96,17 @@ verify_all_or_source_archive() {
   fi
 }
 
+test_workspace_or_source_archive() {
+  if [[ "${IN_GIT_CHECKOUT}" -eq 1 ]]; then
+    cargo test --locked --workspace --all-targets --all-features
+  else
+    info "source archive omits Git history; skipping the two Git-history-only xtask fixtures"
+    cargo test --locked --workspace --all-targets --all-features -- \
+      --skip release_identity::tests::complete_public_verifier_rejects_reported_document_bypasses \
+      --skip release_identity::tests::production_command_authenticates_exact_objects_and_both_merge_parents
+  fi
+}
+
 verify_release_identity_or_archive() {
   if [[ "${IN_GIT_CHECKOUT}" -eq 1 ]]; then
     cargo run --locked -p xtask -- verify-release-identity
@@ -128,7 +139,7 @@ run_step "cargo check --locked --workspace --all-targets --all-features" \
 run_step "cargo clippy --locked --workspace --all-targets --all-features -- -D warnings" \
   cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 run_step "cargo test --locked --workspace --all-targets --all-features" \
-  cargo test --locked --workspace --all-targets --all-features
+  test_workspace_or_source_archive
 run_step "cargo run --locked -p aero-codex-cli -- version --json" \
   run_public_cli version --json
 run_step "cargo run --locked -p aero-codex-cli -- formula status-report --json" \

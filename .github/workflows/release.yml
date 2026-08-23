@@ -308,7 +308,17 @@ jobs:
           spdx = json.loads((root / "aerocodex-0.1.0-alpha.1.spdx.json").read_text())
           provenance = json.loads((root / "aerocodex-0.1.0-alpha.1.intoto.jsonl").read_text())
           assert spdx["spdxVersion"] == "SPDX-2.3"
-          assert spdx["documentDescribes"]
+          assert len(spdx["packages"]) == 1
+          package_id = spdx["packages"][0]["SPDXID"]
+          describes = [
+              item for item in spdx["relationships"]
+              if item == {
+                  "spdxElementId": "SPDXRef-DOCUMENT",
+                  "relationshipType": "DESCRIBES",
+                  "relatedSpdxElement": package_id,
+              }
+          ]
+          assert len(describes) == 1
           assert provenance["_type"] == "https://in-toto.io/Statement/v1"
           definition = provenance["predicate"]["buildDefinition"]
           assert definition["externalParameters"]["ref"] == f"refs/tags/{tag}"
