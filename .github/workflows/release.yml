@@ -15,6 +15,11 @@ on:
         description: Exact governed commit object to package.
         required: true
         type: string
+      publish_release:
+        description: Publish the governed final release after every artifact gate passes.
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -25,6 +30,7 @@ permissions:
 env:
   AEROCODEX_RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
   AEROCODEX_RELEASE_COMMIT: ${{ inputs.release_commit || github.sha }}
+  AEROCODEX_PUBLISH_RELEASE: ${{ inputs.publish_release || false }}
 
 jobs:
   validate:
@@ -41,6 +47,10 @@ jobs:
           set -euo pipefail
           if [[ ! "${AEROCODEX_RELEASE_TAG}" =~ ^v0\.1\.0-alpha\.1(-rc\.[1-9][0-9]*)?$ ]]; then
             echo "unsupported release tag: ${AEROCODEX_RELEASE_TAG}" >&2
+            exit 1
+          fi
+          if [[ "${AEROCODEX_PUBLISH_RELEASE}" == "true" && "${AEROCODEX_RELEASE_TAG}" != "v0.1.0-alpha.1" ]]; then
+            echo "only the governed final tag may be published" >&2
             exit 1
           fi
           resolved="$(git rev-parse 'HEAD^{commit}')"
@@ -149,7 +159,7 @@ jobs:
           if ($formulas.formulas.Count -ne 12) { throw "executable formula count mismatch" }
           if ($selfCheck.passed -ne 14 -or $selfCheck.failed -ne 0) { throw "self-check count mismatch" }
           Compress-Archive -Path $bundlePath -DestinationPath "dist/${{ matrix.archive }}"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-${{ matrix.target }}
           path: dist/${{ matrix.archive }}
@@ -164,7 +174,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ env.AEROCODEX_RELEASE_COMMIT }}
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: release-*
           path: dist
@@ -202,7 +212,7 @@ jobs:
             dist/aerocodex-0.1.0-alpha.1-source.tar.gz
             dist/aerocodex-0.1.0-alpha.1-release-manifest.toml
           sbom-path: dist/aerocodex-0.1.0-alpha.1.spdx.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: aerocodex-release-bundle
           path: dist/*
@@ -237,7 +247,7 @@ jobs:
             shell_kind: unix
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: aerocodex-release-bundle
           path: download
@@ -288,7 +298,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: ${{ env.AEROCODEX_RELEASE_COMMIT }}
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: aerocodex-release-bundle
           path: download
@@ -349,18 +359,18 @@ jobs:
           PY
 
   draft:
-    name: Create or refresh governed draft release
+    name: Create or publish governed release
     needs: [validate-artifacts, verify-metadata]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
           ref: ${{ env.AEROCODEX_RELEASE_COMMIT }}
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: aerocodex-release-bundle
           path: dist
-      - name: Create or refresh draft GitHub Release
+      - name: Create, refresh, or publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -368,7 +378,23 @@ jobs:
           set -euo pipefail
           tag="${AEROCODEX_RELEASE_TAG}"
           if gh release view "$tag" >/dev/null 2>&1; then
+            is_draft="$(gh release view "$tag" --json isDraft --jq '.isDraft')"
+            if [[ "${AEROCODEX_PUBLISH_RELEASE}" != "true" && "$is_draft" != "true" ]]; then
+              echo "candidate release ${tag} is already public; refusing to mutate it" >&2
+              exit 1
+            fi
             gh release upload "$tag" dist/* --clobber
           else
             gh release create "$tag" dist/* --draft --verify-tag --title "AeroCodex ${tag}" --notes-file docs/release/v0.1.0-alpha.1-release-notes.md
+          fi
+          if [[ "${AEROCODEX_PUBLISH_RELEASE}" == "true" ]]; then
+            gh release edit "$tag" --draft=false --verify-tag --title "AeroCodex ${tag}" --notes-file docs/release/v0.1.0-alpha.1-release-notes.md
+            expected_draft=false
+          else
+            expected_draft=true
+          fi
+          actual_draft="$(gh release view "$tag" --json isDraft --jq '.isDraft')"
+          if [[ "$actual_draft" != "$expected_draft" ]]; then
+            echo "release draft state mismatch: expected ${expected_draft}, found ${actual_draft}" >&2
+            exit 1
           fi
