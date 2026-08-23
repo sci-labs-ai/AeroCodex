@@ -23,6 +23,7 @@ jobs:
     outputs:
       tag: ${{ steps.request.outputs.tag }}
       commit: ${{ steps.request.outputs.commit }}
+      publish: ${{ steps.request.outputs.publish }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -52,6 +53,7 @@ jobs:
               if not re.fullmatch(r"v0\.1\.0-alpha\.1-rc\.[1-9][0-9]*", tag) or target != "self":
                   raise SystemExit("candidate request must create a numbered RC tag at the request merge commit")
               commit = sys.argv[1]
+              publish = "false"
           elif kind == "final":
               if tag != "v0.1.0-alpha.1" or not re.fullmatch(r"[0-9a-f]{40}", target):
                   raise SystemExit("final request must name the exact reviewed RC commit")
@@ -72,12 +74,14 @@ jobs:
                       matching_rc_tags.append(candidate_tag)
               if not matching_rc_tags:
                   raise SystemExit(f"final target {commit} is not the target of a governed RC tag")
+              publish = "true"
           else:
               raise SystemExit("release request kind must be candidate or final")
 
           subprocess.run(["git", "cat-file", "-e", f"{commit}^{{commit}}"], check=True)
           print(f"tag={tag}")
           print(f"commit={commit}")
+          print(f"publish={publish}")
           PY
 
   tag:
@@ -117,3 +121,4 @@ jobs:
     with:
       release_tag: ${{ needs.validate.outputs.tag }}
       release_commit: ${{ needs.validate.outputs.commit }}
+      publish_release: ${{ needs.validate.outputs.publish == 'true' }}
