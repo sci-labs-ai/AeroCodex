@@ -126,6 +126,14 @@ verify_release_identity_or_archive() {
   info "downloaded binary commit and manifest hash match the source archive"
 }
 
+verify_release_manifest_or_archive() {
+  if [[ "${IN_GIT_CHECKOUT}" -eq 1 ]]; then
+    cargo run --locked -p xtask -- verify-release-manifest
+  else
+    cargo run --locked -p xtask -- verify-release-manifest-source-archive
+  fi
+}
+
 run_step "git status --short" \
   source_status
 run_step "git diff --check" \
@@ -149,7 +157,7 @@ run_step "cargo run --locked -p aero-codex-cli -- self-check --json" \
 run_step "cargo run --locked -p xtask -- verify --all" \
   verify_all_or_source_archive
 run_step "cargo run --locked -p xtask -- verify-release-manifest" \
-  cargo run --locked -p xtask -- verify-release-manifest
+  verify_release_manifest_or_archive
 run_step "cargo run --locked -p xtask -- verify-release-identity" \
   verify_release_identity_or_archive
 run_step "cargo run --locked -p xtask -- verify-generated" \

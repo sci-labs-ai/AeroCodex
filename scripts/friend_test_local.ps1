@@ -132,6 +132,14 @@ function Test-ReleaseIdentityOrArchive {
     Write-FriendTestInfo "downloaded binary commit and manifest hash match the source archive"
 }
 
+function Test-ReleaseManifestOrArchive {
+    if ($script:InGitCheckout) {
+        cargo run --locked -p xtask -- verify-release-manifest
+    } else {
+        cargo run --locked -p xtask -- verify-release-manifest-source-archive
+    }
+}
+
 Invoke-FriendTestStep "git status --short" {
     Test-SourceStatus
 }
@@ -166,7 +174,7 @@ Invoke-FriendTestStep "cargo run --locked -p xtask -- verify --all" {
     Test-AllOrSourceArchive
 }
 Invoke-FriendTestStep "cargo run --locked -p xtask -- verify-release-manifest" {
-    cargo run --locked -p xtask -- verify-release-manifest
+    Test-ReleaseManifestOrArchive
 }
 Invoke-FriendTestStep "cargo run --locked -p xtask -- verify-release-identity" {
     Test-ReleaseIdentityOrArchive

@@ -549,6 +549,10 @@ fn main() {
             let root = repo_root();
             release_manifest::verify_release_manifest(&root)
         }
+        ["verify-release-manifest-source-archive"] => {
+            let root = repo_root();
+            release_manifest::verify_release_manifest_source_archive(&root)
+        }
         ["verify-release-identity"] => {
             let root = repo_root();
             release_identity::verify_release_identity(&root)
@@ -936,6 +940,7 @@ fn verify_source_archive_at_root(root: &Path) -> Result<(), String> {
     verify_equation_inventory(root)?;
     verify_equation_batch_scaffold(root)?;
     verify_beta1(root)?;
+    release_manifest::verify_release_manifest_source_archive(root)?;
     release_slice_validation::verify_release_slice_validation(root)?;
     Ok(())
 }

@@ -239,10 +239,24 @@ struct CliDispatchFormula {
 }
 
 pub fn verify_release_manifest(root: &Path) -> Result<(), String> {
+    verify_release_manifest_with_revision(root, true)
+}
+
+pub fn verify_release_manifest_source_archive(root: &Path) -> Result<(), String> {
+    verify_release_manifest_with_revision(root, false)
+}
+
+fn verify_release_manifest_with_revision(
+    root: &Path,
+    require_revision: bool,
+) -> Result<(), String> {
     verify_authority_contract(root)?;
     verify_manifest_sha256_sidecar(root)?;
     let manifest = load_release_manifest(root)?;
-    verify_pinned_base_commit(root, &manifest.base_commit)?;
+    validate_pinned_base_commit_syntax(&manifest.base_commit)?;
+    if require_revision {
+        verify_pinned_base_commit(root, &manifest.base_commit)?;
+    }
 
     verify_workspace_contract(root, &manifest)?;
 
@@ -646,15 +660,7 @@ fn git_error(output: &Output) -> String {
 }
 
 fn verify_pinned_base_commit(root: &Path, base_commit: &str) -> Result<(), String> {
-    if base_commit.len() != 40
-        || !base_commit
-            .bytes()
-            .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
-    {
-        return Err(format!(
-            "malformed pinned base revision `{base_commit}`: expected a 40-character lowercase Git object ID"
-        ));
-    }
+    validate_pinned_base_commit_syntax(base_commit)?;
 
     let worktree = git_output(root, &["rev-parse", "--is-inside-work-tree"])?;
     if !worktree.status.success() || String::from_utf8_lossy(&worktree.stdout).trim() != "true" {
@@ -691,6 +697,19 @@ fn verify_pinned_base_commit(root: &Path, base_commit: &str) -> Result<(), Strin
             git_error(&ancestor)
         )),
     }
+}
+
+fn validate_pinned_base_commit_syntax(base_commit: &str) -> Result<(), String> {
+    if base_commit.len() != 40
+        || !base_commit
+            .bytes()
+            .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+    {
+        return Err(format!(
+            "malformed pinned base revision `{base_commit}`: expected a 40-character lowercase Git object ID"
+        ));
+    }
+    Ok(())
 }
 
 #[derive(Debug, Default)]
