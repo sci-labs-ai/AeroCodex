@@ -118,11 +118,17 @@ verify_release_identity_or_archive() {
   fi
   local version_json actual_commit actual_manifest expected_manifest
   version_json="$("${FRIEND_BINARY}" version --json)"
-  actual_commit="$(printf '%s' "${version_json}" | sed -n 's/.*"git_commit":"\([^"]*\)".*/\1/p')"
+  actual_commit="$(printf '%s' "${version_json}" | sed -n 's/.*"build_commit":"\([^"]*\)".*/\1/p')"
   actual_manifest="$(printf '%s' "${version_json}" | sed -n 's/.*"release_manifest_sha256":"\([0-9a-f]*\)".*/\1/p')"
   expected_manifest="$(sed -n 's/^\([0-9a-f]\{64\}\)  release\/release-manifest.toml$/\1/p' release/release-manifest.sha256)"
-  test "${actual_commit}" = "${EXPECTED_COMMIT}"
-  test "${actual_manifest}" = "${expected_manifest}"
+  if [[ "${actual_commit}" != "${EXPECTED_COMMIT}" ]]; then
+    info "ERROR: downloaded binary build_commit=${actual_commit:-missing}, expected ${EXPECTED_COMMIT}"
+    return 1
+  fi
+  if [[ "${actual_manifest}" != "${expected_manifest}" ]]; then
+    info "ERROR: downloaded binary manifest hash=${actual_manifest:-missing}, expected ${expected_manifest}"
+    return 1
+  fi
   info "downloaded binary commit and manifest hash match the source archive"
 }
 
@@ -131,6 +137,18 @@ verify_release_manifest_or_archive() {
     cargo run --locked -p xtask -- verify-release-manifest
   else
     cargo run --locked -p xtask -- verify-release-manifest-source-archive
+  fi
+}
+
+verify_generated_or_source_archive() {
+  if [[ "${IN_GIT_CHECKOUT}" -eq 1 ]]; then
+    cargo run --locked -p xtask -- verify-generated
+  else
+    cargo run --locked -p xtask -- equation-batch report --all-manifests \
+      --out generated/equation_batch_status_report.json --check
+    cargo run --locked -p xtask -- verify-release-slice-validation
+    cargo run --locked -p xtask -- formula-registry check
+    cargo run --locked -p xtask -- verify-checksums
   fi
 }
 
@@ -161,7 +179,7 @@ run_step "cargo run --locked -p xtask -- verify-release-manifest" \
 run_step "cargo run --locked -p xtask -- verify-release-identity" \
   verify_release_identity_or_archive
 run_step "cargo run --locked -p xtask -- verify-generated" \
-  cargo run --locked -p xtask -- verify-generated
+  verify_generated_or_source_archive
 run_step "cargo run --locked -p xtask -- dependency-policy" \
   cargo run --locked -p xtask -- dependency-policy
 run_shell_step "RUSTDOCFLAGS=\"-D warnings\" cargo doc --locked --workspace --all-features --no-deps" \
