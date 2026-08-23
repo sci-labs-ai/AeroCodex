@@ -123,8 +123,8 @@ function Test-ReleaseIdentityOrArchive {
     $version = (& $script:FriendBinary version --json | Out-String) | ConvertFrom-Json
     if ($LASTEXITCODE -ne 0) { throw "downloaded binary version command failed" }
     $expectedManifest = ((Get-Content -Raw release/release-manifest.sha256) -split '\s+')[0]
-    if ($version.git_commit -ne $script:ExpectedCommit) {
-        throw "downloaded binary commit does not match the source archive"
+    if ($version.build_commit -ne $script:ExpectedCommit) {
+        throw "downloaded binary build_commit does not match the source archive: actual=$($version.build_commit) expected=$($script:ExpectedCommit)"
     }
     if ($version.release_manifest_sha256 -ne $expectedManifest) {
         throw "downloaded binary manifest hash does not match the source archive"
@@ -137,6 +137,18 @@ function Test-ReleaseManifestOrArchive {
         cargo run --locked -p xtask -- verify-release-manifest
     } else {
         cargo run --locked -p xtask -- verify-release-manifest-source-archive
+    }
+}
+
+function Test-GeneratedOrSourceArchive {
+    if ($script:InGitCheckout) {
+        cargo run --locked -p xtask -- verify-generated
+    } else {
+        cargo run --locked -p xtask -- equation-batch report --all-manifests `
+            --out generated/equation_batch_status_report.json --check
+        cargo run --locked -p xtask -- verify-release-slice-validation
+        cargo run --locked -p xtask -- formula-registry check
+        cargo run --locked -p xtask -- verify-checksums
     }
 }
 
@@ -180,7 +192,7 @@ Invoke-FriendTestStep "cargo run --locked -p xtask -- verify-release-identity" {
     Test-ReleaseIdentityOrArchive
 }
 Invoke-FriendTestStep "cargo run --locked -p xtask -- verify-generated" {
-    cargo run --locked -p xtask -- verify-generated
+    Test-GeneratedOrSourceArchive
 }
 Invoke-FriendTestStep "cargo run --locked -p xtask -- dependency-policy" {
     cargo run --locked -p xtask -- dependency-policy
