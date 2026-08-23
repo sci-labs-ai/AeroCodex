@@ -69,10 +69,10 @@ function Test-SourceStatus {
     if ($script:InGitCheckout) {
         git status --short
     } else {
-        if (-not (Test-Path Cargo.lock) -or -not (Test-Path release/release-manifest.toml)) {
-            throw "source archive is missing the committed lockfile or release manifest"
+        if (-not (Test-Path Cargo.lock) -or -not (Test-Path release/release-manifest.sha256)) {
+            throw "source archive is missing the committed lockfile or manifest sidecar"
         }
-        Write-FriendTestInfo "source archive contains the committed lockfile and release manifest"
+        Write-FriendTestInfo "source archive contains the committed lockfile and manifest sidecar"
     }
 }
 

@@ -67,8 +67,8 @@ source_status() {
     git status --short
   else
     test -f Cargo.lock
-    test -f release/release-manifest.toml
-    info "source archive contains the committed lockfile and release manifest"
+    test -f release/release-manifest.sha256
+    info "source archive contains the committed lockfile and manifest sidecar"
   fi
 }
 
