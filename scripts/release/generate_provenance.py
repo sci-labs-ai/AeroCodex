@@ -22,6 +22,7 @@ def is_release_subject(path: Path) -> bool:
 parser = argparse.ArgumentParser()
 parser.add_argument("--dist", required=True)
 parser.add_argument("--commit", required=True)
+parser.add_argument("--tag", required=True)
 parser.add_argument("--run-id", required=True)
 parser.add_argument("--repository", required=True)
 parser.add_argument("--output", required=True)
@@ -42,8 +43,9 @@ statement = {
         "buildDefinition": {
             "buildType": "https://github.com/"
             + args.repository
-            + "/.github/workflows/release.yml@refs/tags/v0.1.0-alpha.1",
-            "externalParameters": {"ref": "refs/tags/v0.1.0-alpha.1"},
+            + "/.github/workflows/release.yml@"
+            + args.commit,
+            "externalParameters": {"ref": "refs/tags/" + args.tag},
             "internalParameters": {"locked": True, "releaseProfile": True},
             "resolvedDependencies": [
                 {

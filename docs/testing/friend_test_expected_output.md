@@ -2,6 +2,8 @@
 
 A successful run prints the friend-test header, the repository root, Rust toolchain versions, then sixteen numbered steps using the committed lockfile.
 
+Downloaded-artifact mode additionally prints `source archive mode`, the downloaded binary path, and confirmation that the binary's embedded commit and release-manifest hash match the source archive. Its numbered step labels remain stable so reports from checkout and archive modes can be compared directly.
+
 Representative skeleton:
 
 ```text

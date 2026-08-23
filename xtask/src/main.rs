@@ -492,6 +492,7 @@ fn main() {
 
     let result = match arg_refs.as_slice() {
         ["verify"] | ["verify", "--all"] => verify_all(),
+        ["verify-source-archive"] => verify_source_archive(),
         ["verify", "cards"] => {
             let root = repo_root();
             verify_schema(&root).and_then(|()| {
@@ -623,7 +624,7 @@ fn run_formula_registry_check(args: &[&str]) -> Result<(), String> {
 
 fn print_usage() {
     eprintln!(
-        "usage:\n  cargo run -p xtask -- verify --all\n  cargo run -p xtask -- verify cards\n  cargo run -p xtask -- verify source-registry\n  cargo run -p xtask -- verify data-registry\n  cargo run -p xtask -- verify status-vocabulary\n  cargo run -p xtask -- verify formula-vault\n  cargo run -p xtask -- verify equation-inventory\n  cargo run -p xtask -- verify beta1\n  cargo run -p xtask -- verify-release-manifest\n  cargo run -p xtask -- verify-release-identity\n  cargo run -p xtask -- verify-release-slice-validation\n  cargo run -p xtask -- verify-checksums\n  cargo run -p xtask -- generate-checksums\n  cargo run -p xtask -- verify-generated\n  cargo run -p xtask -- equation-batch plan --manifest equation-batches/m00-canonical-units.tsv [--json]\n  cargo run -p xtask -- equation-batch plan --all-manifests [--json]\n  cargo run -p xtask -- equation-batch report --all-manifests --out generated/equation_batch_status_report.json [--check]\n  cargo run -p xtask -- equation-batch generate --manifest equation-batches/m00-canonical-units.tsv --output-dir /tmp/acx-m00-probe [--json]\n  cargo run -p xtask -- equation-batch verify --manifest equation-batches/m00-canonical-units.tsv --output-dir /tmp/acx-m00-probe [--json] [--keep-output]\n  cargo run -p xtask -- equation-batch verify --all-manifests --output-dir /tmp/acx-equation-batch-probes [--json] [--check]\n  cargo run -p xtask -- formula-registry generate --out generated/formula_registry.json [--check]\n  cargo run -p xtask -- formula-registry generate-rust --out generated/rust/formula_registry.rs\n  cargo run -p xtask -- formula-registry check\n  cargo run -p xtask -- dependency-policy"
+        "usage:\n  cargo run -p xtask -- verify --all\n  cargo run -p xtask -- verify-source-archive\n  cargo run -p xtask -- verify cards\n  cargo run -p xtask -- verify source-registry\n  cargo run -p xtask -- verify data-registry\n  cargo run -p xtask -- verify status-vocabulary\n  cargo run -p xtask -- verify formula-vault\n  cargo run -p xtask -- verify equation-inventory\n  cargo run -p xtask -- verify beta1\n  cargo run -p xtask -- verify-release-manifest\n  cargo run -p xtask -- verify-release-identity\n  cargo run -p xtask -- verify-release-slice-validation\n  cargo run -p xtask -- verify-checksums\n  cargo run -p xtask -- generate-checksums\n  cargo run -p xtask -- verify-generated\n  cargo run -p xtask -- equation-batch plan --manifest equation-batches/m00-canonical-units.tsv [--json]\n  cargo run -p xtask -- equation-batch plan --all-manifests [--json]\n  cargo run -p xtask -- equation-batch report --all-manifests --out generated/equation_batch_status_report.json [--check]\n  cargo run -p xtask -- equation-batch generate --manifest equation-batches/m00-canonical-units.tsv --output-dir /tmp/acx-m00-probe [--json]\n  cargo run -p xtask -- equation-batch verify --manifest equation-batches/m00-canonical-units.tsv --output-dir /tmp/acx-m00-probe [--json] [--keep-output]\n  cargo run -p xtask -- equation-batch verify --all-manifests --output-dir /tmp/acx-equation-batch-probes [--json] [--check]\n  cargo run -p xtask -- formula-registry generate --out generated/formula_registry.json [--check]\n  cargo run -p xtask -- formula-registry generate-rust --out generated/rust/formula_registry.rs\n  cargo run -p xtask -- formula-registry check\n  cargo run -p xtask -- dependency-policy"
     );
 }
 
@@ -914,18 +915,28 @@ fn repo_root() -> PathBuf {
 
 fn verify_all() -> Result<(), String> {
     let root = repo_root();
-    verify_schema(&root)?;
-    let source_ids = verify_source_registry(&root)?;
-    verify_cards(&root, Some(&source_ids))?;
-    verify_data_registry(&root)?;
-    verify_status_vocabulary(&root)?;
-    verify_public_wording_guardrails(&root)?;
-    verify_formula_vault(&root)?;
-    verify_equation_inventory(&root)?;
-    verify_equation_batch_scaffold(&root)?;
-    verify_beta1(&root)?;
-    release_slice_validation::verify_release_slice_validation(&root)?;
+    verify_source_archive_at_root(&root)?;
     release_identity::verify_release_identity(&root)?;
+    Ok(())
+}
+
+fn verify_source_archive() -> Result<(), String> {
+    let root = repo_root();
+    verify_source_archive_at_root(&root)
+}
+
+fn verify_source_archive_at_root(root: &Path) -> Result<(), String> {
+    verify_schema(root)?;
+    let source_ids = verify_source_registry(root)?;
+    verify_cards(root, Some(&source_ids))?;
+    verify_data_registry(root)?;
+    verify_status_vocabulary(root)?;
+    verify_public_wording_guardrails(root)?;
+    verify_formula_vault(root)?;
+    verify_equation_inventory(root)?;
+    verify_equation_batch_scaffold(root)?;
+    verify_beta1(root)?;
+    release_slice_validation::verify_release_slice_validation(root)?;
     Ok(())
 }
 

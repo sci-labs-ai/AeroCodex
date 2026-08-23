@@ -1,0 +1,109 @@
+name: Governed release controller
+
+on:
+  push:
+    branches: [release/v0.1.0-alpha.1]
+    paths:
+      - release/release-request.toml
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+  artifact-metadata: write
+
+concurrency:
+  group: aerocodex-v0.1.0-alpha.1-release-controller
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate governed tag request
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.request.outputs.tag }}
+      commit: ${{ steps.request.outputs.commit }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Validate request schema and target
+        id: request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - "$GITHUB_SHA" >> "$GITHUB_OUTPUT" <<'PY'
+          import os, re, subprocess, sys, tomllib
+          from pathlib import Path
+
+          request = tomllib.loads(Path("release/release-request.toml").read_text())
+          expected_keys = {"schema", "kind", "tag", "target"}
+          if set(request) != expected_keys:
+              raise SystemExit(f"release request keys must be exactly {sorted(expected_keys)}")
+          if request["schema"] != "aerocodex.release_request.v1":
+              raise SystemExit("unsupported release request schema")
+
+          kind = request["kind"]
+          tag = request["tag"]
+          target = request["target"]
+          if kind == "candidate":
+              if tag != "v0.1.0-alpha.1-rc.1" or target != "self":
+                  raise SystemExit("candidate request must create rc.1 at the request merge commit")
+              commit = sys.argv[1]
+          elif kind == "final":
+              if tag != "v0.1.0-alpha.1" or not re.fullmatch(r"[0-9a-f]{40}", target):
+                  raise SystemExit("final request must name the exact reviewed RC commit")
+              commit = target
+              rc_ref = subprocess.check_output(
+                  ["gh", "api", f"repos/{os.environ['GITHUB_REPOSITORY']}/git/ref/tags/v0.1.0-alpha.1-rc.1", "--jq", ".object.sha"],
+                  text=True,
+              ).strip()
+              if rc_ref != commit:
+                  raise SystemExit(f"final target {commit} does not equal RC tag target {rc_ref}")
+          else:
+              raise SystemExit("release request kind must be candidate or final")
+
+          subprocess.run(["git", "cat-file", "-e", f"{commit}^{{commit}}"], check=True)
+          print(f"tag={tag}")
+          print(f"commit={commit}")
+          PY
+
+  tag:
+    name: Create exact governed tag
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create tag or verify an identical existing tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.validate.outputs.tag }}
+          RELEASE_COMMIT: ${{ needs.validate.outputs.commit }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          endpoint="repos/${GITHUB_REPOSITORY}/git/ref/tags/${RELEASE_TAG}"
+          if existing="$(gh api "$endpoint" --jq '.object.sha' 2>/dev/null)"; then
+            if [[ "$existing" != "$RELEASE_COMMIT" ]]; then
+              echo "existing tag ${RELEASE_TAG} points to ${existing}, expected ${RELEASE_COMMIT}" >&2
+              exit 1
+            fi
+          else
+            gh api --method POST "repos/${GITHUB_REPOSITORY}/git/refs" \
+              -f ref="refs/tags/${RELEASE_TAG}" \
+              -f sha="${RELEASE_COMMIT}" >/dev/null
+          fi
+
+  release:
+    name: Build and validate governed release
+    needs: [validate, tag]
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    uses: ./.github/workflows/release.yml
+    with:
+      release_tag: ${{ needs.validate.outputs.tag }}
+      release_commit: ${{ needs.validate.outputs.commit }}

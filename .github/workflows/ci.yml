@@ -51,6 +51,8 @@ jobs:
         run: cargo run --locked -p xtask -- verify-generated
       - name: Aggregate verification
         run: cargo run --locked -p xtask -- verify --all
+      - name: Source-archive governance verification
+        run: cargo run --locked -p xtask -- verify-source-archive
       - name: Dependency policy
         run: cargo run --locked -p xtask -- dependency-policy
       - name: Publishable package archives
