@@ -1,4 +1,4 @@
 schema = "aerocodex.release_request.v1"
 kind = "candidate"
-tag = "v0.1.0-alpha.1-rc.2"
+tag = "v0.1.0-alpha.1-rc.3"
 target = "self"
